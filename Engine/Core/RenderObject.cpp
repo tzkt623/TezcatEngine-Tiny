@@ -5,32 +5,43 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "Shader.h"
+#include "Material.h"
 
 
 namespace tezcat::Tiny::Core
 {
-	RenderObject::RenderObject():
+	RenderObject::RenderObject() :
 		m_Enable(true),
-		m_MasterObject(nullptr)
+		m_MasterObject(nullptr),
+		m_Material(nullptr)
 	{
 
 	}
 
 	RenderObject::~RenderObject()
 	{
-
+		m_MasterObject = nullptr;
+		m_Material = nullptr;
 	}
 
 	/// <summary>
 	/// 
 	/// </summary>
 
-	ROMesh::ROMesh():
+	ROMesh::ROMesh() :
 		m_VAO(nullptr),
 		m_Mesh(nullptr)
 	{
 
 	}
+
+	ROMesh::ROMesh(Mesh* mesh) :
+		m_VAO(nullptr),
+		m_Mesh(mesh)
+	{
+
+	}
+
 
 	ROMesh::~ROMesh()
 	{
@@ -40,6 +51,8 @@ namespace tezcat::Tiny::Core
 
 	void ROMesh::draw(Shader* shader)
 	{
+		shader->bindTextures(m_Material->allTexture());
+
 		m_VAO->bind();
 
 		auto transform = this->getMasterObject()->getTransform();

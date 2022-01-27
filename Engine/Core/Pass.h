@@ -6,6 +6,7 @@
 namespace tezcat::Tiny::Module
 {
 	class Camera;
+	class Material;
 }
 
 namespace tezcat::Tiny::Core
@@ -16,6 +17,7 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		Pass(Shader* program);
+		Pass(Module::Material* material);
 		~Pass();
 
 		void addRenderObject(RenderObject* renderObject);
@@ -32,6 +34,7 @@ namespace tezcat::Tiny::Core
 
 	private:
 		Shader* m_Shader;
+		Module::Material* m_Material;
 		std::list<RenderObject*> m_ObjectList;
 	};
 }

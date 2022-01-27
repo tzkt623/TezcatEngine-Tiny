@@ -249,19 +249,49 @@ namespace tezcat::Tiny::Core
 
 
 	//-------------------------------------------------------------------------
-	GUIDragFloat3::GUIDragFloat3(const std::u8string& name) :
+	GUIDragFloat::GUIDragFloat(const std::u8string& name) :
 		GUIWidget(name),
-		m_Data(),
 		m_Speed(0.1f),
 		m_Min(0.0f),
-		m_Max(0.0f)
+		m_Max(0.0f),
+		postFunction(GUIDragFloat::defaultPostFunction)
+	{
+
+	}
+
+	GUIDragFloat::~GUIDragFloat()
+	{
+		postFunction = nullptr;
+	}
+
+	//
+	GUIDragFloat2::GUIDragFloat2(const std::u8string& name) :
+		GUIDragFloat(name),
+		m_Data()
+	{
+
+	}
+
+	GUIDragFloat2::~GUIDragFloat2()
+	{
+	}
+
+	void GUIDragFloat2::onRender()
+	{
+		ImGui::DragFloat2(this->getName(), m_Data, m_Speed, m_Min, m_Max);
+		postFunction(m_Data);
+	}
+
+	//
+	GUIDragFloat3::GUIDragFloat3(const std::u8string& name) :
+		GUIDragFloat(name),
+		m_Data()
 	{
 
 	}
 
 	GUIDragFloat3::~GUIDragFloat3()
 	{
-		postFunction = nullptr;
 	}
 
 	void GUIDragFloat3::onRender()

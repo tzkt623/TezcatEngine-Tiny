@@ -5,7 +5,8 @@ namespace tezcat::Tiny::Module
 {
 	IMPLEMENT_DELEGATE_INSTANCE(CameraManager);
 
-	CameraManager::CameraManager()
+	CameraManager::CameraManager():
+		m_CameraWithName()
 	{
 		REGISTER_DELEGATE_INSTANCE(CameraManager);
 	}
@@ -25,7 +26,15 @@ namespace tezcat::Tiny::Module
 		m_CameraList.push_back(camera);
 	}
 
+	Camera* CameraManager::getMainCamera()
+	{
+		return m_CameraList[0];
+	}
 
+	Camera* CameraManager::getCamera(int index)
+	{
+		return m_CameraList[index];
+	}
 
 	Camera* CameraManager::getCamera(const std::string& name)
 	{

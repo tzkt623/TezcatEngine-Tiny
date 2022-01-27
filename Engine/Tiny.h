@@ -1,9 +1,10 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include "Engine.h"
 #include "GUI.h"
+
+#include "Texture.h"
+#include "Image.h"
 
 #include "SceneManager.h"
 #include "Scene.h"
@@ -28,3 +29,14 @@ using namespace tezcat::Tiny;
 using namespace tezcat::Tiny::Core;
 using namespace tezcat::Tiny::Module;
 using namespace tezcat::Tiny::Utility;
+
+#define TINY_ENGINE_ENTRY(resouce_loader)\
+int main()\
+{\
+	auto result = Engine::getInstance()->init(resouce_loader);\
+	if (result == 0)\
+	{\
+		Engine::getInstance()->run();\
+	}\
+	return result;\
+}

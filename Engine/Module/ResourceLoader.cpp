@@ -9,9 +9,16 @@ using namespace tezcat::Tiny;
 
 namespace tezcat::Tiny::Module
 {
+	ResourceLoader::~ResourceLoader()
+	{
+
+	}
+
 	void ResourceLoader::prepareResource(Core::Engine* engine)
 	{
 		auto shader = new Core::Shader("Default", 0);
+		shader->registerTextureName("texColor");
+
 		shader->attachShader("../Resource/Shaders/vert.glsl", GL_VERTEX_SHADER)
 			->attachShader("../Resource/Shaders/frag.glsl", GL_FRAGMENT_SHADER)
 			->apply();

@@ -1,15 +1,17 @@
 #include "Shader.h"
-
-#include <glad/glad.h>
 #include "Engine.h"
 #include "ShaderManager.h"
+#include "Texture.h"
 
 namespace tezcat::Tiny::Core
 {
-	Shader::Shader(const std::string& name, int orderID):
+	Shader::Shader(const std::string& name, int orderID) :
 		m_ProgramID(glCreateProgram()),
 		m_Name(name),
-		m_OrderID(orderID)
+		m_OrderID(orderID),
+		m_ViewMatrixID(0),
+		m_ModelMatrixID(0),
+		m_ProjectionMatrixID(0)
 	{
 
 	}
@@ -34,7 +36,17 @@ namespace tezcat::Tiny::Core
 		glUseProgram(m_ProgramID);
 	}
 
-	Shader* Shader::attachShader(ShaderBuilder *shader)
+	void Shader::bindTextures(const std::unordered_map<std::string, Core::Texture*>& allTexture)
+	{
+		int index = 0;
+		for (auto& pair : allTexture)
+		{
+			glActiveTexture(GL_TEXTURE0 + m_TextureID[pair.first]);
+			pair.second->bind();
+		}
+	}
+
+	Shader* Shader::attachShader(ShaderBuilder* shader)
 	{
 		glAttachShader(m_ProgramID, shader->getID());
 		return this;
@@ -65,7 +77,25 @@ namespace tezcat::Tiny::Core
 		m_ViewMatrixID = glGetUniformLocation(m_ProgramID, "VMatrix");
 		m_ModelMatrixID = glGetUniformLocation(m_ProgramID, "MMatrix");
 
-		Engine::getInstance()->getShaderManager()->addShader(this);
+		glUseProgram(m_ProgramID);
+		if (!m_TextureID.empty())
+		{
+			int index = 0;
+			for (auto& pair : m_TextureID)
+			{
+				auto id = glGetUniformLocation(m_ProgramID, pair.first.c_str());
+				glUniform1i(id, index++);
+				pair.second = id;
+			}
+		}
+		glUseProgram(0);
+
+		ShaderManager::getInstance()->addShader(this);
+	}
+
+	void Shader::registerTextureName(const std::string& textureTypeName)
+	{
+		m_TextureID[textureTypeName] = 0;
 	}
 
 	void Shader::setProjectionMatrix(const glm::mat4x4& matrix)

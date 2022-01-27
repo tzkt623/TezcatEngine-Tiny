@@ -3,8 +3,10 @@
 
 namespace tezcat::Tiny::Core
 {
+	IMPLEMENT_DELEGATE_INSTANCE(ShaderManager);
 	ShaderManager::ShaderManager()
 	{
+		REGISTER_DELEGATE_INSTANCE(ShaderManager);
 	}
 
 	ShaderManager::~ShaderManager()

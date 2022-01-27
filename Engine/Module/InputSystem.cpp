@@ -59,5 +59,21 @@ namespace tezcat::Tiny::Module
 		return glfwGetKey(m_Window, key) == GLFW_RELEASE;
 	}
 
+	bool InputSystem::getMouseButtonDown(int key)
+	{
+		return glfwGetMouseButton(m_Window, key) == GLFW_PRESS;
+	}
+
+	bool InputSystem::getMouseButtonUp(int key)
+	{
+		return glfwGetMouseButton(m_Window, key) == GLFW_RELEASE;
+	}
+
+	void InputSystem::getMousePosition(float& x, float& y)
+	{
+		glfwGetCursorPos(m_Window, &m_MouseX, &m_MouseY);
+		x = static_cast<float>(m_MouseX);
+		y = static_cast<float>(m_MouseY);
+	}
 }
 

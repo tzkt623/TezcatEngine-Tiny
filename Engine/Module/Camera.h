@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Engine.h"
-#include "Matrix.h"
+#include "CommonHead.h"
 
 namespace tezcat::Tiny::Module
 {
@@ -40,9 +40,7 @@ namespace tezcat::Tiny::Module
 		glm::mat4x4& getProjectionMatrix() { return m_ProjectionMatrix; }
 		glm::mat4x4& getViewMatrix() { return m_ViewMatrix; }
 
-		glm::vec3& getFront() { return m_Front; }
-		glm::vec3& getUp() { return m_Up; }
-
+	public:
 
 		int getDeep() const { return m_Deep; }
 		void setDeep(int val) { m_Deep = val; }
@@ -56,8 +54,15 @@ namespace tezcat::Tiny::Module
 		}
 
 	public:
+
+		glm::vec3& getFront() { return m_Front; }
+		glm::vec3& getUp() { return m_Up; }
+		glm::vec3& getRight() { return m_Right; }
+
+	public:
 		void update() override;
 		void sceneEnter(Scene* scene) override;
+		void rotateCamera(float offsetX, float offsetY, bool constrainPitch = true);
 
 	private:
 		void updateCameraVector();

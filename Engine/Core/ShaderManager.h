@@ -1,12 +1,14 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include "Tools.h"
 
 namespace tezcat::Tiny::Core
 {
 	class Shader;
 	class ShaderManager
 	{
+		CREATE_DELEGATE_INSTANCE(ShaderManager)
 	public:
 		ShaderManager();
 

@@ -114,6 +114,7 @@ namespace tezcat::Tiny::Core
 	void Renderer::init(Engine* engine)
 	{
 		m_GUI->init(engine);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 }

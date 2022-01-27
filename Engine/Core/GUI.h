@@ -100,7 +100,57 @@ namespace tezcat::Tiny::Core
 	};
 
 
-	class GUIDragFloat3 : public GUIWidget
+	class GUIDragFloat : public GUIWidget
+	{
+	public:
+		GUIDragFloat(const std::u8string& name);
+		virtual ~GUIDragFloat();
+
+		std::function<void(float* data)> postFunction;
+
+	protected:
+		void onUpdate() override {}
+
+	protected:
+		float m_Speed;
+		float m_Min;
+		float m_Max;
+
+	private:
+		static void defaultPostFunction(float* data) {}
+	};
+
+	class GUIDragFloat2 : public GUIDragFloat
+	{
+	public:
+		GUIDragFloat2(const std::u8string& name);
+		~GUIDragFloat2();
+
+		void setFloat2(float x, float y)
+		{
+			m_Data[0] = x;
+			m_Data[1] = y;
+		}
+
+		void setFloat2(float* v)
+		{
+			m_Data[0] = v[0];
+			m_Data[1] = v[1];
+		}
+
+		float* getFloat2()
+		{
+			return m_Data;
+		}
+
+	protected:
+		void onRender() override;
+
+	private:
+		float m_Data[2];
+	};
+
+	class GUIDragFloat3 : public GUIDragFloat
 	{
 	public:
 		GUIDragFloat3(const std::u8string& name);
@@ -113,22 +163,23 @@ namespace tezcat::Tiny::Core
 			m_Data[2] = z;
 		}
 
+		void setFloat3(float* v)
+		{
+			m_Data[0] = v[0];
+			m_Data[1] = v[1];
+			m_Data[2] = v[2];
+		}
+
 		float* getFloat3()
 		{
 			return m_Data;
 		}
 
-		std::function<void(float* data)> postFunction;
-
-	public:
+	protected:
 		void onRender() override;
-		void onUpdate() override {}
 
 	private:
 		float m_Data[3];
-		float m_Speed;
-		float m_Min;
-		float m_Max;
 	};
 
 	class GUIText : public GUIWidget
@@ -155,7 +206,10 @@ namespace tezcat::Tiny::Core
 	};
 
 
-
+	//--------------------------------------------------
+	//
+	//	GUI
+	//
 	class GUI
 	{
 		CREATE_DELEGATE_INSTANCE(GUI)

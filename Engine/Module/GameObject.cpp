@@ -57,6 +57,7 @@ namespace tezcat::Tiny::Module
 		if (m_RenderObject != nullptr)
 		{
 			m_RenderObject->setMasterObject(this);
+			m_RenderObject->setMaterial(m_Material);
 			m_RenderObject->apply();
 			Core::Engine::getInstance()->getRenderer()->dispatch(this);
 		}

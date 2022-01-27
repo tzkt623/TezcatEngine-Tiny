@@ -4,6 +4,7 @@
 namespace tezcat::Tiny::Module
 {
 	class GameObject;
+	class Material;
 }
 
 namespace tezcat::Tiny::Core
@@ -20,6 +21,11 @@ namespace tezcat::Tiny::Core
 
 		Module::GameObject* getMasterObject() const { return m_MasterObject; }
 		void setMasterObject(Module::GameObject* val) { m_MasterObject = val; }
+		void setMaterial(Module::Material* material)
+		{
+			m_Material = material;
+		}
+
 
 		bool setEnable() const { return m_Enable; }
 		void getEnable(bool val) { m_Enable = val; }
@@ -27,7 +33,9 @@ namespace tezcat::Tiny::Core
 	private:
 		bool m_Enable;
 
+	protected:
 		Module::GameObject* m_MasterObject;
+		Module::Material* m_Material;
 	};
 
 
@@ -36,15 +44,16 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		ROMesh();
-		ROMesh(Mesh* mesh) :m_VAO(nullptr) { m_Mesh = mesh; }
+		ROMesh(Mesh* mesh);
+
 		virtual ~ROMesh();
 
 		void draw(Shader* shader) override;
 		void apply() override;
 
 	private:
-		Mesh* m_Mesh;
 		RCVAO* m_VAO;
+		Mesh* m_Mesh;
 	};
 }
 

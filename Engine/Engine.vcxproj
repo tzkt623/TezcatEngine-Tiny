@@ -118,7 +118,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>E:\Github\TezTiny\Engine\ThirdParty\glad\include;E:\Github\TezTiny\Engine\ThirdParty;E:\Github\glfw\include;E:\Github\TezTiny\Engine\Core;E:\Github\TezTiny\Engine\Module;E:\Github\TezTiny\Engine\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Github\TezTiny\Engine\ThirdParty\glad\include;E:\Github\TezTiny\Engine\ThirdParty;E:\Github\glfw\include;E:\Github\TezTiny\Engine\Core;E:\Github\TezTiny\Engine\Module;E:\Github\TezTiny\Engine\Utility;E:\Github\TezTiny\Engine\Test;E:\Github\TezTiny\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\GUI.cpp" />
+    <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\Mesh.cpp" />
     <ClCompile Include="Core\Pass.cpp" />
     <ClCompile Include="Core\PassQueue.cpp" />
@@ -157,7 +159,7 @@
     <ClCompile Include="Core\ShaderManager.cpp" />
     <ClCompile Include="Core\RCVAO.cpp" />
     <ClCompile Include="Core\Statistic.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Core\Texture.cpp" />
     <ClCompile Include="Module\Camera.cpp" />
     <ClCompile Include="Module\CameraManager.cpp" />
     <ClCompile Include="Module\GameObject.cpp" />
@@ -168,10 +170,11 @@
     <ClCompile Include="Module\Scene.cpp" />
     <ClCompile Include="Module\SceneManager.cpp" />
     <ClCompile Include="Module\Transform.cpp" />
-    <ClCompile Include="MyGUI.cpp" />
-    <ClCompile Include="MyInputer.cpp" />
-    <ClCompile Include="MyResourceLoader.cpp" />
-    <ClCompile Include="MyScene.cpp" />
+    <ClCompile Include="Test\main.cpp" />
+    <ClCompile Include="Test\MyGUI.cpp" />
+    <ClCompile Include="Test\MyInputer.cpp" />
+    <ClCompile Include="Test\MyResourceLoader.cpp" />
+    <ClCompile Include="Test\MyScene.cpp" />
     <ClCompile Include="ThirdParty\glad\src\glad.c" />
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
@@ -184,11 +187,12 @@
     <ClCompile Include="Utility\Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\CommonHead.h" />
     <ClInclude Include="Core\Config.h" />
     <ClInclude Include="Core\Engine.h" />
+    <ClInclude Include="Core\GLHead.h" />
     <ClInclude Include="Core\GUI.h" />
-    <ClInclude Include="Core\ImageLoader.h" />
-    <ClInclude Include="Core\Matrix.h" />
+    <ClInclude Include="Core\Image.h" />
     <ClInclude Include="Core\Mesh.h" />
     <ClInclude Include="Core\Pass.h" />
     <ClInclude Include="Core\PassQueue.h" />
@@ -200,6 +204,7 @@
     <ClInclude Include="Core\ShaderManager.h" />
     <ClInclude Include="Core\RCVAO.h" />
     <ClInclude Include="Core\Statistic.h" />
+    <ClInclude Include="Core\Texture.h" />
     <ClInclude Include="Module\Camera.h" />
     <ClInclude Include="Module\CameraManager.h" />
     <ClInclude Include="Module\GameObject.h" />
@@ -210,10 +215,10 @@
     <ClInclude Include="Module\Scene.h" />
     <ClInclude Include="Module\SceneManager.h" />
     <ClInclude Include="Module\Transform.h" />
-    <ClInclude Include="MyGUI.h" />
-    <ClInclude Include="MyInputer.h" />
-    <ClInclude Include="MyResourceLoader.h" />
-    <ClInclude Include="MyScene.h" />
+    <ClInclude Include="Test\MyGUI.h" />
+    <ClInclude Include="Test\MyInputer.h" />
+    <ClInclude Include="Test\MyResourceLoader.h" />
+    <ClInclude Include="Test\MyScene.h" />
     <ClInclude Include="ThirdParty\glad\include\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\include\KHR\khrplatform.h" />
     <ClInclude Include="ThirdParty\glm\common.hpp" />
@@ -513,7 +518,6 @@
     <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\stb_image.h" />
     <ClInclude Include="Tiny.h" />
-    <ClInclude Include="Utility\IDGenerator.h" />
     <ClInclude Include="Utility\Tools.h" />
   </ItemGroup>
   <ItemGroup>

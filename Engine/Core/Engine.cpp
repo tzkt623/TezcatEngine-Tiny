@@ -2,11 +2,6 @@
 #include <vector>
 #include <initializer_list>
 
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include "Matrix.h"
 #include "Engine.h"
 #include "ShaderBuilder.h"
 #include "Shader.h"
@@ -15,7 +10,6 @@
 #include "RCVAO.h"
 #include "PassQueue.h"
 #include "RenderObject.h"
-#include "ImageLoader.h"
 #include "SceneManager.h"
 #include "ShaderManager.h"
 #include "CameraManager.h"
@@ -52,19 +46,20 @@ namespace tezcat::Tiny::Core
 		delete m_CameraManager;
 	}
 
-	int Engine::init(const std::u8string& windowName, int width, int height)
+	int Engine::init(Module::ResourceLoader* loader)
 	{
-		ScreenWidth = width;
-		ScreenHeight = height;
+		m_ResourceLoader = loader;
+		m_ResourceLoader->prepareEngine(this);
+
+		ScreenWidth = m_ResourceLoader->getWindowWidth();
+		ScreenHeight = m_ResourceLoader->getWindowHeight();
 
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		std::string str(windowName.begin(), windowName.end());
-
-		m_Window = glfwCreateWindow(ScreenWidth, ScreenHeight, str.c_str(), nullptr, nullptr);
+		m_Window = glfwCreateWindow(ScreenWidth, ScreenHeight, m_ResourceLoader->getName().c_str(), nullptr, nullptr);
 		if (m_Window == nullptr)
 		{
 			std::cout << "Failed to create GLFW window" << std::endl;
@@ -82,6 +77,13 @@ namespace tezcat::Tiny::Core
 		}
 
 		m_Renderer->init(this);
+
+		m_ResourceLoader->prepareResource(this);
+		m_ResourceLoader->prepareScene(this);
+
+		this->initInputSystem();
+		m_SceneManager->init();
+
 
 		return 0;
 	}
@@ -117,6 +119,11 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
+	void Engine::close()
+	{
+
+	}
+
 	void Engine::mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
 	{
 		Engine::getInstance()->getInputSystem()->mouseButtonCallBack(button, action, mods);
@@ -130,16 +137,5 @@ namespace tezcat::Tiny::Core
 	void Engine::mouseScrollPosCallBack(GLFWwindow* window, double xoffset, double yoffset)
 	{
 		Engine::getInstance()->getInputSystem()->mouseScrollPosCallBack(xoffset, yoffset);
-	}
-
-	void Engine::setOn(Module::ResourceLoader* loader)
-	{
-		m_ResourceLoader = loader;
-		m_ResourceLoader->prepareResource(this);
-		m_ResourceLoader->prepareEngine(this);
-		m_ResourceLoader->prepareScene(this);
-
-		this->initInputSystem();
-		m_SceneManager->init();
 	}
 }

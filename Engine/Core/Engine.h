@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "GLHead.h"
 
 struct GLFWwindow;
 
@@ -29,13 +30,11 @@ namespace tezcat::Tiny::Core
 		~Engine();
 
 	public:
-		int init(const std::u8string& windowName, int width, int height);
-		void setOn(Module::ResourceLoader* loader);
+		int init(Module::ResourceLoader* loader);
 		void run();
+		void close();
 
 	private:
-		void processInput(GLFWwindow* window);
-		void initShaders();
 		void initInputSystem();
 
 	public:

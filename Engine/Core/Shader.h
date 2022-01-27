@@ -1,11 +1,13 @@
 #pragma once
 #include "ShaderBuilder.h"
+#include "CommonHead.h"
 #include <vector>
 #include <string>
-#include "Matrix.h"
+#include <unordered_map>
 
 namespace tezcat::Tiny::Core
 {
+	class Texture;
 	class Shader
 	{
 	public:
@@ -14,11 +16,13 @@ namespace tezcat::Tiny::Core
 
 		Shader* create();
 		void bind();
+		void bindTextures(const std::unordered_map<std::string, Texture*>& allTexture);
 
 		Shader* attachShader(ShaderBuilder *shader);
 		Shader* attachShader(const std::string& filePath, GLenum shaderType);
 
 		void apply();
+		void registerTextureName(const std::string& textureTypeName);
 
 	public:
 		const std::string& getName() const { return m_Name; }
@@ -32,12 +36,13 @@ namespace tezcat::Tiny::Core
 	private:
 		int m_ProgramID;
 		std::string m_Name;
-
 		int m_OrderID;
+
 
 	private:
 		int m_ProjectionMatrixID;
 		int m_ViewMatrixID;
 		int m_ModelMatrixID;
+		std::unordered_map<std::string, unsigned int> m_TextureID;
 	};
 }

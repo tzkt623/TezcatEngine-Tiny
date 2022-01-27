@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="MyInputer.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="MyScene.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="MyResourceLoader.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Engine.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
@@ -112,8 +100,26 @@
     <ClCompile Include="Utility\Tools.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="MyGUI.cpp">
+    <ClCompile Include="Core\Texture.cpp">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\main.cpp">
       <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyInputer.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyResourceLoader.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyScene.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Image.cpp">
+      <Filter>Engine\Core\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,26 +188,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyInputer.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="MyScene.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="MyResourceLoader.h">
-      <Filter>Test</Filter>
-    </ClInclude>
     <ClInclude Include="Tiny.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Core\Engine.h">
       <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Matrix.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ImageLoader.h">
-      <Filter>Engine\Core\Data</Filter>
     </ClInclude>
     <ClInclude Include="Core\Mesh.h">
       <Filter>Engine\Core\Data</Filter>
@@ -262,9 +253,6 @@
     </ClInclude>
     <ClInclude Include="Module\ResourceLoader.h">
       <Filter>Engine\Module</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility\IDGenerator.h">
-      <Filter>Engine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\glad\include\glad\glad.h">
       <Filter>Engine\Thirdparty\glad</Filter>
@@ -1169,10 +1157,31 @@
     <ClInclude Include="Core\Statistic.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MyGUI.h">
+    <ClInclude Include="Core\Config.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Texture.h">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI.h">
       <Filter>Test</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Config.h">
+    <ClInclude Include="Test\MyInputer.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyResourceLoader.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyScene.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Image.h">
+      <Filter>Engine\Core\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GLHead.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommonHead.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
   </ItemGroup>

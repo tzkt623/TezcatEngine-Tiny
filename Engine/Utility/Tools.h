@@ -45,7 +45,49 @@ namespace tezcat::Tiny::Utility
 	};
 
 
+	//-------------------------------
+	//
+	//  [1/27/2022 Administrator]
+	//
+	//
+	template<class T, typename R>
+	class IDGenerator
+	{
+	public:
+		IDGenerator() = delete;
+		~IDGenerator() = delete;
 
+		static R generate()
+		{
+
+		}
+	};
+
+	template<class T>
+	class IDGenerator<T, unsigned int>
+	{
+	public:
+		IDGenerator() = delete;
+		~IDGenerator() = delete;
+
+		static unsigned int generate()
+		{
+			return m_ID++;
+		}
+
+	private:
+		static unsigned int m_ID;
+	};
+
+	template<class T>
+	unsigned int IDGenerator<T, unsigned int>::m_ID = 0;
+
+	//---------------------------------------------------------------------------------
+	//
+	// 
+	//   [1/27/2022 Administrator]
+	//
+	//
 #define CREATE_DELEGATE_INSTANCE(class_name)\
 private:\
 	static class_name* m_Instance##class_name;\

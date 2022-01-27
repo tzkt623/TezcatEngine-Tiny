@@ -2,6 +2,8 @@
 #include "Shader.h"
 #include "RenderObject.h"
 #include "Camera.h"
+#include "Material.h"
+#include "Statistic.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -11,8 +13,15 @@ namespace tezcat::Tiny::Core
 
 	}
 
+	Pass::Pass(Module::Material* material) :
+		m_Material(material)
+	{
+		m_Shader = m_Material->getShader();
+	}
+
 	Pass::~Pass()
 	{
+		m_Material = nullptr;
 		m_Shader = nullptr;
 	}
 
@@ -22,6 +31,8 @@ namespace tezcat::Tiny::Core
 
 		m_Shader->setProjectionMatrix(camera->getProjectionMatrix());
 		m_Shader->setViewMatrix(camera->getViewMatrix());
+
+		Statistic::DrawCall = m_ObjectList.size();
 
 		auto it = m_ObjectList.begin();
 		while (it != m_ObjectList.end())
