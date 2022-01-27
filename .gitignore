@@ -10,6 +10,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+*.pdb
 
 # Compiled Dynamic libraries
 *.so
@@ -30,3 +31,8 @@
 *.exe
 *.out
 *.app
+
+# dic
+/.vs
+/x64
+/Engine/x64
