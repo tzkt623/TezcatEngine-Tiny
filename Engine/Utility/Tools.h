@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 #include <cstdio>
+#include <unordered_map>
+#include <list>
+#include <memory>
 
 namespace tezcat::Tiny::Utility
 {

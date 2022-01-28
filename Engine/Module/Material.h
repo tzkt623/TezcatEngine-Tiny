@@ -28,6 +28,8 @@ namespace tezcat::Tiny::Module
 			return m_TextureWithName;
 		}
 
+		void draw();
+
 	private:
 		std::string m_Name;
 		unsigned int m_ID;

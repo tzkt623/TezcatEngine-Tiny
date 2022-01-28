@@ -1,55 +1,51 @@
 #include "Mesh.h"
-#include "RCVAO.h"
+#include "MeshData.h"
+#include "Material.h"
+#include "Shader.h"
+#include "VAO.h"
+#include "GameObject.h"
+#include "Transform.h"
 
 namespace tezcat::Tiny::Core
 {
-	Mesh::Mesh():
-		m_VAO(nullptr)
+	Mesh::Mesh() :
+		Mesh((VAO*)nullptr)
+	{
+
+	}
+
+	Mesh::Mesh(MeshData* meshData) :
+		Mesh(new VAO())
+	{
+		m_VAO->createMesh(meshData);
+	}
+
+	Mesh::Mesh(VAO* vao) :
+		m_VAO(vao),
+		m_DrawMode(DrawMode::Triangles)
 	{
 
 	}
 
 	Mesh::~Mesh()
 	{
-		delete m_VAO;
+		m_VAO = nullptr;
 	}
 
-	int Mesh::getBufferSize()
+	void Mesh::render(Shader* shader)
 	{
-		int count = 0;
-		if (!this->vertices.empty())
+		if (m_VAO->getIndexCount() > 0)
 		{
-			count++;
+			glDrawElements(m_DrawMode, m_VAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
 		}
-
-		if (!this->normals.empty())
+		else
 		{
-			count++;
+			glDrawArrays(m_DrawMode, 0, m_VAO->getVertexCount());
 		}
-
-		if (!this->colors.empty())
-		{
-			count++;
-		}
-
-		if (!this->uv.empty())
-		{
-			count++;
-		}
-
-		if (!this->indices.empty())
-		{
-			count++;
-		}
-
-		return count;
 	}
 
 	void Mesh::apply()
 	{
-		m_VAO = new RCVAO();
-		m_VAO->createMesh(this);
+
 	}
 }
-
-

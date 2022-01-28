@@ -16,13 +16,15 @@
 #include "InputSystem.h"
 
 #include "Transform.h"
-#include "Mesh.h"
+#include "MeshData.h"
 #include "Material.h"
 #include "RenderObject.h"
+#include "RenderAgent.h"
 #include "ResourceLoader.h"
 
 #include "Tools.h"
 #include "Statistic.h"
+#include "ShaderConfig.h"
 
 
 using namespace tezcat::Tiny;

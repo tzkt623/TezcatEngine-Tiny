@@ -118,13 +118,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>E:\Github\TezTiny\Engine\ThirdParty\glad\include;E:\Github\TezTiny\Engine\ThirdParty;E:\Github\glfw\include;E:\Github\TezTiny\Engine\Core;E:\Github\TezTiny\Engine\Module;E:\Github\TezTiny\Engine\Utility;E:\Github\TezTiny\Engine\Test;E:\Github\TezTiny\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Github\TezTiny\Engine\ThirdParty\glad\include;E:\Github\TezTiny\Engine\ThirdParty;E:\Github\TezTiny\Engine\Core;E:\Github\TezTiny\Engine\Module;E:\Github\TezTiny\Engine\Utility;E:\Github\TezTiny\Engine\Test;E:\Github\TezTiny\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\Github\glfw\build\src\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\Github\TezTiny\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -136,30 +136,40 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\Github\TezTiny\Engine\ThirdParty\glad\include;E:\Github\TezTiny\Engine\ThirdParty;E:\Github\TezTiny\Engine\Core;E:\Github\TezTiny\Engine\Module;E:\Github\TezTiny\Engine\Utility;E:\Github\TezTiny\Engine\Test;E:\Github\TezTiny\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\Github\TezTiny\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\GUI.cpp" />
     <ClCompile Include="Core\Image.cpp" />
+    <ClCompile Include="Core\Light.cpp" />
     <ClCompile Include="Core\Mesh.cpp" />
-    <ClCompile Include="Core\Pass.cpp" />
-    <ClCompile Include="Core\PassQueue.cpp" />
+    <ClCompile Include="Core\MeshData.cpp" />
+    <ClCompile Include="Core\Pass_Shader.cpp" />
+    <ClCompile Include="Core\Pass_VAO.cpp" />
+    <ClCompile Include="Core\RenderAgent.cpp" />
     <ClCompile Include="Core\RenderCommand.cpp" />
     <ClCompile Include="Core\Renderer.cpp" />
     <ClCompile Include="Core\RenderObject.cpp" />
     <ClCompile Include="Core\Shader.cpp" />
     <ClCompile Include="Core\ShaderBuilder.cpp" />
+    <ClCompile Include="Core\ShaderConfig.cpp" />
     <ClCompile Include="Core\ShaderManager.cpp" />
-    <ClCompile Include="Core\RCVAO.cpp" />
+    <ClCompile Include="Core\VAO.cpp" />
     <ClCompile Include="Core\Statistic.cpp" />
     <ClCompile Include="Core\Texture.cpp" />
+    <ClCompile Include="Core\VAOManager.cpp" />
     <ClCompile Include="Module\Camera.cpp" />
     <ClCompile Include="Module\CameraManager.cpp" />
     <ClCompile Include="Module\GameObject.cpp" />
@@ -193,18 +203,23 @@
     <ClInclude Include="Core\GLHead.h" />
     <ClInclude Include="Core\GUI.h" />
     <ClInclude Include="Core\Image.h" />
+    <ClInclude Include="Core\Light.h" />
     <ClInclude Include="Core\Mesh.h" />
-    <ClInclude Include="Core\Pass.h" />
-    <ClInclude Include="Core\PassQueue.h" />
+    <ClInclude Include="Core\MeshData.h" />
+    <ClInclude Include="Core\Pass_Shader.h" />
+    <ClInclude Include="Core\Pass_VAO.h" />
+    <ClInclude Include="Core\RenderAgent.h" />
     <ClInclude Include="Core\RenderCommand.h" />
     <ClInclude Include="Core\Renderer.h" />
     <ClInclude Include="Core\RenderObject.h" />
     <ClInclude Include="Core\Shader.h" />
     <ClInclude Include="Core\ShaderBuilder.h" />
+    <ClInclude Include="Core\ShaderConfig.h" />
     <ClInclude Include="Core\ShaderManager.h" />
-    <ClInclude Include="Core\RCVAO.h" />
+    <ClInclude Include="Core\VAO.h" />
     <ClInclude Include="Core\Statistic.h" />
     <ClInclude Include="Core\Texture.h" />
+    <ClInclude Include="Core\VAOManager.h" />
     <ClInclude Include="Module\Camera.h" />
     <ClInclude Include="Module\CameraManager.h" />
     <ClInclude Include="Module\GameObject.h" />
@@ -221,6 +236,8 @@
     <ClInclude Include="Test\MyScene.h" />
     <ClInclude Include="ThirdParty\glad\include\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\include\KHR\khrplatform.h" />
+    <ClInclude Include="ThirdParty\GLFW\glfw3.h" />
+    <ClInclude Include="ThirdParty\GLFW\glfw3native.h" />
     <ClInclude Include="ThirdParty\glm\common.hpp" />
     <ClInclude Include="ThirdParty\glm\detail\compute_common.hpp" />
     <ClInclude Include="ThirdParty\glm\detail\compute_vector_relational.hpp" />

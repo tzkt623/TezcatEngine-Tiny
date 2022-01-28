@@ -47,12 +47,6 @@ namespace tezcat::Tiny::Module
 
 		unsigned int getID() const { return m_ID; }
 
-		void translateYP(float yaw, float pitch)
-		{
-			m_Yaw += yaw;
-			m_Pitch += pitch;
-		}
-
 	public:
 
 		glm::vec3& getFront() { return m_Front; }

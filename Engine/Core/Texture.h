@@ -3,33 +3,35 @@
 
 namespace tezcat::Tiny::Core
 {
-	enum TexWrap
-	{
-		Tex_REPEAT = GL_REPEAT,
-		Tex_MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
-		Tex_CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
-		Tex_CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
-	};
-
-	enum TexFilter
-	{
-		Tex_NEAREST = GL_NEAREST,
-		Tex_LINEAR = GL_LINEAR
-	};
-
 	class Image;
+	class Shader;
 	class Texture
 	{
+	public:
+		enum Wrap : int
+		{
+			Tex_REPEAT = GL_REPEAT,
+			Tex_MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
+			Tex_CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+			Tex_CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
+		};
+
+		enum Filter : int
+		{
+			Tex_NEAREST = GL_NEAREST,
+			Tex_LINEAR = GL_LINEAR
+		};
 	public:
 		Texture();
 		~Texture();
 
 		void createTexture(Image* image);
-		void bind();
+		unsigned int getTexID() const { return m_TexID; }
+
 
 	private:
-		TexWrap m_Wrap;
-		TexFilter m_Filter;
+		Wrap m_Wrap;
+		Filter m_Filter;
 
 		unsigned int m_TexID;
 	};

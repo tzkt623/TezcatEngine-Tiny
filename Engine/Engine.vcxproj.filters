@@ -4,22 +4,22 @@
     <ClCompile Include="Core\Engine.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Mesh.cpp">
+    <ClCompile Include="Core\MeshData.cpp">
       <Filter>Engine\Core\Data</Filter>
     </ClCompile>
     <ClCompile Include="Core\RenderCommand.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RCVAO.cpp">
+    <ClCompile Include="Core\VAO.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\RenderObject.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Pass.cpp">
+    <ClCompile Include="Core\Pass_Shader.cpp">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClCompile>
-    <ClCompile Include="Core\PassQueue.cpp">
+    <ClCompile Include="Core\Pass_VAO.cpp">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClCompile>
     <ClCompile Include="Core\Renderer.cpp">
@@ -100,9 +100,6 @@
     <ClCompile Include="Utility\Tools.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Texture.cpp">
-      <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClCompile>
     <ClCompile Include="Test\main.cpp">
       <Filter>Test</Filter>
     </ClCompile>
@@ -120,6 +117,24 @@
     </ClCompile>
     <ClCompile Include="Core\Image.cpp">
       <Filter>Engine\Core\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Light.cpp">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Texture.cpp">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mesh.cpp">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\RenderAgent.cpp">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\VAOManager.cpp">
+      <Filter>Engine\Core\Renderer\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ShaderConfig.cpp">
+      <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -186,30 +201,33 @@
     <Filter Include="Engine\Thirdparty\imgui">
       <UniqueIdentifier>{ef4057ec-58ad-4dad-ac1d-54f1a630f1e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Thirdparty\glfw">
+      <UniqueIdentifier>{02afedab-b556-4d76-8333-cc5b1c2a460b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Header">
+      <UniqueIdentifier>{ee483fd2-cbbd-41aa-8abc-a3cc039cab0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Tiny.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Engine.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Mesh.h">
+    <ClInclude Include="Core\MeshData.h">
       <Filter>Engine\Core\Data</Filter>
     </ClInclude>
     <ClInclude Include="Core\RenderCommand.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\RCVAO.h">
+    <ClInclude Include="Core\VAO.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\RenderObject.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Pass.h">
+    <ClInclude Include="Core\Pass_Shader.h">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClInclude>
-    <ClInclude Include="Core\PassQueue.h">
+    <ClInclude Include="Core\Pass_VAO.h">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClInclude>
     <ClInclude Include="Core\Renderer.h">
@@ -1157,12 +1175,6 @@
     <ClInclude Include="Core\Statistic.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Config.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Texture.h">
-      <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Test\MyGUI.h">
       <Filter>Test</Filter>
     </ClInclude>
@@ -1178,11 +1190,41 @@
     <ClInclude Include="Core\Image.h">
       <Filter>Engine\Core\Data</Filter>
     </ClInclude>
+    <ClInclude Include="ThirdParty\GLFW\glfw3.h">
+      <Filter>Engine\Thirdparty\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\GLFW\glfw3native.h">
+      <Filter>Engine\Thirdparty\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Light.h">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClInclude>
     <ClInclude Include="Core\GLHead.h">
-      <Filter>Engine\Core</Filter>
+      <Filter>Engine\Header</Filter>
     </ClInclude>
     <ClInclude Include="Core\CommonHead.h">
-      <Filter>Engine\Core</Filter>
+      <Filter>Engine\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Config.h">
+      <Filter>Engine\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Tiny.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Texture.h">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh.h">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\RenderAgent.h">
+      <Filter>Engine\Core\Renderer\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VAOManager.h">
+      <Filter>Engine\Core\Renderer\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ShaderConfig.h">
+      <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

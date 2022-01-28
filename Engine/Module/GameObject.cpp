@@ -5,7 +5,9 @@
 #include "Engine.h"
 #include "Renderer.h"
 #include "Scene.h"
-#include "Mesh.h"
+#include "MeshData.h"
+#include "RenderAgent.h"
+
 #include <functional>
 
 
@@ -20,13 +22,12 @@ namespace tezcat::Tiny::Module
 	GameObject::GameObject(const std::string& name) :
 		m_Name(name),
 		m_Transform(new Transform()),
-		m_RenderObject(nullptr),
-		m_Material(nullptr),
+		m_RenderAgent(new Core::RenderAgent()),
 		m_IsLogic(false),
 		m_Scene(nullptr),
 		m_UserObject(nullptr)
 	{
-
+		m_RenderAgent->setMasterObject(this);
 	}
 
 	GameObject::~GameObject()
@@ -38,12 +39,11 @@ namespace tezcat::Tiny::Module
 
 		m_Children.clear();
 
-		delete m_Material;
 		delete m_UserObject;
+		delete m_RenderAgent;
 
-		m_Material = nullptr;
-		m_RenderObject = nullptr;
 		m_Scene = nullptr;
+		m_RenderAgent = nullptr;
 	}
 
 	void GameObject::addChild(GameObject* gameObject)
@@ -54,13 +54,7 @@ namespace tezcat::Tiny::Module
 
 	void GameObject::onApply()
 	{
-		if (m_RenderObject != nullptr)
-		{
-			m_RenderObject->setMasterObject(this);
-			m_RenderObject->setMaterial(m_Material);
-			m_RenderObject->apply();
-			Core::Engine::getInstance()->getRenderer()->dispatch(this);
-		}
+		m_RenderAgent->apply();
 	}
 
 	void GameObject::sceneEnter(Scene* scene)
@@ -79,11 +73,6 @@ namespace tezcat::Tiny::Module
 	void GameObject::sceneExit(Scene* scene)
 	{
 
-	}
-
-	void GameObject::setMaterial(Material* material)
-	{
-		m_Material = material;
 	}
 
 	void GameObject::apply()
@@ -131,16 +120,6 @@ namespace tezcat::Tiny::Module
 
 	void GameObject::logic()
 	{
-	}
-
-	void GameObject::setMesh(Core::Mesh* mesh)
-	{
-		m_RenderObject = new Core::ROMesh(mesh);
-	}
-
-	void GameObject::setRenderObject(Core::RenderObject* renderObject)
-	{
-		m_RenderObject = renderObject;
 	}
 
 	void GameObject::foreachChild(

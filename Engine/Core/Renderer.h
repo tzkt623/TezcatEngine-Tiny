@@ -14,12 +14,26 @@ namespace tezcat::Tiny::Module
 
 namespace tezcat::Tiny::Core
 {
-	class PassQueue;
-	class Pass;
-	class RenderObject;
-	class GameObject;
+	class Pass_Shader;
+	class RenderAgent;
 	class GUI;
 	class Engine;
+	class VAOManager;
+
+	//------------------------------------------
+	//
+	//	Rednerer
+	//	|
+	//	Pass
+	//	|
+	//	----light->camera
+	//	|
+	//	VAOPass
+	//	|
+	//	RenderCommand
+	//
+	//
+	//
 	class Renderer
 	{
 	public:
@@ -29,19 +43,20 @@ namespace tezcat::Tiny::Core
 		void init(Engine* engine);
 
 	public:
-		void addPass(Pass* pass);
-		Pass* getPass(int id);
-		Pass* getPass(const std::string& name);
+		void addPass(Pass_Shader* pass);
+		Pass_Shader* getPass(int id);
+		Pass_Shader* getPass(const std::string& name);
 
 	public:
 		void render();
-		void dispatch(Module::GameObject* renderObject);
+		void dispatch(RenderAgent* renderAgent);
 
 	private:
-		std::list<Pass*> m_PassList;
-		std::unordered_map<int, Pass*> m_PassWithID;
-		std::unordered_map<std::string, Pass*> m_PassWithName;
+		std::list<Pass_Shader*> m_PassList;
+		std::unordered_map<int, Pass_Shader*> m_PassWithID;
+		std::unordered_map<std::string, Pass_Shader*> m_PassWithName;
 
 		GUI* m_GUI;
+		VAOManager* m_VAOManager;
 	};
 }

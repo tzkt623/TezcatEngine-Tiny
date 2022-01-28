@@ -22,7 +22,7 @@ namespace tezcat::Tiny::Module
 		void setSharedCameras(std::unordered_map<std::string, Camera*>* share);
 		void addCamera(Camera* camera);
 
-
+		std::vector<Camera*>& getAllCamera() { return m_CameraList; }
 
 	private:
 		std::vector<Camera*> m_CameraList;

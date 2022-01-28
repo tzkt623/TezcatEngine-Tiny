@@ -1,9 +1,8 @@
 #include "Renderer.h"
-#include "PassQueue.h"
-#include "glad/glad.h"
+#include "Pass_VAO.h"
 #include "Material.h"
 #include "Shader.h"
-#include "Pass.h"
+#include "Pass_Shader.h"
 #include "RenderObject.h"
 #include "GameObject.h"
 #include "Camera.h"
@@ -12,12 +11,15 @@
 #include "GUI.h"
 #include "Engine.h"
 #include "Statistic.h"
+#include "RenderAgent.h"
+#include "VAOManager.h"
 
 
 namespace tezcat::Tiny::Core
 {
 	Renderer::Renderer() :
-		m_GUI(new GUI())
+		m_GUI(new GUI()),
+		m_VAOManager(new VAOManager())
 	{
 
 	}
@@ -27,29 +29,31 @@ namespace tezcat::Tiny::Core
 		delete m_GUI;
 	}
 
-	void Renderer::addPass(Pass* passQueue)
+	void Renderer::addPass(Pass_Shader* pass)
 	{
 		if (m_PassList.empty())
 		{
-			m_PassList.push_front(passQueue);
+			m_PassList.push_front(pass);
+			m_PassWithName.emplace(pass->getName(), pass);
+			m_PassWithID.emplace(pass->getID(), pass);
 			return;
 		}
 
 		auto it = m_PassList.begin();
 		while (it != m_PassList.end())
 		{
-			if ((*it)->getID() < passQueue->getID())
+			if ((*it)->getID() < pass->getID())
 			{
-				m_PassList.insert(it, passQueue);
-				m_PassWithID.emplace((*it)->getID(), (*it));
-				m_PassWithName.emplace((*it)->getName(), (*it));
+				m_PassList.insert(it, pass);
+				m_PassWithName.emplace(pass->getName(), pass);
+				m_PassWithID.emplace(pass->getID(), pass);
 				break;
 			}
 			it++;
 		}
 	}
 
-	Pass* Core::Renderer::getPass(int id)
+	Pass_Shader* Core::Renderer::getPass(int id)
 	{
 		auto it = m_PassWithID.find(id);
 		if (it != m_PassWithID.end())
@@ -60,7 +64,7 @@ namespace tezcat::Tiny::Core
 		return nullptr;
 	}
 
-	Pass* Core::Renderer::getPass(const std::string& name)
+	Pass_Shader* Core::Renderer::getPass(const std::string& name)
 	{
 		auto it = m_PassWithName.find(name);
 		if (it != m_PassWithName.end())
@@ -73,18 +77,21 @@ namespace tezcat::Tiny::Core
 
 	void Renderer::render()
 	{
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearDepth(1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		Engine::getInstance()->getCameraManager()->foreach(
-			[this](Module::Camera* camera)
+		Statistic::DrawCall = 0;
+
+		auto& cameras = CameraManager::getInstance()->getAllCamera();
+		for (auto camera : cameras)
+		{
+			auto it = m_PassList.begin();
+			while (it != m_PassList.end())
 			{
-				auto it = m_PassList.begin();
-				while (it != m_PassList.end())
-				{
-					(*it++)->render(camera);
-				}
-			});
+				(*it++)->render(camera);
+			}
+		}
 
 		if (m_GUI)
 		{
@@ -92,22 +99,21 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	void Renderer::dispatch(Module::GameObject* gameObject)
+	void Renderer::dispatch(RenderAgent* renderAgent)
 	{
-		auto shader = gameObject->getMaterial()->getShader();
+		auto shader = renderAgent->getMaterial()->getShader();
 
 		if (m_PassWithID.find(shader->getOrderID()) == m_PassWithID.end())
 		{
-			auto pass = new Pass(shader);
+			auto pass = new Pass_Shader(shader);
 			this->addPass(pass);
-			pass->addRenderObject(gameObject->getRenderObject());
+			pass->addRenderAgent(renderAgent);
 
-			m_PassWithID.emplace(shader->getOrderID(), pass);
 			Statistic::PassCount = m_PassWithID.size();
 		}
 		else
 		{
-			m_PassWithID[shader->getOrderID()]->addRenderObject(gameObject->getRenderObject());
+			m_PassWithID[shader->getOrderID()]->addRenderAgent(renderAgent);
 		}
 	}
 

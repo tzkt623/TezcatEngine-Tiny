@@ -3,7 +3,9 @@
 
 MyInputer::MyInputer() :
 	m_Camera(nullptr),
-	m_LockMouse(true)
+	m_LockMouse(true),
+	m_LastX(0),
+	m_LastY(0)
 {
 
 }

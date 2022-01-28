@@ -3,6 +3,7 @@
 #include "ShaderManager.h"
 #include "Texture.h"
 #include "Tools.h"
+#include "Shader.h"
 
 namespace tezcat::Tiny::Module
 {
@@ -25,5 +26,10 @@ namespace tezcat::Tiny::Module
 	void Material::addTexture(const std::string& texType, Core::Texture* texture)
 	{
 		m_TextureWithName[texType] = texture;
+	}
+
+	void Material::draw()
+	{
+		m_Shader->setTextures(m_TextureWithName);
 	}
 }

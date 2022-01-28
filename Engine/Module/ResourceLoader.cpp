@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 using namespace tezcat::Tiny;
+using namespace tezcat::Tiny::Core;
 
 namespace tezcat::Tiny::Module
 {
@@ -17,7 +18,7 @@ namespace tezcat::Tiny::Module
 	void ResourceLoader::prepareResource(Core::Engine* engine)
 	{
 		auto shader = new Core::Shader("Default", 0);
-		shader->registerTextureName("texColor");
+		shader->registerTextureName(TINY_TexColor);
 
 		shader->attachShader("../Resource/Shaders/vert.glsl", GL_VERTEX_SHADER)
 			->attachShader("../Resource/Shaders/frag.glsl", GL_FRAGMENT_SHADER)

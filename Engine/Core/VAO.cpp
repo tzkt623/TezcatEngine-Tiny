@@ -1,21 +1,23 @@
-#include "RCVAO.h"
-#include "Mesh.h"
+#include "VAO.h"
+#include "MeshData.h"
+#include "VAOManager.h"
 
-#include <glad/glad.h>
+#include "GLHead.h"
 
 
 
 namespace tezcat::Tiny::Core
 {
-	RCVAO::RCVAO() :
+	VAO::VAO() :
 		m_ID(0),
 		m_VBOArray(nullptr),
-		m_VBOSize(0)
+		m_VBOSize(0),
+		m_Name("##ErrorVAO")
 	{
 
 	}
 
-	RCVAO::~RCVAO()
+	VAO::~VAO()
 	{
 		glDeleteBuffers(m_VBOSize, m_VBOArray);
 		glDeleteVertexArrays(1, &m_ID);
@@ -23,12 +25,12 @@ namespace tezcat::Tiny::Core
 		m_VBOArray = nullptr;
 	}
 
-	void RCVAO::bind()
+	void VAO::bind()
 	{
 		glBindVertexArray(m_ID);
 	}
 
-	void RCVAO::createMesh(Mesh* mesh)
+	void VAO::createMesh(MeshData* mesh)
 	{
 		if (m_ID != 0)
 		{
@@ -112,6 +114,11 @@ namespace tezcat::Tiny::Core
 		*/
 
 		glBindVertexArray(0);
+
+		m_Name = mesh->getName();
+		m_VertexCount = static_cast<int>(mesh->vertices.size());
+		m_IndexCount = static_cast<int>(mesh->indices.size());
+		VAOManager::getInstance()->addVAO(this);
 	}
 }
 

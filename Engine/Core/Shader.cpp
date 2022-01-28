@@ -21,28 +21,18 @@ namespace tezcat::Tiny::Core
 		glDeleteProgram(m_ProgramID);
 	}
 
-	Shader* Shader::create()
-	{
-		if (m_ProgramID != 0)
-		{
-			return nullptr;
-		}
-
-		return this;
-	}
-
 	void Shader::bind()
 	{
 		glUseProgram(m_ProgramID);
 	}
 
-	void Shader::bindTextures(const std::unordered_map<std::string, Core::Texture*>& allTexture)
+	void Shader::setTextures(const std::unordered_map<std::string, Core::Texture*>& allTexture)
 	{
 		int index = 0;
 		for (auto& pair : allTexture)
 		{
 			glActiveTexture(GL_TEXTURE0 + m_TextureID[pair.first]);
-			pair.second->bind();
+			glBindTexture(GL_TEXTURE_2D, pair.second->getTexID());
 		}
 	}
 
@@ -73,9 +63,9 @@ namespace tezcat::Tiny::Core
 
 		ShaderBuilder::clearPool();
 
-		m_ProjectionMatrixID = glGetUniformLocation(m_ProgramID, "PMatrix");
-		m_ViewMatrixID = glGetUniformLocation(m_ProgramID, "VMatrix");
-		m_ModelMatrixID = glGetUniformLocation(m_ProgramID, "MMatrix");
+		m_ProjectionMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatP);
+		m_ViewMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatV);
+		m_ModelMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatM);
 
 		glUseProgram(m_ProgramID);
 		if (!m_TextureID.empty())
@@ -95,7 +85,12 @@ namespace tezcat::Tiny::Core
 
 	void Shader::registerTextureName(const std::string& textureTypeName)
 	{
-		m_TextureID[textureTypeName] = 0;
+		m_TextureID[textureTypeName] = -1;
+	}
+
+	void Shader::registerUniformName(const std::string& uniformName)
+	{
+		m_UniformID[uniformName] = -1;
 	}
 
 	void Shader::setProjectionMatrix(const glm::mat4x4& matrix)
@@ -111,6 +106,21 @@ namespace tezcat::Tiny::Core
 	void Shader::setModelMatrix(const glm::mat4x4& matrix)
 	{
 		glUniformMatrix4fv(m_ModelMatrixID, 1, GL_FALSE, glm::value_ptr(matrix));
+	}
+
+	void Shader::setFloat1(const std::string& name, float* data)
+	{
+		glUniform1fv(m_TextureID[name], 1, data);
+	}
+
+	void Shader::setFloat2(const std::string& name, float* data)
+	{
+		glUniform2fv(m_TextureID[name], 2, data);
+	}
+
+	void Shader::setFloat3(const std::string& name, float* data)
+	{
+		glUniform3fv(m_TextureID[name], 3, data);
 	}
 }
 

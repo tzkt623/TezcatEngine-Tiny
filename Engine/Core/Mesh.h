@@ -1,60 +1,30 @@
 #pragma once
-#include <vector>
-#include <glm/glm.hpp>
-#include <initializer_list>
-#include <xutility>
-#include <memory>
+#include "RenderObject.h"
+#include "GLHead.h"
 
 namespace tezcat::Tiny::Core
 {
-	class RCVAO;
-	class Mesh
+	class VAO;
+	class MeshData;
+	class Shader;
+
+	class Mesh : public RenderObject
 	{
 	public:
-		Mesh();
-		~Mesh();
-
-		size_t vertexSize()
-		{
-			return this->vertices.size() * sizeof(glm::vec3);
-		}
-
-		size_t normalSize()
-		{
-			return this->normals.size() * sizeof(glm::vec3);
-		}
-
-		size_t colorSize()
-		{
-			return this->colors.size() * sizeof(glm::vec4);
-		}
-
-		size_t uvSize()
-		{
-			return this->uv.size() * sizeof(glm::vec2);
-		}
-
-		size_t indexSize()
-		{
-			return this->indices.size() * sizeof(unsigned int);
-		}
-
-		int getBufferSize();
-
-		void apply();
-
-		RCVAO* getRenderCommand() const { return m_VAO; }
 
 	public:
-		std::vector<glm::vec3> vertices;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec4> colors;
-		std::vector<glm::vec2> uv;
+		Mesh();
+		Mesh(MeshData* meshData);
+		Mesh(VAO* vao);
+		virtual ~Mesh();
 
-		std::vector<unsigned int> indices;
+		void render(Shader* shader) override;
+		void apply() override;
+
+		VAO* getVAO() const { return m_VAO; }
 
 	private:
-		RCVAO* m_VAO;
+		DrawMode m_DrawMode;
+		VAO* m_VAO;
 	};
 }
-

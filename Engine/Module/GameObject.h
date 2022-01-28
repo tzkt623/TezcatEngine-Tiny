@@ -7,7 +7,8 @@
 namespace tezcat::Tiny::Core
 {
 	class RenderObject;
-	class Mesh;
+	class MeshData;
+	class RenderAgent;
 }
 
 namespace tezcat::Tiny::Module
@@ -51,14 +52,12 @@ namespace tezcat::Tiny::Module
 		virtual void logic();
 
 	public:
+		Core::RenderAgent* getRenderAgent() const { return m_RenderAgent; }
+
 		void addChild(GameObject* gameObject);
 
-		void setMaterial(Material* material);
-		Material* getMaterial() const { return m_Material; }
-
-		void setMesh(Core::Mesh* mesh);
+		void setMesh(Core::MeshData* mesh);
 		void setRenderObject(Core::RenderObject* renderObject);
-		Core::RenderObject* getRenderObject() const { return m_RenderObject; }
 
 		Transform* getTransform() const { return m_Transform; }
 
@@ -73,8 +72,7 @@ namespace tezcat::Tiny::Module
 		bool m_IsLogic;
 
 		Transform* m_Transform;
-		Material* m_Material;
-		Core::RenderObject* m_RenderObject;
+		Core::RenderAgent* m_RenderAgent;
 		std::vector<GameObject*> m_Children;
 
 		Scene* m_Scene;
