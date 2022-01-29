@@ -30,10 +30,8 @@ void MyInfoWindow::init()
 
 void MyInfoWindow::onUpdate()
 {
-	m_LabelFPS->setData(Tools::stringFormat(
-		"FPS: %.1f(%.3f ms/Frame)",
-		ImGui::GetIO().Framerate,
-		1000.0f / ImGui::GetIO().Framerate));
+	m_LabelFPS->setData(Tools::stringFormat("FPS: %.1f(%.3f ms/Frame)",
+		GUIFunction::getFrameRate(), GUIFunction::getFrameRateTime()));
 
 	m_LabelPass->setData(Tools::stringFormat("PassCount: %d", Statistic::PassCount));
 	m_LabelDrawCall->setData(Tools::stringFormat("DrawCount: %d", Statistic::DrawCall));
@@ -73,8 +71,8 @@ MyMainCameraWindow::MyMainCameraWindow() :
 	GUIWindow(u8"主相机信息"),
 	m_Position(new GUIDragFloat3(u8"坐标")),
 	m_Rotation(new GUIDragFloat3(u8"旋转")),
-	m_Up(new GUIDragFloat3(u8"上方")),
 	m_Right(new GUIDragFloat3(u8"右方")),
+	m_Up(new GUIDragFloat3(u8"上方")),
 	m_Front(new GUIDragFloat3(u8"前方")),
 	m_MainCamera(nullptr)
 {
@@ -89,19 +87,18 @@ void MyMainCameraWindow::init()
 {
 	m_MainCamera = CameraManager::getInstance()->getMainCamera();
 
-
 	this->addChild(m_Position);
 	this->addChild(m_Rotation);
-	this->addChild(m_Front);
-	this->addChild(m_Up);
 	this->addChild(m_Right);
+	this->addChild(m_Up);
+	this->addChild(m_Front);
+
 	m_Position->postFunction = [this](float* data)
 	{
 		m_MainCamera->getTransform()->setPosition(data);
 	};
 
 
-	// 
 	// 	m_Up->postFunction = [this](float* data)
 	// 	{
 	// 		m_MainCamera->setPosition(data);

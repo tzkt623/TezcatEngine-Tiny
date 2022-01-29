@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\GUI.cpp" />
+    <ClCompile Include="Core\GUIWidget.cpp" />
     <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\Light.cpp" />
     <ClCompile Include="Core\Mesh.cpp" />
@@ -198,11 +199,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CommonHead.h" />
-    <ClInclude Include="Core\Config.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\GLHead.h" />
     <ClInclude Include="Core\GUI.h" />
+    <ClInclude Include="Core\GUIWidget.h" />
     <ClInclude Include="Core\Image.h" />
+    <ClInclude Include="Core\ImGuiHead.h" />
     <ClInclude Include="Core\Light.h" />
     <ClInclude Include="Core\Mesh.h" />
     <ClInclude Include="Core\MeshData.h" />

@@ -127,14 +127,17 @@
     <ClCompile Include="Core\Mesh.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RenderAgent.cpp">
-      <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClCompile>
     <ClCompile Include="Core\VAOManager.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\ShaderConfig.cpp">
       <Filter>Engine\Core\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\RenderAgent.cpp">
+      <Filter>Engine\Core\Renderer\Object\Agent</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GUIWidget.cpp">
+      <Filter>Engine\Core\Renderer\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -206,6 +209,9 @@
     </Filter>
     <Filter Include="Engine\Header">
       <UniqueIdentifier>{ee483fd2-cbbd-41aa-8abc-a3cc039cab0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Renderer\Object\Agent">
+      <UniqueIdentifier>{de53db17-1a4c-47a7-8f1e-1f773a5c9165}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1205,9 +1211,6 @@
     <ClInclude Include="Core\CommonHead.h">
       <Filter>Engine\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Config.h">
-      <Filter>Engine\Header</Filter>
-    </ClInclude>
     <ClInclude Include="Tiny.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -1217,14 +1220,20 @@
     <ClInclude Include="Core\Mesh.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\RenderAgent.h">
-      <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Core\VAOManager.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\ShaderConfig.h">
       <Filter>Engine\Core\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\RenderAgent.h">
+      <Filter>Engine\Core\Renderer\Object\Agent</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GUIWidget.h">
+      <Filter>Engine\Core\Renderer\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ImGuiHead.h">
+      <Filter>Engine\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

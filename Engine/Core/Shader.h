@@ -18,12 +18,12 @@ namespace tezcat::Tiny::Core
 		// 比如开关深度检测,模板,剪裁方式等等
 		//
 	public:
+		Shader();
 		Shader(const std::string& name, int orderID);
 		~Shader();
 
 	public://初始化生成
-		Shader* attachShader(ShaderBuilder* shader);
-		Shader* attachShader(const std::string& filePath, GLenum shaderType);
+		void attachShader(unsigned int id);
 
 		void registerTextureName(const std::string& textureTypeName);
 		void registerUniformName(const std::string& uniformName);
@@ -32,7 +32,9 @@ namespace tezcat::Tiny::Core
 
 	public:
 		const std::string& getName() const { return m_Name; }
+		void setName(const std::string& name) { m_Name = name; }
 		int getOrderID() const { return m_OrderID; }
+		void setOrderID(int orderID) { m_OrderID = orderID; }
 		void bind();
 
 	public://特化传参功能
@@ -41,7 +43,8 @@ namespace tezcat::Tiny::Core
 		void setModelMatrix(const glm::mat4x4& matrix);
 		void setTextures(const std::unordered_map<std::string, Texture*>& allTexture);
 
-		
+
+
 	public://通用传参功能
 		void setFloat1(const std::string& name, float* data);
 		void setFloat2(const std::string& name, float* data);

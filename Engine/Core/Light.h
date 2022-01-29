@@ -22,4 +22,15 @@ namespace tezcat::Tiny::Core
 		std::string m_Name;
 		glm::vec3 m_Color;
 	};
+
+
+	class MyClass
+	{
+	public:
+		MyClass();
+		~MyClass();
+
+	private:
+
+	};
 }

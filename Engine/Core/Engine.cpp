@@ -76,15 +76,12 @@ namespace tezcat::Tiny::Core
 			return -1;
 		}
 
-		m_Renderer->init(this);
 
 		m_ResourceLoader->prepareResource(this);
 		m_ResourceLoader->prepareScene(this);
 
 		this->initInputSystem();
 		m_SceneManager->init();
-
-
 		return 0;
 	}
 
@@ -98,6 +95,8 @@ namespace tezcat::Tiny::Core
 
 	void Engine::run()
 	{
+		m_Renderer->init(this);
+
 		double old_time = glfwGetTime();
 		double now_time = 0;
 

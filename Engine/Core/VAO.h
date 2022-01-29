@@ -1,9 +1,6 @@
 #pragma once
+#include "CommonHead.h"
 #include "RenderCommand.h"
-#include <memory>
-#include "Config.h"
-#include <initializer_list>
-#include <string>
 
 namespace tezcat::Tiny::Core
 {

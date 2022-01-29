@@ -2,6 +2,8 @@
 
 namespace tezcat::Tiny::Core
 {
+	const char* TINY_Default_Shader = "TINY_DefaultShader";
+
 	const char* TINY_MatP = "TINY_MatP";
 	const char* TINY_MatV = "TINY_MatV";
 	const char* TINY_MatM = "TINY_MatM";

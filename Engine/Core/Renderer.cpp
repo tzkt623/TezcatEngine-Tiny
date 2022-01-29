@@ -17,11 +17,12 @@
 
 namespace tezcat::Tiny::Core
 {
+	IMPLEMENT_DELEGATE_INSTANCE(Renderer);
 	Renderer::Renderer() :
 		m_GUI(new GUI()),
 		m_VAOManager(new VAOManager())
 	{
-
+		REGISTER_DELEGATE_INSTANCE(Renderer);
 	}
 
 	Renderer::~Renderer()
@@ -121,6 +122,8 @@ namespace tezcat::Tiny::Core
 	{
 		m_GUI->init(engine);
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 
 }

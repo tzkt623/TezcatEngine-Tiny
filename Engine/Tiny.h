@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Engine.h"
-#include "GUI.h"
+#include "GUIWidget.h"
 
 #include "Texture.h"
 #include "Image.h"

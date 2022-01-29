@@ -17,12 +17,9 @@ namespace tezcat::Tiny::Module
 
 	void ResourceLoader::prepareResource(Core::Engine* engine)
 	{
-		auto shader = new Core::Shader("Default", 0);
-		shader->registerTextureName(TINY_TexColor);
-
-		shader->attachShader("../Resource/Shaders/vert.glsl", GL_VERTEX_SHADER)
-			->attachShader("../Resource/Shaders/frag.glsl", GL_FRAGMENT_SHADER)
-			->apply();
+		ShaderBuilder::create("../Resource/Shaders/Unlit/color.glsl");
+		ShaderBuilder::create("../Resource/Shaders/Unlit/texture.glsl");
+		ShaderBuilder::create("../Resource/Shaders/Standard/std1.glsl");
 	}
 
 	void ResourceLoader::prepareEngine(Core::Engine* engine)

@@ -4,6 +4,8 @@
 
 namespace tezcat::Tiny::Core
 {
+	extern const char* TINY_Default_Shader;
+
 	extern const char* TINY_MatP;
 	extern const char* TINY_MatV;
 	extern const char* TINY_MatM;

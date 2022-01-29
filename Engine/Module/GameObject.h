@@ -52,19 +52,15 @@ namespace tezcat::Tiny::Module
 		virtual void logic();
 
 	public:
-		Core::RenderAgent* getRenderAgent() const { return m_RenderAgent; }
-
 		void addChild(GameObject* gameObject);
-
-		void setMesh(Core::MeshData* mesh);
-		void setRenderObject(Core::RenderObject* renderObject);
-
-		Transform* getTransform() const { return m_Transform; }
 
 		void foreachChild(const std::function<void()>& begin,
 			const std::function<void(GameObject*)>& get,
 			const std::function<void()>& end,
 			const std::function<void()>& nochildren);
+	public:
+		Core::RenderAgent* getRenderAgent() const { return m_RenderAgent; }
+		Transform* getTransform() const { return m_Transform; }
 
 
 	private:

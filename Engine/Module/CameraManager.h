@@ -17,7 +17,6 @@ namespace tezcat::Tiny::Module
 		Camera* getCamera(const std::string& name);
 		Camera* getMainCamera();
 
-
 		void foreach(const std::function<void(Camera* camera)>& function);
 		void setSharedCameras(std::unordered_map<std::string, Camera*>* share);
 		void addCamera(Camera* camera);

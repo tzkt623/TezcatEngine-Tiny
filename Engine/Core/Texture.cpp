@@ -5,11 +5,11 @@
 namespace tezcat::Tiny::Core
 {
 	Texture::Texture() :
-		m_Filter(Filter::Tex_LINEAR),
-		m_Wrap(Wrap::Tex_REPEAT),
+		m_Filter(TexFilter::Tex_LINEAR),
+		m_Wrap(TexWrap::Tex_REPEAT),
 		m_TexID(0)
 	{
-
+		glGenTextures(1, &m_TexID);
 	}
 
 	Texture::~Texture()
@@ -19,13 +19,12 @@ namespace tezcat::Tiny::Core
 
 	void Texture::createTexture(Image* image)
 	{
-		glGenTextures(1, &m_TexID);
 		glBindTexture(GL_TEXTURE_2D, m_TexID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 
-		if (m_Wrap == Wrap::Tex_CLAMP_TO_BORDER)
+		if (m_Wrap == TexWrap::Tex_CLAMP_TO_BORDER)
 		{
 			float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);

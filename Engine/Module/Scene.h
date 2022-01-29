@@ -1,13 +1,12 @@
 #pragma once
-#include <list>
-#include <string>
-#include <unordered_map>
-#include <functional>
+
+#include "CommonHead.h"
 
 namespace tezcat::Tiny::Module
 {
 	class GameObject;
 	class Camera;
+	class Light;
 	class Scene
 	{
 	public:
@@ -45,7 +44,11 @@ namespace tezcat::Tiny::Module
 		std::list<GameObject*> m_ObjectList;
 		std::unordered_map<GameObject*, std::function<void()>> m_LogicList;
 
+	private://光源信息
 
+		std::unordered_set<Light*> m_LightList;
+
+	private:
 		std::unordered_map<std::string, Camera*> m_CameraWithName;
 	};
 }

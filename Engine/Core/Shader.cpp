@@ -5,6 +5,17 @@
 
 namespace tezcat::Tiny::Core
 {
+	Shader::Shader() :
+		m_ProgramID(glCreateProgram()),
+		m_Name("##ErrorShader"),
+		m_OrderID(0),
+		m_ViewMatrixID(0),
+		m_ModelMatrixID(0),
+		m_ProjectionMatrixID(0)
+	{
+
+	}
+
 	Shader::Shader(const std::string& name, int orderID) :
 		m_ProgramID(glCreateProgram()),
 		m_Name(name),
@@ -36,17 +47,9 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	Shader* Shader::attachShader(ShaderBuilder* shader)
+	void Shader::attachShader(unsigned int id)
 	{
-		glAttachShader(m_ProgramID, shader->getID());
-		return this;
-	}
-
-	Shader* Shader::attachShader(const std::string& filePath, GLenum shaderType)
-	{
-		ShaderBuilder* builder = ShaderBuilder::createFromPool(filePath, shaderType);
-		glAttachShader(m_ProgramID, builder->getID());
-		return this;
+		glAttachShader(m_ProgramID, id);
 	}
 
 	void Shader::apply()
@@ -60,8 +63,6 @@ namespace tezcat::Tiny::Core
 		{
 			glGetProgramInfoLog(m_ProgramID, 512, nullptr, infoLog);
 		}
-
-		ShaderBuilder::clearPool();
 
 		m_ProjectionMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatP);
 		m_ViewMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatV);

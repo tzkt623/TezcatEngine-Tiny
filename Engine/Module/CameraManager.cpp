@@ -5,7 +5,7 @@ namespace tezcat::Tiny::Module
 {
 	IMPLEMENT_DELEGATE_INSTANCE(CameraManager);
 
-	CameraManager::CameraManager():
+	CameraManager::CameraManager() :
 		m_CameraWithName()
 	{
 		REGISTER_DELEGATE_INSTANCE(CameraManager);

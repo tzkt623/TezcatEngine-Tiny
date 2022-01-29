@@ -3,9 +3,14 @@
 #include <string>
 #include <vector>
 #include <cstdio>
-#include <unordered_map>
 #include <list>
 #include <memory>
+#include <functional>
+#include <unordered_map>
+#include <unordered_set>
+#include <initializer_list>
+#include <regex>
+
 
 namespace tezcat::Tiny::Utility
 {
@@ -99,7 +104,12 @@ public:\
 
 #define IMPLEMENT_DELEGATE_INSTANCE(class_name) class_name* class_name::m_Instance##class_name = nullptr
 
-#define REGISTER_DELEGATE_INSTANCE(class_name) m_Instance##class_name = this
+#define REGISTER_DELEGATE_INSTANCE(class_name)\
+if(m_Instance##class_name != nullptr)\
+{\
+	delete m_Instance##class_name;\
+}\
+m_Instance##class_name = this
 
 #define STATIC_IMPLEMENT(class_name, valut_type, value_name, value) static valut_type class_name::value_name = value
 }
@@ -110,7 +120,7 @@ namespace tezcat::Tiny::Core {}
 namespace tezcat::Tiny::Module {}
 namespace tezcat::Tiny::Utility {}
 
-#define ALL_NAMESPACE()\
+#define USING_ALL_NAMESPACE()\
 using namespace tezcat::Tiny;\
 using namespace tezcat::Tiny::Core;\
 using namespace tezcat::Tiny::Module;\

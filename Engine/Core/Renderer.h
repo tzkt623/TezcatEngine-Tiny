@@ -1,9 +1,6 @@
 #pragma once
 
-#include <list>
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include "CommonHead.h"
 
 namespace tezcat::Tiny::Module
 {
@@ -36,6 +33,7 @@ namespace tezcat::Tiny::Core
 	//
 	class Renderer
 	{
+		CREATE_DELEGATE_INSTANCE(Renderer)
 	public:
 		Renderer();
 		~Renderer();

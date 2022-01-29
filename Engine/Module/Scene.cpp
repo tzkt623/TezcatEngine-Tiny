@@ -18,7 +18,7 @@ namespace tezcat::Tiny::Module
 
 	void Scene::onEnter()
 	{
-		Core::Engine::getInstance()->getCameraManager()->setSharedCameras(&m_CameraWithName);
+		CameraManager::getInstance()->setSharedCameras(&m_CameraWithName);
 	}
 
 	void Scene::onExit()
@@ -94,6 +94,7 @@ namespace tezcat::Tiny::Module
 		// 			m_NewEnterObjectList.clear();
 		// 		}
 		// 
+
 		for (auto go : m_ObjectList)
 		{
 			go->update();
