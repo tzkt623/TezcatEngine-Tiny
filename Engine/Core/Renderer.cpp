@@ -35,19 +35,15 @@ namespace tezcat::Tiny::Core
 		if (m_PassList.empty())
 		{
 			m_PassList.push_front(pass);
-			m_PassWithName.emplace(pass->getName(), pass);
-			m_PassWithID.emplace(pass->getID(), pass);
 			return;
 		}
 
 		auto it = m_PassList.begin();
 		while (it != m_PassList.end())
 		{
-			if ((*it)->getID() < pass->getID())
+			if ((*it)->getOrderID() <= pass->getOrderID())
 			{
 				m_PassList.insert(it, pass);
-				m_PassWithName.emplace(pass->getName(), pass);
-				m_PassWithID.emplace(pass->getID(), pass);
 				break;
 			}
 			it++;
@@ -104,17 +100,20 @@ namespace tezcat::Tiny::Core
 	{
 		auto shader = renderAgent->getMaterial()->getShader();
 
-		if (m_PassWithID.find(shader->getOrderID()) == m_PassWithID.end())
+		if (m_PassWithID.find(shader->getProgramID()) == m_PassWithID.end())
 		{
 			auto pass = new Pass_Shader(shader);
 			this->addPass(pass);
 			pass->addRenderAgent(renderAgent);
 
+			m_PassWithName.emplace(pass->getName(), pass);
+			m_PassWithID.emplace(pass->getProgramID(), pass);
+
 			Statistic::PassCount = m_PassWithID.size();
 		}
 		else
 		{
-			m_PassWithID[shader->getOrderID()]->addRenderAgent(renderAgent);
+			m_PassWithID[shader->getProgramID()]->addRenderAgent(renderAgent);
 		}
 	}
 

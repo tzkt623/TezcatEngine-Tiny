@@ -20,6 +20,16 @@ void MyScene::onEnter()
 	camera->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
 	this->addGameObject(camera);
 
+	auto light_material = new Material("Unlit/Color");
+	auto light = new GameObject();
+	auto agent = light->getRenderAgent();
+	agent->setMaterial(light_material);
+	agent->setMesh("Cube");
+	light->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	light->getTransform()->setScale(glm::vec3(4.0f));
+	light->apply();
+	this->addGameObject(light);
+
 	Image image;
 	image.openFile("../Resource/Image/dragon.jpg");
 
@@ -46,6 +56,7 @@ void MyScene::onEnter()
 
 		this->addGameObject(go);
 	}
+
 
 	InputSystem::getInstance()->push(MyInputer::getInstace());
 

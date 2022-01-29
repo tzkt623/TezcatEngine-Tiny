@@ -69,6 +69,7 @@ void MyObjectWindow::onUpdate()
 //------------------------------------
 MyMainCameraWindow::MyMainCameraWindow() :
 	GUIWindow(u8"主相机信息"),
+	m_Info(new GUIText(u8"操作")),
 	m_Position(new GUIDragFloat3(u8"坐标")),
 	m_Rotation(new GUIDragFloat3(u8"旋转")),
 	m_Right(new GUIDragFloat3(u8"右方")),
@@ -87,6 +88,7 @@ void MyMainCameraWindow::init()
 {
 	m_MainCamera = CameraManager::getInstance()->getMainCamera();
 
+	this->addChild(m_Info);
 	this->addChild(m_Position);
 	this->addChild(m_Rotation);
 	this->addChild(m_Right);
@@ -107,6 +109,8 @@ void MyMainCameraWindow::init()
 
 void MyMainCameraWindow::onUpdate()
 {
+	m_Info->setData(Tools::fromU8(u8"控制<CTRL>\n[W A S D]\n[R:Up] [F:Down]"));
+
 	auto position = m_MainCamera->getTransform()->getPosition();
 	m_Position->setFloat3(glm::value_ptr(position));
 

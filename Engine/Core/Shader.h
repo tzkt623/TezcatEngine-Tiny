@@ -33,6 +33,7 @@ namespace tezcat::Tiny::Core
 	public:
 		const std::string& getName() const { return m_Name; }
 		void setName(const std::string& name) { m_Name = name; }
+		int getProgramID() const { return m_ProgramID; }
 		int getOrderID() const { return m_OrderID; }
 		void setOrderID(int orderID) { m_OrderID = orderID; }
 		void bind();
@@ -41,6 +42,11 @@ namespace tezcat::Tiny::Core
 		void setProjectionMatrix(const glm::mat4x4& matrix);
 		void setViewMatrix(const glm::mat4x4& matrix);
 		void setModelMatrix(const glm::mat4x4& matrix);
+
+		/// <summary>
+		/// 传入参数为模型矩阵
+		/// </summary>
+		void setNormalMatrix(const glm::mat4x4& matrix);
 		void setTextures(const std::unordered_map<std::string, Texture*>& allTexture);
 
 
@@ -59,6 +65,7 @@ namespace tezcat::Tiny::Core
 		int m_ProjectionMatrixID;
 		int m_ViewMatrixID;
 		int m_ModelMatrixID;
+		int m_NormalMatrixID;
 		std::unordered_map<std::string, unsigned int> m_TextureID;
 		std::unordered_map<std::string, unsigned int> m_UniformID;
 	};

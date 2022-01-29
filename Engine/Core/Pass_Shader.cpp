@@ -45,9 +45,14 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	int Pass_Shader::getID() const
+	int Pass_Shader::getOrderID() const
 	{
 		return m_Shader->getOrderID();
+	}
+
+	int Pass_Shader::getProgramID() const
+	{
+		return m_Shader->getProgramID();
 	}
 
 	const std::string& Pass_Shader::getName() const

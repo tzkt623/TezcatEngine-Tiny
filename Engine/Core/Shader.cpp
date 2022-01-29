@@ -67,6 +67,7 @@ namespace tezcat::Tiny::Core
 		m_ProjectionMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatP);
 		m_ViewMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatV);
 		m_ModelMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatM);
+		m_NormalMatrixID = glGetUniformLocation(m_ProgramID, TINY_MatN);
 
 		glUseProgram(m_ProgramID);
 		if (!m_TextureID.empty())
@@ -109,6 +110,12 @@ namespace tezcat::Tiny::Core
 		glUniformMatrix4fv(m_ModelMatrixID, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
+	void Shader::setNormalMatrix(const glm::mat4x4& matrix)
+	{
+		auto mat = glm::mat3(glm::transpose(glm::inverse(matrix)));
+		glUniformMatrix3fv(m_NormalMatrixID, 1, GL_FALSE, glm::value_ptr(mat));
+	}
+
 	void Shader::setFloat1(const std::string& name, float* data)
 	{
 		glUniform1fv(m_TextureID[name], 1, data);
@@ -123,5 +130,8 @@ namespace tezcat::Tiny::Core
 	{
 		glUniform3fv(m_TextureID[name], 3, data);
 	}
+
+
+
 }
 

@@ -7,6 +7,7 @@ namespace tezcat::Tiny::Core
 	const char* TINY_MatP = "TINY_MatP";
 	const char* TINY_MatV = "TINY_MatV";
 	const char* TINY_MatM = "TINY_MatM";
+	const char* TINY_MatN = "TINY_MatN";
 
 	const char* TINY_VertexColor = "TINY_VertexColor";
 

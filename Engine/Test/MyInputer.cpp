@@ -42,6 +42,27 @@ void MyInputer::processInput(InputSystem* system)
 		position += m_Camera->getRight() * speed;
 	}
 
+	if (system->getKeyDown(GLFW_KEY_R))
+	{
+		transform = true;
+		position += m_Camera->getUp() * speed;
+	}
+	else if (system->getKeyDown(GLFW_KEY_F))
+	{
+		transform = true;
+		position -= m_Camera->getUp() * speed;
+
+	}
+
+// 	if (system->getKeyDown(GLFW_KEY_Q))
+// 	{
+// 		m_Camera->roll(-speed);
+// 	}
+// 	else if (system->getKeyDown(GLFW_KEY_E))
+// 	{
+// 		m_Camera->roll(speed);
+// 	}
+
 	float current_x;
 	float current_y;
 	system->getMousePosition(current_x, current_y);
@@ -67,7 +88,7 @@ void MyInputer::processInput(InputSystem* system)
 			m_LastX = current_x;
 			m_LastY = current_y;
 
-			m_Camera->rotateCamera(offset_x, offset_y);
+			m_Camera->yawPitch(offset_x, offset_y);
 		}
 	}
 	else

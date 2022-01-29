@@ -5,11 +5,13 @@
 #include "CameraManager.h"
 #include "glm/gtx/quaternion.hpp"
 #include "glm/ext/quaternion_float.hpp"
+#include <iostream>
 
 namespace tezcat::Tiny::Module
 {
 	Camera::Camera(const std::string& name) :
 		GameObject(name),
+		m_ID(Utility::IDGenerator<Camera, unsigned int>::generate()),
 		m_NearFace(0.1f),
 		m_FarFace(100.0f),
 		m_FOV(60.0f),
@@ -18,13 +20,13 @@ namespace tezcat::Tiny::Module
 		m_Type(Type::Perspective),
 		m_PMatDirty(true),
 		m_Deep(0),
-		m_ID(Utility::IDGenerator<Camera, unsigned int>::generate()),
 		m_Front(0.0f, 0.0f, -1.0f),
 		m_Up(0.0f, 1.0f, 0.0f),
+		m_Right(1.0f, 0.0f, 0.0f),
+		m_WorldUp(0.0f, 1.0f, 0.0f),
 		m_Yaw(-90.0f),
 		m_Pitch(0.0f),
-		m_Right(1.0f, 0.0f, 0.0f),
-		m_WorldUp(0.0f, 1.0f, 0.0f)
+		m_Roll(0.0f)
 	{
 
 	}
@@ -75,13 +77,13 @@ namespace tezcat::Tiny::Module
 		GameObject::sceneEnter(scene);
 	}
 
-	void Camera::rotateCamera(float offsetX, float offsetY, bool constrainPitch)
+	void Camera::yawPitch(float yaw, float pitch, bool constrainPitch)
 	{
-		offsetX *= 0.2f;
-		offsetY *= 0.2f;
+		yaw *= 0.2f;
+		pitch *= 0.2f;
 
-		m_Yaw += offsetX;
-		m_Pitch += offsetY;
+		m_Yaw += yaw;
+		m_Pitch += pitch;
 
 		if (m_Yaw > 360)
 		{
@@ -104,7 +106,8 @@ namespace tezcat::Tiny::Module
 			}
 		}
 
-		this->getTransform()->setRotation(glm::vec3(m_Pitch, m_Yaw, 0.0f));
+		this->getTransform()->setRotation(glm::vec3(m_Pitch, m_Yaw, m_Roll));
+
 		this->updateCameraVector();
 	}
 
@@ -119,4 +122,13 @@ namespace tezcat::Tiny::Module
 		m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
 		m_Up = glm::normalize(glm::cross(m_Right, m_Front));
 	}
+
+	void Camera::roll(float speed)
+	{
+		m_Roll += speed;
+		m_WorldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f) * glm::angleAxis(glm::radians(m_Roll), m_Front));
+		m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
+		m_Up = glm::normalize(glm::cross(m_Right, m_Front));
+	}
+
 }

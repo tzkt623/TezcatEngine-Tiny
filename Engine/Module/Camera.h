@@ -38,7 +38,10 @@ namespace tezcat::Tiny::Module
 		}
 
 		glm::mat4x4& getProjectionMatrix() { return m_ProjectionMatrix; }
-		glm::mat4x4& getViewMatrix() { return m_ViewMatrix; }
+		glm::mat4x4& getViewMatrix()
+		{
+			return m_ViewMatrix;
+		}
 
 	public:
 
@@ -56,7 +59,8 @@ namespace tezcat::Tiny::Module
 	public:
 		void update() override;
 		void sceneEnter(Scene* scene) override;
-		void rotateCamera(float offsetX, float offsetY, bool constrainPitch = true);
+		void yawPitch(float yaw, float pitch, bool constrainPitch = true);
+		void roll(float roll);
 
 	private:
 		void updateCameraVector();
@@ -81,5 +85,6 @@ namespace tezcat::Tiny::Module
 		glm::vec3 m_WorldUp;
 		float m_Yaw;
 		float m_Pitch;
+		float m_Roll;
 	};
 }

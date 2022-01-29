@@ -15,6 +15,7 @@ TINY_BEGIN_VS
     uniform mat4 TINY_MatP;
     uniform mat4 TINY_MatV;
     uniform mat4 TINY_MatM;
+    uniform mat3 TINY_MatN;
 
     out vec4 myColor;
     out vec2 myUV;
@@ -28,7 +29,7 @@ TINY_BEGIN_VS
         
         myColor = aColor;
         myUV = aUV;
-        myNormal = aNormal;
+        myNormal = TINY_MatN * aNormal;
         myWorldPosition = vec3(TINY_MatM * position);
     }
 }
@@ -51,7 +52,7 @@ TINY_BEGIN_FS
     void main()
     {
         vec3 normal = normalize(myNormal);
-        vec3 lightDir = normalize(vec3(1,1,1) - myWorldPosition);
+        vec3 lightDir = normalize(lightPosition - myWorldPosition);
         float diff = max(dot(normal, lightDir), 0.0);
         vec3 diffuse = diff * lightColor;
 

@@ -36,7 +36,9 @@ namespace tezcat::Tiny::Core
 	{
 		auto transform = this->getMasterObject()->getTransform();
 		shader->setModelMatrix(transform->getModelMatrix());
+		shader->setNormalMatrix(transform->getModelMatrix());
 		shader->setTextures(m_Material->allTexture());
+
 		m_Mesh->render(shader);
 	}
 

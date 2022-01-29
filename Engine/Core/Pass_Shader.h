@@ -33,7 +33,8 @@ namespace tezcat::Tiny::Core
 	public:
 		void render(Module::Camera* camera);
 
-		int getID() const;
+		int getOrderID() const;
+		int getProgramID() const;
 		const std::string& getName() const;
 
 	private:
