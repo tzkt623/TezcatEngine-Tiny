@@ -55,7 +55,6 @@ TINY_BEGIN_FS
         float diff = max(dot(normal, lightDir), 0.0);
         vec3 diffuse = diff * lightColor;
 
-        //FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
         myFinalColor = diff * myColor * texture(TINY_TexColor, myUV);
     }
 }

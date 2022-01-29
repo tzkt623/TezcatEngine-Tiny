@@ -26,7 +26,7 @@ void MyScene::onEnter()
 	auto texture = new Texture();
 	texture->createTexture(&image);
 
-	auto material = new Material("Unlit/Texture");
+	auto material = new Material("Standard/Std1");
 	material->addTexture(TINY_TexColor, texture);
 
 	std::random_device rd;
