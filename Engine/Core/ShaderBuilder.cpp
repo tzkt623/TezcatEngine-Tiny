@@ -8,8 +8,10 @@
 
 namespace tezcat::Tiny::Core
 {
-	std::regex ShaderBuilder::TINY_SHADER_FILTER("\t|\r|\n");
-	std::string ShaderBuilder::TINY_SHADER_FILTER_NULL;
+	static std::regex TINY_SHADER_INFO_FILTER(" |\t|\r|\n");
+	static std::string TINY_FILTER_FMT_NULL;
+
+	std::regex ShaderBuilder::TINY_SHADER_FILTER(" |\t|\r|\n");
 
 	const char* ShaderBuilder::TINY_BEGIN_DEF = "TINY_BEGIN_DEF";
 	const char* ShaderBuilder::TINY_END_DEF = "TINY_END_DEF";
@@ -19,6 +21,20 @@ namespace tezcat::Tiny::Core
 
 	const char* ShaderBuilder::TINY_BEGIN_FS = "TINY_BEGIN_FS";
 	const char* ShaderBuilder::TINY_END_FS = "TINY_END_FS";
+
+	bool splitString(const std::string& content, std::string& result1, std::string& result2, const char* spliter)
+	{
+		auto spliter_length = std::strlen(spliter);
+		auto pos = content.find(spliter);
+		if (pos != std::string::npos)
+		{
+			result1 = content.substr(0, pos + spliter_length);
+			result2 = content.substr(pos + spliter_length, content.size() - pos - spliter_length);
+			return true;
+		}
+
+		return false;
+	}
 
 	void parsePair(const std::string& content, const char* tokenName, std::string& tokenValue)
 	{
@@ -57,14 +73,57 @@ namespace tezcat::Tiny::Core
 		return false;
 	}
 
+	bool parseShaderRange(const std::string& content, std::string& newContent, const char* tokenBegin, const char* tokenEnd)
+	{
+		auto begin = content.find(tokenBegin);
+		auto end = content.find(tokenEnd);
+
+		if (begin != std::string::npos && end != std::string::npos)
+		{
+			int offset = 0;
+			auto token_begin_pos = std::strlen(tokenBegin) + begin;
+			for (auto i = token_begin_pos; i < content.size(); i++)
+			{
+				if (content[i] == '{')
+				{
+					break;
+				}
+				else
+				{
+					offset++;
+				}
+			}
+			token_begin_pos += offset;
+
+			offset = 0;
+			for (auto i = end; i > token_begin_pos; i--)
+			{
+				if (content[i] == '}')
+				{
+					break;
+				}
+				else
+				{
+					offset++;
+				}
+			}
+
+			auto token_end_pos = end - offset;
+			newContent = content.substr(token_begin_pos + 1, token_end_pos - 1 - token_begin_pos - 1);
+			return true;
+		}
+
+		newContent = "##Error##Content##";
+		return false;
+	}
+
 	//----------------------------------------------------------------------
 	//
 	//
 	//
-	ShaderBuilder::ShaderBuilder():
-		m_ShaderIDs(4)
+	ShaderBuilder::ShaderBuilder()
 	{
-
+		m_ShaderIDs.reserve(4);
 	}
 
 	ShaderBuilder::~ShaderBuilder()
@@ -97,26 +156,24 @@ namespace tezcat::Tiny::Core
 
 	void ShaderBuilder::parse(Shader* shader, std::string& content)
 	{
-		content = std::regex_replace(content, TINY_SHADER_FILTER, TINY_SHADER_FILTER_NULL);
+		std::string define, shader_content;
+		splitString(content, define, shader_content, TINY_END_DEF);
 
-		ShaderBuilder::parseDefine(shader, content);
-		this->parseShader(shader, content, TINY_BEGIN_VS, TINY_END_VS);
-		this->parseShader(shader, content, TINY_BEGIN_FS, TINY_END_FS);
+		define = std::regex_replace(define, TINY_SHADER_INFO_FILTER, TINY_FILTER_FMT_NULL);
+
+		this->parseDefine(shader, define);
+		this->parseShader(shader, shader_content, TINY_BEGIN_VS, TINY_END_VS);
+		this->parseShader(shader, shader_content, TINY_BEGIN_FS, TINY_END_FS);
 	}
 
 	void ShaderBuilder::parseDefine(Shader* shader, std::string& content)
 	{
-		static std::regex filter(" ");
-		static std::string null;
-
 		static const char* OrderID = "OrderID";
 		static const char* Name = "Name";
 
 		std::string new_content;
 		if (parseRange(content, new_content, TINY_BEGIN_DEF, TINY_END_DEF))
 		{
-			new_content = std::regex_replace(new_content, filter, null);
-
 			std::string value;
 
 			parsePair(new_content, OrderID, value);
@@ -133,7 +190,7 @@ namespace tezcat::Tiny::Core
 	void ShaderBuilder::parseShader(Shader* shader, std::string& content, const char* tinyBegin, const char* tinyEnd)
 	{
 		std::string new_content;
-		if (parseRange(content, new_content, tinyBegin, tinyEnd))
+		if (parseShaderRange(content, new_content, tinyBegin, tinyEnd))
 		{
 			new_content = "#version 330 core\n\r" + new_content;
 

@@ -55,6 +55,8 @@ TINY_BEGIN_FS
         float diff = max(dot(normal, lightDir), 0.0);
         vec3 diffuse = diff * lightColor;
 
+        //vec3 oiffs=0;
+
         myFinalColor = diff * myColor * texture(TINY_TexColor, myUV);
     }
 }
