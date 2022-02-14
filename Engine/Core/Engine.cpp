@@ -1,21 +1,15 @@
-﻿#include <iostream>
-#include <vector>
-#include <initializer_list>
-
-#include "Engine.h"
-#include "ShaderBuilder.h"
-#include "Shader.h"
-#include "MeshData.h"
-#include "Renderer.h"
-#include "VAO.h"
-#include "Pass_VAO.h"
-#include "RenderObject.h"
-#include "SceneManager.h"
-#include "ShaderManager.h"
-#include "CameraManager.h"
-#include "InputSystem.h"
-#include "ResourceLoader.h"
-#include "Tools.h"
+﻿#include "Engine.h"
+#include "Manager/LightManager.h"
+#include "Manager/ShaderManager.h"
+#include "Manager/SceneManager.h"
+#include "Manager/CameraManager.h"
+#include "Data/ResourceLoader.h"
+#include "Input/InputSystem.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/BaseGraphics.h"
+#include "Scene/LayerMask.h"
+#include "Scene/GameObject.h"
+#include "Manager/VertexGroupManager.h"
 
 
 namespace tezcat::Tiny::Core
@@ -24,29 +18,51 @@ namespace tezcat::Tiny::Core
 	int Engine::ScreenWidth = 0;
 	float Engine::DeltaTime = 0;
 
-	Engine::Engine() :
-		m_Window(nullptr),
-		m_Renderer(new Renderer()),
-		m_ShaderManager(new ShaderManager()),
-		m_SceneManager(new Module::SceneManager()),
-		m_CameraManager(new Module::CameraManager()),
-		m_InputSystem(new Module::InputSystem()),
-		m_ResourceLoader(nullptr)
+	Engine::Engine()
+		: m_ResourceLoader(nullptr)
+		, m_LightManager(new LightManager())
+		, m_ShaderManager(new ShaderManager())
+		, m_SceneManager(new SceneManager())
+		, m_CameraManager(new CameraManager())
+		, m_InputSystem(new InputSystem())
+		, m_Graphics(nullptr)
+		, m_IsRunning(true)
 	{
-
+		new VertexGroupManager();
 	}
 
 	Engine::~Engine()
 	{
-		glfwTerminate();
-
-		delete m_Renderer;
+		delete m_InputSystem;
+		delete m_Graphics;
 		delete m_SceneManager;
 		delete m_ShaderManager;
 		delete m_CameraManager;
+		delete m_ResourceLoader;
+		delete m_LightManager;
 	}
 
-	int Engine::init(Module::ResourceLoader* loader)
+	bool Engine::init(ResourceLoader* loader)
+	{
+		if (!this->preInit(loader))
+		{
+			return false;
+		}
+
+		if (!this->onInit(loader))
+		{
+			return false;
+		}
+
+		if (!this->postInit(loader))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Engine::preInit(ResourceLoader* loader)
 	{
 		m_ResourceLoader = loader;
 		m_ResourceLoader->prepareEngine(this);
@@ -54,87 +70,70 @@ namespace tezcat::Tiny::Core
 		ScreenWidth = m_ResourceLoader->getWindowWidth();
 		ScreenHeight = m_ResourceLoader->getWindowHeight();
 
-		glfwInit();
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-		m_Window = glfwCreateWindow(ScreenWidth, ScreenHeight, m_ResourceLoader->getName().c_str(), nullptr, nullptr);
-		if (m_Window == nullptr)
-		{
-			std::cout << "Failed to create GLFW window" << std::endl;
-			glfwTerminate();
-			return -1;
-		}
-
-		glfwMakeContextCurrent(m_Window);
-		glfwSwapInterval(1);
-
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		{
-			std::cout << "Failed to initialize GLAD" << std::endl;
-			return -1;
-		}
-
-
-		m_ResourceLoader->prepareResource(this);
-		m_ResourceLoader->prepareScene(this);
-
-		this->initInputSystem();
-		m_SceneManager->init();
-		return 0;
+		LayerMask::init();
+		return true;
 	}
 
-	void Engine::initInputSystem()
+	bool Engine::onInit(ResourceLoader* loader)
 	{
-		m_InputSystem->setWindow(m_Window);
-// 		glfwSetMouseButtonCallback(m_Window, Engine::mouseButtonCallBack);
-// 		glfwSetCursorPosCallback(m_Window, Engine::mouseCursorPosCallBack);
-// 		glfwSetScrollCallback(m_Window, Engine::mouseScrollPosCallBack);
+		m_Graphics = this->createGraphics();
+		GraphicsT::attach(m_Graphics);
+		m_Graphics->init(this);
+
+		m_ResourceLoader->prepareResource(this);
+		return true;
+	}
+
+	bool Engine::postInit(ResourceLoader* loader)
+	{
+		m_SceneManager->init();
+		m_ResourceLoader->prepareScene(this);
+		return true;
+	}
+	void Engine::beforeLoop()
+	{
+
+	}
+
+	void Engine::endLoop()
+	{
+
 	}
 
 	void Engine::run()
 	{
-		m_Renderer->init(this);
+		this->beforeLoop();
 
-		double old_time = glfwGetTime();
-		double now_time = 0;
-
-		while (!glfwWindowShouldClose(m_Window))
+		while (m_IsRunning)
 		{
-			glfwPollEvents();
-
-			now_time = glfwGetTime();
-			DeltaTime = static_cast<float>(now_time - old_time);
-			old_time = now_time;
-
-			m_InputSystem->processInput();
-
-			m_SceneManager->update();
-
-			m_Renderer->render();
-
-			glfwSwapBuffers(m_Window);
+			this->preUpdate();
+			this->onUpdate();
+			this->postUpdate();
 		}
+
+		this->endLoop();
 	}
 
-	void Engine::close()
+	void Engine::preUpdate()
 	{
 
 	}
 
-	void Engine::mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
+	void Engine::onUpdate()
 	{
-		Engine::getInstance()->getInputSystem()->mouseButtonCallBack(button, action, mods);
+		m_InputSystem->update();
+		m_SceneManager->update();
+		m_Graphics->render();
+		m_Graphics->swapBuffer();
 	}
 
-	void Engine::mouseCursorPosCallBack(GLFWwindow* window, double xpos, double ypos)
+	void Engine::postUpdate()
 	{
-		Engine::getInstance()->getInputSystem()->mouseCursorPosCallBack(xpos, ypos);
+
 	}
 
-	void Engine::mouseScrollPosCallBack(GLFWwindow* window, double xoffset, double yoffset)
+	void Engine::stop()
 	{
-		Engine::getInstance()->getInputSystem()->mouseScrollPosCallBack(xoffset, yoffset);
+		m_IsRunning = false;
 	}
 }

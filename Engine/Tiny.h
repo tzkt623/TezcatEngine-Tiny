@@ -1,44 +1,47 @@
 #pragma once
 
-#include "Engine.h"
-#include "GUIWidget.h"
+#include "Core/Engine.h"
+#include "Core/Statistic.h"
 
-#include "Texture.h"
-#include "Image.h"
+#include "Core/GUI/GUIWidget.h"
 
-#include "SceneManager.h"
-#include "Scene.h"
+#include "Core/Renderer/Texture.h"
 
-#include "Camera.h"
-#include "CameraManager.h"
+#include "Core/Manager/SceneManager.h"
+#include "Core/Manager/CameraManager.h"
 
-#include "Inputer.h"
-#include "InputSystem.h"
+#include "Core/Scene/Scene.h"
+#include "Core/Scene/GameObject.h"
 
-#include "Transform.h"
-#include "MeshData.h"
-#include "Material.h"
-#include "RenderObject.h"
-#include "RenderAgent.h"
-#include "ResourceLoader.h"
+#include "Core/Component/RenderObject.h"
+#include "Core/Component/Camera.h"
+#include "Core/Component/Transform.h"
+#include "Core/Component/MeshRenderer.h"
 
-#include "Tools.h"
-#include "Statistic.h"
-#include "ShaderConfig.h"
+#include "Core/Data/Image.h"
+#include "Core/Data/MeshData.h"
+#include "Core/Data/Material.h"
+#include "Core/Data/ResourceLoader.h"
+
+#include "Core/Input/Inputer.h"
+#include "Core/Input/InputSystem.h"
+
+#include "Core/Shader/ShaderConfig.h"
+
+#include "Utility/Tools.h"
+
+#ifdef TINY_PLATFORM_WINDOWS
+#include "Platform/Windows/WindowsEngine.h"
+#endif
 
 
-using namespace tezcat::Tiny;
-using namespace tezcat::Tiny::Core;
-using namespace tezcat::Tiny::Module;
-using namespace tezcat::Tiny::Utility;
-
-#define TINY_ENGINE_ENTRY(resouce_loader)\
+#define TINY_ENGINE_ENTRY(my_engine, resouce_loader)\
 int main()\
 {\
-	auto result = Engine::getInstance()->init(resouce_loader);\
-	if (result == 0)\
+	auto engine = new my_engine();\
+	if(engine->init(resouce_loader))\
 	{\
-		Engine::getInstance()->run();\
+		engine->run();\
 	}\
-	return result;\
+	return 0;\
 }

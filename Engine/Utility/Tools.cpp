@@ -8,11 +8,4 @@ namespace tezcat::Tiny::Utility
 	{
 		return std::string(string.begin(), string.end());
 	}
-
-
-	//---------------------------------------------
-	// 
-	//  [1/27/2022 Administrator]
-	//
-
 }

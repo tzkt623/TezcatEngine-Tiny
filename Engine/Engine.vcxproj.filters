@@ -4,73 +4,43 @@
     <ClCompile Include="Core\Engine.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\MeshData.cpp">
+    <ClCompile Include="Core\Data\MeshData.cpp">
       <Filter>Engine\Core\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RenderCommand.cpp">
+    <ClCompile Include="Core\Renderer\RenderCommand.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\VAO.cpp">
+    <ClCompile Include="Core\Renderer\VertexGroup.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RenderObject.cpp">
+    <ClCompile Include="Core\Component\RenderObject.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Pass_Shader.cpp">
+    <ClCompile Include="Core\Pipeline\PassShader.cpp">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Pass_VAO.cpp">
+    <ClCompile Include="Core\Pipeline\PassVertexGroup.cpp">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Renderer.cpp">
+    <ClCompile Include="Core\Renderer\Renderer.cpp">
       <Filter>Engine\Core\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Shader.cpp">
+    <ClCompile Include="Core\Shader\Shader.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ShaderBuilder.cpp">
+    <ClCompile Include="Core\Shader\ShaderBuilder.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ShaderManager.cpp">
+    <ClCompile Include="Core\Manager\ShaderManager.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Module\Inputer.cpp">
-      <Filter>Engine\Module\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\InputSystem.cpp">
-      <Filter>Engine\Module\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\Material.cpp">
-      <Filter>Engine\Module\Material</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\Camera.cpp">
-      <Filter>Engine\Module\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\CameraManager.cpp">
-      <Filter>Engine\Module\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\GameObject.cpp">
-      <Filter>Engine\Module\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\Scene.cpp">
-      <Filter>Engine\Module\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\SceneManager.cpp">
-      <Filter>Engine\Module\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\Transform.cpp">
-      <Filter>Engine\Module\Transform</Filter>
-    </ClCompile>
-    <ClCompile Include="Module\ResourceLoader.cpp">
-      <Filter>Engine\Module</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\glad\src\glad.c">
+    <ClCompile Include="ThirdParty\glad\glad.c">
       <Filter>Engine\Thirdparty\glad</Filter>
     </ClCompile>
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp">
       <Filter>Engine\Thirdparty\glm</Filter>
     </ClCompile>
-    <ClCompile Include="Core\GUI.cpp">
+    <ClCompile Include="Core\GUI\GUI.cpp">
       <Filter>Engine\Core\Renderer\GUI</Filter>
     </ClCompile>
     <ClCompile Include="ThirdParty\imgui\imgui.cpp">
@@ -100,45 +70,83 @@
     <ClCompile Include="Utility\Tools.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Test\main.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="Test\MyGUI.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="Test\MyInputer.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="Test\MyResourceLoader.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="Test\MyScene.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Image.cpp">
+    <ClCompile Include="Core\Data\Image.cpp">
       <Filter>Engine\Core\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Light.cpp">
+    <ClCompile Include="Core\Renderer\Texture.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Texture.cpp">
+    <ClCompile Include="Core\Component\MeshRenderer.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Mesh.cpp">
-      <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\VAOManager.cpp">
+    <ClCompile Include="Core\Manager\VertexGroupManager.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\ShaderConfig.cpp">
+    <ClCompile Include="Core\Shader\ShaderConfig.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RenderAgent.cpp">
-      <Filter>Engine\Core\Renderer\Object\Agent</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\GUIWidget.cpp">
+    <ClCompile Include="Core\GUI\GUIWidget.cpp">
       <Filter>Engine\Core\Renderer\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Component\Transform.cpp">
+      <Filter>Engine\Core\Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Scene\Scene.cpp">
+      <Filter>Engine\Core\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Manager\SceneManager.cpp">
+      <Filter>Engine\Core\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Input\Inputer.cpp">
+      <Filter>Engine\Core\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Input\InputSystem.cpp">
+      <Filter>Engine\Core\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Scene\GameObject.cpp">
+      <Filter>Engine\Core\Scene\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Component\Camera.cpp">
+      <Filter>Engine\Core\Scene\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Manager\CameraManager.cpp">
+      <Filter>Engine\Core\Scene\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Component\Light.cpp">
+      <Filter>Engine\Core\Renderer\Object\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Manager\LightManager.cpp">
+      <Filter>Engine\Core\Renderer\Object\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Data\ResourceLoader.cpp">
+      <Filter>Engine\Core\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Scene\LayerMask.cpp">
+      <Filter>Engine\Core\Scene\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Base\TinyObject.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Component\Component.cpp">
+      <Filter>Engine\Core\Scene\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Pipeline\Pipeline.cpp">
+      <Filter>Engine\Core\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Data\Material.cpp">
+      <Filter>Engine\Core\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Shader\ShaderPackage.cpp" />
+    <ClCompile Include="Core\Manager\PipelineManager.cpp" />
+    <ClCompile Include="Platform\Windows\WindowsEngine.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
+    <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLVertexBuffer.cpp" />
+    <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="Core\Scene\Layer.cpp" />
+    <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
+    <ClCompile Include="Core\Head\ConfigHead.cpp" />
+    <ClCompile Include="Core\Head\CppHead.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -165,26 +173,8 @@
     <Filter Include="Engine\Core\Shader">
       <UniqueIdentifier>{58e81e64-f529-4e67-9d7e-821f2170d87b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Module">
-      <UniqueIdentifier>{ba4c8f0e-6caa-4e1d-86d4-e20a79b45a31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Module\Scene">
-      <UniqueIdentifier>{30805f96-e40a-4d1c-9b8d-718df949e553}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Module\Object">
-      <UniqueIdentifier>{c24a479e-1f87-4528-89f8-8f50309a156f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Module\Transform">
-      <UniqueIdentifier>{e3eed163-11b1-46b3-b1c9-75df74cbe885}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Module\Material">
-      <UniqueIdentifier>{b421cee4-4277-4613-ab5f-00500b9acc9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Utility">
       <UniqueIdentifier>{3903e188-7dda-49b2-ab1c-e0e36fd0de29}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Module\Input">
-      <UniqueIdentifier>{6d441da2-1d77-4850-a194-095f33e8944d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test">
       <UniqueIdentifier>{160ff020-f1fa-496d-b646-f817f1c7b5c2}</UniqueIdentifier>
@@ -210,78 +200,63 @@
     <Filter Include="Engine\Header">
       <UniqueIdentifier>{ee483fd2-cbbd-41aa-8abc-a3cc039cab0f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Core\Renderer\Object\Agent">
-      <UniqueIdentifier>{de53db17-1a4c-47a7-8f1e-1f773a5c9165}</UniqueIdentifier>
+    <Filter Include="Engine\Core\Renderer\Object\Light">
+      <UniqueIdentifier>{3a1d12fe-bad7-418d-a616-ba9069f813a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Input">
+      <UniqueIdentifier>{6d441da2-1d77-4850-a194-095f33e8944d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Scene">
+      <UniqueIdentifier>{30805f96-e40a-4d1c-9b8d-718df949e553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Scene\GameObject">
+      <UniqueIdentifier>{c24a479e-1f87-4528-89f8-8f50309a156f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Transform">
+      <UniqueIdentifier>{e3eed163-11b1-46b3-b1c9-75df74cbe885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core\Scene\Camera">
+      <UniqueIdentifier>{a15767f7-864d-4ba7-bcc6-f3214bbb35b1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Engine.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\MeshData.h">
+    <ClInclude Include="Core\Data\MeshData.h">
       <Filter>Engine\Core\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Core\RenderCommand.h">
+    <ClInclude Include="Core\Renderer\RenderCommand.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\VAO.h">
+    <ClInclude Include="Core\Renderer\VertexGroup.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\RenderObject.h">
+    <ClInclude Include="Core\Component\RenderObject.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Pass_Shader.h">
+    <ClInclude Include="Core\Pipeline\PassShader.h">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Pass_VAO.h">
+    <ClInclude Include="Core\Pipeline\PassVertexGroup.h">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Renderer.h">
+    <ClInclude Include="Core\Renderer\Renderer.h">
       <Filter>Engine\Core\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Shader.h">
+    <ClInclude Include="Core\Shader\Shader.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ShaderBuilder.h">
+    <ClInclude Include="Core\Shader\ShaderBuilder.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ShaderManager.h">
+    <ClInclude Include="Core\Manager\ShaderManager.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Module\Inputer.h">
-      <Filter>Engine\Module\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\InputSystem.h">
-      <Filter>Engine\Module\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\Material.h">
-      <Filter>Engine\Module\Material</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\Camera.h">
-      <Filter>Engine\Module\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\CameraManager.h">
-      <Filter>Engine\Module\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\GameObject.h">
-      <Filter>Engine\Module\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\Scene.h">
-      <Filter>Engine\Module\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\SceneManager.h">
-      <Filter>Engine\Module\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\Transform.h">
-      <Filter>Engine\Module\Transform</Filter>
-    </ClInclude>
-    <ClInclude Include="Module\ResourceLoader.h">
-      <Filter>Engine\Module</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\glad\include\glad\glad.h">
+    <ClInclude Include="ThirdParty\glad\glad.h">
       <Filter>Engine\Thirdparty\glad</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\glad\include\KHR\khrplatform.h">
+    <ClInclude Include="ThirdParty\glad\khrplatform.h">
       <Filter>Engine\Thirdparty\glad</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\stb_image.h">
@@ -1145,7 +1120,7 @@
     <ClInclude Include="ThirdParty\glm\vector_relational.hpp">
       <Filter>Engine\Thirdparty\glm</Filter>
     </ClInclude>
-    <ClInclude Include="Core\GUI.h">
+    <ClInclude Include="Core\GUI\GUI.h">
       <Filter>Engine\Core\Renderer\GUI</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\imgui\imconfig.h">
@@ -1181,19 +1156,7 @@
     <ClInclude Include="Core\Statistic.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="Test\MyInputer.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="Test\MyResourceLoader.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="Test\MyScene.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Image.h">
+    <ClInclude Include="Core\Data\Image.h">
       <Filter>Engine\Core\Data</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\GLFW\glfw3.h">
@@ -1202,39 +1165,95 @@
     <ClInclude Include="ThirdParty\GLFW\glfw3native.h">
       <Filter>Engine\Thirdparty\glfw</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Light.h">
-      <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\GLHead.h">
-      <Filter>Engine\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\CommonHead.h">
+    <ClInclude Include="Core\Head\GLHead.h">
       <Filter>Engine\Header</Filter>
     </ClInclude>
     <ClInclude Include="Tiny.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Texture.h">
+    <ClInclude Include="Core\Renderer\Texture.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Mesh.h">
+    <ClInclude Include="Core\Component\MeshRenderer.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\VAOManager.h">
+    <ClInclude Include="Core\Manager\VertexGroupManager.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ShaderConfig.h">
+    <ClInclude Include="Core\Shader\ShaderConfig.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Core\RenderAgent.h">
-      <Filter>Engine\Core\Renderer\Object\Agent</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\GUIWidget.h">
+    <ClInclude Include="Core\GUI\GUIWidget.h">
       <Filter>Engine\Core\Renderer\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ImGuiHead.h">
+    <ClInclude Include="Core\Head\ImGuiHead.h">
       <Filter>Engine\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Component\Transform.h">
+      <Filter>Engine\Core\Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Manager\SceneManager.h">
+      <Filter>Engine\Core\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Scene\Scene.h">
+      <Filter>Engine\Core\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Input\InputSystem.h">
+      <Filter>Engine\Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Input\Inputer.h">
+      <Filter>Engine\Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Scene\GameObject.h">
+      <Filter>Engine\Core\Scene\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Manager\CameraManager.h">
+      <Filter>Engine\Core\Scene\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Component\Camera.h">
+      <Filter>Engine\Core\Scene\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Manager\LightManager.h">
+      <Filter>Engine\Core\Renderer\Object\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Component\Light.h">
+      <Filter>Engine\Core\Renderer\Object\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Data\ResourceLoader.h">
+      <Filter>Engine\Core\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Scene\LayerMask.h">
+      <Filter>Engine\Core\Scene\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Base\TinyObject.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Component\Component.h">
+      <Filter>Engine\Core\Scene\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Pipeline\Pipeline.h">
+      <Filter>Engine\Core\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Head\CppHead.h">
+      <Filter>Engine\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Head\GLMHead.h">
+      <Filter>Engine\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Data\Material.h">
+      <Filter>Engine\Core\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Shader\ShaderPackage.h" />
+    <ClInclude Include="Core\Manager\PipelineManager.h" />
+    <ClInclude Include="Core\Head\ConfigHead.h" />
+    <ClInclude Include="Utility\Bitmask.h" />
+    <ClInclude Include="Platform\Windows\WindowsEngine.h" />
+    <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
+    <ClInclude Include="Core\Renderer\BaseGraphics.h" />
+    <ClInclude Include="Platform\OpenGL\GLVertexBuffer.h" />
+    <ClInclude Include="Core\Renderer\VertexBuffer.h" />
+    <ClInclude Include="Core\Scene\Layer.h" />
+    <ClInclude Include="Core\Renderer\RenderLayer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

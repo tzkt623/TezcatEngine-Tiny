@@ -36,4 +36,5 @@
 # dic
 /.vs
 /x64
-/Engine/x64
+/bin
+/bin-int
