@@ -1,8 +1,9 @@
 # TezcatEngine-Tiny
 
-引擎二周目进行中
+# 引擎二周目进行中
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo.jpg?raw=true)
+## 代码结构
 
 因为我用unity比较多,就模仿了他的结构,现在的结构是这样
 ```c
@@ -40,7 +41,7 @@ elden_ring2->getTransform()->setRotation(glm::vec3(0.0f, -180.0f, 0.0f));
 elden_ring2->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1));
 this->addGameObject(elden_ring2);
 ```
-
+## 材质结构
 Shader系统的定义是这样
 ```c
 #TINY_HEAD_BEGIN
