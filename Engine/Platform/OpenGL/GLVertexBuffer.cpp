@@ -1,5 +1,5 @@
 #include "GLVertexBuffer.h"
-#include "Core/Head/GLHead.h"
+#include "GLHead.h"
 #include "Core/Data/MeshData.h"
 #include "Core/Manager/VertexGroupManager.h"
 
@@ -72,7 +72,7 @@ namespace tezcat::Tiny::Core
 
 	GLVertexGroup::GLVertexGroup(MeshData* meshData)
 	{
-		this->initWithMesh(meshData);
+		this->init(meshData);
 	}
 
 	GLVertexGroup::~GLVertexGroup()
@@ -80,7 +80,7 @@ namespace tezcat::Tiny::Core
 		delete m_VertexBuffer;
 	}
 
-	void GLVertexGroup::initWithMesh(MeshData* meshData)
+	void GLVertexGroup::init(MeshData* meshData)
 	{
 		if (m_UID != 0)
 		{

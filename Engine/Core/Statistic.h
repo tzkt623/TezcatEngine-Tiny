@@ -10,6 +10,8 @@ namespace tezcat::Tiny
 		static glm::vec2 mouseOffset;
 		static glm::vec2 mousePosition;
 
+		static double RenderTime;
+
 		static size_t MemoryAlloc;
 		static size_t MemoryFree;
 

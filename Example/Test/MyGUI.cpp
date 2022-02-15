@@ -2,7 +2,8 @@
 
 MyInfoWindow::MyInfoWindow()
 	: GUIWindow(u8"统计信息")
-	, m_LabelMemory(new GUIText(u8"Memeory"))
+	, m_LabelMemory(new GUIText(u8"Memory"))
+	, m_LabelRenderTime(new GUIText(u8"RenderTime"))
 	, m_LabelPass(new GUIText(u8"PassCount"))
 	, m_LabelFPS(new GUIText(u8"FPS"))
 	, m_LabelDrawCall(new GUIText(u8"DrawCall"))
@@ -19,11 +20,13 @@ MyInfoWindow::~MyInfoWindow()
 	delete m_MousePosition;
 	delete m_MouseOffset;
 	delete m_LabelMemory;
+	delete m_LabelRenderTime;
 }
 
 void MyInfoWindow::init()
 {
 	this->addChild(m_LabelMemory);
+	this->addChild(m_LabelRenderTime);
 	this->addChild(m_LabelFPS);
 	this->addChild(m_LabelPass);
 	this->addChild(m_LabelDrawCall);
@@ -34,6 +37,7 @@ void MyInfoWindow::init()
 void MyInfoWindow::onUpdate()
 {
 	m_LabelMemory->setData(Tools::stringFormat("Memory: %.3f kb", Statistic::getMemoryUse() / 1024.0f));
+	m_LabelRenderTime->setData(Tools::stringFormat("RenderTime: %.1f ms", Statistic::RenderTime));
 
 	m_LabelFPS->setData(Tools::stringFormat("FPS: %.1f(%.3f ms/Frame)",
 		GUIFunction::getFrameRate(), GUIFunction::getFrameRateTime()));

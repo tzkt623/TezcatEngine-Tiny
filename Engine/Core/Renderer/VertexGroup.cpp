@@ -1,7 +1,6 @@
 #include "VertexGroup.h"
 #include "../Data/MeshData.h"
 #include "../Manager/VertexGroupManager.h"
-#include "../Head/GLHead.h"
 #include "Utility/Tools.h"
 #include "VertexBuffer.h"
 #include "BaseGraphics.h"

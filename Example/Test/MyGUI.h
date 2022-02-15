@@ -15,6 +15,7 @@ protected:
 
 private:
 	GUIText* m_LabelMemory;
+	GUIText* m_LabelRenderTime;
 	GUIText* m_LabelFPS;
 	GUIText* m_LabelPass;
 	GUIText* m_LabelDrawCall;

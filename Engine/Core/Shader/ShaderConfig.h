@@ -4,22 +4,26 @@
 
 namespace tezcat::Tiny::Core
 {
-	//-----------------------------
-	//内置Shader名称
-	extern const char* TINY_Default_Shader;
+	struct TinyParameter
+	{
+		//-----------------------------
+		//内置Shader名称
+		const static char* TINY_Default_Shader;
 
-	//----------------------------
-	//Shader内置参数
-	extern const char* TINY_MatP;
-	extern const char* TINY_MatV;
-	extern const char* TINY_MatM;
-	extern const char* TINY_MatN;
-	extern const char* TINY_VertexColor;
-	extern const char* TINY_TexColor;
+		//----------------------------
+		//Shader内置参数
+		const static char* MatP;
+		const static char* MatV;
+		const static char* MatM;
+		const static char* MatN;
+		const static char* VertexColor;
+		const static char* TexColor;
 
-	extern const char* TINY_LightPosition;
-	extern const char* TINY_LightColor;
-	extern const char* TINY_ViewPosition;
-	extern const char* TINY_AmbientStrength;
+		const static char* LightPosition;
+		const static char* LightColor;
+		const static char* ViewPosition;
+		const static char* AmbientStrength;
+	}; 
+
 }
 

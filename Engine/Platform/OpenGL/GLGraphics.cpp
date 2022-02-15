@@ -1,22 +1,27 @@
 #include "GLGraphics.h"
 #include "GLVertexBuffer.h"
 
-#include "Core/Head/GLHead.h"
+#include "GLHead.h"
+#include "GLShaderBuilder.h"
+#include "GLTexture.h"
+
+#include "../Windows/WindowsEngine.h"
+
 #include "Core/Head/CppHead.h"
 #include "Core/Component/MeshRenderer.h"
 #include "Core/Engine.h"
 #include "Core/Statistic.h"
 #include "Core/GUI/GUI.h"
 #include "Core/Shader/ShaderPackage.h"
-#include "Core/Shader/ShaderBuilder.h"
-#include "../Windows/WindowsEngine.h"
+#include "Core/Head/ContextMap.h"
+#include "Core/Component/Camera.h"
 
 namespace tezcat::Tiny::Core
 {
 	GLGraphics::GLGraphics()
 		: m_Window(nullptr)
 	{
-		
+
 	}
 
 	GLGraphics::~GLGraphics()
@@ -35,6 +40,8 @@ namespace tezcat::Tiny::Core
 			throw std::logic_error("Failed to initialize GLAD");
 		}
 
+		this->initContextMap();
+
 		(new GUI())->init(engine);
 
 		glEnable(GL_DEPTH_TEST);
@@ -44,6 +51,12 @@ namespace tezcat::Tiny::Core
 		GLint max;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
+	}
+
+	void GLGraphics::updateViewport(Camera* camera)
+	{
+		auto& info = camera->getViewRect();
+		glViewport(info.OX, info.OY, info.Width, info.Height);
 	}
 
 	void GLGraphics::preRender()
@@ -74,11 +87,11 @@ namespace tezcat::Tiny::Core
 	{
 		if (renderer->hasIndex())
 		{
-			glDrawElements(renderer->getDrawMode(), renderer->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+			glDrawElements((GLenum)renderer->getDrawMode(), renderer->getIndexCount(), GL_UNSIGNED_INT, nullptr);
 		}
 		else
 		{
-			glDrawArrays(renderer->getDrawMode(), 0, renderer->getVertexCount());
+			glDrawArrays((GLenum)renderer->getDrawMode(), 0, renderer->getVertexCount());
 		}
 	}
 
@@ -94,7 +107,77 @@ namespace tezcat::Tiny::Core
 
 	void GLGraphics::createShaderPackage(const std::string& filePath)
 	{
-		ShaderBuilder::createPackage(filePath);
+		GLShaderBuilder::createPackage(filePath);
+	}
+
+	Texture* GLGraphics::createTexture(const std::string& filePath, TextureType type)
+	{
+		Texture* texture = nullptr;
+		switch (type)
+		{
+		case TextureType::Texture1D:
+			break;
+		case TextureType::Texture2D:
+			texture = new GLTexture2D();
+			break;
+		case TextureType::Texture3D:
+			break;
+		case TextureType::TextureCube:
+			break;
+		case TextureType::Texture1DA:
+			break;
+		case TextureType::Texture2DA:
+			break;
+		default:
+			break;
+		}
+
+		texture->createTexture(filePath);
+		return texture;
+	}
+
+	void GLGraphics::initContextMap()
+	{
+		ContextMap::DrawMode =
+		{
+			GL_POINTS,
+			GL_LINES,
+			GL_LINE_LOOP,
+			GL_LINE_STRIP,
+			GL_TRIANGLES,
+			GL_TRIANGLE_STRIP,
+			GL_TRIANGLE_FAN
+		};
+
+		ContextMap::TextureType =
+		{
+			GL_TEXTURE_1D,
+			GL_TEXTURE_2D,
+			GL_TEXTURE_3D,
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_1D_ARRAY,
+			GL_TEXTURE_2D_ARRAY
+		};
+
+		ContextMap::TextureFilter =
+		{
+			GL_NEAREST,
+			GL_LINEAR
+		};
+
+		ContextMap::TextureWrap =
+		{
+			GL_REPEAT,
+			GL_MIRRORED_REPEAT,
+			GL_CLAMP_TO_EDGE,
+			GL_CLAMP_TO_BORDER
+		};
+
+		ContextMap::TextureChannel =
+		{
+			GL_RGB,
+			GL_RGBA
+		};
 	}
 
 }

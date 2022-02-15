@@ -2,6 +2,7 @@
 
 #include "Core/Head/CppHead.h"
 #include "Core/Head/ConfigHead.h"
+#include "ProfilerTimer.h"
 
 namespace tezcat::Tiny::Utility
 {
@@ -57,23 +58,23 @@ namespace tezcat::Tiny::Utility
 	};
 
 	template<class T>
-	class TINY_API IDGenerator<T, unsigned int>
+	class TINY_API IDGenerator<T, uint32_t>
 	{
 	public:
 		IDGenerator() = delete;
 		~IDGenerator() = delete;
 
-		static unsigned int generate()
+		static uint32_t generate()
 		{
 			return m_ID++;
 		}
 
 	private:
-		static unsigned int m_ID;
+		static uint32_t m_ID;
 	};
 
 	template<class T>
-	unsigned int IDGenerator<T, unsigned int>::m_ID = 0;
+	unsigned int IDGenerator<T, uint32_t>::m_ID = 0;
 
 
 	template<class T>

@@ -1,4 +1,4 @@
-#include "Core/Head/GLHead.h"
+#include "../OpenGL/GLHead.h"
 #include "Core/Engine.h"
 
 struct GLFWwindow;

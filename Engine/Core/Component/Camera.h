@@ -24,6 +24,14 @@ namespace tezcat::Tiny::Core
 		static std::vector<Camera*> m_Layers[32];
 	};
 
+	struct TINY_API ViewportInfo
+	{
+		int OX;
+		int OY;
+		int Width;
+		int Height;
+	};
+
 	class Transform;
 	class MeshRenderer;
 	class Shader;
@@ -96,8 +104,8 @@ namespace tezcat::Tiny::Core
 		inline glm::vec3& getUp() { return m_Up; }
 		inline glm::vec3& getRight() { return m_Right; }
 
-		void setViewrect(int x, int y, int width, int height);
-		void updateViewport();
+		void setViewRect(int x, int y, int width, int height);
+		ViewportInfo& getViewRect() { return m_ViewInfo; }
 
 	public:
 		void yawPitch(float yaw, float pitch, bool constrainPitch = true);
@@ -120,10 +128,7 @@ namespace tezcat::Tiny::Core
 		uint32_t m_CullMask;
 
 	private:
-		int m_ViewX;
-		int m_ViewY;
-		int m_ViewWidth;
-		int m_ViewHeight;
+		ViewportInfo m_ViewInfo;
 
 		float m_NearFace;
 		float m_FarFace;

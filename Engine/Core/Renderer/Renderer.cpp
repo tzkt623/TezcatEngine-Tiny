@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include "../Head/GLHead.h"
+#include "Platform/OpenGL/GLHead.h"
 #include "../GUI/GUI.h"
 #include "../Engine.h"
 #include "../Statistic.h"

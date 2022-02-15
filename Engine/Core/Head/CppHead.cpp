@@ -1,43 +1,45 @@
 #include "CppHead.h"
 #include "../Statistic.h"
 
-#define MemoryCheck
+#define MemoryCheck 1
 
-#ifdef MemoryCheck
+#if MemoryCheck
 
-#if false
-#define Check() std::cout << Statistic::getMemoryUse() / 1024.0 << " kb" << std::endl;
+#define EnableLog 0
+
+#if EnableLog
+#define Log() std::cout << Statistic::getMemoryUse() / 1024.0 << " kb" << std::endl
 #else
-#define Check()
+#define Log()
 #endif
 
 using namespace tezcat::Tiny;
 
-void* operator new(size_t size)
+void* operator new(std::size_t size)
 {
 	Statistic::MemoryAlloc += size;
-	Check()
+	Log();
 	return malloc(size);
 }
 
-void operator delete(void* memory, size_t size)
+void operator delete(void* memory, std::size_t size)
 {
 	Statistic::MemoryFree += size;
-	Check()
+	Log();
 	free(memory);
 }
 
-void* operator new[](size_t size)
+void* operator new[](std::size_t size)
 {
 	Statistic::MemoryAlloc += size;
-	Check()
+	Log();
 	return malloc(size);
 }
 
-void operator delete[](void* memory, size_t size)
+void operator delete[](void* memory, std::size_t size)
 {
 	Statistic::MemoryFree += size;
-	Check()
+	Log();
 	free(memory);
 }
 #endif // MemoryCheck

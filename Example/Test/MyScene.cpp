@@ -1,14 +1,24 @@
 #include "MyScene.h"
 #include "MyInputer.h"
 #include "MyGUI.h"
-#include <random>
-
 
 
 MyScene::MyScene(const std::string& name)
 	: Scene(name)
 {
 
+}
+
+void MyScene::initGUI()
+{
+	auto info = new MyInfoWindow();
+	info->open();
+
+	auto object = new MyObjectWindow();
+	object->open();
+
+	auto camera = new MyMainCameraWindow();
+	camera->open();
 }
 
 void MyScene::onEnter()
@@ -42,11 +52,8 @@ void MyScene::onEnter()
 	}
 
 	{
-		auto texture = new Texture();
-		texture->createTexture("../Resource/Image/reimu.jpg");
-
 		auto wife1_material = new Material("Unlit/Texture");
-		wife1_material->addTexture(TINY_TexColor, texture);
+		wife1_material->addTexture2D(TinyParameter::TexColor, "../Resource/Image/reimu.jpg");
 
 		auto wife1 = new GameObject();
 		auto mr1 = wife1->addComponent<MeshRenderer>();
@@ -58,11 +65,8 @@ void MyScene::onEnter()
 		this->addGameObject(wife1);
 
 
-		auto texture2 = new Texture();
-		texture2->createTexture("../Resource/Image/wifu.jpg");
-
 		auto wife_material2 = new Material("Unlit/Texture");
-		wife_material2->addTexture(TINY_TexColor, texture2);
+		wife_material2->addTexture2D(TinyParameter::TexColor, "../Resource/Image/wifu.jpg");
 
 		auto wife2 = new GameObject();
 		auto mr2 = wife2->addComponent<MeshRenderer>();
@@ -75,18 +79,13 @@ void MyScene::onEnter()
 
 
 		//--------------------------------------
-
-		auto texture_elden1 = new Texture();
-		texture_elden1->createTexture("../Resource/Image/eldenring1.jpg");
-
 		auto elden_ring1_material = new Material("Unlit/Texture");
-		elden_ring1_material->addTexture(TINY_TexColor, texture_elden1);
+		elden_ring1_material->addTexture2D(TinyParameter::TexColor, "../Resource/Image/eldenring1.jpg");
 
 		auto elden_ring1 = new GameObject();
 		auto mre1 = elden_ring1->addComponent<MeshRenderer>();
 		mre1->setMaterial(elden_ring1_material);
 		mre1->setMesh("Square");
-
 		elden_ring1->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, -960.0f));
 		elden_ring1->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 		elden_ring1->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1));
@@ -94,11 +93,8 @@ void MyScene::onEnter()
 
 
 
-		auto texture_elden2 = new Texture();
-		texture_elden2->createTexture("../Resource/Image/eldenring2.jpg");
-
 		auto elden_ring2_material = new Material("Unlit/Texture");
-		elden_ring2_material->addTexture(TINY_TexColor, texture_elden2);
+		elden_ring2_material->addTexture2D(TinyParameter::TexColor, "../Resource/Image/eldenring2.jpg");
 
 		auto elden_ring2 = new GameObject();
 		auto mre2 = elden_ring2->addComponent<MeshRenderer>();
@@ -112,11 +108,8 @@ void MyScene::onEnter()
 	}
 
 	{
-		auto texture = new Texture();
-		texture->createTexture("../Resource/Image/container.png");
-
 		auto plane_material = new Material("Standard/Std1");
-		plane_material->addTexture(TINY_TexColor, texture);
+		plane_material->addTexture2D(TinyParameter::TexColor, "../Resource/Image/container.png");
 
 		auto plane = new GameObject();
 
@@ -132,11 +125,8 @@ void MyScene::onEnter()
 	}
 
 	{
-		auto texture = new Texture();
-		texture->createTexture("../Resource/Image/dragon.jpg");
-
 		auto material = new Material("Standard/Std1");
-		material->addTexture(TINY_TexColor, texture);
+		material->addTexture2D(TinyParameter::TexColor, "../Resource/Image/dragon.jpg");
 
 		std::random_device rd;
 		std::mt19937 gen(rd());
@@ -160,15 +150,3 @@ void MyScene::onEnter()
 	this->initGUI();
 }
 
-
-void MyScene::initGUI()
-{
-	auto info = new MyInfoWindow();
-	info->open();
-
-	auto object = new MyObjectWindow();
-	object->open();
-
-	auto camera = new MyMainCameraWindow();
-	camera->open();
-}

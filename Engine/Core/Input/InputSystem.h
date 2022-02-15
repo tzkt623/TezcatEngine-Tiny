@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Head/CppHead.h"
-#include "../Head/GLHead.h"
+#include "Platform/OpenGL/GLHead.h"
 
 struct GLFWwindow;
 

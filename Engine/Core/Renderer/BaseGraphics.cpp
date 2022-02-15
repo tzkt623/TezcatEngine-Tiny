@@ -24,6 +24,7 @@ namespace tezcat::Tiny::Core
 
 	void BaseGraphics::render()
 	{
+		TINY_PROFILER_TIMER_OUT(Statistic::RenderTime);
 		this->preRender();
 		this->onRender();
 		this->postRender();
@@ -32,6 +33,7 @@ namespace tezcat::Tiny::Core
 	void BaseGraphics::preRender()
 	{
 		Statistic::DrawCall = 0;
+		Statistic::PassCount = 0;
 	}
 
 	void BaseGraphics::onRender()
@@ -39,6 +41,7 @@ namespace tezcat::Tiny::Core
 		auto& cameras = CameraMgr::getInstance()->getAllCamera();
 		for (auto camera : cameras)
 		{
+			this->updateViewport(camera);
 			m_PipelineWithCamera[camera->getID()]->render(camera);
 		}
 	}

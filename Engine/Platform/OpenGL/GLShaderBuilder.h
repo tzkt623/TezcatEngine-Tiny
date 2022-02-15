@@ -1,7 +1,6 @@
 #pragma once
-#include "../Head/CppHead.h"
-#include "../Head/GLHead.h"
-#include "../Head/ConfigHead.h"
+#include "Core/Head/CppHead.h"
+#include "Core/Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -26,31 +25,21 @@ namespace tezcat::Tiny::Core
 	* TINY_END_FS
 	*/
 
-	class Shader;
+	class GLShader;
 	class ShaderPackage;
-	class TINY_API ShaderBuilder
+	class TINY_API GLShaderBuilder
 	{
-		struct Head
-		{
-
-		};
-
-		struct Pass
-		{
-
-		};
+	private:
+		GLShaderBuilder();
+		~GLShaderBuilder();
 
 	private:
-		ShaderBuilder();
-		~ShaderBuilder();
+		GLShader* loadFromFile(const char* filePath);
+		void loadFromData(GLShader* shader, const char* data, uint32_t shaderType);
 
-	private:
-		Shader* loadFromFile(const char* filePath);
-		void loadFromData(Shader* shader, const char* data, GLenum shaderType);
-
-		void parseShaders(Shader* shader, std::string& content);
-		void parseShaderConfig(Shader* shader, std::string& content);
-		void parseShader(Shader* shader, std::string& content, const char* regex, uint32_t shaderType);
+		void parseShaders(GLShader* shader, std::string& content);
+		void parseShaderConfig(GLShader* shader, std::string& content);
+		void parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType);
 		void splitPackage(std::string& content);
 		void splitPasses(ShaderPackage* pack, std::string& content);
 		ShaderPackage* parsePackageHead(std::string& content);

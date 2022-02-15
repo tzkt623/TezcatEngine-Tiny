@@ -11,6 +11,12 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
+        bool Lighting = true;
+        bool ZWrite = true;
+        str CullFace = Back;
+        bool Blend = false;
+        str BlendSrc = 1;
+        str BlendTar = 1-TarA;
     }
     #TINY_CFG_END
 

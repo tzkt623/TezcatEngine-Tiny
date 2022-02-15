@@ -1,8 +1,8 @@
-#include "ShaderBuilder.h"
-#include "Shader.h"
-#include "../Manager/ShaderManager.h"
-#include "../Head/GLHead.h"
-#include "ShaderPackage.h"
+#include "GLShaderBuilder.h"
+#include "GLShader.h"
+#include "GLHead.h"
+#include "Core/Manager/ShaderManager.h"
+#include "Core/Shader/ShaderPackage.h"
 
 
 namespace tezcat::Tiny::Core
@@ -15,7 +15,7 @@ namespace tezcat::Tiny::Core
 		{
 			config = result[1];
 			suffix = result.suffix();
-			std::cout << result[1] << std::endl;
+			//			std::cout << result[1] << std::endl;
 			return true;
 		}
 
@@ -57,9 +57,13 @@ namespace tezcat::Tiny::Core
 					{
 						map.emplace(value_pair_result[2], true);
 					}
-					else
+					else if (value_pair_result[3] == "false")
 					{
 						map.emplace(value_pair_result[2], false);
+					}
+					else
+					{
+						throw std::logic_error("GLShader: Shader Param [bool]`s string must be [true] or [false]");
 					}
 				}
 			}
@@ -72,12 +76,12 @@ namespace tezcat::Tiny::Core
 	//
 	//	ShaderBuilder
 	//
-	ShaderBuilder::ShaderBuilder()
+	GLShaderBuilder::GLShaderBuilder()
 	{
 		m_ShaderIDs.reserve(4);
 	}
 
-	ShaderBuilder::~ShaderBuilder()
+	GLShaderBuilder::~GLShaderBuilder()
 	{
 		for (auto id : m_ShaderIDs)
 		{
@@ -87,9 +91,9 @@ namespace tezcat::Tiny::Core
 		m_ShaderIDs.clear();
 	}
 
-	Shader* ShaderBuilder::loadFromFile(const char* filePath)
+	GLShader* GLShaderBuilder::loadFromFile(const char* filePath)
 	{
-		Shader* shader = nullptr;
+		GLShader* shader = nullptr;
 		std::fstream io(filePath, std::ios::in | std::ios::binary);
 		if (io.is_open())
 		{
@@ -104,7 +108,7 @@ namespace tezcat::Tiny::Core
 		return shader;
 	}
 
-	void ShaderBuilder::splitPackage(std::string& content)
+	void GLShaderBuilder::splitPackage(std::string& content)
 	{
 		std::string head, passes;
 		if (splitConfig(content, head, passes, R"(#TINY_HEAD_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_HEAD_END)"))
@@ -115,7 +119,7 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	ShaderPackage* ShaderBuilder::parsePackageHead(std::string& content)
+	ShaderPackage* GLShaderBuilder::parsePackageHead(std::string& content)
 	{
 		std::unordered_map<std::string, Any> map;
 		splitValue(content, map);
@@ -124,70 +128,141 @@ namespace tezcat::Tiny::Core
 		return pack;
 	}
 
-	void ShaderBuilder::splitPasses(ShaderPackage* pack, std::string& content)
+	void GLShaderBuilder::splitPasses(ShaderPackage* pack, std::string& content)
 	{
 		std::regex pattern(R"(#TINY_PASS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_PASS_END)");
 		std::sregex_iterator end;
 		for (auto i = std::sregex_iterator(content.begin(), content.end(), pattern); i != end; i++)
 		{
 			std::string temp((*i)[1]);
-			auto shader = new Shader();
+			auto shader = new GLShader();
 			this->parseShaders(shader, temp);
 			shader->apply();
 			pack->addShader(shader);
 		}
 	}
 
-	void ShaderBuilder::parseShaders(Shader* shader, std::string& content)
+	void GLShaderBuilder::parseShaders(GLShader* shader, std::string& content)
 	{
 		std::string config, shader_content;
-		splitConfig(content, config, shader_content, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)");
+		if (splitConfig(content, config, shader_content, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
+		{
+			this->parseShaderConfig(shader, config);
+			this->parseShader(shader
+				, shader_content
+				, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
+				, GL_VERTEX_SHADER);
+			this->parseShader(shader
+				, shader_content
+				, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
+				, GL_FRAGMENT_SHADER);
+		}
+		else
+		{
+			throw std::logic_error("GLShader: Pass Format Error");
+		}
 
-		this->parseShaderConfig(shader, config);
-		this->parseShader(shader
-			, shader_content
-			, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
-			, GL_VERTEX_SHADER);
-		this->parseShader(shader
-			, shader_content
-			, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
-			, GL_FRAGMENT_SHADER);
 	}
 
-	void ShaderBuilder::parseShaderConfig(Shader* shader, std::string& content)
+	void GLShaderBuilder::parseShaderConfig(GLShader* shader, std::string& content)
 	{
 		std::unordered_map<std::string, Any> map;
 		if (splitValue(content, map))
 		{
 			shader->setVersion(map["Version"].cast<int>());
-			shader->setOrderID(map["OrderID"].cast<int>());
-			shader->setRenderQueue(Pipeline::getQueue(map["Queue"].cast<std::string>()));
+
+			//OrderID
+			auto it = map.find("OrderID");
+			if (it != map.end())
+			{
+				shader->setOrderID(it->second.cast<int>());
+			}
+			else
+			{
+				shader->setOrderID(0);
+			}
+
+			//Queue
+			it = map.find("Queue");
+			if (it != map.end())
+			{
+				shader->setRenderQueue(Pipeline::getQueue(it->second.cast<std::string>()));
+			}
+			else
+			{
+				shader->setRenderQueue(Pipeline::Queue::Opaque);
+			}
+
+			//ZWrite
+			it = map.find("ZWrite");
+			if (it != map.end())
+			{
+				shader->setZWrite(it->second.cast<bool>());
+			}
+			else
+			{
+				shader->setZWrite(false);
+			}
+
+			//Blend
+			it = map.find("Blend");
+			if (it != map.end() && it->second.cast<bool>())
+			{
+				shader->setBlend(true);
+				shader->setBlendFunction(GLShader::blendMap[map["BlendSrc"].cast<std::string>()]
+					, GLShader::blendMap[map["BlendTar"].cast<std::string>()]);
+			}
+			else
+			{
+				shader->setBlend(false);
+			}
+
+			//CullFace
+			it = map.find("CullFace");
+			if (it != map.end())
+			{
+				shader->setCullFace(GLShader::cullFaceMap[it->second.cast<std::string>()]);
+			}
+			else
+			{
+				shader->setCullFace(0);
+			}
+
+			//Lighting
+			it = map.find("Lighting");
+			if (it != map.end())
+			{
+				shader->setLighting(it->second.cast<bool>());
+			}
+			else
+			{
+				shader->setLighting(false);
+			}
 		}
 		else
 		{
-			throw std::logic_error("Shader CFG Error");
+			throw std::logic_error("GLShader: Shader CFG Error");
 		}
 	}
 
-	void ShaderBuilder::parseShader(Shader* shader, std::string& content, const char* regex, uint32_t shaderType)
+	void GLShaderBuilder::parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType)
 	{
 		std::regex regex_shader(regex);
 		std::smatch result;
 		if (std::regex_search(content, result, regex_shader))
 		{
 			std::string temp(result[1]);
-			temp = "#version " + std::to_string(shader->getVersion()) + " core\n\r" + temp;
-
-			std::regex regex_uniform(R"(uniform\s+(\S+)\s+(\S+)(?=;))");
+			std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(?=[\s\S]*;))");
 			std::sregex_iterator end;
 			for (auto i = std::sregex_iterator(temp.begin(), temp.end(), regex_uniform); i != end; i++)
 			{
-// 				std::cout << (*i)[1] << std::endl;
-// 				std::cout << (*i)[2] << std::endl;
+				// 				std::cout << (*i)[1] << std::endl;
+				// 				std::cout << (*i)[2] << std::endl;
 
 				shader->registerUniform((*i)[1], (*i)[2]);
 			}
 
+			temp = "#version " + std::to_string(shader->getVersion()) + " core\n\r" + temp;
 			switch (shaderType)
 			{
 			case GL_VERTEX_SHADER:
@@ -200,9 +275,13 @@ namespace tezcat::Tiny::Core
 				break;
 			}
 		}
+		else
+		{
+			throw std::logic_error("GLShader: Shader Format Error");
+		}
 	}
 
-	void ShaderBuilder::loadFromData(Shader* shader, const char* data, GLenum shaderType)
+	void GLShaderBuilder::loadFromData(GLShader* shader, const char* data, uint32_t shaderType)
 	{
 		auto shader_id = glCreateShader(shaderType);
 		glShaderSource(shader_id, 1, &data, nullptr);
@@ -217,23 +296,24 @@ namespace tezcat::Tiny::Core
 			switch (shaderType)
 			{
 			case GL_VERTEX_SHADER:
-				std::cout << "ERROR::SHADER [VERTEX] COMPILATION_FAILED" << infoLog << std::endl;
+				std::cout << "GLShader: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
 				break;
 			case GL_FRAGMENT_SHADER:
-				std::cout << "ERROR::SHADER [FRAGMENT] COMPILATION_FAILED" << infoLog << std::endl;
+				std::cout << "GLShader: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
 				break;
 			default:
 				break;
 			}
-
 		}
 
 		m_ShaderIDs.push_back(shader_id);
 		shader->attachShader(shader_id);
 	}
 
-	void ShaderBuilder::createPackage(const std::string& filePath)
+	void GLShaderBuilder::createPackage(const std::string& filePath)
 	{
-		ShaderBuilder().loadFromFile(filePath.c_str());
+		TINY_PROFILER_TIMER_FUNCTION();
+		GLShaderBuilder().loadFromFile(filePath.c_str());
+		TINY_PROFILER_TIMER_FUNCTION_LOG();
 	}
 }

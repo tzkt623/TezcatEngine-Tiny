@@ -2,7 +2,7 @@
 #include "../Engine.h"
 #include "../Statistic.h"
 #include "../Head//ImGuiHead.h"
-#include "../Head/GLHead.h"
+#include "Platform/OpenGL/GLHead.h"
 #include "GUIWidget.h"
 
 #include "../Platform/Windows/WindowsEngine.h"
@@ -25,7 +25,7 @@ namespace tezcat::Tiny::Core
 	void GUI::init(Engine* engine)
 	{
 		m_Engine = engine;
-		const char* glsl_version = "#version 410";
+		const char* glsl_version = "#version 410 core";
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();

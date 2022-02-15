@@ -8,7 +8,6 @@ namespace tezcat::Tiny::Core
 	class CameraManager;
 	class InputSystem;
 	class ResourceLoader;
-	class Renderer;
 	class ShaderManager;
 	class LightManager;
 	class BaseGraphics;
@@ -37,7 +36,6 @@ namespace tezcat::Tiny::Core
 
 		virtual BaseGraphics* createGraphics() = 0;
 	protected:
-		Renderer* m_Renderer;
 		ShaderManager* m_ShaderManager;
 		LightManager* m_LightManager;
 		SceneManager* m_SceneManager;

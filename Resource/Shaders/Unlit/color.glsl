@@ -11,6 +11,8 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
+        bool ZWrite = true;
+        str CullFace = Back;
     }
     #TINY_CFG_END
 
@@ -24,7 +26,6 @@
         uniform mat4 TINY_MatM;
 
         out vec4 myColor;
-
 
         void main()
         {

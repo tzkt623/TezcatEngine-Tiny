@@ -17,6 +17,10 @@
 #include <stdexcept>
 #include <fstream>
 #include <sstream>
+#include <chrono>
+#include <random>
+#include <array>
+
 
 template<typename T>
 using ref = std::shared_ptr<T>;

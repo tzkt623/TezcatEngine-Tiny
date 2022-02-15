@@ -120,7 +120,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;TINY_DEBUG;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="Core\Component\Camera.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
+    <ClCompile Include="Core\Head\ContextMap.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
     <ClCompile Include="Core\Manager\CameraManager.cpp" />
     <ClCompile Include="Core\Component\Component.cpp" />
@@ -188,7 +189,7 @@
     <ClCompile Include="Core\Scene\Scene.cpp" />
     <ClCompile Include="Core\Manager\SceneManager.cpp" />
     <ClCompile Include="Core\Shader\Shader.cpp" />
-    <ClCompile Include="Core\Shader\ShaderBuilder.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLShaderBuilder.cpp" />
     <ClCompile Include="Core\Shader\ShaderConfig.cpp" />
     <ClCompile Include="Core\Manager\ShaderManager.cpp" />
     <ClCompile Include="Core\Base\TinyObject.cpp" />
@@ -202,6 +203,9 @@
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
     <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
+    <ClCompile Include="Utility\ProfilerTimer.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
@@ -218,13 +222,14 @@
   <ItemGroup>
     <ClInclude Include="Core\Component\Camera.h" />
     <ClInclude Include="Core\Head\ConfigHead.h" />
+    <ClInclude Include="Core\Head\ContextMap.h" />
     <ClInclude Include="Core\Manager\CameraManager.h" />
     <ClInclude Include="Core\Component\Component.h" />
     <ClInclude Include="Core\Head\CppHead.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Scene\GameObject.h" />
-    <ClInclude Include="Core\Head\GLHead.h" />
+    <ClInclude Include="Platform\OpenGL\GLHead.h" />
     <ClInclude Include="Core\Head\GLMHead.h" />
     <ClInclude Include="Core\GUI\GUI.h" />
     <ClInclude Include="Core\GUI\GUIWidget.h" />
@@ -249,7 +254,7 @@
     <ClInclude Include="Core\Scene\Scene.h" />
     <ClInclude Include="Core\Manager\SceneManager.h" />
     <ClInclude Include="Core\Shader\Shader.h" />
-    <ClInclude Include="Core\Shader\ShaderBuilder.h" />
+    <ClInclude Include="Platform\OpenGL\GLShaderBuilder.h" />
     <ClInclude Include="Core\Shader\ShaderConfig.h" />
     <ClInclude Include="Core\Manager\ShaderManager.h" />
     <ClInclude Include="Core\Base\TinyObject.h" />
@@ -263,6 +268,9 @@
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
     <ClInclude Include="Core\Renderer\RenderLayer.h" />
+    <ClInclude Include="Platform\OpenGL\GLShader.h" />
+    <ClInclude Include="Platform\OpenGL\GLTexture.h" />
+    <ClInclude Include="Utility\ProfilerTimer.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
     <ClInclude Include="ThirdParty\GLFW\glfw3.h" />

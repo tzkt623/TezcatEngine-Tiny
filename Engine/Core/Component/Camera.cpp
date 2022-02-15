@@ -1,5 +1,7 @@
 #include "Camera.h"
 #include "Transform.h"
+#include "Component.h"
+
 #include "../Engine.h"
 #include "../Manager/CameraManager.h"
 #include "../Pipeline/Pipeline.h"
@@ -9,13 +11,14 @@
 #include "../Shader/ShaderPackage.h"
 #include "../Shader/Shader.h"
 
-#include "Utility/Tools.h"
 #include "../Manager/SceneManager.h"
 #include "../Scene/Layer.h"
 #include "../Renderer/BaseGraphics.h"
-#include "Component.h"
 #include "../Scene/GameObject.h"
 #include "../Scene/LayerMask.h"
+
+#include "Utility/Tools.h"
+
 
 namespace tezcat::Tiny::Core
 {
@@ -38,10 +41,7 @@ namespace tezcat::Tiny::Core
 		, m_Yaw(-90.0f)
 		, m_Pitch(0.0f)
 		, m_Roll(0.0f)
-		, m_ViewX(0)
-		, m_ViewY(0)
-		, m_ViewWidth(Engine::getScreenWidth())
-		, m_ViewHeight(Engine::getScreenHeight())
+		, m_ViewInfo({ 0, 0, Engine::getScreenWidth(), Engine::getScreenHeight() })
 	{
 		this->setCullLayerMask(LayerMask::getMask(0));
 	}
@@ -97,17 +97,12 @@ namespace tezcat::Tiny::Core
 		CameraMgr::getInstance()->setMainCamera(this);
 	}
 
-	void Camera::setViewrect(int x, int y, int width, int height)
+	void Camera::setViewRect(int x, int y, int width, int height)
 	{
-		m_ViewX = x;
-		m_ViewY = y;
-		m_ViewWidth = width;
-		m_ViewHeight = height;
-	}
-
-	void Camera::updateViewport()
-	{
-		glViewport(0, 0, m_ViewWidth, m_ViewHeight);
+		m_ViewInfo.OX = x;
+		m_ViewInfo.OY = y;
+		m_ViewInfo.Width = width;
+		m_ViewInfo.Height = height;
 	}
 
 	void Camera::yawPitch(float yaw, float pitch, bool constrainPitch)

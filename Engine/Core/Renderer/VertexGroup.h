@@ -21,7 +21,7 @@ namespace tezcat::Tiny::Core
 		unsigned int getUID() const { return m_UID; }
 
 	public:
-		virtual void initWithMesh(MeshData* mesh) = 0;
+		virtual void init(MeshData* mesh) = 0;
 		virtual void bind() = 0;
 
 	protected:

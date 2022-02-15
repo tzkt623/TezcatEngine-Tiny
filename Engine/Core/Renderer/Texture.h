@@ -1,6 +1,6 @@
 #pragma once
-#include "../Head/GLHead.h"
 #include "../Head/CppHead.h"
+#include "../Head/ContextMap.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -11,17 +11,23 @@ namespace tezcat::Tiny::Core
 
 	public:
 		Texture();
-		~Texture();
+		Texture(TextureWrap wrap, TextureFilter filter);
+		virtual ~Texture();
 
-		void createTexture(Image* image);
-		void createTexture(const std::string& filePath);
-		unsigned int getTexID() const { return m_TexID; }
+		virtual void createTexture(Image* image) = 0;
+		virtual void createTexture(const std::string& filePath) = 0;
+		virtual TextureType getTextureType() const = 0;
 
+		inline uint32_t getTextureID() const { return m_TextureID; }
+		inline TextureWrap getWrap() const { return m_Wrap; }
+		inline void setWrap(TextureWrap val) { m_Wrap = val; }
+		inline TextureFilter getFilter() const { return m_Filter; }
+		inline void setFilter(TextureFilter val) { m_Filter = val; }
 
-	private:
-		TexWrap m_Wrap;
-		TexFilter m_Filter;
+	protected:
+		uint32_t m_TextureID;
+		TextureWrap m_Wrap;
+		TextureFilter m_Filter;
 
-		unsigned int m_TexID;
 	};
 }

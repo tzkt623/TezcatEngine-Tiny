@@ -28,7 +28,7 @@
     <ClCompile Include="Core\Shader\Shader.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Shader\ShaderBuilder.cpp">
+    <ClCompile Include="Platform\OpenGL\GLShaderBuilder.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Core\Manager\ShaderManager.cpp">
@@ -147,6 +147,10 @@
     <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
+    <ClCompile Include="Utility\ProfilerTimer.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
+    <ClCompile Include="Core\Head\ContextMap.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -247,7 +251,7 @@
     <ClInclude Include="Core\Shader\Shader.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Shader\ShaderBuilder.h">
+    <ClInclude Include="Platform\OpenGL\GLShaderBuilder.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Core\Manager\ShaderManager.h">
@@ -1165,7 +1169,7 @@
     <ClInclude Include="ThirdParty\GLFW\glfw3native.h">
       <Filter>Engine\Thirdparty\glfw</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Head\GLHead.h">
+    <ClInclude Include="Platform\OpenGL\GLHead.h">
       <Filter>Engine\Header</Filter>
     </ClInclude>
     <ClInclude Include="Tiny.h">
@@ -1254,6 +1258,10 @@
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Scene\Layer.h" />
     <ClInclude Include="Core\Renderer\RenderLayer.h" />
+    <ClInclude Include="Utility\ProfilerTimer.h" />
+    <ClInclude Include="Platform\OpenGL\GLTexture.h" />
+    <ClInclude Include="Core\Head\ContextMap.h" />
+    <ClInclude Include="Platform\OpenGL\GLShader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

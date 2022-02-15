@@ -11,6 +11,8 @@ namespace tezcat::Tiny
 	size_t Statistic::MemoryAlloc;
 	size_t Statistic::MemoryFree;
 
+	double Statistic::RenderTime;
+
 }
 
 

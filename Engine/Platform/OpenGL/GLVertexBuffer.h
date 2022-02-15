@@ -27,7 +27,7 @@ namespace tezcat::Tiny::Core
 		GLVertexGroup(MeshData* meshData);
 		virtual ~GLVertexGroup();
 
-		void initWithMesh(MeshData* mesh) override;
+		void init(MeshData* mesh) override;
 		void bind() override;
 	};
 }

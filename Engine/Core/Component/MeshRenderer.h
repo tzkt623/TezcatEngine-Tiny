@@ -1,6 +1,6 @@
 #pragma once
 #include "RenderObject.h"
-#include "../Head/GLHead.h"
+#include "../Head/ContextMap.h"
 #include "../Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
