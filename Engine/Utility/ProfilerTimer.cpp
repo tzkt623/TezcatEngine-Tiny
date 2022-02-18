@@ -34,6 +34,18 @@ namespace tezcat::Tiny::Utility
 
 	ProfilerTimer::~ProfilerTimer()
 	{
+		this->stop();
+		m_Name = nullptr;
+		//		std::cout  << duration << "us (" << ms << "ms)" << std::endl;
+	}
+
+	void ProfilerTimer::stop()
+	{
+		this->stop(m_DeltaTime);
+	}
+
+	void ProfilerTimer::stop(double& time)
+	{
 		auto end_time = std::chrono::high_resolution_clock::now();
 
 		auto start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTime)
@@ -44,11 +56,6 @@ namespace tezcat::Tiny::Utility
 			.count();
 
 		auto duration = end - start;
-		m_DeltaTime = duration * 0.001;
-
-		m_Name = nullptr;
-		//		std::cout  << duration << "us (" << ms << "ms)" << std::endl;
+		time = duration * 0.001;
 	}
-
-
 }

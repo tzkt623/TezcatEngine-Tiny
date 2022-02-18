@@ -7,7 +7,6 @@ namespace tezcat::Tiny::Core
 {
 	class GameObject;
 	class Camera;
-	class Light;
 	class LightData;
 	class Transform;
 	class Layer;

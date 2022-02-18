@@ -14,7 +14,9 @@ protected:
 	void onUpdate() override;
 
 private:
+	GUIText* m_LabelGPU;
 	GUIText* m_LabelMemory;
+	GUIText* m_LabelLogicTime;
 	GUIText* m_LabelRenderTime;
 	GUIText* m_LabelFPS;
 	GUIText* m_LabelPass;

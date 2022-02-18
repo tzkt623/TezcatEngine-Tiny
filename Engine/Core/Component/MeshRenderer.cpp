@@ -5,7 +5,6 @@
 #include "../Data/Material.h"
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
-#include "../Renderer/Renderer.h"
 #include "../Renderer/VertexGroup.h"
 #include "../Pipeline/Pipeline.h"
 #include "../Pipeline/PassShader.h"
@@ -30,7 +29,7 @@ namespace tezcat::Tiny::Core
 
 	MeshRenderer::MeshRenderer(VertexGroup* vg)
 		: m_VertexGroup(vg)
-		, m_DrawMode(DrawMode::Triangles)
+		, m_DrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
 		, m_MainMaterial(nullptr)
 		, m_HasIndex(false)
 	{
@@ -47,10 +46,7 @@ namespace tezcat::Tiny::Core
 
 	void MeshRenderer::submit(Shader* shader)
 	{
-		auto transform = this->getTransform();
-		shader->setModelMatrix(transform->getModelMatrix());
-		shader->setNormalMatrix(transform->getModelMatrix());
-		shader->setTextures(m_MainMaterial->allTexture());
+		m_MainMaterial->submit(this->getTransform(), shader);
 	}
 
 	void MeshRenderer::setMesh(const std::string& meshName)
@@ -82,5 +78,11 @@ namespace tezcat::Tiny::Core
 	int MeshRenderer::getIndexCount() const
 	{
 		return m_VertexGroup->getIndexCount();
+	}
+
+	void MeshRenderer::addMaterialConfig()
+	{
+		m_MainMaterial->addUniform<UniformMatrixM>(ShaderParam::MatrixM);
+		m_MainMaterial->addUniform<UniformMatrixN>(ShaderParam::MatrixN);
 	}
 }

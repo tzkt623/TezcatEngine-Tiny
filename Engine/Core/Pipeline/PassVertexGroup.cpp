@@ -31,6 +31,8 @@ namespace tezcat::Tiny::Core
 
 		for (auto renderer : m_MeshRendererList)
 		{
+			double time;
+			TINY_PROFILER_TIMER_OUT(time);
 			renderer->submit(shader);
 			Graphics->renderMesh(renderer);
 		}

@@ -29,6 +29,11 @@ void MyResourceLoader::prepareResource(Engine* engine)
 	this->createSomeMode();
 }
 
+void MyResourceLoader::initYourShaderParam()
+{
+	std::cout << "Init My Shader Params\n";
+}
+
 void MyResourceLoader::createSomeMode()
 {
 	{

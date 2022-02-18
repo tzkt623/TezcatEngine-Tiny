@@ -10,6 +10,7 @@ public:
 	void prepareEngine(Engine* engine) override;
 	void prepareScene(Engine* engine) override;
 	void prepareResource(Engine* engine) override;
+	void initYourShaderParam() override;
 
 private:
 	void createSomeMode();

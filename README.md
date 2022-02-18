@@ -3,38 +3,116 @@
 # **引擎二周目进行中**
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo.jpg?raw=true)
-## **代码结构**
+
+注意!本引擎使用C++20版本
+
+Notice!Tiny Use The C++20 Ver.
+
+具体使用方法请看Example.
+
+Please check the Example project to know more info.
+
+## **代码结构 Code**
 
 因为我用unity比较多,就模仿了他的结构,现在的结构是这样
+
+i am a Unity user, so Tiny look like this
 ```c
-auto elden_ring1_material = new Material("Unlit/Texture");
-elden_ring1_material->addTexture2D(TinyParameter::TexColor, "../Resource/Image/eldenring1.jpg");
-
-auto elden_ring1 = new GameObject();
-auto mre1 = elden_ring1->addComponent<MeshRenderer>();
-mre1->setMaterial(elden_ring1_material);
-mre1->setMesh("Square");
-elden_ring1->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, -960.0f));
-elden_ring1->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-elden_ring1->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1));
-this->addGameObject(elden_ring1);
-
-//---------------------------------------------------------
-
-auto elden_ring2_material = new Material("Unlit/Texture");
-elden_ring2_material->addTexture2D(TinyParameter::TexColor, "../Resource/Image/eldenring2.jpg");
-
 auto elden_ring2 = new GameObject();
-auto mre2 = elden_ring2->addComponent<MeshRenderer>();
-mre2->setMaterial(elden_ring2_material);
-mre2->setMesh("Square");
-
 elden_ring2->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 960.0f));
 elden_ring2->getTransform()->setRotation(glm::vec3(0.0f, -180.0f, 0.0f));
 elden_ring2->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1));
+
+auto mre2 = elden_ring2->addComponent<MeshRenderer>();
+auto elden_ring2_material = new Material("Unlit/Texture");
+elden_ring2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "../Resource/Image/eldenring2.jpg");
+mre2->setMaterial(elden_ring2_material);
+mre2->setMesh("Square");
+
 this->addGameObject(elden_ring2);
+
+//---------------------------------------------------------
+
+auto plane = new GameObject();
+plane->getTransform()->setPosition(glm::vec3(0.0f, -20.0f, 0.0f));
+plane->getTransform()->setRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+plane->getTransform()->setScale(glm::vec3(10.0f, 10.0f, 1));
+
+auto mr = plane->addComponent<MeshRenderer>();
+auto plane_material = new Material("Standard/Std2");
+plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "../Resource/Image/container.png");
+plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "../Resource/Image/container_specular.png");
+plane_material->addUniform<UniformF>(ShaderParam::StdMaterial::Shininess, 64.0f);
+mr->setMaterial(plane_material);
+mr->setMesh("Square");
+
+this->addGameObject(plane);
 ```
-## **材质结构**
+
+
+## **材质结构 Material**
+
+目前Shader构建器可以自动解析出所有非数组的Uniform变量.
+
+ShaderBuilder can auto scan all GLSL Uniform value except array type.
+
+目前Tiny的内建变量如下
+
+Tiny Current Buildin Uniform Values
+
+```c
+static UniformID Empty;
+
+static UniformID MatrixP;
+static UniformID MatrixV;
+static UniformID MatrixM;
+static UniformID MatrixN;
+
+static UniformID VertexColor;
+static UniformID TexColor;
+
+static UniformID LightPosition;
+static UniformID LightColor;
+static UniformID ViewPosition;
+static UniformID AmbientStrength;
+static UniformID ModeSpecular;
+
+struct LightDirection
+{
+    static UniformID Direction;
+    static UniformID Ambient;
+    static UniformID Diffuse;
+    static UniformID Specular;
+};
+
+struct StdMaterial
+{
+    static UniformID Diffuse;
+    static UniformID Specular;
+    static UniformID Shininess;
+};
+```
+
+**目前内建材质变量类型有**(后续会慢慢添加)
+
+Current Buildin Material Values
+
+|    TinyType     |  CommonType   |
+| :-------------: | :-----------: |
+|  UniformI[1-4]  |   int[1-4]    |
+|  UniformF[1-4]  |  float[1-4]   |
+| UniformMat[3-4] | glm::mat[3-4] |
+|  UniformTex2D   |   Texture2D   |
+
+给一个object添加一个材质之后一定要记得添加材质对应的参数,贴图,数值等等
+
+notice! add uniform value to your material for the gameobject.
+
+```c
+auto material = new Material("Standard/Std1");
+material->addUniform<UniformTex2D>(ShaderParam::TexColor, "../Resource/Image/dragon.jpg");
+material->addUniform<UniformF>(ShaderParam::ModeSpecular, 64.0f);
+```
 
 ### **默认值 default**
 除了[`int Version`]为必须值,其他值均为拥有默认值的可选参数
@@ -45,20 +123,20 @@ The[`int Version`] should be setted.The other params You can set as your wish.
 混合参数 BlendFunc
 
 ```c
-"0",			ZERO
-"1",			ONE
-"Src",			SRC_COLOR
-"1-Src",		ONE_MINUS_SRC_COLOR
-"Tar",			DST_COLOR
-"1-Tar",		ONE_MINUS_DST_COLOR
-"SrcA",		    SRC_ALPHA
-"1-SrcA",		ONE_MINUS_SRC_ALPHA
-"TarA",		    DST_ALPHA
-"1-TarA",		ONE_MINUS_DST_ALPHA
-"Const",		CONSTANT_COLOR
-"1-Const",		ONE_MINUS_CONSTANT_COLOR
-"ConstA",		CONSTANT_ALPHA
-"1-ConstA",	    ONE_MINUS_CONSTANT_ALPHA
+"0"         ZERO
+"1"         ONE
+"Src"		SRC_COLOR
+"1-Src"     ONE_MINUS_SRC_COLOR
+"Tar"		DST_COLOR
+"1-Tar"     ONE_MINUS_DST_COLOR
+"SrcA"	    SRC_ALPHA
+"1-SrcA"	ONE_MINUS_SRC_ALPHA
+"TarA"      DST_ALPHA
+"1-TarA"    ONE_MINUS_DST_ALPHA
+"Const"     CONSTANT_COLOR
+"1-Const"   ONE_MINUS_CONSTANT_COLOR
+"ConstA"    CONSTANT_ALPHA
+"1-ConstA"  ONE_MINUS_CONSTANT_ALPHA
 ```
 
 启用混合 EnableBlend
@@ -69,13 +147,19 @@ str BlendSrc = 1;
 str BlendTar = 1-TarA;
 ```
 
+关闭混合 DisableBlend
+
+```c
+bool Blend = false;
+```
+
 ### **剔除 Cull**
 剔除参数 Cullface
 ```c
-"Off",		disable
-"Front",	FRONT
-"Back",	    BACK
-"All",		FRONT_AND_BACK
+"Off"       disable
+"Front"     FRONT
+"Back"      BACK
+"All"       FRONT_AND_BACK
 ```
 
 启用剔除 EnableCullface
@@ -84,18 +168,28 @@ str BlendTar = 1-TarA;
 str CullFace = Back;
 ```
 
+关闭剔除
+
+```c
+str CullFace = Off;
+```
+
 ### **深度测试 DepthTest**
 启用 Enable
 ```c
 bool ZWrite = true;
 ```
 
+关闭 Disable
+```c
+bool ZWrite = false;
+```
 
 ### **示例 example**
 ```c
 #TINY_HEAD_BEGIN
 {
-    str Name = Standard/Std1;
+    str Name = Standard/Std2;
 }
 #TINY_HEAD_END
 
@@ -103,6 +197,7 @@ bool ZWrite = true;
 {
     #TINY_CFG_BEGIN
     {
+        str Name = Std2;
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
@@ -122,10 +217,10 @@ bool ZWrite = true;
         layout (location = 2) in vec4 aColor;
         layout (location = 3) in vec2 aUV;
 
-        uniform mat4 TINY_MatP;
-        uniform mat4 TINY_MatV;
-        uniform mat4 TINY_MatM;
-        uniform mat3 TINY_MatN;
+        uniform mat4 TINY_MatrixP;
+        uniform mat4 TINY_MatrixV;
+        uniform mat4 TINY_MatrixM;
+        uniform mat3 TINY_MatrixN;
 
         out vec4 myColor;
         out vec2 myUV;
@@ -135,48 +230,65 @@ bool ZWrite = true;
         void main()
         {
             vec4 position =  vec4(aPos, 1.0);
-            gl_Position = TINY_MatP * TINY_MatV * TINY_MatM * position;
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
             
             myColor = aColor;
             myUV = aUV;
-            myNormal = TINY_MatN * aNormal;
-            myWorldPosition = vec3(TINY_MatM * position);
+            myNormal = TINY_MatrixN * aNormal;
+            myWorldPosition = vec3(TINY_MatrixM * position);
         }
     }
     #TINY_VS_END
 
     #TINY_FS_BEGIN
     {
+        struct TINY_Mateial_Std
+        {
+            sampler2D diffuse;
+            sampler2D specular;
+            float shininess;
+        };
+
+        struct TINY_Light_Direction
+        {
+            vec3 direction;
+            vec3 ambient;
+            vec3 diffuse;
+            vec3 specular;
+        };
+
         in vec4 myColor;
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
 
-        uniform float TINY_AmbientStrength = 0.1f;
-        uniform vec3 TINY_LightPosition = vec3(0.0f, 0.0f, 0.0f);
-        uniform vec3 TINY_LightColor = vec3(1.0f, 1.0f, 1.0f);
+        uniform TINY_Mateial_Std TINY_MatStd;
+        uniform TINY_Light_Direction TINY_LightDir;
         uniform vec3 TINY_ViewPosition;
-        uniform sampler2D TINY_TexColor;
-
+    
         out vec4 myFinalColor;
 
-        float specularStrength = 0.5;
+        vec3 calculateDirectionLight(TINY_Light_Direction light, vec3 normal, vec3 viewDir)
+        {
+            vec3 light_dir = normalize(-light.direction);
+            float diff = max(dot(normal, light_dir), 0.0);
+            vec3 reflect_dir = reflect(-light_dir, normal);
+            float spec = pow(max(dot(viewDir, reflect_dir), 0.0), TINY_MatStd.shininess);
+
+            vec3 ambient = light.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 diffuse = light.diffuse * diff * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 specular = light.specular * spec * texture(TINY_MatStd.specular, myUV).rgb;
+
+            return ambient + diffuse + specular;
+        }
 
         void main()
         {
-            vec3 ambient = TINY_AmbientStrength * TINY_LightColor;
-
             vec3 normal = normalize(myNormal);
-            vec3 lightDir = normalize(TINY_LightPosition - myWorldPosition);
-            float diff = max(dot(normal, lightDir), 0.0);
-            vec3 diffuse = diff * TINY_LightColor;
-
             vec3 viewDir = normalize(TINY_ViewPosition - myWorldPosition);
-            vec3 reflectDir = reflect(-lightDir, normal);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
-            vec3 specular = specularStrength * spec * TINY_LightColor;
 
-            myFinalColor = vec4(ambient + diffuse + specular, 1.0f) * myColor * texture(TINY_TexColor, myUV);
+            vec3 dir_light = calculateDirectionLight(TINY_LightDir, normal, viewDir);
+            myFinalColor = vec4(dir_light, 1.0f);
         }
     }
     #TINY_FS_END

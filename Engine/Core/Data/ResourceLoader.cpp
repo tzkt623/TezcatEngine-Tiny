@@ -1,7 +1,4 @@
 #include "ResourceLoader.h"
-
-#include "../Shader/ShaderBuilder.h"
-#include "../Shader/ShaderPackage.h"
 #include "../Renderer/BaseGraphics.h"
 
 
@@ -21,6 +18,7 @@ namespace tezcat::Tiny::Core
 
 	void ResourceLoader::prepareResource(Engine* engine)
 	{
+		Graphics->createShaderPackage("../Resource/Shaders/Standard/std2.glsl");
 		Graphics->createShaderPackage("../Resource/Shaders/Standard/std1.glsl");
 		Graphics->createShaderPackage("../Resource/Shaders/Unlit/color.glsl");
 		Graphics->createShaderPackage("../Resource/Shaders/Unlit/texture.glsl");

@@ -5,7 +5,10 @@
 #include "../Component/Camera.h"
 #include "../Component/Transform.h"
 #include "../Component/MeshRenderer.h"
+#include "../Component/Light.h"
 #include "../Head/GLMHead.h"
+#include "../Manager/LightManager.h"
+#include "../Statistic.h"
 
 
 namespace tezcat::Tiny::Core
@@ -40,18 +43,21 @@ namespace tezcat::Tiny::Core
 
 	void PassShader::render(Camera* camera)
 	{
+		//#PassShaderRender
+		if (m_VAOWithID.empty())
+		{
+			return;
+		}
+
+		Statistic::PassCount += 1;
+
 		m_Shader->setGPUOptions();
 		// 共用同一个shader
 		m_Shader->bind();
 
 		if (m_Shader->isEnableLighting())
 		{
-			// 			auto light_data = SG<LightManager>::getInstance()->getData();
-			// 			light_data->render();
-			// 			for (auto light : lights)
-			// 			{
-			// 				light->render(m_Shader);
-			// 			}
+			LightMgr::getInstance()->getDirectionalLight()->submit(m_Shader);
 		}
 
 		m_Shader->setProjectionMatrix(camera->getProjectionMatrix());

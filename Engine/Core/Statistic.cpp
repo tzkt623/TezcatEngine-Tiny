@@ -12,6 +12,9 @@ namespace tezcat::Tiny
 	size_t Statistic::MemoryFree;
 
 	double Statistic::RenderTime;
+	double Statistic::LogicTime;
+
+	const unsigned char* Statistic::GPU;
 
 }
 

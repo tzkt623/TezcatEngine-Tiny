@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Standard/Std1;
+    str Name = Standard/Std2;
 }
 #TINY_HEAD_END
 
@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = STD1;
+        str Name = Std2;
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
@@ -53,37 +53,53 @@
 
     #TINY_FS_BEGIN
     {
+        struct TINY_Mateial_Std
+        {
+            sampler2D diffuse;
+            sampler2D specular;
+            float shininess;
+        };
+
+        struct TINY_Light_Direction
+        {
+            vec3 direction;
+            vec3 ambient;
+            vec3 diffuse;
+            vec3 specular;
+        };
+
         in vec4 myColor;
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
 
-        uniform float TINY_AmbientStrength = 0.1f;
-        uniform vec3 TINY_LightPosition = vec3(0.0f, 0.0f, 0.0f);
-        uniform vec3 TINY_LightColor = vec3(1.0f, 1.0f, 1.0f);
+        uniform TINY_Mateial_Std TINY_MatStd;
+        uniform TINY_Light_Direction TINY_LightDir;
         uniform vec3 TINY_ViewPosition;
-        uniform sampler2D TINY_TexColor;
-
+    
         out vec4 myFinalColor;
 
-        float specularStrength = 0.5;
+        vec3 calculateDirectionLight(TINY_Light_Direction light, vec3 normal, vec3 viewDir)
+        {
+            vec3 light_dir = normalize(-light.direction);
+            float diff = max(dot(normal, light_dir), 0.0);
+            vec3 reflect_dir = reflect(-light_dir, normal);
+            float spec = pow(max(dot(viewDir, reflect_dir), 0.0), TINY_MatStd.shininess);
+
+            vec3 ambient = light.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 diffuse = light.diffuse * diff * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 specular = light.specular * spec * texture(TINY_MatStd.specular, myUV).rgb;
+
+            return ambient + diffuse + specular;
+        }
 
         void main()
         {
-            vec3 ambient = TINY_AmbientStrength * TINY_LightColor;
-
             vec3 normal = normalize(myNormal);
-            vec3 lightDir = normalize(TINY_LightPosition - myWorldPosition);
-
-            float diff = max(dot(normal, lightDir), 0.0);
-            vec3 diffuse = TINY_LightColor * texture(TINY_TexColor, myUV).rgb * vec3(myColor) * diff;
-
             vec3 viewDir = normalize(TINY_ViewPosition - myWorldPosition);
-            vec3 reflectDir = reflect(-lightDir, normal);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
-            vec3 specular = specularStrength * spec * TINY_LightColor;
 
-            myFinalColor = vec4(ambient + diffuse + specular, 1.0f);
+            vec3 dir_light = calculateDirectionLight(TINY_LightDir, normal, viewDir);
+            myFinalColor = vec4(dir_light, 1.0f);
         }
     }
     #TINY_FS_END

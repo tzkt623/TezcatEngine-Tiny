@@ -9,6 +9,7 @@
 #include "Scene/LayerMask.h"
 #include "Scene/GameObject.h"
 #include "Manager/VertexGroupManager.h"
+#include "Shader/ShaderParam.h"
 
 
 namespace tezcat::Tiny::Core
@@ -64,6 +65,7 @@ namespace tezcat::Tiny::Core
 	bool Engine::preInit(ResourceLoader* loader)
 	{
 		m_ResourceLoader = loader;
+		ShaderParam::initAllParam(std::bind(&ResourceLoader::initYourShaderParam, m_ResourceLoader));
 		m_ResourceLoader->prepareEngine(this);
 
 		ScreenWidth = m_ResourceLoader->getWindowWidth();

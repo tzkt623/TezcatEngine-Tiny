@@ -22,9 +22,6 @@
     <ClCompile Include="Core\Pipeline\PassVertexGroup.cpp">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Renderer\Renderer.cpp">
-      <Filter>Engine\Core\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Shader\Shader.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
@@ -82,7 +79,7 @@
     <ClCompile Include="Core\Manager\VertexGroupManager.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Shader\ShaderConfig.cpp">
+    <ClCompile Include="Core\Shader\ShaderParam.cpp">
       <Filter>Engine\Core\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Core\GUI\GUIWidget.cpp">
@@ -149,8 +146,10 @@
     <ClCompile Include="Core\Head\CppHead.cpp" />
     <ClCompile Include="Utility\ProfilerTimer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
-    <ClCompile Include="Core\Head\ContextMap.cpp" />
+    <ClCompile Include="Core\Head\Context.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
+    <ClCompile Include="Core\Shader\Uniform.cpp" />
+    <ClCompile Include="Core\Manager\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -244,9 +243,6 @@
     </ClInclude>
     <ClInclude Include="Core\Pipeline\PassVertexGroup.h">
       <Filter>Engine\Core\Renderer\Pass</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Renderer\Renderer.h">
-      <Filter>Engine\Core\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Core\Shader\Shader.h">
       <Filter>Engine\Core\Shader</Filter>
@@ -1184,7 +1180,7 @@
     <ClInclude Include="Core\Manager\VertexGroupManager.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Shader\ShaderConfig.h">
+    <ClInclude Include="Core\Shader\ShaderParam.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Core\GUI\GUIWidget.h">
@@ -1260,8 +1256,12 @@
     <ClInclude Include="Core\Renderer\RenderLayer.h" />
     <ClInclude Include="Utility\ProfilerTimer.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
-    <ClInclude Include="Core\Head\ContextMap.h" />
+    <ClInclude Include="Core\Head\Context.h" />
     <ClInclude Include="Platform\OpenGL\GLShader.h" />
+    <ClInclude Include="Utility\IDString.h" />
+    <ClInclude Include="Core\Shader\Uniform.h" />
+    <ClInclude Include="Utility\Any.h" />
+    <ClInclude Include="Core\Manager\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

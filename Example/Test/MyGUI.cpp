@@ -2,7 +2,9 @@
 
 MyInfoWindow::MyInfoWindow()
 	: GUIWindow(u8"统计信息")
+	, m_LabelGPU(new GUIText(u8"GPU"))
 	, m_LabelMemory(new GUIText(u8"Memory"))
+	, m_LabelLogicTime(new GUIText(u8"LogicTime"))
 	, m_LabelRenderTime(new GUIText(u8"RenderTime"))
 	, m_LabelPass(new GUIText(u8"PassCount"))
 	, m_LabelFPS(new GUIText(u8"FPS"))
@@ -15,17 +17,22 @@ MyInfoWindow::MyInfoWindow()
 
 MyInfoWindow::~MyInfoWindow()
 {
+	delete m_LabelGPU;
 	delete m_LabelPass;
 	delete m_LabelFPS;
 	delete m_MousePosition;
 	delete m_MouseOffset;
 	delete m_LabelMemory;
 	delete m_LabelRenderTime;
+	delete m_LabelLogicTime;
 }
 
 void MyInfoWindow::init()
 {
+	m_LabelGPU->setData(Tools::stringFormat("GPU: %s", Statistic::GPU));
+	this->addChild(m_LabelGPU);
 	this->addChild(m_LabelMemory);
+	this->addChild(m_LabelLogicTime);
 	this->addChild(m_LabelRenderTime);
 	this->addChild(m_LabelFPS);
 	this->addChild(m_LabelPass);
@@ -37,6 +44,7 @@ void MyInfoWindow::init()
 void MyInfoWindow::onUpdate()
 {
 	m_LabelMemory->setData(Tools::stringFormat("Memory: %.3f kb", Statistic::getMemoryUse() / 1024.0f));
+	m_LabelLogicTime->setData(Tools::stringFormat("LogicTime: %.1f ms", Statistic::LogicTime));
 	m_LabelRenderTime->setData(Tools::stringFormat("RenderTime: %.1f ms", Statistic::RenderTime));
 
 	m_LabelFPS->setData(Tools::stringFormat("FPS: %.1f(%.3f ms/Frame)",

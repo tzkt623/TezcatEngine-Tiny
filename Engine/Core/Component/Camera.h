@@ -61,8 +61,8 @@ namespace tezcat::Tiny::Core
 
 	public:
 
-		inline const glm::mat4x4& getProjectionMatrix() { return m_ProjectionMatrix; }
-		inline const glm::mat4x4& getViewMatrix() { return m_ViewMatrix; }
+		inline glm::mat4x4& getProjectionMatrix() { return m_ProjectionMatrix; }
+		inline glm::mat4x4& getViewMatrix() { return m_ViewMatrix; }
 
 	public:
 		inline bool isMain() const { return m_IsMain; }

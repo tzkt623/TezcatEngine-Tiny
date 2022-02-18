@@ -160,11 +160,12 @@
   <ItemGroup>
     <ClCompile Include="Core\Component\Camera.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
-    <ClCompile Include="Core\Head\ContextMap.cpp" />
+    <ClCompile Include="Core\Head\Context.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
     <ClCompile Include="Core\Manager\CameraManager.cpp" />
     <ClCompile Include="Core\Component\Component.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
+    <ClCompile Include="Core\Manager\TextureManager.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Core\Scene\GameObject.cpp" />
     <ClCompile Include="Core\GUI\GUI.cpp" />
@@ -183,14 +184,14 @@
     <ClCompile Include="Core\Pipeline\PassVertexGroup.cpp" />
     <ClCompile Include="Core\Pipeline\Pipeline.cpp" />
     <ClCompile Include="Core\Renderer\RenderCommand.cpp" />
-    <ClCompile Include="Core\Renderer\Renderer.cpp" />
     <ClCompile Include="Core\Component\RenderObject.cpp" />
     <ClCompile Include="Core\Data\ResourceLoader.cpp" />
     <ClCompile Include="Core\Scene\Scene.cpp" />
     <ClCompile Include="Core\Manager\SceneManager.cpp" />
     <ClCompile Include="Core\Shader\Shader.cpp" />
+    <ClCompile Include="Core\Shader\Uniform.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShaderBuilder.cpp" />
-    <ClCompile Include="Core\Shader\ShaderConfig.cpp" />
+    <ClCompile Include="Core\Shader\ShaderParam.cpp" />
     <ClCompile Include="Core\Manager\ShaderManager.cpp" />
     <ClCompile Include="Core\Base\TinyObject.cpp" />
     <ClCompile Include="Core\Component\Transform.cpp" />
@@ -222,13 +223,15 @@
   <ItemGroup>
     <ClInclude Include="Core\Component\Camera.h" />
     <ClInclude Include="Core\Head\ConfigHead.h" />
-    <ClInclude Include="Core\Head\ContextMap.h" />
+    <ClInclude Include="Core\Head\Context.h" />
     <ClInclude Include="Core\Manager\CameraManager.h" />
     <ClInclude Include="Core\Component\Component.h" />
     <ClInclude Include="Core\Head\CppHead.h" />
     <ClInclude Include="Core\Engine.h" />
+    <ClInclude Include="Core\Manager\TextureManager.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Scene\GameObject.h" />
+    <ClInclude Include="Core\Shader\Uniform.h" />
     <ClInclude Include="Platform\OpenGL\GLHead.h" />
     <ClInclude Include="Core\Head\GLMHead.h" />
     <ClInclude Include="Core\GUI\GUI.h" />
@@ -248,14 +251,13 @@
     <ClInclude Include="Core\Pipeline\PassVertexGroup.h" />
     <ClInclude Include="Core\Pipeline\Pipeline.h" />
     <ClInclude Include="Core\Renderer\RenderCommand.h" />
-    <ClInclude Include="Core\Renderer\Renderer.h" />
     <ClInclude Include="Core\Component\RenderObject.h" />
     <ClInclude Include="Core\Data\ResourceLoader.h" />
     <ClInclude Include="Core\Scene\Scene.h" />
     <ClInclude Include="Core\Manager\SceneManager.h" />
     <ClInclude Include="Core\Shader\Shader.h" />
     <ClInclude Include="Platform\OpenGL\GLShaderBuilder.h" />
-    <ClInclude Include="Core\Shader\ShaderConfig.h" />
+    <ClInclude Include="Core\Shader\ShaderParam.h" />
     <ClInclude Include="Core\Manager\ShaderManager.h" />
     <ClInclude Include="Core\Base\TinyObject.h" />
     <ClInclude Include="Core\Component\Transform.h" />
@@ -270,6 +272,8 @@
     <ClInclude Include="Core\Renderer\RenderLayer.h" />
     <ClInclude Include="Platform\OpenGL\GLShader.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
+    <ClInclude Include="Utility\Any.h" />
+    <ClInclude Include="Utility\IDString.h" />
     <ClInclude Include="Utility\ProfilerTimer.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />

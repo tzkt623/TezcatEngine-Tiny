@@ -22,34 +22,6 @@ namespace tezcat::Tiny::Core
 		m_GameObject = nullptr;
 	}
 
-	template<class Com>
-	Com* Component::getComponentInChildren()
-	{
-		auto result = m_GameObject->getComponent<Com>();
-		if (result != nullptr)
-		{
-			return result;
-		}
-
-		auto children = m_Transform->getChildren();
-		for (auto child : children)
-		{
-			auto result = child->getComponentInChildren<Com>();
-			if (result != nullptr)
-			{
-				return result;
-			}
-		}
-
-		return nullptr;
-	}
-
-	template<class Com>
-	Com* Component::getComponent()
-	{
-		return m_GameObject->getComponent<Com>();
-	}
-
 	void Component::startLogic(const std::function<void()>& logicFunction)
 	{
 		m_GameObject->getScene()->addLogicFunction(this, logicFunction);

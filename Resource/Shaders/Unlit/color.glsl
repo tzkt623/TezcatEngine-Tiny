@@ -8,6 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
+        str Name = Color;
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
@@ -21,16 +22,16 @@
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec4 aColor;
 
-        uniform mat4 TINY_MatP;
-        uniform mat4 TINY_MatV;
-        uniform mat4 TINY_MatM;
+        uniform mat4 TINY_MatrixP;
+        uniform mat4 TINY_MatrixV;
+        uniform mat4 TINY_MatrixM;
 
         out vec4 myColor;
 
         void main()
         {
             vec4 position =  vec4(aPos, 1.0);
-            gl_Position = TINY_MatP * TINY_MatV * TINY_MatM * position;
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
             
             myColor = aColor;
         }

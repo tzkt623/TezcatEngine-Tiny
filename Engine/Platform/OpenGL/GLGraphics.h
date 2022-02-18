@@ -13,7 +13,6 @@ namespace tezcat::Tiny::Core
 		GLGraphics();
 		virtual ~GLGraphics();
 
-
 	public:
 		void init(Engine* engine) override;
 		void swapBuffer() override;
@@ -30,10 +29,10 @@ namespace tezcat::Tiny::Core
 		VertexGroup* createVertexGroup(MeshData* mesh) override;
 		VertexBuffer* createVertexBuffer(MeshData* mesh) override;
 		void createShaderPackage(const std::string& filePath) override;
-		Texture* createTexture(const std::string& filePath, TextureType type) override;
+
 
 	private:
-		void initContextMap();
+		void initContext();
 
 	private:
 		GLFWwindow* m_Window;

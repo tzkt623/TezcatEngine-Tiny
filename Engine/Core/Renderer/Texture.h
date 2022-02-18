@@ -1,6 +1,6 @@
 #pragma once
 #include "../Head/CppHead.h"
-#include "../Head/ContextMap.h"
+#include "../Head/Context.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -11,23 +11,40 @@ namespace tezcat::Tiny::Core
 
 	public:
 		Texture();
-		Texture(TextureWrap wrap, TextureFilter filter);
+		Texture(const TextureWrap& wrap, const TextureFilter& filter);
 		virtual ~Texture();
 
-		virtual void createTexture(Image* image) = 0;
-		virtual void createTexture(const std::string& filePath) = 0;
 		virtual TextureType getTextureType() const = 0;
+		virtual void createTexture(Image* image) = 0;
+		void createTexture(const char* filePath);
 
 		inline uint32_t getTextureID() const { return m_TextureID; }
-		inline TextureWrap getWrap() const { return m_Wrap; }
-		inline void setWrap(TextureWrap val) { m_Wrap = val; }
-		inline TextureFilter getFilter() const { return m_Filter; }
-		inline void setFilter(TextureFilter val) { m_Filter = val; }
+
+		inline TexWrapWrapper& getWrap() { return m_Wrap; }
+		void setWrap(const TextureWrap& val)
+		{
+			m_Wrap = ContextMap::TextureWrapArray[(int)val];
+		}
+
+		inline TexFilterWrapper& getFilter() { return m_Filter; }
+		void setFilter(const TextureFilter& val)
+		{
+			m_Filter = ContextMap::TextureFilterArray[(int)val];
+		}
 
 	protected:
 		uint32_t m_TextureID;
-		TextureWrap m_Wrap;
-		TextureFilter m_Filter;
+		TexWrapWrapper m_Wrap;
+		TexFilterWrapper m_Filter;
+	};
 
+	class Texture2D : public Texture
+	{
+		TextureType getTextureType() const final { return TextureType::Texture2D; }
+	};
+
+	class Texture3D : public Texture
+	{
+		TextureType getTextureType() const final { return TextureType::Texture3D; }
 	};
 }

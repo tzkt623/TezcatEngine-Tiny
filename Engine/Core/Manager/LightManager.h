@@ -39,7 +39,16 @@ namespace tezcat::Tiny::Core
 			return m_Data;
 		}
 
+		DirectionalLight* getDirectionalLight() const { return m_DirectionalLight; }
+		void setDirectionalLight(DirectionalLight* val)
+		{
+			m_DirectionalLight = val;
+		}
+
 	private:
 		LightData* m_Data;
+		DirectionalLight* m_DirectionalLight;
 	};
+
+	using LightMgr = SG<LightManager>;
 }

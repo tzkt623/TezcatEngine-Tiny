@@ -77,13 +77,6 @@ namespace tezcat::Tiny::Core
 
 		bool isDetached() const { return m_GameObject == nullptr; }
 
-	public:
-		template<class Com>
-		Com* getComponent();
-
-		template<class Com>
-		Com* getComponentInChildren();
-
 	public://RTTI
 		template<class Com>
 		bool is() { return this->is(std::type_index(typeid(Com))); }

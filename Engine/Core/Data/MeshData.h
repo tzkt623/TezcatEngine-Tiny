@@ -2,10 +2,11 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
+#include "../Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
 {
-	class MeshData
+	class TINY_API MeshData
 	{
 	public:
 		MeshData(const std::string& name);

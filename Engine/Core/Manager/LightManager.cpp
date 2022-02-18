@@ -28,7 +28,7 @@ namespace tezcat::Tiny::Core
 
 	//------------------------------------------------------------
 	LightManager::LightManager()
-		: m_Data(nullptr)
+		: m_Data(new LightData())
 	{
 		SG<LightManager>::attach(this);
 	}

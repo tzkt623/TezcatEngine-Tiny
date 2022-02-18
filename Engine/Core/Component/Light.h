@@ -30,22 +30,15 @@ namespace tezcat::Tiny::Core
 		virtual LightType getLightType() = 0;
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::Light; }
 
-		template<typename T>
-		void render(Shader* shader)
-		{
-			shader->setFloat3(m_Name, glm::value_ptr(m_Color));
-		}
-
 		glm::vec3 getColor() const { return m_Color; }
 		void setColor(const glm::vec3& val) { m_Color = val; }
 
 	private:
-		std::string m_Name;
 		glm::vec3 m_Color;
 	};
 
 
-	class DirectionalLight : Light<DirectionalLight>
+	class DirectionalLight : public Light<DirectionalLight>
 	{
 	public:
 		DirectionalLight();
@@ -54,20 +47,24 @@ namespace tezcat::Tiny::Core
 
 		LightType getLightType() final { return LightType::Directional; }
 
+		void sendDataToGPU() override;
+
+		void onEnable() override;
+
 	public:
 		void submit(Shader* shader) override;
 
-		glm::vec3 getDirection() const { return m_Direction; }
-		void setDirection(glm::vec3 val) { m_Direction = val; }
+		glm::vec3& getDirection() { return m_Direction; }
+		void setDirection(const glm::vec3& val) { m_Direction = val; }
 
-		glm::vec3 getAmbient() const { return m_Ambient; }
-		void setAmbient(glm::vec3 val) { m_Ambient = val; }
+		glm::vec3& getAmbient() { return m_Ambient; }
+		void setAmbient(const glm::vec3& val) { m_Ambient = val; }
 
-		glm::vec3 getDiffuse() const { return m_Diffuse; }
-		void setDiffuse(glm::vec3 val) { m_Diffuse = val; }
+		glm::vec3& getDiffuse() { return m_Diffuse; }
+		void setDiffuse(const glm::vec3& val) { m_Diffuse = val; }
 
-		glm::vec3 getSpecular() const { return m_Specular; }
-		void setSpecular(glm::vec3 val) { m_Specular = val; }
+		glm::vec3& getSpecular() { return m_Specular; }
+		void setSpecular(const glm::vec3& val) { m_Specular = val; }
 
 	private:
 		glm::vec3 m_Direction;
@@ -87,7 +84,7 @@ namespace tezcat::Tiny::Core
 
 	};
 
-	class Spotlight : public  Light<Spotlight>
+	class Spotlight : public Light<Spotlight>
 	{
 	public:
 		Spotlight();

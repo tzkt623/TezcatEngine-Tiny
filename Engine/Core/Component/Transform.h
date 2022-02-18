@@ -51,7 +51,7 @@ namespace tezcat::Tiny::Core
 			m_Scale = val;
 		}
 
-		glm::mat4x4& getModelMatrix() { return m_ModelMatrix; }
+		inline glm::mat4x4& getModelMatrix() { return m_ModelMatrix; }
 
 		Transform* getParent() const { return m_Parent; }
 		void setParent(Transform* parent);

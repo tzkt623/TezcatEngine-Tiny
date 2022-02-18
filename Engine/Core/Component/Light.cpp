@@ -1,15 +1,16 @@
 #include "Light.h"
 #include "../Shader/Shader.h"
+#include "../Manager/LightManager.h"
 
 
 namespace tezcat::Tiny::Core
 {
 	//------------------------------------------------------------------------
 	DirectionalLight::DirectionalLight()
-		: m_Direction(0.0f, -1.0f, -1.0f)
-		, m_Ambient(1.0f)
+		: m_Direction(-1.0f, -1.0f, -1.0f)
+		, m_Ambient(0.1f)
 		, m_Diffuse(1.0f)
-		, m_Specular(1.0f)
+		, m_Specular(0.2f)
 	{
 
 	}
@@ -30,6 +31,20 @@ namespace tezcat::Tiny::Core
 
 	void DirectionalLight::submit(Shader* shader)
 	{
+		shader->setFloat3(ShaderParam::LightDirection::Direction, glm::value_ptr(m_Direction));
+		shader->setFloat3(ShaderParam::LightDirection::Ambient, glm::value_ptr(m_Ambient));
+		shader->setFloat3(ShaderParam::LightDirection::Diffuse, glm::value_ptr(m_Diffuse));
+		shader->setFloat3(ShaderParam::LightDirection::Specular, glm::value_ptr(m_Specular));
+	}
+
+	void DirectionalLight::sendDataToGPU()
+	{
+
+	}
+
+	void DirectionalLight::onEnable()
+	{
+		LightMgr::getInstance()->setDirectionalLight(this);
 	}
 
 	//------------------------------------------------------------------------

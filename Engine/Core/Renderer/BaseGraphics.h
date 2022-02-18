@@ -1,7 +1,8 @@
 #pragma once
 #include "Utility/Tools.h"
 #include "../Head/ConfigHead.h"
-#include "../Head/ContextMap.h"
+#include "../Head/Context.h"
+#include "../Shader/Uniform.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -39,7 +40,6 @@ namespace tezcat::Tiny::Core
 		virtual VertexBuffer* createVertexBuffer(MeshData* mesh) = 0;
 		virtual VertexGroup* createVertexGroup(MeshData* mesh) = 0;
 		virtual void createShaderPackage(const std::string& filePath) = 0;
-		virtual Texture* createTexture(const std::string& filePath, TextureType type) = 0;
 
 	public:
 		void sendMeshData(uint32_t index, MeshRenderer* meshRenderer);

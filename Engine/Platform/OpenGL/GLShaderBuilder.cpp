@@ -3,6 +3,7 @@
 #include "GLHead.h"
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Shader/ShaderPackage.h"
+#include "Core/Head/Context.h"
 
 
 namespace tezcat::Tiny::Core
@@ -38,32 +39,35 @@ namespace tezcat::Tiny::Core
 			std::string temp(std::move((*i).str()));
 			if (std::regex_search(temp, value_pair_result, regex_value_pair))
 			{
-				if (value_pair_result[1] == "str")
+				std::string type(std::move(value_pair_result[1].str()));
+				std::string name(std::move(value_pair_result[2].str()));
+				std::string value(std::move(value_pair_result[3].str()));
+
+				if (type == "str")
 				{
-					std::string t = value_pair_result[3];
-					map.emplace(value_pair_result[2], t);
+					map.emplace(name, value);
 				}
-				else if (value_pair_result[1] == "int")
+				else if (type == "int")
 				{
-					map.emplace(value_pair_result[2], std::stoi(value_pair_result[3]));
+					map.emplace(name, std::stoi(value));
 				}
-				else if (value_pair_result[1] == "float")
+				else if (type == "float")
 				{
-					map.emplace(value_pair_result[2], std::stof(value_pair_result[3]));
+					map.emplace(name, std::stof(value));
 				}
-				else if (value_pair_result[1] == "bool")
+				else if (type == "bool")
 				{
-					if (value_pair_result[3] == "true")
+					if (value == "true")
 					{
-						map.emplace(value_pair_result[2], true);
+						map.emplace(name, true);
 					}
-					else if (value_pair_result[3] == "false")
+					else if (value == "false")
 					{
-						map.emplace(value_pair_result[2], false);
+						map.emplace(name, false);
 					}
 					else
 					{
-						throw std::logic_error("GLShader: Shader Param [bool]`s string must be [true] or [false]");
+						throw std::logic_error("GLShader: Shader Param [bool]`s string must [true] or [false]");
 					}
 				}
 			}
@@ -134,15 +138,18 @@ namespace tezcat::Tiny::Core
 		std::sregex_iterator end;
 		for (auto i = std::sregex_iterator(content.begin(), content.end(), pattern); i != end; i++)
 		{
+			UniformID::USet set;
+
 			std::string temp((*i)[1]);
 			auto shader = new GLShader();
-			this->parseShaders(shader, temp);
-			shader->apply();
+			this->parseShaders(shader, temp, set);
+			shader->apply(set);
+
 			pack->addShader(shader);
 		}
 	}
 
-	void GLShaderBuilder::parseShaders(GLShader* shader, std::string& content)
+	void GLShaderBuilder::parseShaders(GLShader* shader, std::string& content, UniformID::USet& uniformArray)
 	{
 		std::string config, shader_content;
 		if (splitConfig(content, config, shader_content, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
@@ -151,17 +158,18 @@ namespace tezcat::Tiny::Core
 			this->parseShader(shader
 				, shader_content
 				, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
-				, GL_VERTEX_SHADER);
+				, GL_VERTEX_SHADER
+				, uniformArray);
 			this->parseShader(shader
 				, shader_content
 				, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
-				, GL_FRAGMENT_SHADER);
+				, GL_FRAGMENT_SHADER
+				, uniformArray);
 		}
 		else
 		{
 			throw std::logic_error("GLShader: Pass Format Error");
 		}
-
 	}
 
 	void GLShaderBuilder::parseShaderConfig(GLShader* shader, std::string& content)
@@ -171,8 +179,15 @@ namespace tezcat::Tiny::Core
 		{
 			shader->setVersion(map["Version"].cast<int>());
 
+			//Name
+			auto it = map.find("Name");
+			if (it != map.end())
+			{
+				shader->setName(it->second.cast<std::string>());
+			}
+
 			//OrderID
-			auto it = map.find("OrderID");
+			it = map.find("OrderID");
 			if (it != map.end())
 			{
 				shader->setOrderID(it->second.cast<int>());
@@ -209,8 +224,8 @@ namespace tezcat::Tiny::Core
 			if (it != map.end() && it->second.cast<bool>())
 			{
 				shader->setBlend(true);
-				shader->setBlendFunction(GLShader::blendMap[map["BlendSrc"].cast<std::string>()]
-					, GLShader::blendMap[map["BlendTar"].cast<std::string>()]);
+				shader->setBlendFunction(ContextMap::BlendMap[map["BlendSrc"].cast<std::string>()]
+					, ContextMap::BlendMap[map["BlendTar"].cast<std::string>()]);
 			}
 			else
 			{
@@ -221,11 +236,7 @@ namespace tezcat::Tiny::Core
 			it = map.find("CullFace");
 			if (it != map.end())
 			{
-				shader->setCullFace(GLShader::cullFaceMap[it->second.cast<std::string>()]);
-			}
-			else
-			{
-				shader->setCullFace(0);
+				shader->setCullFace(ContextMap::CullFaceMap[it->second.cast<std::string>()]);
 			}
 
 			//Lighting
@@ -245,31 +256,87 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	void GLShaderBuilder::parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType)
+
+	void GLShaderBuilder::parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType, UniformID::USet& uniformArray)
 	{
 		std::regex regex_shader(regex);
 		std::smatch result;
 		if (std::regex_search(content, result, regex_shader))
 		{
-			std::string temp(result[1]);
-			std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(?=[\s\S]*;))");
+			std::string shader_content(result[1]);
 			std::sregex_iterator end;
-			for (auto i = std::sregex_iterator(temp.begin(), temp.end(), regex_uniform); i != end; i++)
-			{
-				// 				std::cout << (*i)[1] << std::endl;
-				// 				std::cout << (*i)[2] << std::endl;
 
-				shader->registerUniform((*i)[1], (*i)[2]);
+			//------------------------------------------------------------
+			//
+			//	分析struct以及内部的arguments
+			//
+			struct StructMetaData
+			{
+				std::string name;
+				std::unordered_map<std::string, std::string> arguments;
+			};
+			std::unordered_map<std::string, StructMetaData*> struct_map;
+
+			std::regex regex_struct(R"(struct\s+(\w+)\s+\{[\w\W]+?\};)");
+			std::regex regex_struct_data(R"(struct\s+\w+\s+\{([\w\W]+)\};)");
+			std::regex regex_argument(R"((\w+)\s*(\w+);)");
+
+			//分析struct
+			for (auto struct_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_struct); struct_i != end; struct_i++)
+			{
+				std::string struct_name = (*struct_i)[1];
+				auto meta_data = new StructMetaData();
+				meta_data->name = struct_name;
+				struct_map[struct_name] = meta_data;
+
+				//分析argument pair
+				std::string struct_data = (*struct_i)[0];
+				for (auto struct_data_i = std::sregex_iterator(struct_data.begin(), struct_data.end(), regex_struct_data); struct_data_i != end; struct_data_i++)
+				{
+					//分析argument
+					std::string arguments_data = (*struct_data_i)[1];
+					for (auto argument_i = std::sregex_iterator(arguments_data.begin(), arguments_data.end(), regex_argument); argument_i != end; argument_i++)
+					{
+						//[name,type]
+						meta_data->arguments.emplace((*argument_i)[2], (*argument_i)[1]);
+					}
+				}
 			}
 
-			temp = "#version " + std::to_string(shader->getVersion()) + " core\n\r" + temp;
+			std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(?=[\s\S]*;))");
+			for (auto i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_uniform); i != end; i++)
+			{
+				std::string type = (*i)[1];
+				auto it = struct_map.find(type);
+				if (it != struct_map.end())
+				{
+					auto meta_data = it->second;
+					for (auto& pair : meta_data->arguments)
+					{
+						uniformArray.emplace(std::string((*i)[2]) + "." + pair.first);
+						// 						shader->registerUniform(type, std::string((*i)[2]) + "." + pair.second);
+					}
+				}
+				else
+				{
+					uniformArray.emplace((*i)[2]);
+					//					shader->registerUniform(type, (*i)[2]);
+				}
+			}
+
+			for (auto& pair : struct_map)
+			{
+				delete pair.second;
+			}
+
+			shader_content = "#version " + std::to_string(shader->getVersion()) + " core\n\r" + shader_content;
 			switch (shaderType)
 			{
 			case GL_VERTEX_SHADER:
-				this->loadFromData(shader, temp.c_str(), GL_VERTEX_SHADER);
+				this->loadFromData(shader, shader_content.c_str(), GL_VERTEX_SHADER);
 				break;
 			case GL_FRAGMENT_SHADER:
-				this->loadFromData(shader, temp.c_str(), GL_FRAGMENT_SHADER);
+				this->loadFromData(shader, shader_content.c_str(), GL_FRAGMENT_SHADER);
 				break;
 			default:
 				break;
@@ -296,10 +363,10 @@ namespace tezcat::Tiny::Core
 			switch (shaderType)
 			{
 			case GL_VERTEX_SHADER:
-				std::cout << "GLShader: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
+				std::cout << "GLShader [" + shader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
 				break;
 			case GL_FRAGMENT_SHADER:
-				std::cout << "GLShader: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
+				std::cout << "GLShader [" + shader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
 				break;
 			default:
 				break;

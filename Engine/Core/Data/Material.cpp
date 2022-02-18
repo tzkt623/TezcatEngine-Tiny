@@ -3,13 +3,13 @@
 
 #include "../Manager/ShaderManager.h"
 #include "../Shader/ShaderPackage.h"
-#include "../Head/ContextMap.h"
+#include "../Head/Context.h"
 #include "../Renderer/BaseGraphics.h"
+#include "../Shader/Shader.h"
+#include "../Component/Transform.h"
 
 namespace tezcat::Tiny::Core
 {
-	int Material::IDGiver = 0;
-
 	Material::Material(const std::string& name)
 		: m_Name(name)
 	{
@@ -18,7 +18,7 @@ namespace tezcat::Tiny::Core
 
 	Material::~Material()
 	{
-		m_TextureWithName.clear();
+		m_Uniforms.clear();
 		m_ShaderPackage = nullptr;
 	}
 
@@ -27,15 +27,12 @@ namespace tezcat::Tiny::Core
 		return m_ShaderPackage->getUID();
 	}
 
-	void Material::addTexture(const std::string& texType, Texture* texture)
+	void Material::submit(Transform* transform, Shader* shader)
 	{
-		m_TextureWithName[texType] = texture;
-	}
-
-	Texture* Material::addTexture2D(const std::string& texType, const std::string& filePath)
-	{
-		auto t2d = Graphics->createTexture(filePath, TextureType::Texture2D);
-		m_TextureWithName[texType] = t2d;
-		return t2d;
+		shader->resetState();
+		for (const auto& uniform : m_Uniforms)
+		{
+			uniform->submit(transform, shader);
+		}
 	}
 }

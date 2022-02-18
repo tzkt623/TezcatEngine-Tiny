@@ -1,6 +1,6 @@
 #pragma once
 #include "RenderObject.h"
-#include "../Head/ContextMap.h"
+#include "../Head/Context.h"
 #include "../Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
@@ -19,15 +19,19 @@ namespace tezcat::Tiny::Core
 		MeshRenderer(VertexGroup* vg);
 		virtual ~MeshRenderer();
 
-		RenderObjectType getRenderObjectType() final { return RenderObjectType::Mesh; }
-		void submit(Shader* shader) override;
+		RenderObjectType getRenderObjectType() final { return RenderObjectType::MeshRenderer; }
 		VertexGroup* getVertexGroup() const { return m_VertexGroup; }
 
-		Material* getMaterial() const { return m_MainMaterial; }
-		void setMaterial(Material* val) { m_MainMaterial = val; }
+		inline Material* getMaterial() const { return m_MainMaterial; }
+		void setMaterial(Material* val)
+		{
+			m_MainMaterial = val;
+			this->addMaterialConfig();
+		}
 		void setMesh(const std::string& meshName);
 
 		void sendDataToGPU() override;
+		void submit(Shader* shader) override;
 
 		void onEnable() override;
 		void onStart() override;
@@ -35,13 +39,16 @@ namespace tezcat::Tiny::Core
 		int getVertexCount() const;
 		int getIndexCount() const;
 
-		inline DrawMode getDrawMode() const { return m_DrawMode; }
-		inline void setDrawMode(DrawMode val) { m_DrawMode = val; }
+		inline DrawModeWrapper& getDrawMode() { return m_DrawMode; }
+		void setDrawMode(DrawMode val) { m_DrawMode = ContextMap::DrawModeArray[(int)val]; }
 
 		inline bool hasIndex() const { return m_HasIndex; }
 
 	private:
-		DrawMode m_DrawMode;
+		void addMaterialConfig();
+
+	private:
+		DrawModeWrapper m_DrawMode;
 
 		bool m_HasIndex;
 		VertexGroup* m_VertexGroup;

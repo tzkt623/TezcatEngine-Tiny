@@ -17,6 +17,7 @@
 #include "Core/Component/Camera.h"
 #include "Core/Component/Transform.h"
 #include "Core/Component/MeshRenderer.h"
+#include "Core/Component/Light.h"
 
 #include "Core/Data/Image.h"
 #include "Core/Data/MeshData.h"
@@ -26,7 +27,7 @@
 #include "Core/Input/Inputer.h"
 #include "Core/Input/InputSystem.h"
 
-#include "Core/Shader/ShaderConfig.h"
+#include "Core/Shader/ShaderParam.h"
 
 #include "Utility/Tools.h"
 

@@ -1,5 +1,4 @@
 #include "ShaderPackage.h"
-#include "ShaderBuilder.h"
 #include "Shader.h"
 
 #include "Utility/Tools.h"

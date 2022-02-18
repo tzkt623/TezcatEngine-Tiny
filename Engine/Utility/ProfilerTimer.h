@@ -12,6 +12,9 @@ namespace tezcat::Tiny::Utility
 		ProfilerTimer(double& deltaTime);
 		ProfilerTimer(const char* functionName, double& deltaTime);
 		~ProfilerTimer();
+
+		void stop();
+		void stop(double& time);
 		const char* getName() const { return m_Name; }
 
 	private:
@@ -33,6 +36,7 @@ namespace tezcat::Tiny::Utility
 
 
 #define TINY_PROFILER_TIMER_LOG() std::cout << ProfilerTimer::DefaultDeltaTime << std::endl
+#define TINY_PROFILER_TIMER_LOG_OUT(deltaTime) std::cout << deltaTime << std::endl
 #define TINY_PROFILER_TIMER_FUNCTION_LOG() std::cout << PROFILER_Timer##__LINE__.getName() << ": " << ProfilerTimer::DefaultDeltaTime << std::endl
 #else
 #define TINY_PROFILER_TIMER()

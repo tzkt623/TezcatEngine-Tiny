@@ -46,7 +46,7 @@ namespace tezcat::Tiny::Core
 			{
 				if (com->is<Com>())
 				{
-					return (Com*)com;
+					return static_cast<Com*>(com.get());
 				}
 			}
 
@@ -60,7 +60,7 @@ namespace tezcat::Tiny::Core
 			{
 				if (com->is<Com>())
 				{
-					return (Com*)com;
+					return static_cast<Com*>(com.get());
 				}
 			}
 
@@ -68,7 +68,7 @@ namespace tezcat::Tiny::Core
 			Com* result = nullptr;
 			for (auto child : children)
 			{
-				result = child->getComponentInChildren<Com>();
+				result = child->getGameObject()->getComponentInChildren<Com>();
 				if (result != nullptr)
 				{
 					return result;

@@ -29,6 +29,8 @@ namespace tezcat::Tiny::Core
 		/// </summary>
 		virtual void prepareScene(Engine* engine);
 
+		virtual void initYourShaderParam() {}
+
 	public:
 		int getWindowHeight() const { return m_WindowHeight; }
 		int getWindowWidth() const { return m_WindowWidth; }

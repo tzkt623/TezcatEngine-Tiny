@@ -8,7 +8,7 @@ namespace tezcat::Tiny::Core
 	class Scene;
 	enum class TINY_API RenderObjectType
 	{
-		Mesh,
+		MeshRenderer,
 		Light,
 		Texture,
 		RenderTexture

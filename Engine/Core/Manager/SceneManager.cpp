@@ -1,5 +1,7 @@
 #include "SceneManager.h"
 #include "../Scene/Scene.h"
+#include "Utility/Tools.h"
+#include "../Statistic.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -46,6 +48,7 @@ namespace tezcat::Tiny::Core
 
 	void SceneManager::update()
 	{
+		TINY_PROFILER_TIMER_OUT(Statistic::LogicTime);
 		m_Scenes.top()->update();
 	}
 }

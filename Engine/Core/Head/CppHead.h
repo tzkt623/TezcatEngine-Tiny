@@ -20,6 +20,8 @@
 #include <chrono>
 #include <random>
 #include <array>
+#include <string_view>
+#include <tuple>
 
 
 template<typename T>
