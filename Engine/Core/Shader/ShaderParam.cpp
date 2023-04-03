@@ -22,6 +22,12 @@ namespace tezcat::Tiny::Core
 	UniformID ShaderParam::LightDirection::Diffuse;
 	UniformID ShaderParam::LightDirection::Specular;
 
+	UniformID ShaderParam::LightPoint::Position;
+	UniformID ShaderParam::LightPoint::Ambient;
+	UniformID ShaderParam::LightPoint::Diffuse;
+	UniformID ShaderParam::LightPoint::Specular;
+	UniformID ShaderParam::LightPoint::Config;
+
 	UniformID ShaderParam::StdMaterial::Diffuse;
 	UniformID ShaderParam::StdMaterial::Specular;
 	UniformID ShaderParam::StdMaterial::Shininess;
@@ -57,12 +63,16 @@ namespace tezcat::Tiny::Core
 		ShaderParam::LightDirection::Diffuse = "TINY_LightDir.diffuse";
 		ShaderParam::LightDirection::Specular = "TINY_LightDir.specular";
 
+		ShaderParam::LightPoint::Position = "TINY_LightPot.position";
+		ShaderParam::LightPoint::Ambient = "TINY_LightPot.ambient";
+		ShaderParam::LightPoint::Diffuse = "TINY_LightPot.diffuse";
+		ShaderParam::LightPoint::Specular = "TINY_LightPot.specular";
+		ShaderParam::LightPoint::Config = "TINY_LightPot.config";
+
 		ShaderParam::StdMaterial::Diffuse = "TINY_MatStd.diffuse";
 		ShaderParam::StdMaterial::Specular = "TINY_MatStd.specular";
 		ShaderParam::StdMaterial::Shininess = "TINY_MatStd.shininess";
 
 		customIniter();
 	}
-
-
 }

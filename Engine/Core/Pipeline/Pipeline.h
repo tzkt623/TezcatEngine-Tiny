@@ -5,55 +5,35 @@
 
 namespace tezcat::Tiny::Core
 {
+	enum class TINY_API PipelineType
+	{
+		Error,
+		Forward,
+		Deferred,
+		ForwardPlus
+	};
+
 	class Camera;
-	class PassShader;
+	class RenderPass;
+	class BaseGraphics;
+
 
 	class TINY_API Pipeline
 	{
 	public:
-		enum Queue : int
-		{
-			Background = 0,
-			Opaque,
-			Alpha,
-			OpaqueLast,
-			Transparent,
-			Overlay
-		};
-	public:
-		Pipeline(Queue queue) : m_QueueID(queue) {}
+		Pipeline();
+		~Pipeline();
 
-		inline int getQueueID() const { return m_QueueID; }
-		inline void setQueueID(Queue queue) { m_QueueID = queue; }
-		void render(Camera* camera);
-		void addPass(PassShader* pass);
+		virtual PipelineType getType() { return PipelineType::Error; }
 
-	private:
-		int m_QueueID;
-		std::vector<PassShader*> m_ShaderList;
+		virtual void init() = 0;
+		virtual void render(Camera* camera) = 0;
+		virtual void addPass(RenderPass* pass) = 0;
 
-	public:
-		static Queue getQueue(const std::string& name)
-		{
-			return s_QueueMap[name];
-		}
+		BaseGraphics* getGraphics() const { return mGraphics; }
+		void setGraphics(BaseGraphics* val) { mGraphics = val; }
 
-	private:
-		static std::unordered_map<std::string, Queue> s_QueueMap;
-	};
-
-	class MeshRenderer;
-	class TINY_API PipelineGroup
-	{
-	public:
-		PipelineGroup();
-		~PipelineGroup();
-
-		void init();
-		void render(Camera* camera);
-
-		void addMeshRenderer(MeshRenderer* meshRenderer);
-	private:
-		std::vector<Pipeline*> m_PipelineList;
+	protected:
+		BaseGraphics* mGraphics;
 	};
 }

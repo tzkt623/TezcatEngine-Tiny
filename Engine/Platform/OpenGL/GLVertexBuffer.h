@@ -4,7 +4,8 @@
 #include "Core/Renderer/VertexGroup.h"
 #include "Core/Head/GLMHead.h"
 
-namespace tezcat::Tiny::Core
+using namespace tezcat::Tiny::Core;
+namespace tezcat::Tiny::GL
 {
 	class TINY_API GLVertexBuffer : public VertexBuffer
 	{
@@ -16,8 +17,8 @@ namespace tezcat::Tiny::Core
 		void init(MeshData* meshData) override;
 
 	private:
-		uint32_t* m_VBOArray;
-		int m_VBOSize;
+		uint32_t* mVBOArray;
+		int mVBOSize;
 	};
 
 
@@ -29,5 +30,19 @@ namespace tezcat::Tiny::Core
 
 		void init(MeshData* mesh) override;
 		void bind() override;
+		void unbind() override;
+	};
+
+
+	class TINY_API GLVertexBufferCreator : public VertexBufferCreatorImp
+	{
+	public:
+		VertexBuffer* create(MeshData* meshData) override;
+	};
+
+	class TINY_API GLVertexGroupCreator : public VertexGroupCreatorImp
+	{
+	public:
+		VertexGroup* create(MeshData* meshData) override;
 	};
 }

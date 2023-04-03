@@ -1,10 +1,11 @@
 #pragma once
 
-#include "../Core/Head/CppHead.h"
+#include "Core/Head/CppHead.h"
+#include "Core/Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Utility
 {
-	class ProfilerTimer
+	class TINY_API ProfilerTimer
 	{
 	public:
 		ProfilerTimer();
@@ -14,12 +15,13 @@ namespace tezcat::Tiny::Utility
 		~ProfilerTimer();
 
 		void stop();
-		void stop(double& time);
-		const char* getName() const { return m_Name; }
+		double stopOut();
+		const char* getName() const { return mName; }
 
 	private:
-		const char* m_Name;
+		const char* mName;
 		double& m_DeltaTime;
+		bool m_NoStop;
 		std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTime;
 
 	public:
@@ -34,9 +36,13 @@ namespace tezcat::Tiny::Utility
 #define TINY_PROFILER_TIMER_FUNCTION() ProfilerTimer PROFILER_Timer##__LINE__(__FUNCTION__)
 #define TINY_PROFILER_TIMER_FUNCTION_OUT(deltaTime) ProfilerTimer PROFILER_Timer##__LINE__(__FUNCTION__, deltaTime)
 
+#define TINY_PROFILER_TIMER_NAME() ProfilerTimer PROFILER_Timer##__FUNCTION__
+#define TINY_PROFILER_TIMER_NAME_OUT(out) out = PROFILER_Timer##__FUNCTION__.stopOut()
+#define TINY_PROFILER_TIMER_NAME_LOG() std::cout << PROFILER_Timer##__FUNCTION__.stopOut() << std::endl
+
 
 #define TINY_PROFILER_TIMER_LOG() std::cout << ProfilerTimer::DefaultDeltaTime << std::endl
-#define TINY_PROFILER_TIMER_LOG_OUT(deltaTime) std::cout << deltaTime << std::endl
+#define TINY_PROFILER_TIMER_LOG_OUT(deltaTime) std::cout << deltaTime * 0.0001 << std::endl
 #define TINY_PROFILER_TIMER_FUNCTION_LOG() std::cout << PROFILER_Timer##__LINE__.getName() << ": " << ProfilerTimer::DefaultDeltaTime << std::endl
 #else
 #define TINY_PROFILER_TIMER()

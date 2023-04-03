@@ -1,5 +1,5 @@
 #include "PassVertexGroup.h"
-#include "PassShader.h"
+#include "../Renderer/RenderPass.h"
 #include "../Renderer/VertexGroup.h"
 #include "../Statistic.h"
 #include "../Shader/Shader.h"
@@ -9,7 +9,7 @@
 namespace tezcat::Tiny::Core
 {
 	PassVertexGroup::PassVertexGroup(VertexGroup* vg)
-		: m_DelegateVertexGroup(vg)
+		: mDelegateVertexGroup(vg)
 	{
 
 	}
@@ -18,25 +18,38 @@ namespace tezcat::Tiny::Core
 	{
 	}
 
-	void PassVertexGroup::addMeshRenderer(MeshRenderer* meshRenderer)
+	void PassVertexGroup::addRenderObject(MeshRenderer* meshRenderer)
 	{
-		m_MeshRendererList.push_back(meshRenderer);
+		mMeshRendererList.push_back(meshRenderer);
 	}
 
 	void PassVertexGroup::render(Shader* shader)
 	{
-		// 共用同一个VAO
-		m_DelegateVertexGroup->bind();
-		Statistic::DrawCall += static_cast<int>(m_MeshRendererList.size());
+		// 鍚屼竴涓猇AO
+		mDelegateVertexGroup->bind();
+		Statistic::DrawCall += static_cast<int>(mMeshRendererList.size());
 
-		for (auto renderer : m_MeshRendererList)
+		for (auto renderer : mMeshRendererList)
 		{
-			double time;
-			TINY_PROFILER_TIMER_OUT(time);
 			renderer->submit(shader);
-			Graphics->renderMesh(renderer);
+			Graphics::getInstance()->draw(renderer);
 		}
 
-		m_MeshRendererList.clear();
+		mMeshRendererList.clear();
+	}
+
+	void PassVertexGroup::render(Shader* shader, DrawModeWrapper& drawMode)
+	{
+		// 鍚屼竴涓猇AO
+		mDelegateVertexGroup->bind();
+		Statistic::DrawCall += static_cast<int>(mMeshRendererList.size());
+
+		for (auto renderer : mMeshRendererList)
+		{
+			renderer->submit(shader);
+			Graphics::getInstance()->draw(renderer->getVertexGroup(), drawMode);
+		}
+
+		mMeshRendererList.clear();
 	}
 }

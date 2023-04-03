@@ -2,28 +2,28 @@
 
 namespace tezcat::Tiny::Core
 {
-	std::vector<std::string> LayerMask::m_MaskWithName(32);
+	std::vector<std::string> LayerMask::sMaskWithName(32);
 
 	void LayerMask::init()
 	{
-		m_MaskWithName[0] = "default";
+		sMaskWithName[0] = "default";
 	}
 
 	const std::string& LayerMask::getName(int index)
 	{
-		return m_MaskWithName[index];
+		return sMaskWithName[index];
 	}
 
 	void LayerMask::setMask(int index, const std::string& maskName)
 	{
-		m_MaskWithName[index] = maskName;
+		sMaskWithName[index] = maskName;
 	}
 
 	uint32_t LayerMask::getMask(const std::string& maskName)
 	{
-		for (int i = 0; i < m_MaskWithName.size(); i++)
+		for (int i = 0; i < sMaskWithName.size(); i++)
 		{
-			if (m_MaskWithName[i] == maskName)
+			if (sMaskWithName[i] == maskName)
 			{
 				return 1 << i;
 			}

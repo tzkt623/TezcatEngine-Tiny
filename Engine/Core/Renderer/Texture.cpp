@@ -11,7 +11,7 @@ namespace tezcat::Tiny::Core
 	}
 
 	Texture::Texture(const TextureWrap& wrap, const TextureFilter& filter)
-		: m_TextureID(0)
+		: mTextureID(0)
 		, m_Wrap(ContextMap::TextureWrapArray[(int)wrap])
 		, m_Filter(ContextMap::TextureFilterArray[(int)filter])
 	{

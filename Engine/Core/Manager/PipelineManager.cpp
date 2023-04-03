@@ -1,17 +1,70 @@
 #include "PipelineManager.h"
 #include "../Shader/Shader.h"
-#include "../Pipeline/PassShader.h"
+#include "../Renderer/RenderPass.h"
+#include "../Renderer/BaseGraphics.h"
+#include "../Layer/RenderLayer.h"
+#include "../Layer/LightLayer.h"
+#include "../Component/Light.h"
+#include "../Pipeline/Forward.h"
 
 namespace tezcat::Tiny::Core
 {
-	std::vector<PassShader*> PipelineManager::m_PassList(100);
+	std::vector<RenderPass*> PipelineManager::mPassList(100);
+	std::vector<RenderLayer*> PipelineManager::mRenderLayerList(32, new RenderLayer());
+	std::vector<LightLayer*> PipelineManager::mLightLayerList(32, new LightLayer());
+	std::unordered_map<std::string, Pipeline*> PipelineManager::sPipelineMap =
+	{
+		{"Forward", new Forward()}
+	};
+
+
 	void PipelineManager::createPass(Shader* shader)
 	{
-		while (m_PassList.size() <= shader->getUID())
+		while (mPassList.size() <= shader->getUID())
 		{
-			m_PassList.push_back(nullptr);
+			mPassList.push_back(nullptr);
 		}
 
-		m_PassList[shader->getUID()] = new PassShader(shader);
+		auto pass = new RenderPass(shader);
+		mPassList[shader->getUID()] = pass;
+		sPipelineMap["Forward"]->addPass(pass);
 	}
+
+	void PipelineManager::loadAllShaderToRenderer(BaseGraphics* graphics)
+	{
+// 		auto pipelineGroup = graphics->currentPipeline();
+// 
+// 		for (auto pass : mPassList)
+// 		{
+// 			pipelineGroup->addPass(pass);
+// 		}
+	}
+
+	void PipelineManager::addRenderObject(uint32_t layerIndex, IRenderObejct* renderObject)
+	{
+		mRenderLayerList[layerIndex]->addRenderObejct(renderObject);
+	}
+
+	void PipelineManager::addLight(uint32_t layerIndex, ILight* light)
+	{
+		mLightLayerList[layerIndex]->addLight(light);
+	}
+
+	void PipelineManager::add(const std::string& name, Pipeline* pl)
+	{
+		sPipelineMap.emplace(name, pl);
+	}
+
+	Pipeline* PipelineManager::get(const std::string& name)
+	{
+		auto pl = sPipelineMap.find(name);
+		if (pl != sPipelineMap.end())
+		{
+			return pl->second;
+		}
+
+		return nullptr;
+	}
+
+
 }

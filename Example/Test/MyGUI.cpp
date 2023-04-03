@@ -1,7 +1,7 @@
 #include "MyGUI.h"
 
 MyInfoWindow::MyInfoWindow()
-	: GUIWindow(u8"Í³¼ÆĞÅÏ¢")
+	: GUIWindow(u8"ä¿¡æ¯(Info)")
 	, m_LabelGPU(new GUIText(u8"GPU"))
 	, m_LabelMemory(new GUIText(u8"Memory"))
 	, m_LabelLogicTime(new GUIText(u8"LogicTime"))
@@ -9,8 +9,8 @@ MyInfoWindow::MyInfoWindow()
 	, m_LabelPass(new GUIText(u8"PassCount"))
 	, m_LabelFPS(new GUIText(u8"FPS"))
 	, m_LabelDrawCall(new GUIText(u8"DrawCall"))
-	, m_MousePosition(new GUIDragFloat2(u8"Êó±êÎ»ÖÃ"))
-	, m_MouseOffset(new GUIDragFloat2(u8"Êó±êÆ«ÒÆ"))
+	, m_MousePosition(new GUIDragFloat2(u8"MousePosition"))
+	, m_MouseOffset(new GUIDragFloat2(u8"MouseOffset"))
 {
 
 }
@@ -29,7 +29,7 @@ MyInfoWindow::~MyInfoWindow()
 
 void MyInfoWindow::init()
 {
-	m_LabelGPU->setData(Tools::stringFormat("GPU: %s", Statistic::GPU));
+	m_LabelGPU->setData(StringTool::stringFormat("GPU: %s", Statistic::GPU));
 	this->addChild(m_LabelGPU);
 	this->addChild(m_LabelMemory);
 	this->addChild(m_LabelLogicTime);
@@ -43,15 +43,15 @@ void MyInfoWindow::init()
 
 void MyInfoWindow::onUpdate()
 {
-	m_LabelMemory->setData(Tools::stringFormat("Memory: %.3f kb", Statistic::getMemoryUse() / 1024.0f));
-	m_LabelLogicTime->setData(Tools::stringFormat("LogicTime: %.1f ms", Statistic::LogicTime));
-	m_LabelRenderTime->setData(Tools::stringFormat("RenderTime: %.1f ms", Statistic::RenderTime));
+	m_LabelMemory->setData(StringTool::stringFormat("Memory: %.3f kb", Statistic::getMemoryUse() / 1024.0f));
+	m_LabelLogicTime->setData(StringTool::stringFormat("LogicTime: %.1f ms", Statistic::LogicTime));
+	m_LabelRenderTime->setData(StringTool::stringFormat("RenderTime: %.1f ms", Statistic::RenderTime));
 
-	m_LabelFPS->setData(Tools::stringFormat("FPS: %.1f(%.3f ms/Frame)",
+	m_LabelFPS->setData(StringTool::stringFormat("FPS: %.1f(%.3f ms/Frame)",
 		GUIFunction::getFrameRate(), GUIFunction::getFrameRateTime()));
 
-	m_LabelPass->setData(Tools::stringFormat("PassCount: %d", Statistic::PassCount));
-	m_LabelDrawCall->setData(Tools::stringFormat("DrawCount: %d", Statistic::DrawCall));
+	m_LabelPass->setData(StringTool::stringFormat("PassCount: %d", Statistic::PassCount));
+	m_LabelDrawCall->setData(StringTool::stringFormat("DrawCount: %d", Statistic::DrawCall));
 
 	m_MousePosition->setFloat2(glm::value_ptr(Statistic::mousePosition));
 	m_MouseOffset->setFloat2(glm::value_ptr(Statistic::mouseOffset));
@@ -61,8 +61,8 @@ void MyInfoWindow::onUpdate()
 
 //------------------------------------------------------
 MyObjectWindow::MyObjectWindow() :
-	GUIWindow(u8"ÎïÌåĞÅÏ¢"),
-	m_Position(new GUIDragFloat3(u8"×ø±ê"))
+	GUIWindow(u8"ç‰©ä½“ä¿¡æ¯(Object Info)"),
+	mPosition(new GUIDragFloat3(u8"åæ ‡"))
 {
 
 }
@@ -85,13 +85,13 @@ void MyObjectWindow::onUpdate()
 
 //------------------------------------
 MyMainCameraWindow::MyMainCameraWindow() :
-	GUIWindow(u8"Ö÷Ïà»úĞÅÏ¢"),
-	m_Info(new GUIText(u8"²Ù×÷")),
-	m_Position(new GUIDragFloat3(u8"×ø±ê")),
-	m_Rotation(new GUIDragFloat3(u8"Ğı×ª")),
-	m_Right(new GUIDragFloat3(u8"ÓÒ·½")),
-	m_Up(new GUIDragFloat3(u8"ÉÏ·½")),
-	m_Front(new GUIDragFloat3(u8"Ç°·½")),
+	GUIWindow(u8"ä¸»ç›¸æœºä¿¡æ¯"),
+	m_Info(new GUIText(u8"ä¿¡æ¯")),
+	mPosition(new GUIDragFloat3(u8"åæ ‡(Position)")),
+	m_Rotation(new GUIDragFloat3(u8"æ—‹è½¬(Rotation)")),
+	m_Right(new GUIDragFloat3(u8"å³æ–¹(Right)")),
+	m_Up(new GUIDragFloat3(u8"ä¸Šæ–¹(Up)")),
+	m_Front(new GUIDragFloat3(u8"å‰æ–¹(Front)")),
 	m_MainCamera(nullptr)
 {
 
@@ -106,13 +106,13 @@ void MyMainCameraWindow::init()
 	m_MainCamera = SG<CameraManager>::getInstance()->getMainCamera();
 
 	this->addChild(m_Info);
-	this->addChild(m_Position);
+	this->addChild(mPosition);
 	this->addChild(m_Rotation);
 	this->addChild(m_Right);
 	this->addChild(m_Up);
 	this->addChild(m_Front);
 
-	m_Position->postFunction = [this](float* data)
+	mPosition->postFunction = [this](float* data)
 	{
 		m_MainCamera->getTransform()->setPosition(data);
 	};
@@ -126,10 +126,10 @@ void MyMainCameraWindow::init()
 
 void MyMainCameraWindow::onUpdate()
 {
-	m_Info->setData(Tools::fromU8(u8"¿ØÖÆ<CTRL>\n[W A S D]\n[R:Up] [F:Down]"));
+	m_Info->setData(StringTool::fromU8(u8"æ“ä½œ<CTRL>\n[W A S D]\n[R:Up] [F:Down]"));
 
 	auto position = m_MainCamera->getTransform()->getPosition();
-	m_Position->setFloat3(glm::value_ptr(position));
+	mPosition->setFloat3(glm::value_ptr(position));
 
 	auto rotation = m_MainCamera->getTransform()->getRotation();
 	m_Rotation->setFloat3(glm::value_ptr(rotation));

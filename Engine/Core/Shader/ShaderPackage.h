@@ -2,7 +2,8 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "Utility/Tools.h"
+#include "../Tool/DelegateCreator.h"
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -19,13 +20,22 @@ namespace tezcat::Tiny::Core
 		void apply();
 
 	public:
-		const std::vector<Shader*>& getShaders() { return m_Shaders; }
-		std::string& getName() { return m_Name; }
-		int getUID() const { return m_UID; }
+		const std::vector<Shader*>& getShaders() { return mShaders; }
+		std::string& getName() { return mName; }
+		int getUID() const { return mUID; }
 
 	private:
-		int m_UID;
-		std::string m_Name;
-		std::vector<Shader*> m_Shaders;
+		int mUID;
+		std::string mName;
+		std::vector<Shader*> mShaders;
 	};
+
+
+	class TINY_API ShaderBuilderCreatorImp
+	{
+	public:
+		virtual ShaderPackage* create(const char* filePath) = 0;
+	};
+
+	using ShaderBuilderCreator = DelegateCreator<ShaderBuilderCreatorImp, ShaderPackage>;
 }

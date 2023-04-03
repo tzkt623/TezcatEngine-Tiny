@@ -7,11 +7,12 @@ namespace tezcat::Tiny::Utility
 {
 	//------------------------------------------
 	// 
-	// 请使用IDString特制的unordered容器
+	// 璇蜂娇鐢↖DString鐨勭壒鍖栫増unordered_xxx
 	// 
-	// please use the special unordered_xx for IDString
+	// Please use the special unordered_xxx for IDString
 	//
 	// IDString::UMap IDString::USet
+	//
 	template<typename Belong>
 	class TINY_API IDString
 	{

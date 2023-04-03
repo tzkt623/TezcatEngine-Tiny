@@ -1,6 +1,6 @@
 #include "GUIWidget.h"
 #include "../Head/ImGuiHead.h"
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 #include "GUI.h"
 
 namespace tezcat::Tiny::Core
@@ -17,19 +17,19 @@ namespace tezcat::Tiny::Core
 
 	//----------------------------------------------------------------------
 	GUIWidget::GUIWidget(const std::u8string& name)
-		: m_Name(Tools::fromU8(name))
+		: mName(StringTool::fromU8(name))
 	{
 
 	}
 
 	GUIWidget::GUIWidget(const std::string& name)
-		: m_Name(name)
+		: mName(name)
 	{
 
 	}
 
 	GUIWidget::GUIWidget(const char* name)
-		: m_Name(name)
+		: mName(name)
 	{
 
 	}
@@ -58,7 +58,7 @@ namespace tezcat::Tiny::Core
 		this->onRender();
 
 		this->beginParent();
-		for (auto w : m_Children)
+		for (auto w : mChildren)
 		{
 			w->update();
 		}

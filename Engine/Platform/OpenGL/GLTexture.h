@@ -5,7 +5,7 @@
 #include "Core/Manager/TextureManager.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny::GL
 {
 	class TINY_API GLTexture2D : public Texture2D
 	{
@@ -16,7 +16,7 @@ namespace tezcat::Tiny::Core
 		void createTexture(Image* image) override;
 	};
 
-	class GLTextureCreator : public TextureCreator
+	class TINY_API GLTextureCreator : public TextureCreator
 	{
 	public:
 		GLTextureCreator() {}

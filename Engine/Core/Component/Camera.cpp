@@ -12,38 +12,56 @@
 #include "../Shader/Shader.h"
 
 #include "../Manager/SceneManager.h"
-#include "../Scene/Layer.h"
 #include "../Renderer/BaseGraphics.h"
-#include "../Scene/GameObject.h"
+#include "../Component/GameObject.h"
 #include "../Scene/LayerMask.h"
 
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
+#include "../Pipeline/Forward.h"
+#include "../Manager/PipelineManager.h"
 
 
 namespace tezcat::Tiny::Core
 {
-	Camera::Camera(bool mainCamera)
-		: m_UID(Utility::IDGenerator<Camera, unsigned int>::generate())
-		, m_IsMain(mainCamera)
-		, m_NearFace(0.1f)
-		, m_FarFace(100.0f)
-		, m_FOV(60.0f)
-		, m_ProjectionMatrix(1.0f)
-		, m_ViewMatrix(1.0f)
-		, m_Type(Type::Perspective)
-		, m_PMatDirty(true)
-		, m_CullMask(1)
-		, m_Deep(0)
-		, m_Front(0.0f, 0.0f, -1.0f)
-		, m_Up(0.0f, 1.0f, 0.0f)
-		, m_Right(1.0f, 0.0f, 0.0f)
-		, m_WorldUp(0.0f, 1.0f, 0.0f)
-		, m_Yaw(-90.0f)
-		, m_Pitch(0.0f)
-		, m_Roll(0.0f)
-		, m_ViewInfo({ 0, 0, Engine::getScreenWidth(), Engine::getScreenHeight() })
+	Camera::Camera(Pipeline* pipeline, bool mainCamera)
+		: mUID(Utility::IDGenerator<Camera, unsigned int>::generate())
+		, mPipeline(pipeline)
+		, mIsMain(mainCamera)
+		, mNearFace(0.1f)
+		, mFarFace(100.0f)
+		, mFOV(60.0f)
+		, mAspect(Engine::getScreenWidth() / (float)Engine::getScreenHeight())
+		, mProjectionMatrix(1.0f)
+		, mViewMatrix(1.0f)
+		, mType(Type::Perspective)
+		, mPMatDirty(true)
+		, mDeep(0)
+		, mFront(0.0f, 0.0f, -1.0f)
+		, mUp(0.0f, 1.0f, 0.0f)
+		, mRight(1.0f, 0.0f, 0.0f)
+		, mWorldUp(0.0f, 1.0f, 0.0f)
+		, mYaw(-90.0f)
+		, mPitch(0.0f)
+		, mRoll(0.0f)
+		, mViewInfo({ 0, 0, Engine::getScreenWidth(), Engine::getScreenHeight() })
 	{
-		this->setCullLayerMask(LayerMask::getMask(0));
+
+	}
+
+	Camera::Camera(Pipeline* pipeling)
+		: Camera(pipeling, true)
+	{
+
+	}
+
+	Camera::Camera(bool mainCamera)
+		: Camera(PipelineManager::get("Forward"), mainCamera)
+	{
+	}
+
+	Camera::Camera()
+		: Camera(PipelineManager::get("Forward"), true)
+	{
 	}
 
 	Camera::~Camera()
@@ -51,151 +69,9 @@ namespace tezcat::Tiny::Core
 
 	}
 
-	void Camera::setOrtho(float near, float far)
-	{
-		m_Type = Type::Ortho;
-		m_NearFace = near;
-		m_FarFace = far;
-		m_PMatDirty = true;
-	}
-
-	void Camera::setPerspective(float fov, float near, float far)
-	{
-		m_Type = Type::Perspective;
-		m_FOV = fov;
-		m_NearFace = near;
-		m_FarFace = far;
-		m_PMatDirty = true;
-	}
-
-	bool Camera::cullGameObject(GameObject* gameObject)
-	{
-		//#Cull Function
-		return true;
-	}
-
 	void Camera::onStart()
 	{
 
-	}
-
-	void Camera::refreshCullMask()
-	{
-		m_CullLayerList.clear();
-		for (int i = 0; i < 32; i++)
-		{
-			if (m_CullMask & (1u << i))
-			{
-				m_CullLayerList.emplace_back(1u << i);
-			}
-		}
-	}
-
-	void Camera::setMain()
-	{
-		m_IsMain = true;
-		CameraMgr::getInstance()->setMainCamera(this);
-	}
-
-	void Camera::setViewRect(int x, int y, int width, int height)
-	{
-		m_ViewInfo.OX = x;
-		m_ViewInfo.OY = y;
-		m_ViewInfo.Width = width;
-		m_ViewInfo.Height = height;
-	}
-
-	void Camera::yawPitch(float yaw, float pitch, bool constrainPitch)
-	{
-		yaw *= 0.2f;
-		pitch *= 0.2f;
-
-		m_Yaw += yaw;
-		m_Pitch += pitch;
-
-		if (m_Yaw > 360)
-		{
-			m_Yaw -= 360;
-		}
-		else if (m_Yaw < -360)
-		{
-			m_Yaw += 360;
-		}
-
-		if (constrainPitch)
-		{
-			if (m_Pitch > 89.0f)
-			{
-				m_Pitch = 89.0f;
-			}
-			if (m_Pitch < -89.0f)
-			{
-				m_Pitch = -89.0f;
-			}
-		}
-
-		this->getTransform()->setRotation(m_Pitch, m_Yaw, m_Roll);
-
-		this->updateCameraVector();
-	}
-
-	void Camera::updateCameraVector()
-	{
-		glm::vec3 front;
-		front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
-		front.y = sin(glm::radians(m_Pitch));
-		front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
-		m_Front = glm::normalize(front);
-
-		m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
-		m_Up = glm::normalize(glm::cross(m_Right, m_Front));
-	}
-
-	void Camera::roll(float speed)
-	{
-		m_Roll += speed;
-		m_WorldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f) * glm::angleAxis(glm::radians(m_Roll), m_Front));
-		m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
-		m_Up = glm::normalize(glm::cross(m_Right, m_Front));
-	}
-
-	void Camera::render()
-	{
-		this->update();
-		Graphics->cullWithCamera(this);
-	}
-
-	void Camera::update()
-	{
-		if (m_PMatDirty)
-		{
-			m_PMatDirty = false;
-			switch (m_Type)
-			{
-			case Type::Ortho:
-				m_ProjectionMatrix = glm::ortho(
-					0.0f, (float)Core::Engine::getScreenWidth(),
-					0.0f, (float)Core::Engine::getScreenHeight(),
-					m_NearFace, m_FarFace);
-				break;
-			case Type::Perspective:
-				m_ProjectionMatrix = glm::perspective(
-					glm::radians(m_FOV),
-					(float)Core::Engine::getScreenWidth() / (float)Core::Engine::getScreenHeight(),
-					m_NearFace, m_FarFace);
-				break;
-			default:
-				break;
-			}
-		}
-
-		auto position = this->getTransform()->getPosition();
-		m_ViewMatrix = glm::lookAt(position, position + m_Front, m_Up);
-
-		if (this->getTransform()->getParent() != nullptr)
-		{
-			m_ViewMatrix = this->getTransform()->getParent()->getModelMatrix() * m_ViewMatrix;
-		}
 	}
 
 	void Camera::onEnable()
@@ -203,29 +79,171 @@ namespace tezcat::Tiny::Core
 		CameraMgr::getInstance()->addCamera(this);
 	}
 
+	void Camera::onDisable()
+	{
+
+	}
+
+	//注意处理这个函数的调用位置
+	void Camera::onUpdate()
+	{
+		if (mPMatDirty)
+		{
+			mPMatDirty = false;
+			switch (mType)
+			{
+			case Type::Ortho:
+				mProjectionMatrix = glm::ortho(
+					0.0f, (float)Core::Engine::getScreenWidth(),
+					0.0f, (float)Core::Engine::getScreenHeight(),
+					mNearFace, mFarFace);
+				break;
+			case Type::Perspective:
+				mProjectionMatrix = glm::perspective(
+					glm::radians(mFOV),
+					(float)Core::Engine::getScreenWidth() / (float)Core::Engine::getScreenHeight(),
+					mNearFace, mFarFace);
+				break;
+			default:
+				break;
+			}
+		}
+
+		auto position = this->getTransform()->getPosition();
+		mViewMatrix = glm::lookAt(position, position + mFront, mUp);
+
+		if (this->getTransform()->getParent() != nullptr)
+		{
+			mViewMatrix = this->getTransform()->getParent()->getModelMatrix() * mViewMatrix;
+		}
+	}
+
+	void Camera::setOrtho(float near, float far)
+	{
+		mType = Type::Ortho;
+		mNearFace = near;
+		mFarFace = far;
+		mPMatDirty = true;
+	}
+
+	void Camera::setPerspective(float fov, float near, float far)
+	{
+		mType = Type::Perspective;
+		mFOV = fov;
+		mNearFace = near;
+		mFarFace = far;
+		mPMatDirty = true;
+	}
+
+	void Camera::setMain()
+	{
+		mIsMain = true;
+		CameraMgr::getInstance()->setMainCamera(this);
+	}
+
+	void Camera::setViewRect(int x, int y, int width, int height)
+	{
+		mViewInfo.OX = x;
+		mViewInfo.OY = y;
+		mViewInfo.Width = width;
+		mViewInfo.Height = height;
+	}
+
+	void Camera::render()
+	{
+		this->onUpdate();
+		mPipeline->render(this);
+	}
+
+	void Camera::submit(Shader* shader)
+	{
+		shader->setProjectionMatrix(this->getProjectionMatrix());
+		shader->setViewMatrix(this->getViewMatrix());
+		shader->setViewPosition(this->getTransform()->getPosition());
+	}
+
+	void Camera::yawPitch(float yaw, float pitch, bool constrainPitch)
+	{
+		yaw *= 0.2f;
+		pitch *= 0.2f;
+
+		mYaw += yaw;
+		mPitch += pitch;
+
+		if (mYaw > 360)
+		{
+			mYaw -= 360;
+		}
+		else if (mYaw < -360)
+		{
+			mYaw += 360;
+		}
+
+		if (constrainPitch)
+		{
+			if (mPitch > 89.0f)
+			{
+				mPitch = 89.0f;
+			}
+			if (mPitch < -89.0f)
+			{
+				mPitch = -89.0f;
+			}
+		}
+
+		this->getTransform()->setRotation(mPitch, mYaw, mRoll);
+
+		this->updateCameraVector();
+	}
+
+	void Camera::updateCameraVector()
+	{
+		glm::vec3 front;
+		front.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+		front.y = sin(glm::radians(mPitch));
+		front.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+		mFront = glm::normalize(front);
+
+		mRight = glm::normalize(glm::cross(mFront, mWorldUp));
+		mUp = glm::normalize(glm::cross(mRight, mFront));
+	}
+
+	void Camera::roll(float speed)
+	{
+		mRoll += speed;
+		mWorldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f) * glm::angleAxis(glm::radians(mRoll), mFront));
+		mRight = glm::normalize(glm::cross(mFront, mWorldUp));
+		mUp = glm::normalize(glm::cross(mRight, mFront));
+	}
+
+	//----------------------------------------
+	//
+	//	layer
+	//
+
 	std::vector<Camera*> CameraLayer::m_Layers[32] = { std::vector<Camera*>() };
 	void CameraLayer::addCamera(Camera* camera)
 	{
-		for (int i = 0; i < 32; i++)
-		{
-			if (camera->cullLayerMask(1u << i))
-			{
-				m_Layers[i].push_back(camera);
-				return;
-			}
-		}
+		// 		for (int i = 0; i < 32; i++)
+		// 		{
+		// 			if (camera->cullLayerMask(1u << i))
+		// 			{
+		// 				m_Layers[i].push_back(camera);
+		// 				return;
+		// 			}
+		// 		}
 	}
 
 	void CameraLayer::removeCamera(Camera* camera)
 	{
-		for (int i = 0; i < 32; i++)
-		{
-			if (camera->cullLayerMask(1u << i))
-			{
-				auto it = std::remove(m_Layers[i].begin(), m_Layers[i].end(), camera);
-				m_Layers[i].erase(it);
-			}
-		}
+		// 		for (int i = 0; i < 32; i++)
+		// 		{
+		// 			if (camera->cullLayerMask(1u << i))
+		// 			{
+		// 				auto it = std::remove(m_Layers[i].begin(), m_Layers[i].end(), camera);
+		// 				m_Layers[i].erase(it);
+		// 			}
+		// 		}
 	}
 
 	void CameraLayer::addCamera(Camera* camera, unsigned int mask)

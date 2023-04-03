@@ -1,14 +1,13 @@
 #pragma once
 #include "../Head/CppHead.h"
 #include "../Head/Context.h"
+#include "../Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
 {
 	class Image;
-	class Texture
+	class TINY_API Texture
 	{
-	public:
-
 	public:
 		Texture();
 		Texture(const TextureWrap& wrap, const TextureFilter& filter);
@@ -18,7 +17,7 @@ namespace tezcat::Tiny::Core
 		virtual void createTexture(Image* image) = 0;
 		void createTexture(const char* filePath);
 
-		inline uint32_t getTextureID() const { return m_TextureID; }
+		inline uint32_t getTextureID() const { return mTextureID; }
 
 		inline TexWrapWrapper& getWrap() { return m_Wrap; }
 		void setWrap(const TextureWrap& val)
@@ -33,17 +32,17 @@ namespace tezcat::Tiny::Core
 		}
 
 	protected:
-		uint32_t m_TextureID;
+		uint32_t mTextureID;
 		TexWrapWrapper m_Wrap;
 		TexFilterWrapper m_Filter;
 	};
 
-	class Texture2D : public Texture
+	class TINY_API Texture2D : public Texture
 	{
 		TextureType getTextureType() const final { return TextureType::Texture2D; }
 	};
 
-	class Texture3D : public Texture
+	class TINY_API Texture3D : public Texture
 	{
 		TextureType getTextureType() const final { return TextureType::Texture3D; }
 	};

@@ -5,7 +5,8 @@
 
 struct GLFWwindow;
 
-namespace tezcat::Tiny::Core
+using namespace tezcat::Tiny::Core;
+namespace tezcat::Tiny::GL
 {
 	class TINY_API GLGraphics : public BaseGraphics
 	{
@@ -21,20 +22,16 @@ namespace tezcat::Tiny::Core
 		void preRender() override;
 		void onRender() override;
 		void postRender() override;
-		void updateViewport(Camera* camera) override;
+		void updateViewport(ViewportInfo& info) override;
 
-		void renderMesh(MeshRenderer* renderer) override;
-
-	public:
-		VertexGroup* createVertexGroup(MeshData* mesh) override;
-		VertexBuffer* createVertexBuffer(MeshData* mesh) override;
-		void createShaderPackage(const std::string& filePath) override;
-
+		void clear() override;
+		void draw(MeshRenderer* renderer) override;
+		void draw(VertexGroup* group, DrawModeWrapper drawMode) override;
 
 	private:
 		void initContext();
 
 	private:
-		GLFWwindow* m_Window;
+		GLFWwindow* mWindow;
 	};
 }

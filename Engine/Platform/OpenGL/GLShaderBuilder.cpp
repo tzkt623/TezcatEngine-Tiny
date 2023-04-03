@@ -2,11 +2,11 @@
 #include "GLShader.h"
 #include "GLHead.h"
 #include "Core/Manager/ShaderManager.h"
-#include "Core/Shader/ShaderPackage.h"
 #include "Core/Head/Context.h"
+#include "Core/Pipeline/PipelineQueue.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny::GL
 {
 	bool splitConfig(const std::string& content, std::string& config, std::string& suffix, const char* regex)
 	{
@@ -134,7 +134,7 @@ namespace tezcat::Tiny::Core
 
 	void GLShaderBuilder::splitPasses(ShaderPackage* pack, std::string& content)
 	{
-		std::regex pattern(R"(#TINY_PASS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_PASS_END)");
+		std::regex pattern(R"(#TINY_PASS_BEGIN\s*\{\s*([\s\S]*?)\}\s*#TINY_PASS_END)");
 		std::sregex_iterator end;
 		for (auto i = std::sregex_iterator(content.begin(), content.end(), pattern); i != end; i++)
 		{
@@ -201,11 +201,33 @@ namespace tezcat::Tiny::Core
 			it = map.find("Queue");
 			if (it != map.end())
 			{
-				shader->setRenderQueue(Pipeline::getQueue(it->second.cast<std::string>()));
+				shader->setRenderQueue(PipelineQueue::getQueue(it->second.cast<std::string>()));
 			}
 			else
 			{
-				shader->setRenderQueue(Pipeline::Queue::Opaque);
+				shader->setRenderQueue(PipelineQueue::Queue::Geometry);
+			}
+
+			//LightMode
+			it = map.find("LightMode");
+			if (it != map.end())
+			{
+				shader->setLightMode(ContextMap::LightModeMap[it->second.cast<std::string>()]);
+			}
+			else
+			{
+				shader->setLightMode(LightMode::Unlit);
+			}
+
+			//DepthTest
+			it = map.find("DepthTest");
+			if (it != map.end())
+			{
+				shader->setDepthTest(ContextMap::DepthTestMap[it->second.cast<std::string>()]);
+			}
+			else
+			{
+				shader->setDepthTest(DepthTest::Less);
 			}
 
 			//ZWrite
@@ -266,9 +288,13 @@ namespace tezcat::Tiny::Core
 			std::string shader_content(result[1]);
 			std::sregex_iterator end;
 
+			//åˆ é™¤æ³¨é‡Š
+			std::regex regex_comment(R"(//+.*;)");
+			shader_content = std::regex_replace(shader_content, regex_comment, "");
+
 			//------------------------------------------------------------
 			//
-			//	·ÖÎöstructÒÔ¼°ÄÚ²¿µÄarguments
+			// åˆ†æstructä¸­çš„arguments
 			//
 			struct StructMetaData
 			{
@@ -277,11 +303,14 @@ namespace tezcat::Tiny::Core
 			};
 			std::unordered_map<std::string, StructMetaData*> struct_map;
 
+			//struct Nameçš„è§£æè§„åˆ™
 			std::regex regex_struct(R"(struct\s+(\w+)\s+\{[\w\W]+?\};)");
+			//structå†…å®¹è§£æè§„åˆ™
 			std::regex regex_struct_data(R"(struct\s+\w+\s+\{([\w\W]+)\};)");
+			//typeå’Œnameçš„è§£æè§„åˆ™
 			std::regex regex_argument(R"((\w+)\s*(\w+);)");
 
-			//·ÖÎöstruct
+			//åˆ†æstruct
 			for (auto struct_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_struct); struct_i != end; struct_i++)
 			{
 				std::string struct_name = (*struct_i)[1];
@@ -289,11 +318,11 @@ namespace tezcat::Tiny::Core
 				meta_data->name = struct_name;
 				struct_map[struct_name] = meta_data;
 
-				//·ÖÎöargument pair
+				//åˆ†æargument pair
 				std::string struct_data = (*struct_i)[0];
 				for (auto struct_data_i = std::sregex_iterator(struct_data.begin(), struct_data.end(), regex_struct_data); struct_data_i != end; struct_data_i++)
 				{
-					//·ÖÎöargument
+					//åˆ†æargument
 					std::string arguments_data = (*struct_data_i)[1];
 					for (auto argument_i = std::sregex_iterator(arguments_data.begin(), arguments_data.end(), regex_argument); argument_i != end; argument_i++)
 					{
@@ -303,6 +332,7 @@ namespace tezcat::Tiny::Core
 				}
 			}
 
+			//åˆ†æUniform
 			std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(?=[\s\S]*;))");
 			for (auto i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_uniform); i != end; i++)
 			{
@@ -313,14 +343,13 @@ namespace tezcat::Tiny::Core
 					auto meta_data = it->second;
 					for (auto& pair : meta_data->arguments)
 					{
+						//ç»„åˆstructä¸­çš„uniform
 						uniformArray.emplace(std::string((*i)[2]) + "." + pair.first);
-						// 						shader->registerUniform(type, std::string((*i)[2]) + "." + pair.second);
 					}
 				}
 				else
 				{
 					uniformArray.emplace((*i)[2]);
-					//					shader->registerUniform(type, (*i)[2]);
 				}
 			}
 
@@ -377,10 +406,9 @@ namespace tezcat::Tiny::Core
 		shader->attachShader(shader_id);
 	}
 
-	void GLShaderBuilder::createPackage(const std::string& filePath)
+	ShaderPackage* GLShaderBuilderCreator::create(const char* filePath)
 	{
-		TINY_PROFILER_TIMER_FUNCTION();
-		GLShaderBuilder().loadFromFile(filePath.c_str());
-		TINY_PROFILER_TIMER_FUNCTION_LOG();
+		GLShaderBuilder().loadFromFile(filePath);
+		return nullptr;
 	}
 }

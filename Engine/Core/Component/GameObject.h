@@ -2,51 +2,54 @@
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
 #include "../Component/Transform.h"
+#include "../Base/BaseObject.h"
 
 namespace tezcat::Tiny::Core
 {
-	class MeshData;
-	class Material;
 	class Scene;
-	class TINY_API GameObject
+	class TINY_API GameObject : BaseObject
 	{
+		friend class Component;
+		friend class Transform;
 	public:
 		GameObject();
 		GameObject(const std::string& name);
-	private:
-		~GameObject();
+		virtual ~GameObject();
 
 	public:
-		std::string getName() const { return m_Name; }
-		void setName(const std::string& val) { m_Name = val; }
+		virtual void close() override;
 
+		std::string getName() const { return mName; }
+		void setName(const std::string& val) { mName = val; }
+
+		Scene* getScene() { return mScene; }
 		void enterScene(Scene* scene);
 		void exitScene();
 
-		uint32_t getLayerMask() { return 1 << m_LayerMaskIndex; }
-		inline uint32_t getLayerMaskIndex() { return m_LayerMaskIndex; }
-		void setLayerMask(uint32_t maskIndex) { m_LayerMaskIndex = 1 << maskIndex; }
-		inline Scene* getScene() { return m_Scene; }
+		uint32_t getLayerMask() { return 1 << mLayerMaskIndex; }
+		uint32_t getLayerMaskIndex() { return mLayerMaskIndex; }
+		void setLayerMask(uint32_t maskIndex) { mLayerMaskIndex = 1 << maskIndex; }
 
 	public:
-		inline bool needDelete() const { return m_NeedDelete; }
+		bool needDelete() const { return mNeedDelete; }
 
 	public:
-		inline int getUID() const { return m_UID; }
+		int getUID() const { return mUID; }
 
-		inline Transform* getTransform()
+		Transform* getTransform()
 		{
-			return (Transform*)m_ComponentList[0].get();
+			return mTransform;
+//			return (Transform*)mComponentList[0];
 		}
 
 		template<class Com>
 		Com* getComponent()
 		{
-			for (auto const& com : m_ComponentList)
+			for (auto const& com : mComponentList)
 			{
 				if (com->is<Com>())
 				{
-					return static_cast<Com*>(com.get());
+					return static_cast<Com*>(com);
 				}
 			}
 
@@ -56,11 +59,11 @@ namespace tezcat::Tiny::Core
 		template<class Com>
 		Com* getComponentInChildren()
 		{
-			for (auto const& com : m_ComponentList)
+			for (auto const& com : mComponentList)
 			{
 				if (com->is<Com>())
 				{
-					return static_cast<Com*>(com.get());
+					return static_cast<Com*>(com);
 				}
 			}
 
@@ -91,19 +94,36 @@ namespace tezcat::Tiny::Core
 		template<typename Com>
 		void removeComponent()
 		{
-			auto it = m_ComponentList.begin();
-			while (it != m_ComponentList.end())
+			auto it = mComponentList.begin();
+			while (it != mComponentList.end())
 			{
 				if ((*it)->is<Com>())
 				{
 					(*it)->onDetach();
-					m_ComponentList.erase(it);
+					mComponentList.erase(it);
 					break;
 				}
 			}
 		}
 
-		void detachAllComponent() { m_ComponentList.clear(); }
+		void detachAllComponent() { mComponentList.clear(); }
+
+		std::vector<Component*>& getCompoents() { return mComponentList; }
+
+	private:
+		void removeComponent(Component* com)
+		{
+			auto it = mComponentList.begin();
+			while (it != mComponentList.end())
+			{
+				if ((*it) == com)
+				{
+					it = mComponentList.erase(it);
+				}
+
+				(*it)->onComponentRemoved(com);
+			}
+		}
 
 	public:
 		template<typename T>
@@ -139,21 +159,24 @@ namespace tezcat::Tiny::Core
 		static void destory(GameObject* go);
 		static void clearDeletedGameObjects();
 
-	private:
-		std::string m_Name;
-		int m_UID;
-		bool m_IsLogic;
-		bool m_NeedDelete;
-		unsigned int m_LayerMaskIndex;
+
 
 	private:
-		Scene* m_Scene;
-		//0号组件必须是Transform
-		std::vector<ref<Component>> m_ComponentList;
+		std::string mName;
+		int mUID;
+		uint32_t mLayerMaskIndex;
+
+		bool mIsLogic;
+		bool mNeedDelete;
 
 	private:
-		static std::stack<int> s_UIDPool;
-		static std::list<GameObject*> s_DeleteObjectList;
+		Scene* mScene;
+		Transform* mTransform;
+		std::vector<Component*> mComponentList;
+
+	private:
+		static std::stack<int> sUIDPool;
+		static std::list<GameObject*> sDeleteObjectList;
 	};
 }
 

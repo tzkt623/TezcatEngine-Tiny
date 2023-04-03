@@ -2,8 +2,9 @@
 #include "Core/Head/CppHead.h"
 #include "Core/Head/ConfigHead.h"
 #include "Core/Shader/Uniform.h"
+#include "Core/Shader/ShaderPackage.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny::GL
 {
 	/*
 	* Shader format
@@ -27,17 +28,15 @@ namespace tezcat::Tiny::Core
 	*/
 
 	class GLShader;
-	class ShaderPackage;
 	class TINY_API GLShaderBuilder
 	{
-	private:
+	public:
 		GLShaderBuilder();
 		~GLShaderBuilder();
+		GLShader* loadFromFile(const char* filePath);
 
 	private:
-		GLShader* loadFromFile(const char* filePath);
 		void loadFromData(GLShader* shader, const char* data, uint32_t shaderType);
-
 		void parseShaders(GLShader* shader, std::string& content, UniformID::USet& uniformArray);
 		void parseShaderConfig(GLShader* shader, std::string& content);
 		void parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType, UniformID::USet& uniformArray);
@@ -45,10 +44,15 @@ namespace tezcat::Tiny::Core
 		void splitPasses(ShaderPackage* pack, std::string& content);
 		ShaderPackage* parsePackageHead(std::string& content);
 
-	public:
-		static void createPackage(const std::string& filePath);
 	private:
 		std::vector<uint32_t> m_ShaderIDs;
+	};
+
+
+	class TINY_API GLShaderBuilderCreator : public ShaderBuilderCreatorImp
+	{
+	public:
+		ShaderPackage* create(const char* filePath) override;
 	};
 }
 

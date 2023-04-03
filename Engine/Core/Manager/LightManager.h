@@ -1,15 +1,17 @@
 #pragma once
 
 #include "../Head/CppHead.h"
-#include "Utility/Tools.h"
+#include "../Head/ConfigHead.h"
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
 	class DirectionalLight;
 	class PointLight;
-	class Spotlight;
+	class SpotLight;
 
-	class LightData
+
+	class TINY_API LightData
 	{
 	public:
 		LightData();
@@ -18,11 +20,11 @@ namespace tezcat::Tiny::Core
 	public:
 		DirectionalLight* directionalLight;
 		std::vector<PointLight*> pointLights;
-		std::vector<Spotlight*> spotLights;
+		std::vector<SpotLight*> spotLights;
 	};
 
 
-	class LightManager
+	class TINY_API LightManager
 	{
 	public:
 		LightManager();
@@ -34,20 +36,14 @@ namespace tezcat::Tiny::Core
 			m_Data = data;
 		}
 
-		LightData* getData()
-		{
-			return m_Data;
-		}
+		DirectionalLight* getDirectionalLight() const { return m_Data->directionalLight; }
+		void setDirectionalLight(DirectionalLight* val) { m_Data->directionalLight = val; }
 
-		DirectionalLight* getDirectionalLight() const { return m_DirectionalLight; }
-		void setDirectionalLight(DirectionalLight* val)
-		{
-			m_DirectionalLight = val;
-		}
+		void addPointLight(PointLight* light);
+		std::vector<PointLight*>& getPointLights() { return m_Data->pointLights; }
 
 	private:
 		LightData* m_Data;
-		DirectionalLight* m_DirectionalLight;
 	};
 
 	using LightMgr = SG<LightManager>;

@@ -1,16 +1,16 @@
 #include "Layer.h"
 
-#include "GameObject.h"
+#include "../Component/GameObject.h"
 #include "../Component/MeshRenderer.h"
 #include "../Component/Camera.h"
-#include "../Component/RenderObject.h"
+#include "../Renderer/RenderObject.h"
 
 
 
 namespace tezcat::Tiny::Core
 {
 	Layer::Layer()
-		: m_Index(-1)
+		: mIndex(-1)
 	{
 
 	}

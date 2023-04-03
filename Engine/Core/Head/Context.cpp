@@ -94,4 +94,38 @@ namespace tezcat::Tiny::Core
 		BlendWrapper(Blend::ConstAlpha,				0),
 		BlendWrapper(Blend::One_Minus_ConstAlpha,	0)
 	};
+
+
+	std::unordered_map<std::string, DepthTestWrapper> ContextMap::DepthTestMap =
+	{
+		{"Off",				DepthTestWrapper(DepthTest::Off,			0)},
+		{"Always",			DepthTestWrapper(DepthTest::Always,			0)},
+		{"Never",			DepthTestWrapper(DepthTest::Never,			0)},
+		{"Less",			DepthTestWrapper(DepthTest::Less,			0)},
+		{"LessEqual",		DepthTestWrapper(DepthTest::LessEqual,		0)},
+		{"Greater",			DepthTestWrapper(DepthTest::Greater,		0)},
+		{"GreaterEqual",	DepthTestWrapper(DepthTest::GreaterEqual,	0)},
+		{"Equal",			DepthTestWrapper(DepthTest::Equal,			0)},
+		{"NotEqual",		DepthTestWrapper(DepthTest::NotEqual,		0)}
+	};
+
+	std::array<DepthTestWrapper, (std::size_t)DepthTest::Count> ContextMap::DepthTestArray =
+	{
+		DepthTestWrapper(DepthTest::Off,			0),
+		DepthTestWrapper(DepthTest::Always,			0),
+		DepthTestWrapper(DepthTest::Never,			0),
+		DepthTestWrapper(DepthTest::Less,			0),
+		DepthTestWrapper(DepthTest::LessEqual,		0),
+		DepthTestWrapper(DepthTest::Greater,		0),
+		DepthTestWrapper(DepthTest::GreaterEqual,	0),
+		DepthTestWrapper(DepthTest::Equal,			0),
+		DepthTestWrapper(DepthTest::NotEqual,		0)
+	};
+
+	std::unordered_map<std::string, LightMode> ContextMap::LightModeMap =
+	{
+		{"Unlit",		LightMode::Unlit },
+		{"Main",		LightMode::Main },
+		{"Addition",	LightMode::Addition }
+	};
 }

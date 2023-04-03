@@ -17,8 +17,6 @@ namespace tezcat::Tiny::Core
 		static uint32_t getMask(uint32_t index);
 
 	private:
-		static std::vector<std::string> m_MaskWithName;
+		static std::vector<std::string> sMaskWithName;
 	};
-
-
 }

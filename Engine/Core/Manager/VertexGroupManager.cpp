@@ -16,17 +16,17 @@ namespace tezcat::Tiny::Core
 
 	void VertexGroupManager::addVertexGroup(VertexGroup* vg)
 	{
-		m_VertexGroupDic.emplace(vg->getName(), vg);
+		mVertexGroupMap.emplace(vg->getName(), vg);
 	}
 
 	void VertexGroupManager::addVertexGroup(MeshData* meshData)
 	{
-		auto vg = Graphics->createVertexGroup(meshData);
+		auto vg = VertexGroupCreator::create(meshData);
 		this->addVertexGroup(vg);
 	}
 
 	VertexGroup* VertexGroupManager::getVertexGroup(const std::string& name)
 	{
-		return m_VertexGroupDic[name];
+		return mVertexGroupMap[name];
 	}
 }

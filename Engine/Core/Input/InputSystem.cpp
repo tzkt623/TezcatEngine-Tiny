@@ -1,14 +1,14 @@
 #include "InputSystem.h"
 #include "Inputer.h"
 
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
 	InputSystem::InputSystem()
-		: m_Window(nullptr)
-		, m_MouseX(0)
-		, m_MouseY(0)
+		: mWindow(nullptr)
+		, mMouseX(0)
+		, mMouseY(0)
 	{
 		SG<InputSystem>::attach(this);
 		this->push(EmptyInputer::getInstance());
@@ -16,65 +16,65 @@ namespace tezcat::Tiny::Core
 
 	void InputSystem::push(Inputer* inputer)
 	{
-		if (!m_InputerStack.empty())
+		if (!mInputerStack.empty())
 		{
-			m_InputerStack.top()->onPause();
+			mInputerStack.top()->onPause();
 		}
 		inputer->onEnter();
-		m_InputerStack.push(inputer);
+		mInputerStack.push(inputer);
 	}
 
 	void InputSystem::pop()
 	{
-		m_InputerStack.top()->onExit();
-		m_InputerStack.pop();
+		mInputerStack.top()->onExit();
+		mInputerStack.pop();
 	}
 
 	void InputSystem::mouseButtonCallBack(int button, int action, int mods)
 	{
-		m_InputerStack.top()->mouseButtonCallBack(button, action, mods);
+		mInputerStack.top()->mouseButtonCallBack(button, action, mods);
 	}
 
 	void InputSystem::mouseCursorPosCallBack(double xpos, double ypos)
 	{
-		m_InputerStack.top()->mouseCursorPosCallBack(xpos, ypos);
+		mInputerStack.top()->mouseCursorPosCallBack(xpos, ypos);
 	}
 
 	void InputSystem::mouseScrollPosCallBack(double xoffset, double yoffset)
 	{
-		m_InputerStack.top()->mouseScrollPosCallBack(xoffset, yoffset);
+		mInputerStack.top()->mouseScrollPosCallBack(xoffset, yoffset);
 	}
 
 	void InputSystem::update()
 	{
-		m_InputerStack.top()->processInput(this);
+		mInputerStack.top()->processInput(this);
 	}
 
 	bool InputSystem::getKeyDown(int key)
 	{
-		return glfwGetKey(m_Window, key) == GLFW_PRESS;
+		return glfwGetKey(mWindow, key) == GLFW_PRESS;
 	}
 
 	bool InputSystem::getKeyUp(int key)
 	{
-		return glfwGetKey(m_Window, key) == GLFW_RELEASE;
+		return glfwGetKey(mWindow, key) == GLFW_RELEASE;
 	}
 
 	bool InputSystem::getMouseButtonDown(int key)
 	{
-		return glfwGetMouseButton(m_Window, key) == GLFW_PRESS;
+		return glfwGetMouseButton(mWindow, key) == GLFW_PRESS;
 	}
 
 	bool InputSystem::getMouseButtonUp(int key)
 	{
-		return glfwGetMouseButton(m_Window, key) == GLFW_RELEASE;
+		return glfwGetMouseButton(mWindow, key) == GLFW_RELEASE;
 	}
 
 	void InputSystem::getMousePosition(float& x, float& y)
 	{
-		glfwGetCursorPos(m_Window, &m_MouseX, &m_MouseY);
-		x = static_cast<float>(m_MouseX);
-		y = static_cast<float>(m_MouseY);
+		glfwGetCursorPos(mWindow, &mMouseX, &mMouseY);
+		x = static_cast<float>(mMouseX);
+		y = static_cast<float>(mMouseY);
 	}
 }
 

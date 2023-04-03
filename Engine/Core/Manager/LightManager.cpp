@@ -28,14 +28,19 @@ namespace tezcat::Tiny::Core
 
 	//------------------------------------------------------------
 	LightManager::LightManager()
-		: m_Data(new LightData())
+		: m_Data(nullptr)
 	{
-		SG<LightManager>::attach(this);
+		LightMgr::attach(this);
 	}
 
 	LightManager::~LightManager()
 	{
 
+	}
+
+	void LightManager::addPointLight(PointLight* light)
+	{
+		m_Data->pointLights.push_back(light);
 	}
 
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Head/GLMHead.h"
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -22,6 +22,8 @@ namespace tezcat::Tiny::Core
 		Int4, Float4,
 		Mat3, Mat4, MatNormal,
 		Tex2D, Tex3D, TexCube,
+
+		Mode,
 	};
 
 
@@ -142,7 +144,7 @@ namespace tezcat::Tiny::Core
 
 	//-----------------------------------------------
 	//
-	//	ÌØ»¯Uniform
+	//	ç‰¹åŒ–Uniform
 	//
 	struct TINY_API UniformMatrixP : public Uniform
 	{
@@ -173,6 +175,14 @@ namespace tezcat::Tiny::Core
 		using Uniform::Uniform;
 
 		inline UniformType getType() final { return UniformType::Mat3; }
+		void submit(Transform* transform, Shader* shader) override;
+	};
+
+	struct TINY_API UniformMode : public Uniform
+	{
+		using Uniform::Uniform;
+
+		inline UniformType getType() final { return UniformType::Mode; }
 		void submit(Transform* transform, Shader* shader) override;
 	};
 }

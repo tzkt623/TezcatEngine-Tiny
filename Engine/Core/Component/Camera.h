@@ -1,9 +1,10 @@
 #pragma once
+#include "Component.h"
 
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
-#include "Component.h"
+#include "../Renderer/RenderObject.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -36,9 +37,10 @@ namespace tezcat::Tiny::Core
 	class MeshRenderer;
 	class Shader;
 	class Scene;
+	class Pipeline;
+
 	/// <summary>
-	/// Ïà»úÖ»Ìá¹©¾ØÕóĞÅÏ¢
-	/// ¶øÇÒ¾ØÕóĞÅÏ¢ÔÚäÖÈ¾Ö®Ç°¼ÆËã
+	/// ç›¸æœºæ¨¡å—
 	/// </summary>
 	class TINY_API Camera : public ComponentT<Camera>
 	{
@@ -50,103 +52,102 @@ namespace tezcat::Tiny::Core
 		};
 
 	public:
-		Camera(bool mainCamera = false);
+		//åˆ›å»ºä¸€ä¸ªforwardä¸»ç›¸æœº
+		Camera();
+		//åˆ›å»ºä¸€ä¸ªforwardç›¸æœº
+		Camera(bool mainCamera);
+		//ä½¿ç”¨ç®¡çº¿åˆ›å»ºä¸€ä¸ªä¸»ç›¸æœº
+		Camera(Pipeline* pipeling);
+		//ä½¿ç”¨ç®¡çº¿åˆ›å»ºä¸€ä¸ªç›¸æœº
+		Camera(Pipeline* pipeling, bool mainCamera);
+
 		~Camera();
 
 		void setOrtho(float near, float far);
 		void setPerspective(float fov, float near, float far);
 
-		inline Type getViewType() { return m_Type; }
-		inline uint32_t getID() const { return m_UID; }
+		Type getViewType() { return mType; }
+		uint32_t getID() const { return mUID; }
 
+		Pipeline* getPipeline() const { return mPipeline; }
+		void setPipeline(Pipeline* val) { mPipeline = val; }
+
+		void setCullLayer(uint32_t layer)
+		{
+			return mCullLayerList.push_back(layer);
+		}
+
+		std::vector<uint32_t>& getCullLayerList() { return mCullLayerList; }
+		bool frustumCulling(GameObject* go) { return true; }
+
+		void render();
+		void submit(Shader* shader);
 	public:
 
-		inline glm::mat4x4& getProjectionMatrix() { return m_ProjectionMatrix; }
-		inline glm::mat4x4& getViewMatrix() { return m_ViewMatrix; }
+		glm::mat4x4& getProjectionMatrix() { return mProjectionMatrix; }
+		glm::mat4x4& getViewMatrix() { return mViewMatrix; }
+
 
 	public:
-		inline bool isMain() const { return m_IsMain; }
+		bool isMain() const { return mIsMain; }
 		void setMain();
-		inline void clearMain() { m_IsMain = false; }
+		void clearMain() { mIsMain = false; }
 
-		inline int getDeep() const { return m_Deep; }
-		inline void setDeep(int val) { m_Deep = val; }
+		int getDeep() const { return mDeep; }
+		void setDeep(int val) { mDeep = val; }
+		float getFOV() { return mFOV; }
+		float getAspect() { return mAspect; }
+		float getNear() { return mNearFace; }
+		float getFar() { return mFarFace; }
 
-		inline bool cullLayerMask(uint32_t layerMask) { return (m_CullMask & layerMask) > 0; }
-		void setCullLayerMask(uint32_t mask)
-		{
-			m_CullMask = mask;
-			this->refreshCullMask();
-		}
-		void addCullLayerMask(uint32_t mask)
-		{
-			m_CullMask |= mask;
-			this->refreshCullMask();
-		}
-
-		void removeCullLayerMask(uint32_t mask)
-		{
-			m_CullMask &= ~mask;
-			this->refreshCullMask();
-		}
-
-		bool cullGameObject(GameObject* gameObject);
-
-		std::vector<glm::uint32_t> getCullLayerList() const { return m_CullLayerList; }
-
-
+		void setViewRect(int x, int y, int width, int height);
+		ViewportInfo& getViewRect() { return mViewInfo; }
 	protected:
 		void onStart() override;
 		void onEnable() override;
+		void onUpdate() override;
+		void onDisable() override;
 
 	public:
-		inline glm::vec3& getFront() { return m_Front; }
-		inline glm::vec3& getUp() { return m_Up; }
-		inline glm::vec3& getRight() { return m_Right; }
-
-		void setViewRect(int x, int y, int width, int height);
-		ViewportInfo& getViewRect() { return m_ViewInfo; }
-
-	public:
+		glm::vec3& getFront() { return mFront; }
+		glm::vec3& getUp() { return mUp; }
+		glm::vec3& getRight() { return mRight; }
 		void yawPitch(float yaw, float pitch, bool constrainPitch = true);
 		void roll(float roll);
-		virtual void render();
-		void update();
-
-
-	protected:
-		void refreshCullMask();
 
 	private:
 		void updateCameraVector();
 
 	private:
-		int m_Deep;
-		bool m_IsMain;
+		int mDeep;
+		bool mIsMain;
 
-		uint32_t m_UID;
-		uint32_t m_CullMask;
+		uint32_t mUID;
 
 	private:
-		ViewportInfo m_ViewInfo;
+		ViewportInfo mViewInfo;
 
-		float m_NearFace;
-		float m_FarFace;
-		float m_FOV;
-		Type m_Type;
-		bool m_PMatDirty;
+		float mNearFace;
+		float mFarFace;
+		float mFOV;
+		float mAspect;
+		Type mType;
+		bool mPMatDirty;
 
-		glm::mat4x4 m_ProjectionMatrix;
-		glm::mat4x4 m_ViewMatrix;
+		glm::mat4x4 mProjectionMatrix;
+		glm::mat4x4 mViewMatrix;
 	private:
-		glm::vec3 m_Front;
-		glm::vec3 m_Up;
-		glm::vec3 m_Right;
-		glm::vec3 m_WorldUp;
-		float m_Yaw;
-		float m_Pitch;
-		float m_Roll;
+		glm::vec3 mFront;
+		glm::vec3 mUp;
+		glm::vec3 mRight;
+		glm::vec3 mWorldUp;
+		float mYaw;
+		float mPitch;
+		float mRoll;
 
-		std::vector<uint32_t> m_CullLayerList;
+
+	private:
+		Pipeline* mPipeline;
+		std::vector<uint32_t> mCullLayerList;
 	};
 }

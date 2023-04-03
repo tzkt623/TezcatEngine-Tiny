@@ -1,18 +1,20 @@
 #include "Scene.h"
-#include "Layer.h"
-#include "GameObject.h"
+#include "../Component/GameObject.h"
 
 #include "../Manager/LightManager.h"
 #include "../Manager/CameraManager.h"
 
 #include "../Component/Camera.h"
+#include "../Component/Light.h"
 #include "../Component/Transform.h"
+#include "../Layer/RenderLayer.h"
 
 namespace tezcat::Tiny::Core
 {
 	Scene::Scene(const std::string& name)
-		: m_Name(name)
-		, m_LightData(new LightData())
+		: mName(name)
+		, mLightData(new LightData())
+		, mCameraData(new CameraData())
 	{
 
 	}
@@ -24,7 +26,8 @@ namespace tezcat::Tiny::Core
 
 	void Scene::onEnter()
 	{
-		SG<CameraManager>::getInstance()->setCurrentSceneCameras(m_CameraWithName);
+		CameraMgr::getInstance()->setCameraData(mCameraData);
+		LightMgr::getInstance()->setData(mLightData);
 	}
 
 	void Scene::onExit()
@@ -39,76 +42,108 @@ namespace tezcat::Tiny::Core
 
 	void Scene::onResume()
 	{
-		SG<CameraManager>::getInstance()->setCurrentSceneCameras(m_CameraWithName);
+		CameraMgr::getInstance()->setCameraData(mCameraData);
+		LightMgr::getInstance()->setData(mLightData);
+	}
+
+	void Scene::addGameObject(GameObject* gameObject)
+	{
+		mNewObjectList.emplace_back(gameObject);
+	}
+
+	void Scene::addParentChangedTransform(Transform* transform)
+	{
+		mParentChangedTransformList.push_back(transform);
 	}
 
 	void Scene::addTransform(Transform* transform)
 	{
-		transform->enterScene(this);
-		m_TransformList.push_back(transform);
+		mTransformList.emplace_back(transform);
 	}
 
 	void Scene::addCamera(Camera* camera)
 	{
-		auto it = m_CameraWithName.find(camera->getGameObject()->getName());
-		if (it == m_CameraWithName.end())
-		{
-			m_CameraWithName.emplace(camera->getGameObject()->getName(), camera);
-			CameraMgr::getInstance()->addCamera(camera);
-		}
+		CameraMgr::getInstance()->addCamera(camera);
 	}
 
 	void Scene::addLogicFunction(void* gameObject, const std::function<void()>& function)
 	{
-		m_LogicList[gameObject] = function;
+		mLogicList[gameObject] = function;
 	}
 
 	void Scene::removeLogicFunction(void* gameObject)
 	{
-		m_LogicList.erase(gameObject);
+		mLogicList.erase(gameObject);
+	}
+
+	void Scene::addNewObject(GameObject* gameObject)
+	{
+		mNewObjectList.emplace_back(gameObject);
 	}
 
 	void Scene::update()
 	{
-		if (!m_NewObjectList.empty())
+		//#InitNewObjects
+		if (!mNewObjectList.empty())
 		{
-			for (auto go : m_NewObjectList)
+			for (auto go : mNewObjectList)
 			{
 				go->enterScene(this);
 			}
-			m_NewObjectList.clear();
+			mNewObjectList.clear();
 		}
 
 		//#SceneUpdate
-		if (!m_LogicList.empty())
+		if (!mLogicList.empty())
 		{
-			for (auto const& pair : m_LogicList)
+			for (const auto& pair : mLogicList)
 			{
 				pair.second();
 			}
 		}
 
-		auto it = m_TransformList.begin();
-		while (it != m_TransformList.end())
+		//#TransformUpdate
+		auto it = mTransformList.begin();
+		auto end = mTransformList.end();
+		while (it != end)
 		{
 			auto go = (*it)->getGameObject();
 			if (go->needDelete())
 			{
+				it = mTransformList.erase(it);
+				end = mTransformList.end();
 				go->exitScene();
-				it = m_TransformList.erase(it);
+				go->close();
+				delete go;
 			}
 			else
 			{
-				(*it++)->update();
+				(*it)->update();
+				it++;
 			}
 		}
 
-		CameraMgr::getInstance()->render();
-	}
-
-	void Scene::addGameObject(GameObject* gameObject)
-	{
-		m_TransformList.emplace_back(gameObject->getTransform());
-		m_NewObjectList.push_back(gameObject);
+		//#CameraCulling
+// 		auto it_camera = m_CameraData->m_CameraList.begin();
+// 		auto end_camera = m_CameraData->m_CameraList.end();
+// 		while (it_camera != end_camera)
+// 		{
+// 			auto c = (*it_camera);
+// 			if (c->isEnable())
+// 			{
+// 				const auto& cull_list = c->getCullLayerList();
+// 				for (auto& index : cull_list)
+// 				{
+// 					m_RenderLayerList[index]->testWithCamera(c, m_LightLayerList[index]);
+// 				}
+// 
+// 				it_camera++;
+// 			}
+// 			else
+// 			{
+// 				it_camera = m_CameraData->m_CameraList.erase(it_camera);
+// 				end_camera = m_CameraData->m_CameraList.end();
+// 			}
+// 		}
 	}
 }

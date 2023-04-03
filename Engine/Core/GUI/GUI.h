@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Head/CppHead.h"
-#include "Utility/Tools.h"
+#include "../Head/ConfigHead.h"
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
 	class Engine;
 	class GUIWindow;
-	class GUI
+	class TINY_API GUI
 	{
 	public:
 		GUI();

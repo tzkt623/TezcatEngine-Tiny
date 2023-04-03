@@ -1,6 +1,6 @@
 #include "SceneManager.h"
 #include "../Scene/Scene.h"
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 #include "../Statistic.h"
 
 namespace tezcat::Tiny::Core
@@ -21,24 +21,24 @@ namespace tezcat::Tiny::Core
 
 	void SceneManager::pushScene(const std::string& name)
 	{
-		if (!m_Scenes.empty())
+		if (!mScenes.empty())
 		{
-			m_Scenes.top()->onPause();
+			mScenes.top()->onPause();
 		}
 
 		auto it = m_SceneWithName.find(name);
 		if (it != m_SceneWithName.end())
 		{
-			m_Scenes.push(it->second);
+			mScenes.push(it->second);
 			it->second->onEnter();
 		}
 	}
 
 	void SceneManager::popScene()
 	{
-		m_Scenes.top()->onExit();
-		m_Scenes.pop();
-		m_Scenes.top()->onResume();
+		mScenes.top()->onExit();
+		mScenes.pop();
+		mScenes.top()->onResume();
 	}
 
 	void SceneManager::prepareScene(Scene* scene)
@@ -49,6 +49,6 @@ namespace tezcat::Tiny::Core
 	void SceneManager::update()
 	{
 		TINY_PROFILER_TIMER_OUT(Statistic::LogicTime);
-		m_Scenes.top()->update();
+		mScenes.top()->update();
 	}
 }

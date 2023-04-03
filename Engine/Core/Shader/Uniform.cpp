@@ -1,25 +1,15 @@
 #include "Uniform.h"
+#include "Shader.h"
+
 #include "../Head/Context.h"
 #include "../Renderer/Texture.h"
 #include "../Component/Transform.h"
-#include "Shader.h"
 #include "../Component/Camera.h"
-#include "../Scene/GameObject.h"
+#include "../Component/GameObject.h"
 #include "../Manager/TextureManager.h"
 
 namespace tezcat::Tiny::Core
 {
-	UniformTex2D::UniformTex2D(const UniformID& id, const char* filePath)
-		: UniformT(id, (Texture2D*)TextureMgr::getInstance()->tryGetTexture(filePath, TextureType::Texture2D))
-	{
-
-	}
-
-	void UniformTex2D::submit(Transform* transform, Shader* shader)
-	{
-		shader->setTexture2D(this->ID, this->value);
-	}
-
 	void UniformI1::submit(Transform* transform, Shader* shader)
 	{
 		shader->setInt1(this->ID, &value);
@@ -70,12 +60,22 @@ namespace tezcat::Tiny::Core
 		shader->setMat4(this->ID, glm::value_ptr(value));
 	}
 
+	UniformTex2D::UniformTex2D(const UniformID& id, const char* filePath)
+		: UniformT(id, (Texture2D*)TextureMgr::getInstance()->tryGetTexture(filePath, TextureType::Texture2D))
+	{
+
+	}
+
+	void UniformTex2D::submit(Transform* transform, Shader* shader)
+	{
+		shader->setTexture2D(this->ID, this->value);
+	}
+
 
 	//---------------------------------------------------------
 	//
-	//	ÌØ»¯Uniform
+	//	ç‰¹åŒ–Uniform
 	//
-
 	void UniformMatrixP::submit(Transform* transform, Shader* shader)
 	{
 		auto camera = transform->getGameObject()->getComponent<Camera>();
@@ -97,5 +97,14 @@ namespace tezcat::Tiny::Core
 	{
 		auto mat = glm::mat3(glm::transpose(glm::inverse(transform->getModelMatrix())));
 		shader->setMat3(this->ID, glm::value_ptr(mat));
+	}
+
+
+	void UniformMode::submit(Transform* transform, Shader* shader)
+	{
+		shader->setMat4(ShaderParam::MatrixM, glm::value_ptr(transform->getModelMatrix()));
+
+		auto mat = glm::mat3(glm::transpose(glm::inverse(transform->getModelMatrix())));
+		shader->setMat3(ShaderParam::MatrixN, glm::value_ptr(mat));
 	}
 }

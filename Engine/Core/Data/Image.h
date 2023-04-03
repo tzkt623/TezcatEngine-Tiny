@@ -24,4 +24,3 @@ namespace tezcat::Tiny::Core
 		unsigned char* m_Data;
 	};
 }
-

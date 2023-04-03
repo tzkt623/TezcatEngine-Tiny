@@ -11,5 +11,4 @@ namespace tezcat::Tiny::Core
 	{
 
 	}
-
 }

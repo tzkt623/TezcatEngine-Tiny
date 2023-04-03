@@ -6,19 +6,20 @@
 #include "Core/Data/ResourceLoader.h"
 #include "Core/Input/InputSystem.h"
 #include "Core/Scene/LayerMask.h"
-#include "Core/Scene/GameObject.h"
-#include "../OpenGL/GLGraphics.h"
+#include "Core/Component/GameObject.h"
 #include "Core/GUI/GUI.h"
 
+#include "../OpenGL/GLGraphics.h"
 
 
 
-namespace tezcat::Tiny::Core
+
+namespace tezcat::Tiny::GL
 {
 	WindowsEngine::WindowsEngine()
-		: m_Window(nullptr)
-		, m_NowTime(0)
-		, m_OldTime(0)
+		: mWindow(nullptr)
+		, mTimeNow(0)
+		, mTimeOld(0)
 	{
 
 	}
@@ -40,8 +41,8 @@ namespace tezcat::Tiny::Core
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		m_Window = glfwCreateWindow(ScreenWidth, ScreenHeight, loader->getName().c_str(), nullptr, nullptr);
-		if (m_Window == nullptr)
+		mWindow = glfwCreateWindow(ScreenWidth, ScreenHeight, loader->getName().c_str(), nullptr, nullptr);
+		if (mWindow == nullptr)
 		{
 			std::cout << "Failed to create GLFW window" << std::endl;
 			glfwTerminate();
@@ -54,7 +55,7 @@ namespace tezcat::Tiny::Core
 
 	bool WindowsEngine::postInit(ResourceLoader* loader)
 	{
-		m_InputSystem->setWindow(m_Window);
+		m_InputSystem->setWindow(mWindow);
 		return Engine::postInit(loader);
 	}
 
@@ -74,22 +75,22 @@ namespace tezcat::Tiny::Core
 	void WindowsEngine::beforeLoop()
 	{
 		Engine::beforeLoop();
-		m_OldTime = glfwGetTime();
-		m_NowTime = 0;
+		mTimeOld = glfwGetTime();
+		mTimeNow = 0;
 	}
 
 	void WindowsEngine::preUpdate()
 	{
 		glfwPollEvents();
-		m_NowTime = glfwGetTime();
-		DeltaTime = static_cast<float>(m_NowTime - m_OldTime);
-		m_OldTime = m_NowTime;
+		mTimeNow = glfwGetTime();
+		sDeltaTime = static_cast<float>(mTimeNow - mTimeOld);
+		mTimeOld = mTimeNow;
 	}
 
 	void WindowsEngine::postUpdate()
 	{
 		GameObject::clearDeletedGameObjects();
-		m_IsRunning = !glfwWindowShouldClose(m_Window);
+		m_IsRunning = !glfwWindowShouldClose(mWindow);
 	}
 
 	void WindowsEngine::endLoop()

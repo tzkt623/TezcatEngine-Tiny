@@ -10,9 +10,9 @@ MyResourceLoader::MyResourceLoader()
 
 void MyResourceLoader::prepareEngine(Engine* engine)
 {
-	m_GameName = u8"YesIndeed,火已将熄,然位不见王影.你好,这是洛斯里克,没有EldenRing玩感觉身上一万个梅琳娜在爬!!!!!";
-	m_WindowWidth = 1600;
-	m_WindowHeight = 900;
+	mGameName = u8"YesIndeed,鐜╀笂鑰佸ご鐜簡!!!!!";
+	mWindowWidth = 1600;
+	mWindowHeight = 900;
 }
 
 
@@ -38,29 +38,29 @@ void MyResourceLoader::createSomeMode()
 {
 	{
 		auto mesh_data = new MeshData("Cube");
-		//前
-		mesh_data->vertices.emplace_back(-0.5f, -0.5f, 0.5f);	//左下
-		mesh_data->vertices.emplace_back(0.5f, -0.5f, 0.5f);	//右下
-		mesh_data->vertices.emplace_back(0.5f, 0.5f, 0.5f);		//右上
-		mesh_data->vertices.emplace_back(-0.5f, 0.5f, 0.5f);	//左上
+		//
+		mesh_data->vertices.emplace_back(-0.5f, -0.5f, 0.5f);	//
+		mesh_data->vertices.emplace_back(0.5f, -0.5f, 0.5f);	//
+		mesh_data->vertices.emplace_back(0.5f, 0.5f, 0.5f);		//
+		mesh_data->vertices.emplace_back(-0.5f, 0.5f, 0.5f);	//
 
 		mesh_data->normals.emplace_back(0.0f, 0.0f, 1.0f);
 		mesh_data->normals.emplace_back(0.0f, 0.0f, 1.0f);
 		mesh_data->normals.emplace_back(0.0f, 0.0f, 1.0f);
 		mesh_data->normals.emplace_back(0.0f, 0.0f, 1.0f);
 
-		//上
-		mesh_data->vertices.emplace_back(-0.5f, 0.5f, 0.5f);	//左下
-		mesh_data->vertices.emplace_back(0.5f, 0.5f, 0.5f);		//右下
-		mesh_data->vertices.emplace_back(0.5f, 0.5f, -0.5f);	//右上
-		mesh_data->vertices.emplace_back(-0.5f, 0.5f, -0.5f);	//左上
+		//
+		mesh_data->vertices.emplace_back(-0.5f, 0.5f, 0.5f);	//
+		mesh_data->vertices.emplace_back(0.5f, 0.5f, 0.5f);		//
+		mesh_data->vertices.emplace_back(0.5f, 0.5f, -0.5f);	//
+		mesh_data->vertices.emplace_back(-0.5f, 0.5f, -0.5f);	//
 
 		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
 		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
 		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
 		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
 
-		//后
+		//
 		mesh_data->vertices.emplace_back(-0.5f, 0.5f, -0.5f);
 		mesh_data->vertices.emplace_back(0.5f, 0.5f, -0.5f);
 		mesh_data->vertices.emplace_back(0.5f, -0.5f, -0.5f);
@@ -71,7 +71,7 @@ void MyResourceLoader::createSomeMode()
 		mesh_data->normals.emplace_back(0.0f, 0.0f, -1.0f);
 		mesh_data->normals.emplace_back(0.0f, 0.0f, -1.0f);
 
-		//下
+		//
 		mesh_data->vertices.emplace_back(-0.5f, -0.5f, -0.5f);
 		mesh_data->vertices.emplace_back(0.5f, -0.5f, -0.5f);
 		mesh_data->vertices.emplace_back(0.5f, -0.5f, 0.5f);
@@ -82,7 +82,7 @@ void MyResourceLoader::createSomeMode()
 		mesh_data->normals.emplace_back(0.0f, -1.0f, 0.0f);
 		mesh_data->normals.emplace_back(0.0f, -1.0f, 0.0f);
 
-		//左
+		//
 		mesh_data->vertices.emplace_back(-0.5f, -0.5f, -0.5f);
 		mesh_data->vertices.emplace_back(-0.5f, -0.5f, 0.5f);
 		mesh_data->vertices.emplace_back(-0.5f, 0.5f, 0.5f);
@@ -93,7 +93,7 @@ void MyResourceLoader::createSomeMode()
 		mesh_data->normals.emplace_back(-1.0f, 0.0f, 0.0f);
 		mesh_data->normals.emplace_back(-1.0f, 0.0f, 0.0f);
 
-		//右
+		//
 		mesh_data->vertices.emplace_back(0.5f, -0.5f, 0.5f);
 		mesh_data->vertices.emplace_back(0.5f, -0.5f, -0.5f);
 		mesh_data->vertices.emplace_back(0.5f, 0.5f, -0.5f);
@@ -131,10 +131,10 @@ void MyResourceLoader::createSomeMode()
 
 	{
 		auto mesh_data = new MeshData("Square");
-		mesh_data->vertices.emplace_back(-0.5f, -0.5f, 0.0f);	//左下
-		mesh_data->vertices.emplace_back(0.5f, -0.5f, 0.0f);	//右下
-		mesh_data->vertices.emplace_back(0.5f, 0.5f, 0.0f);		//右上
-		mesh_data->vertices.emplace_back(-0.5f, 0.5f, 0.0f);	//左上
+		mesh_data->vertices.emplace_back(-0.5f, -0.5f, 0.0f);	//
+		mesh_data->vertices.emplace_back(0.5f, -0.5f, 0.0f);	//
+		mesh_data->vertices.emplace_back(0.5f, 0.5f, 0.0f);		//
+		mesh_data->vertices.emplace_back(-0.5f, 0.5f, 0.0f);	//
 
 		mesh_data->indices.emplace_back(0);
 		mesh_data->indices.emplace_back(1);

@@ -1,36 +1,48 @@
 #pragma once
 
-#include "Core/Head/CppHead.h"
-#include "RenderCommand.h"
+#include "../Head/CppHead.h"
+#include "../Tool/DelegateCreator.h"
+#include "../Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
 {
 	class MeshData;
 	class VertexBuffer;
-	class VertexGroup
+
+	class TINY_API VertexGroup
 	{
 	public:
 		VertexGroup();
 		virtual ~VertexGroup();
 
 	public:
-		std::string getName() const { return m_Name; }
-		void setName(const std::string& val) { m_Name = val; }
-		int getVertexCount() const { return m_VertexCount; }
-		int getIndexCount() const { return m_IndexCount; }
-		unsigned int getUID() const { return m_UID; }
+		std::string getName() const { return mName; }
+		void setName(const std::string& val) { mName = val; }
+		int getVertexCount() const { return mVertexCount; }
+		int getIndexCount() const { return mIndexCount; }
+		unsigned int getUID() const { return mUID; }
 
 	public:
 		virtual void init(MeshData* mesh) = 0;
 		virtual void bind() = 0;
+		virtual void unbind() = 0;
 
 	protected:
-		std::string m_Name;
-		unsigned int m_UID;
+		std::string mName;
+		unsigned int mUID;
 
-		int m_VertexCount;
-		int m_IndexCount;
+		int mVertexCount;
+		int mIndexCount;
 
-		VertexBuffer* m_VertexBuffer;
+		VertexBuffer* mVertexBuffer;
 	};
+
+	class VertexGroupCreatorImp
+	{
+	public:
+		virtual ~VertexGroupCreatorImp() = default;
+		virtual VertexGroup* create(MeshData* meshData) = 0;
+	};
+
+	using VertexGroupCreator = DelegateCreator<VertexGroupCreatorImp, VertexGroup>;
 }

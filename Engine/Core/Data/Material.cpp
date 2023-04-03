@@ -1,5 +1,5 @@
 #include "Material.h"
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 
 #include "../Manager/ShaderManager.h"
 #include "../Shader/ShaderPackage.h"
@@ -11,26 +11,30 @@
 namespace tezcat::Tiny::Core
 {
 	Material::Material(const std::string& name)
-		: m_Name(name)
+		: mName(name)
 	{
-		m_ShaderPackage = ShaderMgr::getInstance()->findPackage(name);
+		mShaderPackage = ShaderMgr::getInstance()->findPackage(name);
 	}
 
 	Material::~Material()
 	{
-		m_Uniforms.clear();
-		m_ShaderPackage = nullptr;
+		for (auto p : mUniforms)
+		{
+			delete p;
+		}
+		mUniforms.clear();
+		mShaderPackage = nullptr;
 	}
 
-	int Material::getUID()
+	int Material::getUID() const
 	{
-		return m_ShaderPackage->getUID();
+		return mShaderPackage->getUID();
 	}
 
 	void Material::submit(Transform* transform, Shader* shader)
 	{
 		shader->resetState();
-		for (const auto& uniform : m_Uniforms)
+		for (auto uniform : mUniforms)
 		{
 			uniform->submit(transform, shader);
 		}

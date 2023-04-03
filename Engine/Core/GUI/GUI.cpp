@@ -5,8 +5,9 @@
 #include "Platform/OpenGL/GLHead.h"
 #include "GUIWidget.h"
 
-#include "../Platform/Windows/WindowsEngine.h"
+#include "../Platform/OpenGL/WindowsEngine.h"
 
+using namespace tezcat::Tiny::GL;
 namespace tezcat::Tiny::Core
 {
 	GUI::GUI()

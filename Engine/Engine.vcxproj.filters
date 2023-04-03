@@ -13,10 +13,10 @@
     <ClCompile Include="Core\Renderer\VertexGroup.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Component\RenderObject.cpp">
+    <ClCompile Include="Core\Renderer\RenderObject.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Pipeline\PassShader.cpp">
+    <ClCompile Include="Core\Renderer\RenderPass.cpp">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClCompile>
     <ClCompile Include="Core\Pipeline\PassVertexGroup.cpp">
@@ -64,7 +64,7 @@
     <ClCompile Include="Core\Statistic.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\Tools.cpp">
+    <ClCompile Include="Utility\StringTool.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Core\Data\Image.cpp">
@@ -100,7 +100,7 @@
     <ClCompile Include="Core\Input\InputSystem.cpp">
       <Filter>Engine\Core\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Scene\GameObject.cpp">
+    <ClCompile Include="Core\Component\GameObject.cpp">
       <Filter>Engine\Core\Scene\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Core\Component\Camera.cpp">
@@ -135,13 +135,13 @@
     </ClCompile>
     <ClCompile Include="Core\Shader\ShaderPackage.cpp" />
     <ClCompile Include="Core\Manager\PipelineManager.cpp" />
-    <ClCompile Include="Platform\Windows\WindowsEngine.cpp" />
+    <ClCompile Include="Platform\OpenGL\WindowsEngine.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
     <ClCompile Include="Platform\OpenGL\GLVertexBuffer.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
-    <ClCompile Include="Core\Scene\Layer.cpp" />
-    <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
+    <ClCompile Include="Core\Layer\Layer.cpp" />
+    <ClCompile Include="Core\Layer\RenderLayer.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
     <ClCompile Include="Utility\ProfilerTimer.cpp" />
@@ -150,6 +150,11 @@
     <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
     <ClCompile Include="Core\Shader\Uniform.cpp" />
     <ClCompile Include="Core\Manager\TextureManager.cpp" />
+    <ClCompile Include="Core\Pipeline\Forward.cpp" />
+    <ClCompile Include="Core\Pipeline\PipelineQueue.cpp" />
+    <ClCompile Include="Core\Layer\LightLayer.cpp" />
+    <ClCompile Include="Core\Tool\AABB.cpp" />
+    <ClCompile Include="Core\Tool\FrustumCulling.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -235,10 +240,10 @@
     <ClInclude Include="Core\Renderer\VertexGroup.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Component\RenderObject.h">
+    <ClInclude Include="Core\Renderer\RenderObject.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Pipeline\PassShader.h">
+    <ClInclude Include="Core\Renderer\RenderPass.h">
       <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClInclude>
     <ClInclude Include="Core\Pipeline\PassVertexGroup.h">
@@ -1150,7 +1155,7 @@
     <ClInclude Include="ThirdParty\imgui\imgui_impl_opengl3_loader.h">
       <Filter>Engine\Thirdparty\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Tools.h">
+    <ClInclude Include="Utility\Utility.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Core\Statistic.h">
@@ -1204,7 +1209,7 @@
     <ClInclude Include="Core\Input\Inputer.h">
       <Filter>Engine\Core\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Scene\GameObject.h">
+    <ClInclude Include="Core\Component\GameObject.h">
       <Filter>Engine\Core\Scene\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Core\Manager\CameraManager.h">
@@ -1247,13 +1252,13 @@
     <ClInclude Include="Core\Manager\PipelineManager.h" />
     <ClInclude Include="Core\Head\ConfigHead.h" />
     <ClInclude Include="Utility\Bitmask.h" />
-    <ClInclude Include="Platform\Windows\WindowsEngine.h" />
+    <ClInclude Include="Platform\OpenGL\WindowsEngine.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
     <ClInclude Include="Platform\OpenGL\GLVertexBuffer.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
-    <ClInclude Include="Core\Scene\Layer.h" />
-    <ClInclude Include="Core\Renderer\RenderLayer.h" />
+    <ClInclude Include="Core\Layer\Layer.h" />
+    <ClInclude Include="Core\Layer\RenderLayer.h" />
     <ClInclude Include="Utility\ProfilerTimer.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
     <ClInclude Include="Core\Head\Context.h" />
@@ -1262,6 +1267,19 @@
     <ClInclude Include="Core\Shader\Uniform.h" />
     <ClInclude Include="Utility\Any.h" />
     <ClInclude Include="Core\Manager\TextureManager.h" />
+    <ClInclude Include="Utility\StringTool.h" />
+    <ClInclude Include="Utility\IDGenerator.h" />
+    <ClInclude Include="Utility\Event.h" />
+    <ClInclude Include="Utility\Singleton.h" />
+    <ClInclude Include="Core\Tool\DelegateCreator.h" />
+    <ClInclude Include="Core\Pipeline\Forward.h" />
+    <ClInclude Include="Core\Pipeline\PipelineQueue.h" />
+    <ClInclude Include="Core\Layer\LightLayer.h" />
+    <ClInclude Include="Core\Tool\AABB.h" />
+    <ClInclude Include="Core\Tool\FrustumCulling.h" />
+    <ClInclude Include="Core\Renderer\RenderObjectTag.h" />
+    <ClInclude Include="Core\Base\TinySmartPointer.h" />
+    <ClInclude Include="Core\Base\BaseObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

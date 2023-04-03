@@ -39,12 +39,12 @@ namespace tezcat::Tiny::Core
 
 		int getBufferSize();
 
-		const std::string& getName() { return m_Name; }
+		const std::string& getName() { return mName; }
 
 		void apply();
 
 	public:
-		std::string m_Name;
+		std::string mName;
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec4> colors;

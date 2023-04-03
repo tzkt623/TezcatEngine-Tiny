@@ -12,39 +12,39 @@ namespace tezcat::Tiny::Core
 		virtual ~ResourceLoader();
 
 		/// <summary>
-		/// ÒıÇæ³õÊ¼»¯Ö®Ç°µ÷ÓÃ
-		/// µ÷ÓÃË³Ğò1
+		/// æ‰§è¡Œé¡ºåº1
+		/// åˆå§‹åŒ–å¼•æ“
 		/// </summary>
 		virtual void prepareEngine(Engine* engine);
 
 		/// <summary>
-		/// ¼ÓÔØ×ÊÔ´
-		/// µ÷ÓÃË³Ğò2
+		/// åŠ è½½èµ„æº
+		/// æ‰§è¡Œé¡ºåº2
 		/// </summary>
 		virtual void prepareResource(Engine* engine);
 
 		/// <summary>
-		/// ×¼±¸Scene
-		/// µ÷ÓÃË³Ğò3
+		/// åŠ è½½åœºæ™¯
+		/// æ‰§è¡Œé¡ºåº3
 		/// </summary>
 		virtual void prepareScene(Engine* engine);
 
 		virtual void initYourShaderParam() {}
 
 	public:
-		int getWindowHeight() const { return m_WindowHeight; }
-		int getWindowWidth() const { return m_WindowWidth; }
+		int getWindowHeight() const { return mWindowHeight; }
+		int getWindowWidth() const { return mWindowWidth; }
 
 		const std::string& getName()
 		{
-			static std::string name(m_GameName.begin(), m_GameName.end());
+			static std::string name(mGameName.begin(), mGameName.end());
 			return name;
 		}
 
 	protected:
-		int m_WindowWidth;
-		int m_WindowHeight;
+		int mWindowWidth;
+		int mWindowHeight;
 
-		std::u8string m_GameName;
+		std::u8string mGameName;
 	};
 }

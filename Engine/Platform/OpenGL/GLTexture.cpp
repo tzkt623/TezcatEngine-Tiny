@@ -2,7 +2,7 @@
 #include "Core/Data/Image.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny::GL
 {
 	//--------------------------------------------------------
 	//
@@ -10,12 +10,12 @@ namespace tezcat::Tiny::Core
 	//
 	GLTexture2D::GLTexture2D()
 	{
-		glGenTextures(1, &m_TextureID);
+		glGenTextures(1, &mTextureID);
 	}
 
 	GLTexture2D::~GLTexture2D()
 	{
-		glDeleteTextures(1, &m_TextureID);
+		glDeleteTextures(1, &mTextureID);
 	}
 
 	void GLTexture2D::createTexture(Image* image)
@@ -39,7 +39,7 @@ namespace tezcat::Tiny::Core
 			break;
 		}
 
-		glBindTexture(GL_TEXTURE_2D, m_TextureID);
+		glBindTexture(GL_TEXTURE_2D, mTextureID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap.platform);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap.platform);

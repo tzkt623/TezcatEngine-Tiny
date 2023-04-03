@@ -1,16 +1,15 @@
 #include "Component.h"
 #include "../Scene/Scene.h"
-#include "../Scene/GameObject.h"
+#include "../Component/GameObject.h"
 #include "Transform.h"
 
 namespace tezcat::Tiny::Core
 {
-	template class ComponentT<Transform>;
+	uint32_t Component::sID = 0;
 
 	Component::Component()
-		: m_Transform(nullptr)
-		, m_GameObject(nullptr)
-		, m_Enable(true)
+		: mGameObject(nullptr)
+		, mEnable(true)
 	{
 		this->onAwake();
 	}
@@ -18,18 +17,28 @@ namespace tezcat::Tiny::Core
 	Component::~Component()
 	{
 		this->onDestroy();
-		m_Transform = nullptr;
-		m_GameObject = nullptr;
+		mGameObject = nullptr;
 	}
 
 	void Component::startLogic(const std::function<void()>& logicFunction)
 	{
-		m_GameObject->getScene()->addLogicFunction(this, logicFunction);
+		mGameObject->getScene()->addLogicFunction(this, logicFunction);
 	}
 
 	void Component::stopLogic()
 	{
-		m_GameObject->getScene()->removeLogicFunction(this);
+		mGameObject->getScene()->removeLogicFunction(this);
+	}
+
+	Transform* Component::getTransform()
+	{
+		return mGameObject->mTransform;
+	}
+
+	void Component::close()
+	{
+		mGameObject->removeComponent(this);
+		delete this;
 	}
 }
 

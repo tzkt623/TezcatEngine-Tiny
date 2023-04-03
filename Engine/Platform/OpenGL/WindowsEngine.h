@@ -3,7 +3,8 @@
 
 struct GLFWwindow;
 
-namespace tezcat::Tiny::Core
+using namespace tezcat::Tiny::Core;
+namespace tezcat::Tiny::GL
 {
 	class TINY_API WindowsEngine : public Engine
 	{
@@ -30,12 +31,12 @@ namespace tezcat::Tiny::Core
 		static void mouseScrollPosCallBack(GLFWwindow* window, double xoffset, double yoffset);
 
 	public:
-		GLFWwindow* getGLFWWindow() const { return m_Window; }
+		GLFWwindow* getGLFWWindow() const { return mWindow; }
 
 	private:
-		GLFWwindow* m_Window;
+		GLFWwindow* mWindow;
 
-		double m_OldTime;
-		double m_NowTime;
+		double mTimeOld;
+		double mTimeNow;
 	};
 }

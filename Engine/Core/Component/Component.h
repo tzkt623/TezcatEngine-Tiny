@@ -2,6 +2,7 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
+#include "../Base/BaseObject.h"
 
 
 namespace tezcat::Tiny::Core
@@ -10,7 +11,21 @@ namespace tezcat::Tiny::Core
 
 	class GameObject;
 	class Transform;
-	class TINY_API Component
+
+	// 	class ComponentIDGenerator
+	// 	{
+	// 		ComponentIDGenerator() = delete;
+	// 		~ComponentIDGenerator() = delete;
+	// 
+	// 		static uint32_t sID;
+	// 	public:
+	// 		static uint32_t giveID()
+	// 		{
+	// 			return sID++;
+	// 		}
+	// 	};
+
+	class TINY_API Component : BaseObject
 	{
 		friend class GameObject;
 	public:
@@ -18,54 +33,68 @@ namespace tezcat::Tiny::Core
 		virtual ~Component();
 
 		/// <summary>
-		/// ø™ º√ø÷°‘À––
+		/// ÂêØÂä®ÈÄªËæë
 		/// </summary>
 		void startLogic(const std::function<void()>& logicFunction);
 
 		/// <summary>
-		/// Õ£÷π√ø÷°‘À––
+		/// ÂÅúÊ≠¢ÈÄªËæë
 		/// </summary>
 		void stopLogic();
 
+		void update()
+		{
+			if (mEnable)
+			{
+				this->onUpdate();
+			}
+		}
+
 	protected:
-		//ππ‘Ï∫Ø ˝µ˜”√
+		//ÊûÑÈÄ†ÂáΩÊï∞ÊâßË°å
 		virtual void onAwake() {}
-		//Ω¯»ÎSceneµ˜”√
+
+		//ËøõÂÖ•Âú∫ÊôØÊó∂ÊâßË°å
 		virtual void onStart() {}
-		//º”»ÎµΩGameObject ±µ˜”√
+
+		//Âä†ÂÖ•GameObject/ÊâãÂä®ÂêØÁî®Êó∂ÊâßË°å
 		virtual void onEnable()
 		{
+
 		}
-		//“∆≥˝≥ˆGameObject ±µ˜”√
+
+		//ÈÄÄÂá∫Âú∫ÊôØ/ÊâãÂä®Êìç‰ΩúÊó∂ÊâßË°å
 		virtual void onDisable()
 		{
+
 		}
-		//Œˆππ∫Ø ˝µ˜”√
-		virtual void onDestroy() {}
+
+		//ÊûêÊûÑÂáΩÊï∞ÊâßË°å
+		virtual void onDestroy()
+		{
+
+		}
+
+		virtual void onUpdate() {}
 
 		void onDetach()
 		{
-			m_Enable = false;
+			mEnable = false;
 			this->onDisable();
-			m_GameObject = nullptr;
-			m_Transform = nullptr;
+			mGameObject = nullptr;
 		}
 
 	public:
-		inline GameObject* getGameObject() const
-		{
-			return m_GameObject;
-		}
-		void setGameObject(GameObject* val) { m_GameObject = val; }
+		GameObject* getGameObject() const { return mGameObject; }
+		void setGameObject(GameObject* val) { mGameObject = val; }
 
-		inline Transform* getTransform() const { return m_Transform; }
-		void setTransform(Transform* val) { m_Transform = val; }
+		Transform* getTransform();
 
-		bool isEnable() const { return m_Enable; }
+		bool isEnable() const { return mEnable; }
 		void setEnable(bool val)
 		{
-			m_Enable = val;
-			if (m_Enable)
+			mEnable = val;
+			if (mEnable)
 			{
 				this->onEnable();
 			}
@@ -75,25 +104,43 @@ namespace tezcat::Tiny::Core
 			}
 		}
 
-		bool isDetached() const { return m_GameObject == nullptr; }
+		bool isDetached() const { return mGameObject == nullptr; }
+
+		virtual void close() override;
+
+	public:
+		virtual void onComponentAdded(Component* com) {}
+		virtual void onComponentRemoved(Component* com) {}
 
 	public://RTTI
 		template<class Com>
 		bool is() { return this->is(std::type_index(typeid(Com))); }
-
 		virtual const std::type_index& getComponentType() = 0;
+
+		virtual uint32_t getComponentID() = 0;
+		virtual bool is(const uint32_t& id) = 0;
 
 	protected:
 		virtual bool is(const std::type_index& type) = 0;
 
 	protected:
-		bool m_Enable;
+		bool mEnable;
 
 	private:
-		GameObject* m_GameObject;
-		Transform* m_Transform;
+		GameObject* mGameObject;
+
+	private:
+		static uint32_t sID;
+	public:
+		static uint32_t giveID()
+		{
+			return sID++;
+		}
 	};
 
+	/// <summary>
+	/// ComponentT
+	/// </summary>
 	template<typename Com>
 	class TINY_API ComponentT : public Component
 	{
@@ -102,16 +149,23 @@ namespace tezcat::Tiny::Core
 		virtual ~ComponentT() = default;
 
 	public:
-		const std::type_index& getComponentType() override { return s_TypeIndex; }
-		bool is(const std::type_index& type) override { return s_TypeIndex == type; }
+		const std::type_index& getComponentType() override { return sTypeIndex; }
+		bool is(const std::type_index& type) override { return sTypeIndex == type; }
+
+		uint32_t getComponentID() override { return sTypeID; }
+		bool is(const uint32_t& id) override { return sTypeID == id; }
 
 	public:
-		static const std::type_index& getComponentTypeStatic() { return s_TypeIndex; }
+		static const std::type_index& getComponentTypeStatic() { return sTypeIndex; }
+		static const uint32_t getComponentIDStatic() { return sTypeID; }
 
 	private:
-		static std::type_index s_TypeIndex;
+		static std::type_index sTypeIndex;
+		static uint32_t sTypeID;
 	};
+	template<typename Com>
+	uint32_t ComponentT<Com>::sTypeID = Component::giveID();
 
 	template<typename Com>
-	std::type_index ComponentT<Com>::s_TypeIndex = typeid(Com);
+	std::type_index ComponentT<Com>::sTypeIndex = typeid(Com);
 }

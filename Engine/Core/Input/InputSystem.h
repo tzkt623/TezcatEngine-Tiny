@@ -8,7 +8,7 @@ struct GLFWwindow;
 namespace tezcat::Tiny::Core
 {
 	class Inputer;
-	class InputSystem
+	class TINY_API InputSystem
 	{
 	public:
 		InputSystem();
@@ -17,7 +17,7 @@ namespace tezcat::Tiny::Core
 		void pop();
 
 	public:
-		void setWindow(GLFWwindow* val) { m_Window = val; }
+		void setWindow(GLFWwindow* val) { mWindow = val; }
 
 		void mouseButtonCallBack(int button, int action, int mods);
 		void mouseCursorPosCallBack(double xpos, double ypos);
@@ -35,11 +35,11 @@ namespace tezcat::Tiny::Core
 		void getMousePosition(float& x, float& y);
 
 	private:
-		GLFWwindow* m_Window;
+		GLFWwindow* mWindow;
 
-		double m_MouseX;
-		double m_MouseY;
-		std::stack<Inputer*> m_InputerStack;
+		double mMouseX;
+		double mMouseY;
+		std::stack<Inputer*> mInputerStack;
 	};
 }
 

@@ -13,6 +13,7 @@
         int OrderID = 0;
         str Queue = Opaque;
         bool ZWrite = true;
+        str DepthTest = Less;
         str CullFace = Back;
     }
     #TINY_CFG_END

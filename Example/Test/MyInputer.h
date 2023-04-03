@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Tiny.h"
 
@@ -9,7 +9,6 @@ public:
 	virtual ~MyInputer();
 
 public:
-	// Í¨¹ý Inputer ¼Ì³Ð
 	void processInput(InputSystem* system) override;
 
 	void onEnter() override;

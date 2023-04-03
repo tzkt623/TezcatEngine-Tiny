@@ -1,12 +1,14 @@
 #pragma once
 #include "../Head/CppHead.h"
-#include "Utility/Tools.h"
+#include "../Head/ConfigHead.h"
+
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
 	class VertexGroup;
 	class MeshData;
-	class VertexGroupManager
+	class TINY_API VertexGroupManager
 	{
 	public:
 		VertexGroupManager();
@@ -18,7 +20,7 @@ namespace tezcat::Tiny::Core
 		VertexGroup* getVertexGroup(const std::string& name);
 
 	private:
-		std::unordered_map<std::string, VertexGroup*> m_VertexGroupDic;
+		std::unordered_map<std::string, VertexGroup*> mVertexGroupMap;
 	};
 
 	using VertexGroupMgr = SG<VertexGroupManager>;

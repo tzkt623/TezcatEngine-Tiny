@@ -4,7 +4,7 @@
 #include "GLHead.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny::GL
 {
 	class TINY_API GLShader : public Shader
 	{
@@ -16,7 +16,7 @@ namespace tezcat::Tiny::Core
 
 	public:
 		void bind() override;
-		void setGPUOptions() override;
+		void setStateOptions() override;
 		void resetState() override;
 
 	public:
@@ -24,8 +24,6 @@ namespace tezcat::Tiny::Core
 		void setViewMatrix(const glm::mat4x4& matrix) override;
 		void setModelMatrix(const glm::mat4x4& matrix) override;
 		void setViewPosition(const glm::vec3& position) override;
-		void setNormalMatrix(const glm::mat4x4& matrix) override;
-		void setTextures(const UniformID::UMap<Texture*>& allTexture) override;
 
 	public:
 		void setFloat1(const char* name, float* data) override;
@@ -58,8 +56,8 @@ namespace tezcat::Tiny::Core
 		void onApply(const UniformID::USet& uniforms) override;
 
 	private:
-		std::unordered_map<std::string, uint32_t> m_TextureID;
-		std::unordered_map<std::string, uint32_t> m_UniformID;
-		int m_TexureCountor;
+		std::unordered_map<std::string, uint32_t> mTextureID;
+		std::unordered_map<std::string, uint32_t> mUniformID;
+		int mTexureCountor;
 	};
 }

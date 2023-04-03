@@ -44,7 +44,8 @@ namespace tezcat::Tiny::Core
 		ResourceLoader* m_ResourceLoader;
 
 	private:
-		BaseGraphics* m_Graphics;
+		BaseGraphics* mGraphics;
+
 
 	protected:
 		bool m_IsRunning;
@@ -52,10 +53,10 @@ namespace tezcat::Tiny::Core
 	public:
 		inline static int getScreenWidth() { return ScreenWidth; }
 		inline static int getScreenHeight() { return ScreenHeight; }
-		inline static float getDeltaTime() { return DeltaTime; }
+		inline static float getDeltaTime() { return sDeltaTime; }
 	protected:
 		static int ScreenWidth;
 		static int ScreenHeight;
-		static float DeltaTime;
+		static float sDeltaTime;
 	};
 }

@@ -1,34 +1,37 @@
 #include "Shader.h"
+#include "Utility/Utility.h"
+
 #include "../Manager/PipelineManager.h"
-#include "Utility/Tools.h"
+#include "../Manager/ShaderManager.h"
 
 namespace tezcat::Tiny::Core
 {
 	Shader::Shader()
-		: Shader("##ErrorShader", 0)	
+		: Shader("##ErrorShader", 0)
 	{
 
 	}
 
 	Shader::Shader(const std::string& name, int orderID)
-		: m_ProgramID(-1)
-		, m_Name(name)
-		, m_UID(IDGenerator<Shader, uint32_t>::generate())
-		, m_OrderID(orderID)
-		, m_ViewMatrixID(0)
-		, m_ModelMatrixID(0)
-		, m_ProjectionMatrixID(0)
-		, m_NormalMatrixID(0)
-		, m_ViewPositionID(0)
-		, m_EnableBlend(false)
-		, m_EnableZWrite(true)
-		, m_EnableLighting(true)
-		, m_Version(-1)
-		, m_RenderQueue(Pipeline::Opaque)
-		, m_BlendSource(ContextMap::BlendArray[(int)Blend::One])
-		, m_BlendTarget(ContextMap::BlendArray[(int)Blend::One])
-		, m_CullFace(ContextMap::CullFaceArray[(int)CullFace::Back])
-		, m_TinyUniformList(UniformID::allStringCount(), -1)
+		: mProgramID(-1)
+		, mName(name)
+		, mUID(IDGenerator<Shader, uint32_t>::generate())
+		, mOrderID(orderID)
+		, mViewMatrixID(0)
+		, mModelMatrixID(0)
+		, mProjectionMatrixID(0)
+		, mNormalMatrixID(0)
+		, mViewPositionID(0)
+		, mEnableBlend(false)
+		, mDepthTest(DepthTest::Less, 0)
+		, mEnableZWrite(true)
+		, mEnableLighting(true)
+		, mVersion(-1)
+		, mRenderQueue(PipelineQueue::Geometry)
+		, mBlendSource(Blend::One, 0)
+		, mBlendTarget(Blend::One, 0)
+		, mCullFace(CullFace::Back, 0)
+		, mTinyUniformList(UniformID::allStringCount(), -1)
 	{
 
 	}
@@ -38,11 +41,27 @@ namespace tezcat::Tiny::Core
 
 	}
 
+	void Shader::apply()
+	{
+		ShaderMgr::getInstance()->addShader(this);
+		PipelineManager::createPass(this);
+	}
 
 	void Shader::apply(const UniformID::USet& uniforms)
 	{
 		this->onApply(uniforms);
-		PipelineManager::createPass(this);
+		this->apply();
+	}
+
+	void Shader::begin()
+	{
+		this->setStateOptions();
+		this->bind();
+	}
+
+	void Shader::end()
+	{
+
 	}
 }
 

@@ -26,7 +26,7 @@ namespace tezcat::Tiny::Core
 		m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_Channels, 0);
 		if (m_Data == nullptr)
 		{
-			std::cout << "Í¼Æ¬¼ÓÔØÊ§°Ü: " << path << std::endl;
+			std::cout << "å›¾ç‰‡åŠ è½½å‡ºé”™" << path << std::endl;
 		}
 	}
 }

@@ -1,72 +1,100 @@
 #include "CameraManager.h"
-#include "../Scene/GameObject.h"
+#include "../Component/GameObject.h"
 #include "../Component/MeshRenderer.h"
 #include "../Component/Camera.h"
 
 namespace tezcat::Tiny::Core
 {
 	CameraManager::CameraManager()
-		: m_CameraWithName()
-		, m_Main(nullptr)
+		: mData(nullptr)
 	{
 		CameraMgr::attach(this);
 	}
 
-	void CameraManager::render()
-	{
-		for (auto c : m_CameraList)
-		{
-			c->render();
-		}
-	}
-
 	void CameraManager::addCamera(Camera* camera)
 	{
-		if (camera->isMain())
-		{
-			this->setMainCamera(camera);
-		}
-
-		if (m_CameraList.empty())
-		{
-			m_CameraList.push_back(camera);
-		}
-		else
-		{
-			auto it = m_CameraList.begin();
-			while (it != m_CameraList.end())
-			{
-				if ((*it)->getDeep() > camera->getDeep())
-				{
-					m_CameraList.insert(it, camera);
-					break;
-				}
-				it++;
-			}
-		}
-
+		mData->addCamera(camera);
 		eventCameraAdded.dispatch(camera);
 	}
 
 	void CameraManager::setMainCamera(Camera* camera)
 	{
-		if (m_Main != nullptr)
-		{
-			m_Main->clearMain();
-		}
-
-		m_Main = camera;
+		mData->setMain(camera);
 	}
 
 	Camera* CameraManager::getCamera(int index)
 	{
-		return m_CameraList[index];
+		return mData->getCamera(index);
 	}
 
 	Camera* CameraManager::getCamera(const std::string& name)
 	{
-		auto it = m_CameraWithName->find(name);
-		if (it != m_CameraWithName->end())
+		return mData->getCamera(name);
+	}
+
+	void CameraManager::setCameraData(CameraData* data)
+	{
+		mData = data;
+		eventSceneChanged.dispatch();
+	}
+
+
+	// CameraData
+	Camera* CameraData::getMainCamera()
+	{
+		return mMain;
+	}
+
+	const std::vector<Camera*>& CameraData::getAllCamera()
+	{
+		if (mDirty)
+		{
+			mDirty = false;
+			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera a, Camera b)->auto
+			{
+				return a.getDeep() < b.getDeep();
+			});
+		}
+
+		return mCameraList;
+	}
+
+	const std::unordered_map<std::string, Camera*>& CameraData::getCameraMap()
+	{
+		return mCameraWithName;
+	}
+
+	void CameraData::addCamera(Camera* camera)
+	{
+		if (camera->isMain())
+		{
+			mMain = camera;
+		}
+
+		if (mCameraList.empty())
+		{
+			mCameraList.push_back(camera);
+		}
+		else
+		{
+			auto it = mCameraList.begin();
+			auto end = mCameraList.end();
+			while (it != end)
+			{
+				if ((*it)->getDeep() > camera->getDeep())
+				{
+					mCameraList.insert(it, camera);
+					break;
+				}
+				it++;
+			}
+		}
+	}
+
+	Camera* CameraData::getCamera(const std::string& name)
+	{
+		auto it = mCameraWithName.find(name);
+		if (it != mCameraWithName.end())
 		{
 			return it->second;
 		}
@@ -74,26 +102,30 @@ namespace tezcat::Tiny::Core
 		return nullptr;
 	}
 
-	void CameraManager::foreach(const std::function<void(Camera* camera)>& function)
+	Camera* CameraData::getCamera(int index)
 	{
-		for (auto it : m_CameraList)
+		return mCameraList[index];
+	}
+
+	void CameraData::sort()
+	{
+		if (mDirty)
 		{
-			function(it);
+			mDirty = false;
+			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera a, Camera b)->auto
+			{
+				return a.getDeep() < b.getDeep();
+			});
 		}
 	}
-	void CameraManager::setCurrentSceneCameras(std::unordered_map<std::string, Camera*>& share)
+
+	void CameraData::setMain(Camera* camera)
 	{
-		eventSceneChanged.dispatch();
-
-		m_CameraWithName = &share;
-		m_CameraList.clear();
-
-		auto it = m_CameraWithName->begin();
-		while (it != m_CameraWithName->end())
+		if (mMain != nullptr)
 		{
-			this->addCamera(it->second);
-			it++;
+			mMain->clearMain();
 		}
+
+		mMain = camera;
 	}
 }
-

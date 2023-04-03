@@ -1,4 +1,4 @@
-#include "MyInputer.h"
+﻿#include "MyInputer.h"
 
 MyInputer::MyInputer()
 	: m_Camera(nullptr)

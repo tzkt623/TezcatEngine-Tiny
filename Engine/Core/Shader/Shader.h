@@ -1,98 +1,109 @@
 #pragma once
-#include "../Head/CppHead.h"
-#include "../Head/GLMHead.h"
-#include "../Pipeline/Pipeline.h"
-#include "../Head/ConfigHead.h"
-#include "../Head/Context.h"
 #include "ShaderParam.h"
 #include "Uniform.h"
+
+#include "../Head/CppHead.h"
+#include "../Head/GLMHead.h"
+#include "../Head/ConfigHead.h"
+#include "../Head/Context.h"
+#include "../Pipeline/PipelineQueue.h"
+#include "../Pipeline/Pipeline.h"
 
 
 namespace tezcat::Tiny::Core
 {
 	class Texture;
-	class Pipeline;
+	class PipelineQueue;
 	class TINY_API Shader
 	{
 		//---------------------------------------------
 		//
-		// shaderÖĞÓ¦¸ÃÓĞ¿ØÖÆGLäÖÈ¾ÅäÖÃºÍÁ÷³ÌµÄ²ÎÊı
-		// ±ÈÈç¿ª¹ØÉî¶È¼ì²â,Ä£°å,¼ô²Ã·½Ê½µÈµÈ
-		// Ã¿Ò»¸öShaderÔÚµ®ÉúÊ±¶¼ÓĞÒ»¸ö¶ÔÓ¦µÄPass
-		// Õâ¸öPassÊÇÓÀÔ¶²»»á±äµÄ
 		//
 	public:
 		Shader();
 		Shader(const std::string& name, int orderID);
 		~Shader();
 
-		inline const std::string& getName() const { return m_Name; }
-		inline Pipeline::Queue getRenderQueue() const { return m_RenderQueue; }
-		inline void setRenderQueue(Pipeline::Queue val) { m_RenderQueue = val; }
-		inline void setName(const std::string& name) { m_Name = name; }
-		inline int getProgramID() const { return m_ProgramID; }
-		inline int getOrderID() const { return m_OrderID; }
-		inline void setOrderID(int orderID) { m_OrderID = orderID; }
-		inline int getUID() const { return m_UID; }
-		inline int getVersion() const { return m_Version; }
-		inline void setVersion(int val) { m_Version = val; }
+		void apply();
 
-	public://³õÊ¼»¯Éú³É
+		inline const std::string& getName() const { return mName; }
+		inline PipelineQueue::Queue getRenderQueue() const { return mRenderQueue; }
+		inline void setRenderQueue(PipelineQueue::Queue val) { mRenderQueue = val; }
+		inline void setName(const std::string& name) { mName = name; }
+		inline int getProgramID() const { return mProgramID; }
+		inline int getOrderID() const { return mOrderID; }
+		inline void setOrderID(int orderID) { mOrderID = orderID; }
+		inline int getUID() const { return mUID; }
+		inline int getVersion() const { return mVersion; }
+		inline void setVersion(int val) { mVersion = val; }
+		inline void setLightMode(LightMode lightMode) { mLightMode = lightMode; }
+		inline LightMode getLightMode() { return mLightMode; }
+
+	public:
 		void apply(const UniformID::USet& uniforms);
 
 	protected:
 		virtual void onApply(const UniformID::USet& uniforms) {}
 
 	public:
+		void begin();
+		void end();
 		virtual void bind() = 0;
 		virtual void resetState() = 0;
 
 	public:
-		inline bool isEnableLighting() const { return m_EnableLighting; }
+		inline bool isEnableLighting() const { return mEnableLighting; }
 
 	public:
-		virtual void setGPUOptions() = 0;
-		void setZWrite(bool val) { m_EnableZWrite = val; }
-		void setLighting(bool val) { m_EnableLighting = val; }
+		/// <summary>
+		/// è®¾ç½®å½“å‰passçš„çŠ¶æ€å‚æ•°
+		/// </summary>
+		virtual void setStateOptions() = 0;
+		void setZWrite(bool val) { mEnableZWrite = val; }
+		void setLighting(bool val) { mEnableLighting = val; }
 
 		void setCullFace(const CullFace& value)
 		{
-			m_CullFace = ContextMap::CullFaceArray[(int)value];
+			mCullFace = ContextMap::CullFaceArray[(uint32_t)value];
 		}
 
 		void setCullFace(const CullFaceWrapper& value)
 		{
-			m_CullFace = value;
+			mCullFace = value;
 		}
 
-		void setBlend(bool val) { m_EnableBlend = val; }
+		void setBlend(bool val) { mEnableBlend = val; }
 
 		void setBlendFunction(const Blend& source, const Blend& target)
 		{
-			m_BlendSource = ContextMap::BlendArray[(int)source];
-			m_BlendTarget = ContextMap::BlendArray[(int)target];
+			mBlendSource = ContextMap::BlendArray[(uint32_t)source];
+			mBlendTarget = ContextMap::BlendArray[(uint32_t)target];
 		}
 
 		void setBlendFunction(const BlendWrapper& source, const BlendWrapper& target)
 		{
-			m_BlendSource = source;
-			m_BlendTarget = target;
+			mBlendSource = source;
+			mBlendTarget = target;
 		}
 
-	public://ÌØ»¯´«²Î¹¦ÄÜ
+		void setDepthTest(const DepthTestWrapper& value)
+		{
+			mDepthTest = value;
+		}
+
+		void setDepthTest(const DepthTest& value)
+		{
+			mDepthTest = ContextMap::DepthTestArray[(uint32_t)value];
+		}
+
+	public://ç‰¹åŒ–ä¼ å‚
 		virtual void setProjectionMatrix(const glm::mat4x4& matrix) = 0;
 
 		virtual void setViewMatrix(const glm::mat4x4& matrix) = 0;
 		virtual void setModelMatrix(const glm::mat4x4& matrix) = 0;
 		virtual void setViewPosition(const glm::vec3& position) = 0;
 
-		/// <summary>
-		/// ´«Èë²ÎÊıÎªÄ£ĞÍ¾ØÕó
-		/// </summary>
-		virtual void setNormalMatrix(const glm::mat4x4& matrix) = 0;
-		virtual void setTextures(const UniformID::UMap<Texture*>& allTexture) = 0;
-
-	public://ÂıËÙ°æÍ¨ÓÃ´«²Î¹¦ÄÜ
+	public://æ…¢é€Ÿä¼ å‚
 		virtual void setFloat1(const char* name, float* data) = 0;
 		virtual void setFloat2(const char* name, float* data) = 0;
 		virtual void setFloat3(const char* name, float* data) = 0;
@@ -106,7 +117,7 @@ namespace tezcat::Tiny::Core
 		virtual void setMat3(const char* name, float* data) = 0;
 		virtual void setMat4(const char* name, float* data) = 0;
 
-	public://¿ìËÙ°æÍ¨ÓÃ´«²Î¹¦ÄÜ
+	public://å¿«é€Ÿä¼ å‚
 		virtual void setFloat1(UniformID& uniform, float* data) = 0;
 		virtual void setFloat2(UniformID& uniform, float* data) = 0;
 		virtual void setFloat3(UniformID& uniform, float* data) = 0;
@@ -123,34 +134,43 @@ namespace tezcat::Tiny::Core
 		virtual void setTexture2D(UniformID& uniform, Texture2D* data) = 0;
 
 	private:
-		std::string m_Name;
-		int m_OrderID;
-		int m_UID;
-		int m_Version;
+		std::string mName;
+		int mOrderID;
+		int mUID;
+		int mVersion;
 
-		Pipeline::Queue m_RenderQueue;
-
-	protected:
-		int m_ProgramID;
-		bool m_EnableZWrite;
-		bool m_EnableBlend;
-		bool m_EnableLighting;
-
-		CullFaceWrapper m_CullFace;
-		BlendWrapper m_BlendSource;
-		BlendWrapper m_BlendTarget;
+		PipelineQueue::Queue mRenderQueue;
 
 	protected:
-		int m_ProjectionMatrixID;
-		int m_ViewMatrixID;
-		int m_ModelMatrixID;
-		int m_NormalMatrixID;
-		int m_ViewPositionID;
+		int mProgramID;
+		bool mEnableLighting;
+
+		//LightMode
+		LightMode mLightMode;
+
+		//cull
+		CullFaceWrapper mCullFace;
+
+		//blend
+		bool mEnableBlend;
+		BlendWrapper mBlendSource;
+		BlendWrapper mBlendTarget;
+
+		//depth test
+		bool mEnableZWrite;
+		DepthTestWrapper mDepthTest;
 
 	protected:
-		std::unordered_map<std::string, uint32_t> m_TextureID;
-		std::unordered_map<std::string, uint32_t> m_UniformID;
+		int mProjectionMatrixID;
+		int mViewMatrixID;
+		int mModelMatrixID;
+		int mNormalMatrixID;
+		int mViewPositionID;
 
-		std::vector<int> m_TinyUniformList;
+	protected:
+		std::unordered_map<std::string, uint32_t> mTextureID;
+		std::unordered_map<std::string, uint32_t> mUniformID;
+
+		std::vector<int> mTinyUniformList;
 	};
 }

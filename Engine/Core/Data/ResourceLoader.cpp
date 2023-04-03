@@ -1,12 +1,13 @@
 #include "ResourceLoader.h"
 #include "../Renderer/BaseGraphics.h"
+#include "../Shader/ShaderPackage.h"
 
 
 namespace tezcat::Tiny::Core
 {
 	ResourceLoader::ResourceLoader(RenderAPI renderAPI)
-		: m_WindowWidth(0)
-		, m_WindowHeight(0)
+		: mWindowWidth(0)
+		, mWindowHeight(0)
 	{
 		EngineConfig::s_RenderAPI = renderAPI;
 	}
@@ -18,10 +19,10 @@ namespace tezcat::Tiny::Core
 
 	void ResourceLoader::prepareResource(Engine* engine)
 	{
-		Graphics->createShaderPackage("../Resource/Shaders/Standard/std2.glsl");
-		Graphics->createShaderPackage("../Resource/Shaders/Standard/std1.glsl");
-		Graphics->createShaderPackage("../Resource/Shaders/Unlit/color.glsl");
-		Graphics->createShaderPackage("../Resource/Shaders/Unlit/texture.glsl");
+		ShaderBuilderCreator::create("../Resource/Shaders/Standard/std2.glsl");
+		ShaderBuilderCreator::create("../Resource/Shaders/Standard/std1.glsl");
+		ShaderBuilderCreator::create("../Resource/Shaders/Unlit/color.glsl");
+		ShaderBuilderCreator::create("../Resource/Shaders/Unlit/texture.glsl");
 	}
 
 	void ResourceLoader::prepareEngine(Engine* engine)

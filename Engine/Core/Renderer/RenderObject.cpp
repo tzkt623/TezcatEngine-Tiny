@@ -2,8 +2,5 @@
 
 namespace tezcat::Tiny::Core
 {
-	IRenderObejct::~IRenderObejct()
-	{
 
-	}
 }

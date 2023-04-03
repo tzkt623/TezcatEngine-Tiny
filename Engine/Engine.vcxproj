@@ -23,32 +23,32 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0b3d514f-1da1-4c7b-873b-04d99e319b38}</ProjectGuid>
     <RootNamespace>Engine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -127,6 +127,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\;$(SolutionDir)Engine\ThirdParty</AdditionalIncludeDirectories>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,34 +163,39 @@
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\Context.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
+    <ClCompile Include="Core\Layer\LightLayer.cpp" />
     <ClCompile Include="Core\Manager\CameraManager.cpp" />
     <ClCompile Include="Core\Component\Component.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\Manager\TextureManager.cpp" />
+    <ClCompile Include="Core\Pipeline\Forward.cpp" />
+    <ClCompile Include="Core\Pipeline\PipelineQueue.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
-    <ClCompile Include="Core\Scene\GameObject.cpp" />
+    <ClCompile Include="Core\Component\GameObject.cpp" />
     <ClCompile Include="Core\GUI\GUI.cpp" />
     <ClCompile Include="Core\GUI\GUIWidget.cpp" />
     <ClCompile Include="Core\Data\Image.cpp" />
     <ClCompile Include="Core\Input\Inputer.cpp" />
     <ClCompile Include="Core\Input\InputSystem.cpp" />
-    <ClCompile Include="Core\Scene\Layer.cpp" />
+    <ClCompile Include="Core\Layer\Layer.cpp" />
     <ClCompile Include="Core\Scene\LayerMask.cpp" />
     <ClCompile Include="Core\Component\Light.cpp" />
     <ClCompile Include="Core\Manager\LightManager.cpp" />
     <ClCompile Include="Core\Data\Material.cpp" />
     <ClCompile Include="Core\Component\MeshRenderer.cpp" />
     <ClCompile Include="Core\Data\MeshData.cpp" />
-    <ClCompile Include="Core\Pipeline\PassShader.cpp" />
+    <ClCompile Include="Core\Renderer\RenderPass.cpp" />
     <ClCompile Include="Core\Pipeline\PassVertexGroup.cpp" />
     <ClCompile Include="Core\Pipeline\Pipeline.cpp" />
     <ClCompile Include="Core\Renderer\RenderCommand.cpp" />
-    <ClCompile Include="Core\Component\RenderObject.cpp" />
+    <ClCompile Include="Core\Renderer\RenderObject.cpp" />
     <ClCompile Include="Core\Data\ResourceLoader.cpp" />
     <ClCompile Include="Core\Scene\Scene.cpp" />
     <ClCompile Include="Core\Manager\SceneManager.cpp" />
     <ClCompile Include="Core\Shader\Shader.cpp" />
     <ClCompile Include="Core\Shader\Uniform.cpp" />
+    <ClCompile Include="Core\Tool\AABB.cpp" />
+    <ClCompile Include="Core\Tool\FrustumCulling.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShaderBuilder.cpp" />
     <ClCompile Include="Core\Shader\ShaderParam.cpp" />
     <ClCompile Include="Core\Manager\ShaderManager.cpp" />
@@ -203,7 +209,7 @@
     <ClCompile Include="Core\Manager\PipelineManager.cpp" />
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
-    <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
+    <ClCompile Include="Core\Layer\RenderLayer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
     <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
     <ClCompile Include="Utility\ProfilerTimer.cpp" />
@@ -216,22 +222,31 @@
     <ClCompile Include="ThirdParty\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Utility\Tools.cpp" />
-    <ClCompile Include="Platform\Windows\WindowsEngine.cpp" />
+    <ClCompile Include="Utility\StringTool.cpp" />
+    <ClCompile Include="Platform\OpenGL\WindowsEngine.cpp" />
     <ClCompile Include="Platform\OpenGL\GLVertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Base\TinySmartPointer.h" />
     <ClInclude Include="Core\Component\Camera.h" />
     <ClInclude Include="Core\Head\ConfigHead.h" />
     <ClInclude Include="Core\Head\Context.h" />
+    <ClInclude Include="Core\Layer\LightLayer.h" />
     <ClInclude Include="Core\Manager\CameraManager.h" />
     <ClInclude Include="Core\Component\Component.h" />
     <ClInclude Include="Core\Head\CppHead.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\Manager\TextureManager.h" />
+    <ClInclude Include="Core\Pipeline\Forward.h" />
+    <ClInclude Include="Core\Pipeline\PipelineQueue.h" />
+    <ClInclude Include="Core\Renderer\RenderObjectTag.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
-    <ClInclude Include="Core\Scene\GameObject.h" />
+    <ClInclude Include="Core\Base\BaseObject.h" />
+    <ClInclude Include="Core\Component\GameObject.h" />
     <ClInclude Include="Core\Shader\Uniform.h" />
+    <ClInclude Include="Core\Tool\AABB.h" />
+    <ClInclude Include="Core\Tool\DelegateCreator.h" />
+    <ClInclude Include="Core\Tool\FrustumCulling.h" />
     <ClInclude Include="Platform\OpenGL\GLHead.h" />
     <ClInclude Include="Core\Head\GLMHead.h" />
     <ClInclude Include="Core\GUI\GUI.h" />
@@ -240,18 +255,18 @@
     <ClInclude Include="Core\Head\ImGuiHead.h" />
     <ClInclude Include="Core\Input\Inputer.h" />
     <ClInclude Include="Core\Input\InputSystem.h" />
-    <ClInclude Include="Core\Scene\Layer.h" />
+    <ClInclude Include="Core\Layer\Layer.h" />
     <ClInclude Include="Core\Scene\LayerMask.h" />
     <ClInclude Include="Core\Component\Light.h" />
     <ClInclude Include="Core\Manager\LightManager.h" />
     <ClInclude Include="Core\Data\Material.h" />
     <ClInclude Include="Core\Component\MeshRenderer.h" />
     <ClInclude Include="Core\Data\MeshData.h" />
-    <ClInclude Include="Core\Pipeline\PassShader.h" />
+    <ClInclude Include="Core\Renderer\RenderPass.h" />
     <ClInclude Include="Core\Pipeline\PassVertexGroup.h" />
     <ClInclude Include="Core\Pipeline\Pipeline.h" />
     <ClInclude Include="Core\Renderer\RenderCommand.h" />
-    <ClInclude Include="Core\Component\RenderObject.h" />
+    <ClInclude Include="Core\Renderer\RenderObject.h" />
     <ClInclude Include="Core\Data\ResourceLoader.h" />
     <ClInclude Include="Core\Scene\Scene.h" />
     <ClInclude Include="Core\Manager\SceneManager.h" />
@@ -269,10 +284,12 @@
     <ClInclude Include="Core\Manager\PipelineManager.h" />
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
-    <ClInclude Include="Core\Renderer\RenderLayer.h" />
+    <ClInclude Include="Core\Layer\RenderLayer.h" />
     <ClInclude Include="Platform\OpenGL\GLShader.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
     <ClInclude Include="Utility\Any.h" />
+    <ClInclude Include="Utility\Event.h" />
+    <ClInclude Include="Utility\IDGenerator.h" />
     <ClInclude Include="Utility\IDString.h" />
     <ClInclude Include="Utility\ProfilerTimer.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
@@ -577,8 +594,10 @@
     <ClInclude Include="ThirdParty\stb_image.h" />
     <ClInclude Include="Tiny.h" />
     <ClInclude Include="Utility\Bitmask.h" />
-    <ClInclude Include="Utility\Tools.h" />
-    <ClInclude Include="Platform\Windows\WindowsEngine.h" />
+    <ClInclude Include="Utility\Singleton.h" />
+    <ClInclude Include="Utility\StringTool.h" />
+    <ClInclude Include="Utility\Utility.h" />
+    <ClInclude Include="Platform\OpenGL\WindowsEngine.h" />
     <ClInclude Include="Platform\OpenGL\GLVertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,13 @@
 #include "ShaderPackage.h"
 #include "Shader.h"
 
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 #include "../Manager/ShaderManager.h"
 
 namespace tezcat::Tiny::Core
 {
 	ShaderPackage::ShaderPackage()
-		: m_UID(-1)
+		: mUID(-1)
 	{
 
 	}
@@ -20,21 +20,21 @@ namespace tezcat::Tiny::Core
 
 	void ShaderPackage::setConfig(std::unordered_map<std::string, Any>& data)
 	{
-		m_Name = data["Name"].cast<std::string>();
+		mName = data["Name"].cast<std::string>();
 	}
 
 	void ShaderPackage::addShader(Shader* shader)
 	{
-		m_Shaders.push_back(shader);
+		mShaders.push_back(shader);
 	}
 
 	void ShaderPackage::apply()
 	{
-		m_UID = SG<ShaderManager>::getInstance()->giveUID();
+		mUID = SG<ShaderManager>::getInstance()->giveUID();
 
-		if (m_Shaders.size() > 1)
+		if (mShaders.size() > 1)
 		{
-			std::sort(m_Shaders.begin(), m_Shaders.end(),
+			std::sort(mShaders.begin(), mShaders.end(),
 				[](Shader* a, Shader* b)
 				{
 					return a->getOrderID() < b->getOrderID();

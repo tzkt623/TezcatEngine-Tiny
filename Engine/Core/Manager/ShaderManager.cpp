@@ -21,6 +21,15 @@ namespace tezcat::Tiny::Core
 		return uid;
 	}
 
+	void ShaderManager::addShader(Shader* shader)
+	{
+		while (m_AllShaderList.size() <= shader->getUID())
+		{
+			m_AllShaderList.push_back(nullptr);
+		}
+		m_AllShaderList[shader->getUID()] = shader;
+	}
+
 	void ShaderManager::addShaderPackage(ShaderPackage* shaderPackage)
 	{
 		if (m_ShaderPackageWithID[shaderPackage->getUID()] == nullptr)
@@ -30,7 +39,7 @@ namespace tezcat::Tiny::Core
 		}
 		else
 		{
-			throw std::invalid_argument(Tools::stringFormat("ShaderManager: This ShaderPackage[%s] has stored[%d]",
+			throw std::invalid_argument(StringTool::stringFormat("ShaderManager: This ShaderPackage[%s] has stored[%d]",
 				shaderPackage->getName().c_str(), shaderPackage->getUID()));
 		}
 	}

@@ -56,7 +56,7 @@ namespace tezcat::Tiny::Core
 		Count
 	};
 
-	enum class TINY_API CullFace : uint8_t
+	enum class TINY_API CullFace : uint32_t
 	{
 		Off = 0,
 		Back,
@@ -66,7 +66,22 @@ namespace tezcat::Tiny::Core
 		Count
 	};
 
-	enum class TINY_API Blend
+	enum class TINY_API DepthTest : uint32_t
+	{
+		Off = 0,
+		Always,
+		Never,
+		Less,
+		LessEqual,
+		Greater,
+		GreaterEqual,
+		Equal,
+		NotEqual,
+
+		Count
+	};
+
+	enum class TINY_API Blend : uint32_t
 	{
 		Zero = 0,
 		One,
@@ -84,6 +99,13 @@ namespace tezcat::Tiny::Core
 		One_Minus_ConstAlpha,
 
 		Count
+	};
+
+	enum class TINY_API LightMode : uint32_t
+	{
+		Unlit,
+		Main,
+		Addition
 	};
 
 	enum TINY_API VertexMask : uint32_t
@@ -134,6 +156,7 @@ namespace tezcat::Tiny::Core
 	using DrawModeWrapper = TinyValueConventor<DrawMode, uint32_t>;
 	using CullFaceWrapper = TinyValueConventor<CullFace, uint32_t>;
 	using BlendWrapper = TinyValueConventor<Blend, uint32_t>;
+	using DepthTestWrapper = TinyValueConventor<DepthTest, uint32_t>;
 
 	struct TINY_API ContextMap
 	{
@@ -183,6 +206,11 @@ namespace tezcat::Tiny::Core
 
 		static std::unordered_map<std::string, BlendWrapper> BlendMap;
 		static std::array<BlendWrapper, (std::size_t)Blend::Count> BlendArray;
+
+		static std::unordered_map<std::string, DepthTestWrapper> DepthTestMap;
+		static std::array<DepthTestWrapper, (std::size_t)DepthTest::Count> DepthTestArray;
+
+		static std::unordered_map<std::string, LightMode> LightModeMap;
 	};
 
 	enum class TINY_API PrimitiveDrawType

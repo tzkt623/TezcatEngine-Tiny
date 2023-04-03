@@ -1,4 +1,4 @@
-﻿#include "Engine.h"
+#include "Engine.h"
 #include "Manager/LightManager.h"
 #include "Manager/ShaderManager.h"
 #include "Manager/SceneManager.h"
@@ -7,16 +7,17 @@
 #include "Input/InputSystem.h"
 #include "Renderer/BaseGraphics.h"
 #include "Scene/LayerMask.h"
-#include "Scene/GameObject.h"
+#include "Component/GameObject.h"
 #include "Manager/VertexGroupManager.h"
 #include "Shader/ShaderParam.h"
+#include "Manager/PipelineManager.h"
 
 
 namespace tezcat::Tiny::Core
 {
 	int Engine::ScreenHeight = 0;
 	int Engine::ScreenWidth = 0;
-	float Engine::DeltaTime = 0;
+	float Engine::sDeltaTime = 0;
 
 	Engine::Engine()
 		: m_ResourceLoader(nullptr)
@@ -25,7 +26,7 @@ namespace tezcat::Tiny::Core
 		, m_SceneManager(new SceneManager())
 		, m_CameraManager(new CameraManager())
 		, m_InputSystem(new InputSystem())
-		, m_Graphics(nullptr)
+		, mGraphics(nullptr)
 		, m_IsRunning(true)
 	{
 		new VertexGroupManager();
@@ -34,7 +35,7 @@ namespace tezcat::Tiny::Core
 	Engine::~Engine()
 	{
 		delete m_InputSystem;
-		delete m_Graphics;
+		delete mGraphics;
 		delete m_SceneManager;
 		delete m_ShaderManager;
 		delete m_CameraManager;
@@ -77,11 +78,12 @@ namespace tezcat::Tiny::Core
 
 	bool Engine::onInit(ResourceLoader* loader)
 	{
-		m_Graphics = this->createGraphics();
-		GraphicsT::attach(m_Graphics);
-		m_Graphics->init(this);
+		mGraphics = this->createGraphics();
+		Graphics::attach(mGraphics);
+		mGraphics->init(this);
 
 		m_ResourceLoader->prepareResource(this);
+		PipelineManager::loadAllShaderToRenderer(mGraphics);
 		return true;
 	}
 
@@ -124,8 +126,8 @@ namespace tezcat::Tiny::Core
 	{
 		m_InputSystem->update();
 		m_SceneManager->update();
-		m_Graphics->render();
-		m_Graphics->swapBuffer();
+		mGraphics->render();
+		mGraphics->swapBuffer();
 	}
 
 	void Engine::postUpdate()

@@ -1,8 +1,8 @@
 #include "Transform.h"
 #include "../Manager/SceneManager.h"
 #include "../Scene/Scene.h"
-#include "../Scene/GameObject.h"
-#include "Utility/Tools.h"
+#include "../Component/GameObject.h"
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -18,144 +18,182 @@ namespace tezcat::Tiny::Core
 	}
 
 	Transform::Transform(Transform* parent)
-		: m_IsDirty(true)
-		, m_Position(0.0f)
-		, m_Rotation(0.0f)
-		, m_Scale(1.0f)
-		, m_ModelMatrix(1.0f)
-		, m_Parent(parent)
-		, m_Index(-1)
+		: mIsDirty(true)
+		, mLocalPosition(0.0f)
+		, mLocalRotation(0.0f)
+		, mLocalScale(1.0f)
+		, mModelMatrix(1.0f)
+		, mParent(parent)
+		, mIndex(0)
 	{
-		this->setTransform(this);
-		if (m_Parent != nullptr)
+		if (mParent != nullptr)
 		{
-			m_Parent->addChild(this);
+			mParent->addChild(this);
 		}
 	}
 
 	Transform::~Transform()
 	{
-		m_Parent = nullptr;
+		mParent = nullptr;
 	}
 
-	void Transform::update()
+	void Transform::onStart()
 	{
-		if (m_IsDirty)
+		if (mParent == nullptr)
 		{
-			m_IsDirty = false;
+			SceneMgr::getInstance()->getCurrentScene()->addTransform(this);
+		}
+	}
 
-			if (m_Parent == nullptr)
+	void Transform::onEnable()
+	{
+		this->getGameObject()->mTransform = this;
+	}
+
+	void Transform::onDisable()
+	{
+
+	}
+
+	void Transform::onUpdate()
+	{
+		if (mIsDirty)
+		{
+			mIsDirty = false;
+
+			if (mParent == nullptr)
 			{
-				m_ModelMatrix = WORLD_MATRIX;
+				mModelMatrix = WORLD_MATRIX;
 			}
 			else
 			{
-				m_ModelMatrix = m_Parent->getModelMatrix();
+				mModelMatrix = mParent->getModelMatrix();
 			}
 
-			m_ModelMatrix = glm::translate(m_ModelMatrix, m_Position);
-			// 			m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.x, XAxis);
-			// 			m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.y, YAxis);
-			// 			m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.z, ZAxis);
+			mModelMatrix = glm::translate(mModelMatrix, mLocalPosition);
+			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.x, XAxis);
+			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.y, YAxis);
+			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.z, ZAxis);
 
-			m_ModelMatrix *= glm::toMat4(glm::quat(glm::radians(m_Rotation)));
-			m_ModelMatrix = glm::scale(m_ModelMatrix, m_Scale);
+			mModelMatrix *= glm::toMat4(glm::quat(glm::radians(mLocalRotation)));
+			mModelMatrix = glm::scale(mModelMatrix, mLocalScale);
 		}
 
-		if (!m_Children.empty())
+		if (!mChildren.empty())
 		{
-			auto it = m_Children.begin();
-			while (it != m_Children.end())
+			auto it = mChildren.begin();
+			while (it != mChildren.end())
 			{
 				auto go = (*it)->getGameObject();
 				if (go->needDelete())
 				{
-					go->exitScene();
-					it = m_Children.erase(it);
+					it = mChildren.erase(it);
+					go->close();
+					delete go;
 				}
 				else
 				{
-					(*it++)->update();
+					(*it)->update();
+					it++;
 				}
 			}
 		}
 	}
 
-	void Transform::enterScene(Scene* scene)
+	void Transform::addChild(Transform* transform)
 	{
-
+		//		transform->mIndex = static_cast<uint32_t>(mChildren.size());
+		mChildren.push_back(transform);
 	}
 
-	void Transform::exitScene()
+	bool Transform::removeChild(Transform* transform)
 	{
+		mChildren.erase(std::find(mChildren.begin(), mChildren.end(), transform));
 
-	}
-
-	void Transform::addChild(Transform* val)
-	{
-		val->m_Index = static_cast<unsigned int>(m_Children.size());
-		m_Children.push_back(val);
-	}
-
-	bool Transform::removeChild(Transform* val)
-	{
-		auto index = val->m_Index;
-		if (m_Children[index] != val)
-		{
-			return false;
-		}
-
-		m_Children.erase(m_Children.begin() + index);
-
-		for (int i = index; i < m_Children.size(); i++)
-		{
-			m_Children[i]->m_Index = i;
-		}
+		// 		auto index = transform->mIndex;
+		// 		if (mChildren[index] != transform)
+		// 		{
+		// 			return false;
+		// 		}
+		// 
+		// 		mChildren.erase(mChildren.begin() + index);
+		// 
+		// 		for (int i = index; i < mChildren.size(); i++)
+		// 		{
+		// 			mChildren[i]->mIndex = i;
+		// 		}
 
 		return true;
 	}
 
+	glm::mat4 Transform::getWorldToLocalMatrix()
+	{
+		return glm::inverse(mModelMatrix);
+	}
+
+	void Transform::transformPoint(glm::vec3& localPosition)
+	{
+		localPosition = mModelMatrix * glm::vec4(localPosition, 1.0f);
+	}
+
+	void Transform::transformPoint(const glm::vec3& localPosition, glm::vec3& worldPosition)
+	{
+		worldPosition = mModelMatrix * glm::vec4(localPosition, 1.0f);
+	}
+
+	void Transform::transformVector(glm::vec3& localVector)
+	{
+		localVector = mModelMatrix * glm::vec4(localVector, 0.0f);
+	}
+
+	void Transform::transformVector(const glm::vec3& localVector, glm::vec3& worldVector)
+	{
+		worldVector = mModelMatrix * glm::vec4(localVector, 0.0f);
+	}
+
+	void Transform::inverseTransformPoint(glm::vec3& worldPosition)
+	{
+		worldPosition = glm::inverse(mModelMatrix) * glm::vec4(worldPosition, 1.0f);
+	}
+
+	void Transform::inverseTransformPoint(const glm::vec3& worldPosition, glm::vec3& localPosition)
+	{
+		localPosition = glm::inverse(mModelMatrix) * glm::vec4(worldPosition, 1.0f);
+	}
+
+	void Transform::inverseTransformVector(glm::vec3& worldVector)
+	{
+		worldVector = glm::inverse(mModelMatrix) * glm::vec4(worldVector, 0.0f);
+	}
+
+	void Transform::inverseTransformVector(const glm::vec3& worldVector, glm::vec3& localVector)
+	{
+		localVector = glm::inverse(mModelMatrix) * glm::vec4(worldVector, 0.0f);
+	}
+
 	void Transform::setParent(Transform* parent)
 	{
-		if (m_Parent != nullptr)
+		if (parent == mParent)
 		{
-			m_Parent->removeChild(this);
+			return;
 		}
 
-		m_Parent = parent;
-
-		if (m_Parent != nullptr)
+		//如果父节点不为空
+		if (mParent != nullptr)
 		{
-			m_Parent->addChild(this);
+			//从父节点中删除自己
+			mParent->removeChild(this);
+		}
+
+		mParent = parent;
+		//如果传入的父节点为空,说明需要添加到Scene中
+		if (mParent == nullptr)
+		{
+			SceneMgr::getInstance()->getCurrentScene()->addTransform(this);
 		}
 		else
 		{
-			SG<SceneManager>::getInstance()->getCurrentScene()->addTransform(this);
+			mParent->addChild(this);
 		}
-	}
-
-
-	//-----------------------------------------------------
-	TransformCollection::TransformCollection()
-	{
-
-	}
-
-	TransformCollection::~TransformCollection()
-	{
-
-	}
-	Transform* TransformCollection::giveTransform(int id)
-	{
-		if (id > m_TransformList.size())
-		{
-			m_TransformList.resize(id + 1);
-		}
-
-		return nullptr;
-	}
-	Transform* TransformCollection::get(int id)
-	{
-		return &m_TransformList[id];
 	}
 }

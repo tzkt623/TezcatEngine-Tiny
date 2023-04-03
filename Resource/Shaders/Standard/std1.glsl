@@ -12,7 +12,6 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
-        bool Lighting = true;
         bool ZWrite = true;
         str CullFace = Back;
         bool Blend = false;

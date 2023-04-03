@@ -37,7 +37,7 @@ protected:
 	void onUpdate() override;
 
 private:
-	GUIDragFloat3* m_Position;
+	GUIDragFloat3* mPosition;
 };
 
 class MyMainCameraWindow : public GUIWindow
@@ -54,7 +54,7 @@ protected:
 private:
 	GUIText* m_Info;
 
-	GUIDragFloat3* m_Position;
+	GUIDragFloat3* mPosition;
 	GUIDragFloat3* m_Rotation;
 	GUIDragFloat3* m_Up;
 	GUIDragFloat3* m_Right;

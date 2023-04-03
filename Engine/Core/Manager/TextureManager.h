@@ -2,8 +2,9 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/Context.h"
-#include "Utility/Tools.h"
 #include "../Head/ConfigHead.h"
+
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {

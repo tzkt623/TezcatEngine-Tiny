@@ -5,7 +5,7 @@
 #include "GLShaderBuilder.h"
 #include "GLTexture.h"
 
-#include "../Windows/WindowsEngine.h"
+#include "WindowsEngine.h"
 
 #include "Core/Head/CppHead.h"
 #include "Core/Component/MeshRenderer.h"
@@ -16,24 +16,29 @@
 #include "Core/Head/Context.h"
 #include "Core/Component/Camera.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny::GL
 {
 	GLGraphics::GLGraphics()
-		: m_Window(nullptr)
+		: mWindow(nullptr)
 	{
 		TextureMgr::init(new GLTextureCreator());
+		VertexBufferCreator::attach(new GLVertexBufferCreator());
+		VertexGroupCreator::attach(new GLVertexGroupCreator());
+		ShaderBuilderCreator::attach(new GLShaderBuilderCreator());
 	}
 
 	GLGraphics::~GLGraphics()
 	{
-		m_Window = nullptr;
+		VertexBufferCreator::destroy();
+		VertexGroupCreator::destroy();
+		mWindow = nullptr;
 	}
 
 	void GLGraphics::init(Engine* engine)
 	{
 		auto we = (WindowsEngine*)engine;
-		m_Window = we->getGLFWWindow();
-		glfwMakeContextCurrent(m_Window);
+		mWindow = we->getGLFWWindow();
+		glfwMakeContextCurrent(mWindow);
 		glfwSwapInterval(1);
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
@@ -44,27 +49,23 @@ namespace tezcat::Tiny::Core
 
 		(new GUI())->init(engine);
 
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+// 		glEnable(GL_DEPTH_TEST);
+// 		glEnable(GL_CULL_FACE);
+// 		glCullFace(GL_BACK);
 
 		GLint max;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
 	}
 
-	void GLGraphics::updateViewport(Camera* camera)
+	void GLGraphics::updateViewport(ViewportInfo& info)
 	{
-		auto& info = camera->getViewRect();
 		glViewport(info.OX, info.OY, info.Width, info.Height);
 	}
 
 	void GLGraphics::preRender()
 	{
 		BaseGraphics::preRender();
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClearDepth(1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void GLGraphics::onRender()
@@ -80,10 +81,17 @@ namespace tezcat::Tiny::Core
 
 	void GLGraphics::swapBuffer()
 	{
-		glfwSwapBuffers(m_Window);
+		glfwSwapBuffers(mWindow);
 	}
 
-	void GLGraphics::renderMesh(MeshRenderer* renderer)
+	void GLGraphics::clear()
+	{
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		glClearDepth(1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void GLGraphics::draw(MeshRenderer* renderer)
 	{
 		if (renderer->hasIndex())
 		{
@@ -95,20 +103,18 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	VertexBuffer* GLGraphics::createVertexBuffer(MeshData* mesh)
+	void GLGraphics::draw(VertexGroup* group, DrawModeWrapper drawMode)
 	{
-		return new GLVertexBuffer(mesh);
+		if (group->getIndexCount() > 0)
+		{
+			glDrawElements(drawMode.platform, group->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+		}
+		else
+		{
+			glDrawArrays(drawMode.platform, 0, group->getVertexCount());
+		}
 	}
 
-	VertexGroup* GLGraphics::createVertexGroup(MeshData* mesh)
-	{
-		return new GLVertexGroup(mesh);
-	}
-
-	void GLGraphics::createShaderPackage(const std::string& filePath)
-	{
-		GLShaderBuilder::createPackage(filePath);
-	}
 
 	void GLGraphics::initContext()
 	{
@@ -172,6 +178,7 @@ namespace tezcat::Tiny::Core
 			{"ConstA",		BlendWrapper(Blend::ConstAlpha,				GL_CONSTANT_ALPHA)},
 			{"1-ConstA",	BlendWrapper(Blend::One_Minus_ConstAlpha,	GL_ONE_MINUS_CONSTANT_ALPHA)}
 		};
+//		std::cout << ContextMap::BlendMap.size() << std::endl;
 
 		ContextMap::BlendArray =
 		{
@@ -205,6 +212,32 @@ namespace tezcat::Tiny::Core
 			CullFaceWrapper(CullFace::Front,	GL_FRONT),
 			CullFaceWrapper(CullFace::Back,		GL_BACK),
 			CullFaceWrapper(CullFace::All,		GL_FRONT_AND_BACK),
+		};
+
+		ContextMap::DepthTestMap =
+		{
+			{"Off",				DepthTestWrapper(DepthTest::Off,			0)},
+			{"Always",			DepthTestWrapper(DepthTest::Always,			GL_ALWAYS)},
+			{"Never",			DepthTestWrapper(DepthTest::Never,			GL_NEVER)},
+			{"Less",			DepthTestWrapper(DepthTest::Less,			GL_LESS)},
+			{"LessEqual",		DepthTestWrapper(DepthTest::LessEqual,		GL_LEQUAL)},
+			{"Greater",			DepthTestWrapper(DepthTest::Greater,		GL_GREATER)},
+			{"GreaterEqual",	DepthTestWrapper(DepthTest::GreaterEqual,	GL_GEQUAL)},
+			{"Equal",			DepthTestWrapper(DepthTest::Equal,			GL_EQUAL)},
+			{"NotEqual",		DepthTestWrapper(DepthTest::NotEqual,		GL_NOTEQUAL)}
+		};
+
+		ContextMap::DepthTestArray =
+		{
+			DepthTestWrapper(DepthTest::Off,			0),
+			DepthTestWrapper(DepthTest::Always,			GL_ALWAYS),
+			DepthTestWrapper(DepthTest::Never,			GL_NEVER),
+			DepthTestWrapper(DepthTest::Less,			GL_LESS),
+			DepthTestWrapper(DepthTest::LessEqual,		GL_LEQUAL),
+			DepthTestWrapper(DepthTest::Greater,		GL_GREATER),
+			DepthTestWrapper(DepthTest::GreaterEqual,	GL_GEQUAL),
+			DepthTestWrapper(DepthTest::Equal,			GL_EQUAL),
+			DepthTestWrapper(DepthTest::NotEqual,		GL_NOTEQUAL)
 		};
 	}
 }

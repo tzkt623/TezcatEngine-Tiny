@@ -1,17 +1,20 @@
 #pragma once
 #include "../Head/CppHead.h"
-#include "Utility/Tools.h"
+#include "../Head/ConfigHead.h"
+
+#include "Utility/Utility.h"
+
 
 namespace tezcat::Tiny::Core
 {
-	class GUIFunction
+	class TINY_API GUIFunction
 	{
 	public:
 		static float getFrameRate();
 		static float getFrameRateTime();
 	};
 
-	class GUIWidget
+	class TINY_API GUIWidget
 	{
 	public:
 		GUIWidget(const std::u8string& name);
@@ -24,14 +27,14 @@ namespace tezcat::Tiny::Core
 
 		virtual void update();
 
-		const char* getName() { return m_Name.c_str(); }
+		const char* getName() { return mName.c_str(); }
 
 		void setName(const std::u8string& val)
 		{
-			m_Name = Utility::Tools::fromU8(val);
+			mName = Utility::StringTool::fromU8(val);
 		}
 
-		void setName(const std::string& val) { m_Name = val; }
+		void setName(const std::string& val) { mName = val; }
 
 		virtual void open() {}
 		virtual void close() {}
@@ -41,10 +44,10 @@ namespace tezcat::Tiny::Core
 		virtual void onUpdate() = 0;
 
 	private:
-		std::string m_Name;
+		std::string mName;
 	};
 
-	class GUIParentWidget : public GUIWidget
+	class TINY_API GUIParentWidget : public GUIWidget
 	{
 		using GUIWidget::GUIWidget;
 
@@ -53,17 +56,17 @@ namespace tezcat::Tiny::Core
 
 		void addChild(GUIWidget* child)
 		{
-			m_Children.emplace_back(child);
+			mChildren.emplace_back(child);
 		}
 
 		void removeChild(GUIWidget* child)
 		{
-			auto it = m_Children.begin();
-			while (it != m_Children.end())
+			auto it = mChildren.begin();
+			while (it != mChildren.end())
 			{
 				if ((*it) == child)
 				{
-					m_Children.erase(it);
+					mChildren.erase(it);
 					break;
 				}
 				it++;
@@ -75,11 +78,11 @@ namespace tezcat::Tiny::Core
 		void onRender() override;
 
 	private:
-		std::vector<GUIWidget*> m_Children;
+		std::vector<GUIWidget*> mChildren;
 	};
 
 
-	class GUIWindow : public GUIParentWidget
+	class TINY_API GUIWindow : public GUIParentWidget
 	{
 	public:
 		GUIWindow(const std::u8string& name);
@@ -97,7 +100,7 @@ namespace tezcat::Tiny::Core
 	};
 
 
-	class GUIDragFloat : public GUIWidget
+	class TINY_API GUIDragFloat : public GUIWidget
 	{
 	public:
 		GUIDragFloat(const std::u8string& name);
@@ -117,7 +120,7 @@ namespace tezcat::Tiny::Core
 		static void defaultPostFunction(float* data) {}
 	};
 
-	class GUIDragFloat2 : public GUIDragFloat
+	class TINY_API GUIDragFloat2 : public GUIDragFloat
 	{
 	public:
 		GUIDragFloat2(const std::u8string& name);
@@ -147,7 +150,7 @@ namespace tezcat::Tiny::Core
 		float m_Data[2];
 	};
 
-	class GUIDragFloat3 : public GUIDragFloat
+	class TINY_API GUIDragFloat3 : public GUIDragFloat
 	{
 	public:
 		GUIDragFloat3(const std::u8string& name);
@@ -179,7 +182,7 @@ namespace tezcat::Tiny::Core
 		float m_Data[3];
 	};
 
-	class GUIText : public GUIWidget
+	class TINY_API GUIText : public GUIWidget
 	{
 	public:
 		GUIText(const std::u8string& name);

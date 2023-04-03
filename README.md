@@ -17,8 +17,9 @@ Please check the Example project to know more info.
 因为我用unity比较多,就模仿了他的结构,现在的结构是这样
 
 i am a Unity user, so Tiny look like this
-```c
+```cpp
 auto elden_ring2 = new GameObject();
+elden_ring2->addComponent<Transform>();
 elden_ring2->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 960.0f));
 elden_ring2->getTransform()->setRotation(glm::vec3(0.0f, -180.0f, 0.0f));
 elden_ring2->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1));
@@ -29,11 +30,10 @@ elden_ring2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "../Resour
 mre2->setMaterial(elden_ring2_material);
 mre2->setMesh("Square");
 
-this->addGameObject(elden_ring2);
-
 //---------------------------------------------------------
 
 auto plane = new GameObject();
+plane->addComponent<Transform>();
 plane->getTransform()->setPosition(glm::vec3(0.0f, -20.0f, 0.0f));
 plane->getTransform()->setRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 plane->getTransform()->setScale(glm::vec3(10.0f, 10.0f, 1));
@@ -45,8 +45,6 @@ plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "..
 plane_material->addUniform<UniformF>(ShaderParam::StdMaterial::Shininess, 64.0f);
 mr->setMaterial(plane_material);
 mr->setMesh("Square");
-
-this->addGameObject(plane);
 ```
 
 
@@ -60,7 +58,7 @@ ShaderBuilder can auto scan all GLSL Uniform value except array type.
 
 Tiny Current Buildin Uniform Values
 
-```c
+```cpp
 static UniformID Empty;
 
 static UniformID MatrixP;
@@ -108,7 +106,7 @@ Current Buildin Material Values
 
 notice! add uniform value to your material for the gameobject.
 
-```c
+```cpp
 auto material = new Material("Standard/Std1");
 material->addUniform<UniformTex2D>(ShaderParam::TexColor, "../Resource/Image/dragon.jpg");
 material->addUniform<UniformF>(ShaderParam::ModeSpecular, 64.0f);
@@ -125,12 +123,12 @@ The[`int Version`] should be setted.The other params You can set as your wish.
 ```c
 "0"         ZERO
 "1"         ONE
-"Src"		SRC_COLOR
+"Src"       SRC_COLOR
 "1-Src"     ONE_MINUS_SRC_COLOR
-"Tar"		DST_COLOR
+"Tar"       DST_COLOR
 "1-Tar"     ONE_MINUS_DST_COLOR
 "SrcA"	    SRC_ALPHA
-"1-SrcA"	ONE_MINUS_SRC_ALPHA
+"1-SrcA"    ONE_MINUS_SRC_ALPHA
 "TarA"      DST_ALPHA
 "1-TarA"    ONE_MINUS_DST_ALPHA
 "Const"     CONSTANT_COLOR
@@ -153,28 +151,48 @@ str BlendTar = 1-TarA;
 bool Blend = false;
 ```
 
-### **剔除 Cull**
+### **表面剔除 Cullface**
 剔除参数 Cullface
 ```c
-"Off"       disable
+"Off"       Disable
 "Front"     FRONT
 "Back"      BACK
 "All"       FRONT_AND_BACK
 ```
 
 启用剔除 EnableCullface
-
 ```c
 str CullFace = Back;
 ```
 
 关闭剔除
-
 ```c
 str CullFace = Off;
 ```
 
 ### **深度测试 DepthTest**
+测试参数
+```c
+"Off"               Off
+"Always"            Always
+"Never"             Never
+"Less"              Less
+"LessEqual"         LessEqual
+"Greater"           Greater
+"GreaterEqual"      GreaterEqual
+"Equal"             Equal
+"NotEqual"          NotEqual
+```
+
+启用 Enable
+```c
+str DepthTest = Less;
+```
+关闭 Disable
+```c
+str DepthTest = Off;
+```
+### **深度写入 ZWrite**
 启用 Enable
 ```c
 bool ZWrite = true;
@@ -186,7 +204,7 @@ bool ZWrite = false;
 ```
 
 ### **示例 example**
-```c
+```glsl
 #TINY_HEAD_BEGIN
 {
     str Name = Standard/Std2;
@@ -202,6 +220,7 @@ bool ZWrite = false;
         int OrderID = 0;
         str Queue = Opaque;
         bool Lighting = true;
+        str DepthTest = Less;
         bool ZWrite = true;
         str CullFace = Back;
         bool Blend = false;

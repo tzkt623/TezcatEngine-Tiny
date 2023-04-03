@@ -7,14 +7,20 @@ namespace tezcat::Tiny::Core
 {
 	class GameObject;
 	class Camera;
+	class CameraData;
 	class LightData;
 	class Transform;
 	class Layer;
+	class IRenderViewer;
+	class RenderLayer;
+	class LightLayer;
 	class TINY_API Scene
 	{
+		friend class GameObject;
 	public:
 		Scene(const std::string& name);
 		virtual ~Scene();
+		inline const std::string& getName() const { return mName; }
 
 	public:
 		virtual void onEnter();
@@ -23,39 +29,39 @@ namespace tezcat::Tiny::Core
 		virtual void onResume();
 	public:
 		void update();
-		void addTransform(Transform* transform);
-
 		void addCamera(Camera* camera);
-		void addGameObject(GameObject* gameObject);
 
 	public:
 		void addLogicFunction(void* gameObject, const std::function<void()>& function);
 		void removeLogicFunction(void* gameObject);
-		void foreachChild(const std::function<void()>& begin,
-			const std::function<void(GameObject*)>& get,
-			const std::function<void()>& end,
-			const std::function<void()>& nochildren);
+		void addParentChangedTransform(Transform* transform);
+		void addTransform(Transform* transform);
+
+	private:
+		void addGameObject(GameObject* gameObject);
+		void addNewObject(GameObject* gameObject);
+
 
 	public:
-		inline std::string getName() const { return m_Name; }
-		inline std::unordered_map<std::string, Camera*>* getCameras() { return &m_CameraWithName; }
-		inline std::vector<Layer*>& getLayers() { return m_LayerList; }
-		inline std::list<GameObject*>& getObjectList() { return m_ObjectList; }
+		inline const std::list<GameObject*> getObjectList() const { return mObjectList; }
 	private:
-		std::string m_Name;
+		std::string mName;
+		std::list<GameObject*> mObjectList;
+		std::list<GameObject*> mNewObjectList;
 
-		std::list<GameObject*> m_ObjectList;
-		std::list<GameObject*> m_NewObjectList;
-		std::list<Transform*> m_TransformList;
-		std::vector<Layer*> m_LayerList;
+		std::list<Transform*> mParentChangedTransformList;
+		std::list<Transform*> mTransformList;
 
-		std::unordered_map<void*, std::function<void()>> m_LogicList;
+		std::unordered_map<void*, std::function<void()>> mLogicList;
 
-	private://光源信息
-		LightData* m_LightData;
+		std::vector<RenderLayer*> m_RenderLayerList;
+		std::vector<LightLayer*> m_LightLayerList;
 
 	private:
-		std::unordered_map<std::string, Camera*> m_CameraWithName;
+		//鐏厜鏁版嵁
+		LightData* mLightData;
+		//鐩告満鏁版嵁
+		CameraData* mCameraData;
 	};
 }
 

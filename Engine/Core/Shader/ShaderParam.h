@@ -1,26 +1,25 @@
 #pragma once
 
 #include "../Head/CppHead.h"
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 #include "Uniform.h"
 
 namespace tezcat::Tiny::Core
 {
-	//#ÄÚÖÃshader²ÎÊı
-
+	//#å†…ç½®Shaderå˜é‡
 	struct TINY_API ShaderParam
 	{
 		static UniformID create(const char* propertyName);
 		static UniformID create(const std::string& propertyName);
 
-		/// <summary>
-		/// ½â¾öÈ«¾Ö±äÁ¿³õÊ¼»¯²»È·¶¨µÄÇé¿ö
-		/// </summary>
+
+		//åˆå§‹åŒ–æ‰€æœ‰å˜é‡
+		//è§£å†³é™æ€å˜é‡åˆå§‹åŒ–é¡ºåºä¸ç¡®å®šçš„æƒ…å†µ
 		static void initAllParam(const std::function<void()>& customIniter);
 
 		//----------------------------
 		//
-		// ShaderÄÚÖÃ²ÎÊı
+		// å†…ç½®shaderå˜é‡
 		//
 	public:
 		static UniformID Empty;
@@ -45,6 +44,17 @@ namespace tezcat::Tiny::Core
 			static UniformID Ambient;
 			static UniformID Diffuse;
 			static UniformID Specular;
+		};
+
+		struct LightPoint
+		{
+			static UniformID Position;
+
+			static UniformID Ambient;
+			static UniformID Diffuse;
+			static UniformID Specular;
+
+			static UniformID Config;
 		};
 
 		struct StdMaterial

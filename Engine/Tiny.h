@@ -6,14 +6,14 @@
 #include "Core/GUI/GUIWidget.h"
 
 #include "Core/Renderer/Texture.h"
+#include "Core/Renderer/RenderObject.h"
 
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/CameraManager.h"
 
 #include "Core/Scene/Scene.h"
-#include "Core/Scene/GameObject.h"
 
-#include "Core/Component/RenderObject.h"
+#include "Core/Component/GameObject.h"
 #include "Core/Component/Camera.h"
 #include "Core/Component/Transform.h"
 #include "Core/Component/MeshRenderer.h"
@@ -29,10 +29,10 @@
 
 #include "Core/Shader/ShaderParam.h"
 
-#include "Utility/Tools.h"
+#include "Utility/Utility.h"
 
 #ifdef TINY_PLATFORM_WINDOWS
-#include "Platform/Windows/WindowsEngine.h"
+#include "Platform/OpenGL/WindowsEngine.h"
 #endif
 
 

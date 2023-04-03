@@ -1,9 +1,10 @@
 #pragma once
 #include "Head/GLMHead.h"
+#include "Head/ConfigHead.h"
 
 namespace tezcat::Tiny
 {
-	struct Statistic
+	struct TINY_API Statistic
 	{
 		static const unsigned char* GPU;
 

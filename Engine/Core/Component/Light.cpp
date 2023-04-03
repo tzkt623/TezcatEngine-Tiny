@@ -1,6 +1,9 @@
 #include "Light.h"
+#include "Transform.h"
+
 #include "../Shader/Shader.h"
 #include "../Manager/LightManager.h"
+#include "../Component/GameObject.h"
 
 
 namespace tezcat::Tiny::Core
@@ -37,20 +40,22 @@ namespace tezcat::Tiny::Core
 		shader->setFloat3(ShaderParam::LightDirection::Specular, glm::value_ptr(m_Specular));
 	}
 
-	void DirectionalLight::sendDataToGPU()
-	{
-
-	}
-
 	void DirectionalLight::onEnable()
 	{
 		LightMgr::getInstance()->setDirectionalLight(this);
 	}
 
+	void DirectionalLight::onDisable()
+	{
+
+	}
+
 	//------------------------------------------------------------------------
-
-
 	PointLight::PointLight()
+		: m_Ambient(0.2f)
+		, m_Diffuse(0.5f)
+		, m_Specular(1.0f)
+		, m_Config(1.0f, 0.09f, 0.032f)
 	{
 
 	}
@@ -60,17 +65,38 @@ namespace tezcat::Tiny::Core
 
 	}
 
+	void PointLight::submit(Shader* shader)
+	{
+		shader->setFloat3(ShaderParam::LightPoint::Position, glm::value_ptr(this->getTransform()->getPosition()));
+		shader->setFloat3(ShaderParam::LightPoint::Ambient, glm::value_ptr(m_Ambient));
+		shader->setFloat3(ShaderParam::LightPoint::Diffuse, glm::value_ptr(m_Diffuse));
+		shader->setFloat3(ShaderParam::LightPoint::Specular, glm::value_ptr(m_Specular));
+		shader->setFloat3(ShaderParam::LightPoint::Config, glm::value_ptr(m_Config));
+	}
 
+	void PointLight::onEnable()
+	{
+		LightMgr::getInstance()->addPointLight(this);
+	}
+
+	void PointLight::onDisable()
+	{
+		
+	}
+
+	bool PointLight::cullGameObject(GameObject* gameObject)
+	{
+		gameObject->getTransform()->getPosition();
+		return false;
+	}
 
 	//------------------------------------------------------------------------
-
-
-	Spotlight::Spotlight()
+	SpotLight::SpotLight()
 	{
 
 	}
 
-	Spotlight::~Spotlight()
+	SpotLight::~SpotLight()
 	{
 
 	}

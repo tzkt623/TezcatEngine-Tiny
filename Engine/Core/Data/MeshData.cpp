@@ -4,7 +4,7 @@
 namespace tezcat::Tiny::Core
 {
 	MeshData::MeshData(const std::string& name)
-		: m_Name(name)
+		: mName(name)
 	{
 
 	}
