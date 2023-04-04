@@ -6,18 +6,18 @@ namespace tezcat::Tiny::Core
 {
 	class GameObject;
 	class Camera;
-	class IRenderObejct;
+	class IRenderObject;
 	class Layer
 	{
 	public:
 		Layer();
 		~Layer();
 
-		void addRenderObejct(IRenderObejct* gameObject);
+		void addRenderObejct(IRenderObject* gameObject);
 		void cullGameObject(Camera* camera);
 
 	private:
 		int mIndex;
-		std::list<ref<IRenderObejct>> m_RenderObejctList;
+		std::list<ref<IRenderObject>> m_RenderObejctList;
 	};
 }

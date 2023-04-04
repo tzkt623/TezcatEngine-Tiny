@@ -10,6 +10,7 @@ namespace tezcat::Tiny::Core
 
 	UniformID ShaderParam::VertexColor;
 	UniformID ShaderParam::TexColor;
+	UniformID ShaderParam::TexCube;
 
 	UniformID ShaderParam::LightPosition;
 	UniformID ShaderParam::LightColor;
@@ -51,6 +52,7 @@ namespace tezcat::Tiny::Core
 
 		ShaderParam::VertexColor = "TINY_VertexColor";
 		ShaderParam::TexColor = "TINY_TexColor";
+		ShaderParam::TexCube = "TINY_TexCube";
 
 		ShaderParam::LightPosition = "TINY_LightPosition";
 		ShaderParam::LightColor = "TINY_LightColor";

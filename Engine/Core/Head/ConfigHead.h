@@ -29,9 +29,9 @@ namespace tezcat::Tiny::Core
 	{
 		friend class ResourceLoader;
 	public:
-		static RenderAPI getRenderAPI() { return s_RenderAPI; }
+		static RenderAPI getRenderAPI() { return sRenderAPI; }
 
 	private:
-		static RenderAPI s_RenderAPI;
+		static RenderAPI sRenderAPI;
 	};
 }

@@ -18,6 +18,7 @@
 #include "Core/Component/Transform.h"
 #include "Core/Component/MeshRenderer.h"
 #include "Core/Component/Light.h"
+#include "Core/Component/Skybox.h"
 
 #include "Core/Data/Image.h"
 #include "Core/Data/MeshData.h"

@@ -11,16 +11,16 @@ namespace tezcat::Tiny::Core
 		Image();
 		~Image();
 
-		void openFile(const std::string& path);
-		inline int getWidth() const { return m_Width; }
-		inline int getHeight() const { return m_Height; }
-		inline int getChannels() const { return m_Channels; }
-		inline unsigned char* getData() { return m_Data; }
+		void openFile(const std::string& path, bool flip = true);
+		inline int getWidth() const { return mWidth; }
+		inline int getHeight() const { return mHeight; }
+		inline int getChannels() const { return mChannels; }
+		inline unsigned char* getData() { return mData; }
 
 	private:
-		int m_Width;
-		int m_Height;
-		int m_Channels;
-		unsigned char* m_Data;
+		int mWidth;
+		int mHeight;
+		int mChannels;
+		unsigned char* mData;
 	};
 }

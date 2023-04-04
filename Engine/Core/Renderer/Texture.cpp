@@ -12,8 +12,8 @@ namespace tezcat::Tiny::Core
 
 	Texture::Texture(const TextureWrap& wrap, const TextureFilter& filter)
 		: mTextureID(0)
-		, m_Wrap(ContextMap::TextureWrapArray[(int)wrap])
-		, m_Filter(ContextMap::TextureFilterArray[(int)filter])
+		, mWrap(ContextMap::TextureWrapArray[(int)wrap])
+		, mFilter(ContextMap::TextureFilterArray[(int)filter])
 	{
 	}
 
@@ -22,12 +22,7 @@ namespace tezcat::Tiny::Core
 
 	}
 
-	void Texture::createTexture(Image* image)
-	{
-
-	}
-
-	void Texture::createTexture(const char* filePath)
+	void Texture::createTexture(const std::string& filePath)
 	{
 		Image img;
 		img.openFile(filePath);

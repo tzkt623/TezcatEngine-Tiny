@@ -41,61 +41,61 @@ namespace tezcat::Tiny::Utility
 		};
 	public:
 		Any()
-			: m_TypeIndex(typeid(void))
-			, m_Container(nullptr)
+			: mTypeIndex(typeid(void))
+			, mContainer(nullptr)
 		{
 		}
 
 		Any(const Any& other)
-			: m_TypeIndex(other.m_TypeIndex)
-			, m_Container(other.clone())
+			: mTypeIndex(other.mTypeIndex)
+			, mContainer(other.clone())
 		{
 		}
 
 		Any(Any&& other) noexcept
-			: m_TypeIndex(other.m_TypeIndex)
-			, m_Container(other.m_Container)
+			: mTypeIndex(other.mTypeIndex)
+			, mContainer(other.mContainer)
 		{
-			other.m_Container = nullptr;
+			other.mContainer = nullptr;
 		}
 
 		template<typename T>
 		Any(T& value)
-			: m_TypeIndex(typeid(T))
-			, m_Container(new ContainerT<T>(value))
+			: mTypeIndex(typeid(T))
+			, mContainer(new ContainerT<T>(value))
 		{
 		}
 
 		template<typename T>
 		Any(T&& value)
-			: m_TypeIndex(typeid(T))
-			, m_Container(new ContainerT<T>(std::forward<T>(value)))
+			: mTypeIndex(typeid(T))
+			, mContainer(new ContainerT<T>(std::forward<T>(value)))
 		{
 		}
 
 		~Any()
 		{
-			delete m_Container;
+			delete mContainer;
 		}
 
 	private:
 		Container* clone() const
 		{
-			if (m_Container != nullptr)
+			if (mContainer != nullptr)
 			{
-				return m_Container->clone();
+				return mContainer->clone();
 			}
 
 			return nullptr;
 		}
 
 	public:
-		bool empty() { return m_Container == nullptr; }
+		bool empty() { return mContainer == nullptr; }
 
 		template<class U>
 		bool is() const
 		{
-			return m_TypeIndex == std::type_index(typeid(U));
+			return mTypeIndex == std::type_index(typeid(U));
 		}
 
 		template<class U>
@@ -106,44 +106,44 @@ namespace tezcat::Tiny::Utility
 				throw std::bad_cast();
 			}
 
-			return dynamic_cast<ContainerT<U>*>(m_Container)->m_Value;
+			return dynamic_cast<ContainerT<U>*>(mContainer)->m_Value;
 		}
 
 		Any& operator=(const Any& other)
 		{
-			if (m_Container == other.m_Container)
+			if (mContainer == other.mContainer)
 			{
 				return *this;
 			}
 
-			m_Container = m_Container->clone();
-			m_TypeIndex = other.m_TypeIndex;
+			mContainer = mContainer->clone();
+			mTypeIndex = other.mTypeIndex;
 			return *this;
 		}
 
 		Any& operator=(Any&& other) noexcept
 		{
-			if (m_Container == other.m_Container)
+			if (mContainer == other.mContainer)
 			{
 				return *this;
 			}
 
-			delete m_Container;
+			delete mContainer;
 
-			m_Container = other.m_Container;
-			m_TypeIndex = other.m_TypeIndex;
+			mContainer = other.mContainer;
+			mTypeIndex = other.mTypeIndex;
 
-			other.m_Container = nullptr;
+			other.mContainer = nullptr;
 			return *this;
 		}
 
 		template <class T>
 		Any& operator=(const T& value)
 		{
-			delete m_Container;
+			delete mContainer;
 
-			m_Container = new ContainerT<T>(value);
-			m_TypeIndex = std::type_index(typeid(T));
+			mContainer = new ContainerT<T>(value);
+			mTypeIndex = std::type_index(typeid(T));
 
 			return *this;
 		}
@@ -151,16 +151,16 @@ namespace tezcat::Tiny::Utility
 		template <class T>
 		Any& operator=(T&& value)
 		{
-			delete m_Container;
+			delete mContainer;
 
-			m_Container = new ContainerT<T>(std::forward<T>(value));
-			m_TypeIndex = std::type_index(typeid(T));
+			mContainer = new ContainerT<T>(std::forward<T>(value));
+			mTypeIndex = std::type_index(typeid(T));
 
 			return *this;
 		}
 
 	private:
-		std::type_index m_TypeIndex;
-		Container* m_Container;
+		std::type_index mTypeIndex;
+		Container* mContainer;
 	};
 }

@@ -25,6 +25,7 @@ namespace tezcat::Tiny::GL
 		void updateViewport(ViewportInfo& info) override;
 
 		void clear() override;
+		void draw(IRenderObject* renderObject) override;
 		void draw(MeshRenderer* renderer) override;
 		void draw(VertexGroup* group, DrawModeWrapper drawMode) override;
 

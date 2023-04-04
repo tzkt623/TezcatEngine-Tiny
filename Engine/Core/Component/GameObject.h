@@ -39,7 +39,7 @@ namespace tezcat::Tiny::Core
 		Transform* getTransform()
 		{
 			return mTransform;
-//			return (Transform*)mComponentList[0];
+//			return static_cast<Transform*>(mComponentList[0]);
 		}
 
 		template<class Com>
@@ -124,6 +124,8 @@ namespace tezcat::Tiny::Core
 				(*it)->onComponentRemoved(com);
 			}
 		}
+
+		void swapTransform(Transform* transform);
 
 	public:
 		template<typename T>

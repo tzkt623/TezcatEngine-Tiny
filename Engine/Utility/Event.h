@@ -26,7 +26,7 @@ namespace tezcat::Tiny::Utility
 		Event() { }
 		~Event()
 		{
-			for (auto d : m_List)
+			for (auto d : mList)
 			{
 				delete d;
 			}
@@ -35,19 +35,19 @@ namespace tezcat::Tiny::Utility
 	public:
 		void addListener(void* master, const std::function<void(Args...)>& function)
 		{
-			m_List.push_back(new Data{ master, std::move(function) });
+			mList.push_back(new Data{ master, std::move(function) });
 		}
 
 		bool removeListener(void* master)
 		{
-			auto result = std::find(m_List.begin(), m_List.end(),
+			auto result = std::find(mList.begin(), mList.end(),
 				[master](Data* data)
 				{
 					return data->master == master;
 				});
-			if (result != m_List.end())
+			if (result != mList.end())
 			{
-				m_List.erase(result);
+				mList.erase(result);
 				return true;
 			}
 
@@ -56,13 +56,13 @@ namespace tezcat::Tiny::Utility
 
 		void dispatch(Args... args)
 		{
-			for (auto d : m_List)
+			for (auto d : mList)
 			{
 				d->callback(args...);
 			}
 		}
 
 	private:
-		std::vector<Data*> m_List;
+		std::vector<Data*> mList;
 	};
 }

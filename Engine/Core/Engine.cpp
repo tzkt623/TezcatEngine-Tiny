@@ -20,27 +20,27 @@ namespace tezcat::Tiny::Core
 	float Engine::sDeltaTime = 0;
 
 	Engine::Engine()
-		: m_ResourceLoader(nullptr)
-		, m_LightManager(new LightManager())
-		, m_ShaderManager(new ShaderManager())
-		, m_SceneManager(new SceneManager())
-		, m_CameraManager(new CameraManager())
-		, m_InputSystem(new InputSystem())
+		: mResourceLoader(nullptr)
+		, mLightManager(new LightManager())
+		, mShaderManager(new ShaderManager())
+		, mSceneManager(new SceneManager())
+		, mCameraManager(new CameraManager())
+		, mInputSystem(new InputSystem())
 		, mGraphics(nullptr)
-		, m_IsRunning(true)
+		, mIsRunning(true)
 	{
 		new VertexGroupManager();
 	}
 
 	Engine::~Engine()
 	{
-		delete m_InputSystem;
+		delete mInputSystem;
 		delete mGraphics;
-		delete m_SceneManager;
-		delete m_ShaderManager;
-		delete m_CameraManager;
-		delete m_ResourceLoader;
-		delete m_LightManager;
+		delete mSceneManager;
+		delete mShaderManager;
+		delete mCameraManager;
+		delete mResourceLoader;
+		delete mLightManager;
 	}
 
 	bool Engine::init(ResourceLoader* loader)
@@ -65,12 +65,12 @@ namespace tezcat::Tiny::Core
 
 	bool Engine::preInit(ResourceLoader* loader)
 	{
-		m_ResourceLoader = loader;
-		ShaderParam::initAllParam(std::bind(&ResourceLoader::initYourShaderParam, m_ResourceLoader));
-		m_ResourceLoader->prepareEngine(this);
+		mResourceLoader = loader;
+		ShaderParam::initAllParam(std::bind(&ResourceLoader::initYourShaderParam, mResourceLoader));
+		mResourceLoader->prepareEngine(this);
 
-		ScreenWidth = m_ResourceLoader->getWindowWidth();
-		ScreenHeight = m_ResourceLoader->getWindowHeight();
+		ScreenWidth = mResourceLoader->getWindowWidth();
+		ScreenHeight = mResourceLoader->getWindowHeight();
 
 		LayerMask::init();
 		return true;
@@ -82,15 +82,14 @@ namespace tezcat::Tiny::Core
 		Graphics::attach(mGraphics);
 		mGraphics->init(this);
 
-		m_ResourceLoader->prepareResource(this);
-		PipelineManager::loadAllShaderToRenderer(mGraphics);
+		mResourceLoader->prepareResource(this);
 		return true;
 	}
 
 	bool Engine::postInit(ResourceLoader* loader)
 	{
-		m_SceneManager->init();
-		m_ResourceLoader->prepareScene(this);
+		mSceneManager->init();
+		mResourceLoader->prepareScene(this);
 		return true;
 	}
 	void Engine::beforeLoop()
@@ -107,7 +106,7 @@ namespace tezcat::Tiny::Core
 	{
 		this->beforeLoop();
 
-		while (m_IsRunning)
+		while (mIsRunning)
 		{
 			this->preUpdate();
 			this->onUpdate();
@@ -124,8 +123,8 @@ namespace tezcat::Tiny::Core
 
 	void Engine::onUpdate()
 	{
-		m_InputSystem->update();
-		m_SceneManager->update();
+		mInputSystem->update();
+		mSceneManager->update();
 		mGraphics->render();
 		mGraphics->swapBuffer();
 	}
@@ -137,6 +136,6 @@ namespace tezcat::Tiny::Core
 
 	void Engine::stop()
 	{
-		m_IsRunning = false;
+		mIsRunning = false;
 	}
 }

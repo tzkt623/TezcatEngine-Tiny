@@ -9,7 +9,7 @@ namespace tezcat::Tiny::Utility
 		void set() {}
 
 	private:
-		unsigned char m_Data[size];
+		unsigned char mData[size];
 	};
 }
 

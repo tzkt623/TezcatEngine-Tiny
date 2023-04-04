@@ -155,6 +155,7 @@
     <ClCompile Include="Core\Layer\LightLayer.cpp" />
     <ClCompile Include="Core\Tool\AABB.cpp" />
     <ClCompile Include="Core\Tool\FrustumCulling.cpp" />
+    <ClCompile Include="Core\Component\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1280,6 +1281,7 @@
     <ClInclude Include="Core\Renderer\RenderObjectTag.h" />
     <ClInclude Include="Core\Base\TinySmartPointer.h" />
     <ClInclude Include="Core\Base\BaseObject.h" />
+    <ClInclude Include="Core\Component\Skybox.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

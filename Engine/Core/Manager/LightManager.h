@@ -33,17 +33,17 @@ namespace tezcat::Tiny::Core
 	public:
 		void setData(LightData* data)
 		{
-			m_Data = data;
+			mData = data;
 		}
 
-		DirectionalLight* getDirectionalLight() const { return m_Data->directionalLight; }
-		void setDirectionalLight(DirectionalLight* val) { m_Data->directionalLight = val; }
+		DirectionalLight* getDirectionalLight() const { return mData->directionalLight; }
+		void setDirectionalLight(DirectionalLight* val) { mData->directionalLight = val; }
 
 		void addPointLight(PointLight* light);
-		std::vector<PointLight*>& getPointLights() { return m_Data->pointLights; }
+		std::vector<PointLight*>& getPointLights() { return mData->pointLights; }
 
 	private:
-		LightData* m_Data;
+		LightData* mData;
 	};
 
 	using LightMgr = SG<LightManager>;

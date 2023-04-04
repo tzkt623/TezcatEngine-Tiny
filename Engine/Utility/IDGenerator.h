@@ -32,15 +32,15 @@ namespace tezcat::Tiny::Utility
 
 		static uint32_t generate()
 		{
-			return m_ID++;
+			return mID++;
 		}
 
 	private:
-		static uint32_t m_ID;
+		static uint32_t mID;
 	};
 
 	template<class T>
-	unsigned int IDGenerator<T, uint32_t>::m_ID = 0;
+	unsigned int IDGenerator<T, uint32_t>::mID = 0;
 
 
 	template<class T>
@@ -52,13 +52,13 @@ namespace tezcat::Tiny::Utility
 
 		static int generate()
 		{
-			return m_ID++;
+			return mID++;
 		}
 
 	private:
-		static int m_ID;
+		static int mID;
 	};
 
 	template<class T>
-	int IDGenerator<T, int>::m_ID = 0;
+	int IDGenerator<T, int>::mID = 0;
 }

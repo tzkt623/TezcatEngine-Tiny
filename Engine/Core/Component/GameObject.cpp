@@ -22,6 +22,7 @@ namespace tezcat::Tiny::Core
 		, mNeedDelete(false)
 		, mLayerMaskIndex(0)
 		, mUID(-1)
+		, mTransform(nullptr)
 	{
 		if (sUIDPool.empty())
 		{
@@ -82,6 +83,16 @@ namespace tezcat::Tiny::Core
 		mScene = nullptr;
 	}
 
+
+	void GameObject::swapTransform(Transform* transform)
+	{
+		if (!mComponentList.empty())
+		{
+			auto temp = mComponentList[0];
+			mComponentList[0] = transform;
+			mComponentList[mComponentList.size() - 1] = temp;
+		}
+	}
 
 	void GameObject::destory(GameObject* go)
 	{

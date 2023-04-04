@@ -25,14 +25,14 @@ namespace tezcat::Tiny::Core
 		virtual bool cullGameObject(GameObject* gameObject) = 0;
 	};
 
-	class TINY_API Light : public ComponentT<Light>, public ILight
-	{
-	public:
-		Light() = default;
-		virtual ~Light() = default;
-	};
+// 	class TINY_API Light : public ComponentT<Light>, public ILight
+// 	{
+// 	public:
+// 		Light() = default;
+// 		virtual ~Light() = default;
+// 	};
 
-	class TINY_API DirectionalLight : public Light
+	class TINY_API DirectionalLight : public ComponentT<DirectionalLight>, public ILight
 	{
 	public:
 		DirectionalLight();
@@ -68,7 +68,7 @@ namespace tezcat::Tiny::Core
 	};
 
 
-	class TINY_API PointLight : public Light
+	class TINY_API PointLight : public ComponentT<PointLight>, public ILight
 	{
 	public:
 		PointLight();
@@ -122,7 +122,7 @@ namespace tezcat::Tiny::Core
 		glm::vec3 m_Config;
 	};
 
-	class TINY_API SpotLight : public Light
+	class TINY_API SpotLight : public ComponentT<SpotLight>, public ILight
 	{
 	public:
 		SpotLight();

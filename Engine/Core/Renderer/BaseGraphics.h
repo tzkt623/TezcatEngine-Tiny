@@ -10,6 +10,8 @@ namespace tezcat::Tiny::Core
 	class MeshRenderer;
 	class Engine;
 	class RenderLayer;
+	class IRenderObject;
+
 	struct ViewportInfo;
 	class TINY_API BaseGraphics
 	{
@@ -31,6 +33,7 @@ namespace tezcat::Tiny::Core
 		virtual void updateViewport(ViewportInfo& info) = 0;
 
 	public:
+		virtual void draw(IRenderObject* renderObject) = 0;
 		virtual void draw(MeshRenderer* renderer) = 0;
 		virtual void draw(VertexGroup* group, DrawModeWrapper drawMode) = 0;
 	};

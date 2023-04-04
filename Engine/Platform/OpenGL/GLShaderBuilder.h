@@ -45,7 +45,7 @@ namespace tezcat::Tiny::GL
 		ShaderPackage* parsePackageHead(std::string& content);
 
 	private:
-		std::vector<uint32_t> m_ShaderIDs;
+		std::vector<uint32_t> mShaderIDs;
 	};
 
 

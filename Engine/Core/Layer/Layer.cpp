@@ -20,7 +20,7 @@ namespace tezcat::Tiny::Core
 
 	}
 
-	void Layer::addRenderObejct(IRenderObejct* renderObject)
+	void Layer::addRenderObejct(IRenderObject* renderObject)
 	{
 		m_RenderObejctList.emplace_back(renderObject);
 	}

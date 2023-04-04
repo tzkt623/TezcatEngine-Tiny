@@ -10,7 +10,8 @@ namespace tezcat::Tiny::Core
 	class Camera;
 	class MeshRenderer;
 	class ILight;
-	class IRenderObejct;
+	class IRenderObject;
+
 
 	/// <summary>
 	/// 
@@ -23,7 +24,7 @@ namespace tezcat::Tiny::Core
 		RenderPass(Shader* shader, ILight* light, DrawMode drawMode);
 		~RenderPass();
 
-		void addRenderObject(MeshRenderer* meshRenderer);
+		void addRenderObject(IRenderObject* renderObject);
 
 		inline bool isAttached() { return mInPipeline; }
 		inline void attach() { mInPipeline = true; }
@@ -46,9 +47,7 @@ namespace tezcat::Tiny::Core
 		Shader* mShader;
 		ILight* mLight;
 
-		DrawModeWrapper mDrawMode;
-
-		std::vector<IRenderObejct*> mRenderObjects;
+		std::vector<IRenderObject*> mRenderObjects;
 		std::unordered_map<uint32_t, PassVertexGroup*> mVAOWithID;
 	};
 }

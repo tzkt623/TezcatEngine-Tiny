@@ -15,35 +15,46 @@ namespace tezcat::Tiny::Core
 
 		virtual TextureType getTextureType() const = 0;
 		virtual void createTexture(Image* image) = 0;
-		void createTexture(const char* filePath);
+		virtual void createTexture(const std::string& filePath);
 
-		inline uint32_t getTextureID() const { return mTextureID; }
+		uint32_t getTextureID() const { return mTextureID; }
 
-		inline TexWrapWrapper& getWrap() { return m_Wrap; }
+		TexWrapWrapper& getWrap() { return mWrap; }
 		void setWrap(const TextureWrap& val)
 		{
-			m_Wrap = ContextMap::TextureWrapArray[(int)val];
+			mWrap = ContextMap::TextureWrapArray[(int)val];
 		}
 
-		inline TexFilterWrapper& getFilter() { return m_Filter; }
+		TexFilterWrapper& getFilter() { return mFilter; }
 		void setFilter(const TextureFilter& val)
 		{
-			m_Filter = ContextMap::TextureFilterArray[(int)val];
+			mFilter = ContextMap::TextureFilterArray[(int)val];
 		}
 
 	protected:
 		uint32_t mTextureID;
-		TexWrapWrapper m_Wrap;
-		TexFilterWrapper m_Filter;
+		TexWrapWrapper mWrap;
+		TexFilterWrapper mFilter;
 	};
 
 	class TINY_API Texture2D : public Texture
 	{
+	public:
 		TextureType getTextureType() const final { return TextureType::Texture2D; }
 	};
 
 	class TINY_API Texture3D : public Texture
 	{
+	public:
 		TextureType getTextureType() const final { return TextureType::Texture3D; }
+	};
+
+	class TINY_API TextureCube : public Texture
+	{
+	public:
+		TextureType getTextureType() const final { return TextureType::TextureCube; }
+
+	private:
+		void createTexture(Image* image) final {}
 	};
 }

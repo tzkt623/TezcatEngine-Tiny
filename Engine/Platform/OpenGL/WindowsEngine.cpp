@@ -55,7 +55,7 @@ namespace tezcat::Tiny::GL
 
 	bool WindowsEngine::postInit(ResourceLoader* loader)
 	{
-		m_InputSystem->setWindow(mWindow);
+		mInputSystem->setWindow(mWindow);
 		return Engine::postInit(loader);
 	}
 
@@ -90,7 +90,7 @@ namespace tezcat::Tiny::GL
 	void WindowsEngine::postUpdate()
 	{
 		GameObject::clearDeletedGameObjects();
-		m_IsRunning = !glfwWindowShouldClose(mWindow);
+		mIsRunning = !glfwWindowShouldClose(mWindow);
 	}
 
 	void WindowsEngine::endLoop()

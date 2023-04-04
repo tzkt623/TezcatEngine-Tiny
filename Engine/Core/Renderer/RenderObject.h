@@ -1,6 +1,7 @@
 #pragma once
 #include "../Component/Component.h"
 #include "../Head/ConfigHead.h"
+#include "../Head/Context.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -8,7 +9,9 @@ namespace tezcat::Tiny::Core
 	{
 		MeshRenderer,
 		Texture,
-		RenderTexture
+		RenderTexture,
+		Skybox,
+		Light
 	};
 
 	enum class TINY_API RenderViewerType
@@ -23,10 +26,10 @@ namespace tezcat::Tiny::Core
 	/// <summary>
 	/// 可渲染的目标
 	/// </summary>
-	class TINY_API IRenderObejct
+	class TINY_API IRenderObject
 	{
 	public:
-		virtual ~IRenderObejct() = default;
+		virtual ~IRenderObject() = default;
 		virtual RenderObjectType getRenderObjectType() = 0;
 		virtual Material* getMaterial() const = 0;
 
@@ -38,13 +41,29 @@ namespace tezcat::Tiny::Core
 		/// 发送数据到shader
 		/// </summary>
 		virtual void submit(Shader* shader) = 0;
+
+		/// <summary>
+		/// 绘制方式
+		/// 索引or顶点
+		/// </summary>
+		virtual DrawModeWrapper& getDrawMode() = 0;
+
+		/// <summary>
+		/// 顶点数量
+		/// </summary>
+		virtual int getVertexCount() const { return 0; }
+
+		/// <summary>
+		/// 索引数量
+		/// </summary>
+		virtual int getIndexCount() const { return 0; }
 	};
 
-	class TINY_API RenderObejct : public ComponentT<RenderObejct>, public IRenderObejct
-	{
-	public:
-		virtual ~RenderObejct() = default;
-	};
+	// 	class TINY_API RenderObejct : public ComponentT<RenderObejct>, public IRenderObejct
+	// 	{
+	// 	public:
+	// 		virtual ~RenderObejct() = default;
+	// 	};
 
 	class TINY_API IRenderViewer
 	{

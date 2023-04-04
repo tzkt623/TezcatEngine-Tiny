@@ -7,7 +7,7 @@ namespace tezcat::Tiny::Core
 {
 	class Camera;
 	class PointLight;
-	class IRenderObejct;
+	class IRenderObject;
 	class LightLayer;
 	class ILight;
 	class TINY_API RenderLayer
@@ -16,13 +16,13 @@ namespace tezcat::Tiny::Core
 		RenderLayer();
 		~RenderLayer();
 	public:
-		void addRenderObejct(IRenderObejct* gameObject);
+		void addRenderObejct(IRenderObject* gameObject);
 		void testWithCamera(Camera* camera);
 		void testVisibleObjects(ILight* light);
 
 	private:
 		int mIndex;
-		std::list<IRenderObejct*> mRenderObjectList;
-		std::list<IRenderObejct*> mVisibleRenderObjectList;
+		std::list<IRenderObject*> mRenderObjectList;
+		std::list<IRenderObject*> mVisibleRenderObjectList;
 	};
 }

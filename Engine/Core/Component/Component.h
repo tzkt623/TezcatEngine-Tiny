@@ -51,11 +51,11 @@ namespace tezcat::Tiny::Core
 		}
 
 	protected:
-		//构造函数执行
-		virtual void onAwake() {}
-
 		//进入场景时执行
-		virtual void onStart() {}
+		virtual void onStart()
+		{
+
+		}
 
 		//加入GameObject/手动启用时执行
 		virtual void onEnable()

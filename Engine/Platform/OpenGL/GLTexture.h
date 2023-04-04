@@ -16,13 +16,26 @@ namespace tezcat::Tiny::GL
 		void createTexture(Image* image) override;
 	};
 
+	class GLTextureCube : public TextureCube
+	{
+	public:
+		GLTextureCube();
+		~GLTextureCube();
+
+		void createTexture(const std::string& filePath) override;
+
+	private:
+
+	};
+
+
+
 	class TINY_API GLTextureCreator : public TextureCreator
 	{
 	public:
 		GLTextureCreator() {}
 		~GLTextureCreator() {}
 
-		Texture* create(const char* filePath, const TextureType& textureType) override;
-
+		Texture* create(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter, const TextureWrap& wrap) override;
 	};
 }

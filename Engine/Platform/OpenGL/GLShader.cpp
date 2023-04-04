@@ -261,9 +261,14 @@ namespace tezcat::Tiny::GL
 		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
 	}
 
+	void GLShader::setTextureCube(UniformID& uniform, TextureCube* data)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
+	}
+
 	void GLShader::resetState()
 	{
 		mTexureCountor = 0;
 	}
-
 }

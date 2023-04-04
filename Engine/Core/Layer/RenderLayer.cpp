@@ -24,7 +24,7 @@ namespace tezcat::Tiny::Core
 		mRenderObjectList.clear();
 	}
 
-	void RenderLayer::addRenderObejct(IRenderObejct* renderObject)
+	void RenderLayer::addRenderObejct(IRenderObject* renderObject)
 	{
 		mRenderObjectList.emplace_back(renderObject);
 	}
@@ -41,12 +41,12 @@ namespace tezcat::Tiny::Core
 		auto end = mRenderObjectList.end();
 		while (it != end)
 		{
-			auto com = static_cast<RenderObejct*>(*it);
+			auto com = (Component*)(*it);
 			if (com->isEnable())
 			{
 				if (camera->frustumCulling(com->getGameObject()))
 				{
-					com->sendToRenderPass();
+					(*it)->sendToRenderPass();
 				}
 			}
 			it++;

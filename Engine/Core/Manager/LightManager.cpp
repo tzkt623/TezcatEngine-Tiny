@@ -28,7 +28,7 @@ namespace tezcat::Tiny::Core
 
 	//------------------------------------------------------------
 	LightManager::LightManager()
-		: m_Data(nullptr)
+		: mData(nullptr)
 	{
 		LightMgr::attach(this);
 	}
@@ -40,7 +40,7 @@ namespace tezcat::Tiny::Core
 
 	void LightManager::addPointLight(PointLight* light)
 	{
-		m_Data->pointLights.push_back(light);
+		mData->pointLights.push_back(light);
 	}
 
 }

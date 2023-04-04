@@ -9,6 +9,9 @@ namespace tezcat::Tiny::Core
 	class MeshData;
 	class VertexBuffer;
 
+	/// <summary>
+	/// 对应gl的VAO
+	/// </summary>
 	class TINY_API VertexGroup
 	{
 	public:

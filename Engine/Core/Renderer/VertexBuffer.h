@@ -7,6 +7,9 @@
 namespace tezcat::Tiny::Core
 {
 	class MeshData;
+	/// <summary>
+	/// 对应gl的VBO
+	/// </summary>
 	class TINY_API VertexBuffer
 	{
 	public:

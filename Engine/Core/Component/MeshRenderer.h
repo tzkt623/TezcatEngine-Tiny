@@ -9,7 +9,7 @@ namespace tezcat::Tiny::Core
 	class Shader;
 	class Material;
 	class MeshData;
-	class TINY_API MeshRenderer : public RenderObejct
+	class TINY_API MeshRenderer : public ComponentT<MeshRenderer>, public IRenderObject
 	{
 	public:
 		MeshRenderer();
@@ -35,21 +35,19 @@ namespace tezcat::Tiny::Core
 		void onDisable() override;
 		void onStart() override;
 
-		int getVertexCount() const;
-		int getIndexCount() const;
+		int getVertexCount() const final;
+		int getIndexCount() const final;
+		DrawModeWrapper& getDrawMode() final { return mDrawMode; }
+		void setDrawMode(DrawMode val) { mDrawMode = ContextMap::DrawModeArray[(int)val]; }
 
-		inline DrawModeWrapper& getDrawMode() { return m_DrawMode; }
-		void setDrawMode(DrawMode val) { m_DrawMode = ContextMap::DrawModeArray[(int)val]; }
+		bool hasIndex() const { return mHasIndex; }
 
-		inline bool hasIndex() const { return mHasIndex; }
-
-		bool extraLight();
 
 	private:
 		void addMaterialConfig();
 
 	private:
-		DrawModeWrapper m_DrawMode;
+		DrawModeWrapper mDrawMode;
 
 		bool mHasIndex;
 		VertexGroup* mVertexGroup;

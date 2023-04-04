@@ -1,12 +1,14 @@
 #pragma once
 
 #include "../Head/GLMHead.h"
+#include "../Head/Context.h"
 #include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
 	class Texture;
 	class Texture2D;
+	class TextureCube;
 	class Shader;
 	class Transform;
 
@@ -135,9 +137,18 @@ namespace tezcat::Tiny::Core
 	struct TINY_API UniformTex2D : public UniformT<Texture2D*>
 	{
 		using UniformT<Texture2D*>::UniformT;
-		UniformTex2D(const UniformID& id, const char* filePath);
+		UniformTex2D(const UniformID& id, const std::string& filePath, const TextureFilter& filter = TextureFilter::Tex_LINEAR, const TextureWrap& wrap = TextureWrap::Tex_REPEAT);
 
 		inline UniformType getType() final { return UniformType::Tex2D; }
+		void submit(Transform* transform, Shader* shader) override;
+	};
+
+	struct TINY_API UniformTexCube : public UniformT<TextureCube*>
+	{
+		using UniformT<TextureCube*>::UniformT;
+		UniformTexCube(const UniformID& id, const std::string& filePath, const TextureFilter& filter = TextureFilter::Tex_LINEAR, const TextureWrap& wrap = TextureWrap::Tex_CLAMP_TO_EDGE);
+
+		inline UniformType getType() final { return UniformType::TexCube; }
 		void submit(Transform* transform, Shader* shader) override;
 	};
 

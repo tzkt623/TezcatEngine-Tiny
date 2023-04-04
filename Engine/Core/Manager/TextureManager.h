@@ -15,7 +15,7 @@ namespace tezcat::Tiny::Core
 		TextureCreator() {}
 		virtual ~TextureCreator() {}
 
-		virtual Texture* create(const char* filePath, const TextureType& textureType) = 0;
+		virtual Texture* create(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter, const TextureWrap& wrap) = 0;
 	};
 
 	class TINY_API TextureManager
@@ -27,11 +27,11 @@ namespace tezcat::Tiny::Core
 
 		void setCreator(TextureCreator* creator);
 
-		Texture* tryGetTexture(const char* filePath, const TextureType& textureType);
+		Texture* tryGetTexture(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter = TextureFilter::Tex_LINEAR, const TextureWrap& wrap = TextureWrap::Tex_REPEAT);
 
 	private:
-		TextureCreator* m_Creator;
-		std::unordered_map<std::string, Texture*> m_TextureMap;
+		TextureCreator* mCreator;
+		std::unordered_map<std::string, Texture*> mTextureMap;
 	};
 
 	using TextureMgr = SG<TextureManager>;

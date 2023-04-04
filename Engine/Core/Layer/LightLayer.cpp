@@ -41,7 +41,7 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	bool LightLayer::testGameObject(Pipeline* pipeline, IRenderObejct* renderObject)
+	bool LightLayer::testGameObject(Pipeline* pipeline, IRenderObject* renderObject)
 	{
 		if (m_LightList.empty())
 		{

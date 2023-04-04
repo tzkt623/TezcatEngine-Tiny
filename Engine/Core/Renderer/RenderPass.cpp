@@ -29,7 +29,6 @@ namespace tezcat::Tiny::Core
 	RenderPass::RenderPass(Shader* shader, ILight* light, DrawMode drawMode)
 		: mShader(shader)
 		, mLight(light)
-		, mDrawMode(ContextMap::DrawModeArray[(uint32_t)drawMode])
 	{
 
 	}
@@ -39,9 +38,9 @@ namespace tezcat::Tiny::Core
 		mShader = nullptr;
 	}
 
-	void RenderPass::addRenderObject(MeshRenderer* meshRenderer)
+	void RenderPass::addRenderObject(IRenderObject* renderObject)
 	{
-		mRenderObjects.push_back(meshRenderer);
+		mRenderObjects.push_back(renderObject);
 
 		// 		auto vao = meshRenderer->getVertexGroup();
 		// 		auto it = mVAOWithID.find(vao->getUID());

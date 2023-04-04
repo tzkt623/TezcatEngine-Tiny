@@ -4,33 +4,33 @@
 namespace tezcat::Tiny::Core
 {
 	TextureManager::TextureManager()
-		: m_Creator(nullptr)
+		: mCreator(nullptr)
 	{
 
 	}
 
 	TextureManager::TextureManager(TextureCreator* creator)
-		: m_Creator(creator)
+		: mCreator(creator)
 	{
 
 	}
 
 	TextureManager::~TextureManager()
 	{
-		delete m_Creator;
+		delete mCreator;
 	}
 
 	void TextureManager::setCreator(TextureCreator* creator)
 	{
-		m_Creator = creator;
+		mCreator = creator;
 	}
 
-	Texture* TextureManager::tryGetTexture(const char* filePath, const TextureType& textureType)
+	Texture* TextureManager::tryGetTexture(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter, const TextureWrap& wrap)
 	{
-		auto it = m_TextureMap.try_emplace(filePath, nullptr);
+		auto it = mTextureMap.try_emplace(filePath, nullptr);
 		if (it.second)
 		{
-			it.first->second = m_Creator->create(filePath, textureType);
+			it.first->second = mCreator->create(filePath, textureType, filter, wrap);
 		}
 
 		return it.first->second;

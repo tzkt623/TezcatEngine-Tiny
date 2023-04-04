@@ -11,7 +11,6 @@ namespace tezcat::Tiny::Core
 	class LightData;
 	class Transform;
 	class Layer;
-	class IRenderViewer;
 	class RenderLayer;
 	class LightLayer;
 	class TINY_API Scene

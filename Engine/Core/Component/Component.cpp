@@ -11,7 +11,7 @@ namespace tezcat::Tiny::Core
 		: mGameObject(nullptr)
 		, mEnable(true)
 	{
-		this->onAwake();
+
 	}
 
 	Component::~Component()

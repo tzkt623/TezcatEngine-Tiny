@@ -14,12 +14,12 @@ namespace tezcat::Tiny::Utility
 		{
 			auto str = format.c_str();
 			auto size = 1 + std::snprintf(nullptr, 0, str, args...);
-			if (s_StringBuffer.capacity() < size)
+			if (sStringBuffer.capacity() < size)
 			{
-				s_StringBuffer.reserve(size);
+				sStringBuffer.reserve(size);
 			}
-			std::snprintf(s_StringBuffer.data(), size, str, args...);
-			return std::string(s_StringBuffer.data(), size);
+			std::snprintf(sStringBuffer.data(), size, str, args...);
+			return std::string(sStringBuffer.data(), size);
 		}
 
 		template<typename... Args>
@@ -33,7 +33,7 @@ namespace tezcat::Tiny::Utility
 		}
 
 	private:
-		static std::vector<char> s_StringBuffer;
+		static std::vector<char> sStringBuffer;
 	};
 }
 

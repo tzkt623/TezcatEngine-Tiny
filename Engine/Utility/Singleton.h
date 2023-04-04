@@ -22,43 +22,43 @@ namespace tezcat::Tiny::Utility
 		template<typename... Args>
 		static void init(Args&&... args)
 		{
-			if (m_IsAttached)
+			if (mIsAttached)
 			{
 				throw std::logic_error(StringTool::stringFormat("SG<>: This Instance is an AttachedType [%s]",
 					typeid(T).name()));
 			}
 
-			m_Instance = new T(std::forward<Args>(args)...);
+			mInstance = new T(std::forward<Args>(args)...);
 		}
 
 		static void destroy()
 		{
-			if (m_IsAttached)
+			if (mIsAttached)
 			{
 				throw std::logic_error(StringTool::stringFormat("SG<>: This Instance is an AttachedType [%s]",
 					typeid(T).name()));
 			}
 
-			delete m_Instance;
+			delete mInstance;
 		}
 
 		static void attach(T* instance)
 		{
-			if (m_Instance != nullptr)
+			if (mInstance != nullptr)
 			{
 				throw std::logic_error(StringTool::stringFormat("SG<>: Instance must be null [%s]",
 					typeid(T).name()));
 			}
 
-			m_IsAttached = true;
-			m_Instance = instance;
+			mIsAttached = true;
+			mInstance = instance;
 		}
 
 		static void detach()
 		{
-			if (m_IsAttached)
+			if (mIsAttached)
 			{
-				m_Instance = nullptr;
+				mInstance = nullptr;
 			}
 			else
 			{
@@ -69,17 +69,17 @@ namespace tezcat::Tiny::Utility
 
 		static T* getInstance()
 		{
-			return m_Instance;
+			return mInstance;
 		}
 
 	private:
-		static T* m_Instance;
-		static bool m_IsAttached;
+		static T* mInstance;
+		static bool mIsAttached;
 	};
 
 	template<typename T>
-	bool SG<T>::m_IsAttached = false;
+	bool SG<T>::mIsAttached = false;
 
 	template<typename T>
-	T* SG<T>::m_Instance = nullptr;
+	T* SG<T>::mInstance = nullptr;
 }

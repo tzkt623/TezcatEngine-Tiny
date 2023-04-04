@@ -15,6 +15,7 @@
 #include "Core/Shader/ShaderPackage.h"
 #include "Core/Head/Context.h"
 #include "Core/Component/Camera.h"
+#include "Core/Renderer/RenderObject.h"
 
 namespace tezcat::Tiny::GL
 {
@@ -89,6 +90,18 @@ namespace tezcat::Tiny::GL
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClearDepth(1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void GLGraphics::draw(IRenderObject* renderObject)
+	{
+		if (renderObject->getIndexCount() > 0)
+		{
+			glDrawElements(renderObject->getDrawMode().platform, renderObject->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+		}
+		else
+		{
+			glDrawArrays(renderObject->getDrawMode().platform, 0, renderObject->getVertexCount());
+		}
 	}
 
 	void GLGraphics::draw(MeshRenderer* renderer)

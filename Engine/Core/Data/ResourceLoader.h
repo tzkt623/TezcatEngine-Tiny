@@ -28,7 +28,6 @@ namespace tezcat::Tiny::Core
 		/// 执行顺序3
 		/// </summary>
 		virtual void prepareScene(Engine* engine);
-
 		virtual void initYourShaderParam() {}
 
 	public:
@@ -40,6 +39,9 @@ namespace tezcat::Tiny::Core
 			static std::string name(mGameName.begin(), mGameName.end());
 			return name;
 		}
+
+	private:
+		void createSomeMode();
 
 	protected:
 		int mWindowWidth;

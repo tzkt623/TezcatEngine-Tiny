@@ -36,19 +36,19 @@ namespace tezcat::Tiny::Core
 
 		virtual BaseGraphics* createGraphics() = 0;
 	protected:
-		ShaderManager* m_ShaderManager;
-		LightManager* m_LightManager;
-		SceneManager* m_SceneManager;
-		CameraManager* m_CameraManager;
-		InputSystem* m_InputSystem;
-		ResourceLoader* m_ResourceLoader;
+		ShaderManager* mShaderManager;
+		LightManager* mLightManager;
+		SceneManager* mSceneManager;
+		CameraManager* mCameraManager;
+		InputSystem* mInputSystem;
+		ResourceLoader* mResourceLoader;
 
 	private:
 		BaseGraphics* mGraphics;
 
 
 	protected:
-		bool m_IsRunning;
+		bool mIsRunning;
 
 	public:
 		inline static int getScreenWidth() { return ScreenWidth; }

@@ -31,6 +31,7 @@ namespace tezcat::Tiny::Core
 
 		static UniformID VertexColor;
 		static UniformID TexColor;
+		static UniformID TexCube;
 
 		static UniformID LightPosition;
 		static UniformID LightColor;

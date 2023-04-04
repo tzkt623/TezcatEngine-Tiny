@@ -128,26 +128,26 @@ namespace tezcat::Tiny::Core
 
 		void setFloat2(float x, float y)
 		{
-			m_Data[0] = x;
-			m_Data[1] = y;
+			mData[0] = x;
+			mData[1] = y;
 		}
 
 		void setFloat2(float* v)
 		{
-			m_Data[0] = v[0];
-			m_Data[1] = v[1];
+			mData[0] = v[0];
+			mData[1] = v[1];
 		}
 
 		float* getFloat2()
 		{
-			return m_Data;
+			return mData;
 		}
 
 	protected:
 		void onRender() override;
 
 	private:
-		float m_Data[2];
+		float mData[2];
 	};
 
 	class TINY_API GUIDragFloat3 : public GUIDragFloat
@@ -158,28 +158,28 @@ namespace tezcat::Tiny::Core
 
 		void setFloat3(float x, float y, float z)
 		{
-			m_Data[0] = x;
-			m_Data[1] = y;
-			m_Data[2] = z;
+			mData[0] = x;
+			mData[1] = y;
+			mData[2] = z;
 		}
 
 		void setFloat3(float* v)
 		{
-			m_Data[0] = v[0];
-			m_Data[1] = v[1];
-			m_Data[2] = v[2];
+			mData[0] = v[0];
+			mData[1] = v[1];
+			mData[2] = v[2];
 		}
 
 		float* getFloat3()
 		{
-			return m_Data;
+			return mData;
 		}
 
 	protected:
 		void onRender() override;
 
 	private:
-		float m_Data[3];
+		float mData[3];
 	};
 
 	class TINY_API GUIText : public GUIWidget
@@ -190,18 +190,18 @@ namespace tezcat::Tiny::Core
 
 		void setData(const char* data)
 		{
-			m_Data = data;
+			mData = data;
 		}
 
 		void setData(std::string&& data)
 		{
-			m_Data = std::move(data);
+			mData = std::move(data);
 		}
 
 		void onRender() override;
 		void onUpdate() override {}
 
 	private:
-		std::string m_Data;
+		std::string mData;
 	};
 }

@@ -130,7 +130,7 @@ namespace tezcat::Tiny::Core
 	//
 	GUIDragFloat2::GUIDragFloat2(const std::u8string& name) :
 		GUIDragFloat(name),
-		m_Data()
+		mData()
 	{
 
 	}
@@ -141,14 +141,14 @@ namespace tezcat::Tiny::Core
 
 	void GUIDragFloat2::onRender()
 	{
-		ImGui::DragFloat2(this->getName(), m_Data, m_Speed, m_Min, m_Max);
-		postFunction(m_Data);
+		ImGui::DragFloat2(this->getName(), mData, m_Speed, m_Min, m_Max);
+		postFunction(mData);
 	}
 
 	//
 	GUIDragFloat3::GUIDragFloat3(const std::u8string& name) :
 		GUIDragFloat(name),
-		m_Data()
+		mData()
 	{
 
 	}
@@ -159,8 +159,8 @@ namespace tezcat::Tiny::Core
 
 	void GUIDragFloat3::onRender()
 	{
-		ImGui::DragFloat3(this->getName(), m_Data, m_Speed, m_Min, m_Max);
-		postFunction(m_Data);
+		ImGui::DragFloat3(this->getName(), mData, m_Speed, m_Min, m_Max);
+		postFunction(mData);
 	}
 
 
@@ -180,6 +180,6 @@ namespace tezcat::Tiny::Core
 
 	void GUIText::onRender()
 	{
-		ImGui::Text(m_Data.c_str());
+		ImGui::Text(mData.c_str());
 	}
 }

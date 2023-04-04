@@ -31,7 +31,7 @@ namespace tezcat::Tiny::Core
 
 	MeshRenderer::MeshRenderer(VertexGroup* vg)
 		: mVertexGroup(vg)
-		, m_DrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
+		, mDrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
 		, mMainMaterial(nullptr)
 		, mHasIndex(false)
 	{
@@ -86,7 +86,7 @@ namespace tezcat::Tiny::Core
 
 	int MeshRenderer::getVertexCount() const
 	{
-		return  mVertexGroup->getVertexCount();
+		return mVertexGroup->getVertexCount();
 	}
 
 	int MeshRenderer::getIndexCount() const

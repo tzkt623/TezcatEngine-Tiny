@@ -1,7 +1,6 @@
 #include "GLVertexBuffer.h"
 #include "GLHead.h"
 #include "Core/Data/MeshData.h"
-#include "Core/Manager/VertexGroupManager.h"
 
 namespace tezcat::Tiny::GL
 {
@@ -96,8 +95,6 @@ namespace tezcat::Tiny::GL
 		mName = meshData->getName();
 		mVertexCount = static_cast<int>(meshData->vertices.size());
 		mIndexCount = static_cast<int>(meshData->indices.size());
-
-		VertexGroupMgr::getInstance()->addVertexGroup(this);
 	}
 
 	void GLVertexGroup::bind()

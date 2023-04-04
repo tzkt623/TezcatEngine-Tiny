@@ -51,6 +51,7 @@ namespace tezcat::Tiny::GL
 		void setMat3(UniformID& uniform, float* data) override;
 		void setMat4(UniformID& uniform, float* data) override;
 		void setTexture2D(UniformID& uniform, Texture2D* data) override;
+		void setTextureCube(UniformID& uniform, TextureCube* data) override;
 
 	protected:
 		void onApply(const UniformID::USet& uniforms) override;

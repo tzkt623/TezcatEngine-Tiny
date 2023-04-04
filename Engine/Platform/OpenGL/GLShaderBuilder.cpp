@@ -82,17 +82,17 @@ namespace tezcat::Tiny::GL
 	//
 	GLShaderBuilder::GLShaderBuilder()
 	{
-		m_ShaderIDs.reserve(4);
+		mShaderIDs.reserve(4);
 	}
 
 	GLShaderBuilder::~GLShaderBuilder()
 	{
-		for (auto id : m_ShaderIDs)
+		for (auto id : mShaderIDs)
 		{
 			std::cout << "ShaderBuilder : " << id << "Deleted" << std::endl;
 			glDeleteShader(id);
 		}
-		m_ShaderIDs.clear();
+		mShaderIDs.clear();
 	}
 
 	GLShader* GLShaderBuilder::loadFromFile(const char* filePath)
@@ -402,7 +402,7 @@ namespace tezcat::Tiny::GL
 			}
 		}
 
-		m_ShaderIDs.push_back(shader_id);
+		mShaderIDs.push_back(shader_id);
 		shader->attachShader(shader_id);
 	}
 

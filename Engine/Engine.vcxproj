@@ -212,6 +212,7 @@
     <ClCompile Include="Core\Layer\RenderLayer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
     <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
+    <ClCompile Include="Core\Component\Skybox.cpp" />
     <ClCompile Include="Utility\ProfilerTimer.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="Core\Layer\RenderLayer.h" />
     <ClInclude Include="Platform\OpenGL\GLShader.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
+    <ClInclude Include="Core\Component\Skybox.h" />
     <ClInclude Include="Utility\Any.h" />
     <ClInclude Include="Utility\Event.h" />
     <ClInclude Include="Utility\IDGenerator.h" />

@@ -12,7 +12,7 @@ namespace tezcat::Tiny::Core
 	class Camera;
 	class RenderLayer;
 	class LightLayer;
-	class IRenderObejct;
+	class IRenderObject;
 	class ILight;
 	class TINY_API PipelineManager
 	{
@@ -24,7 +24,7 @@ namespace tezcat::Tiny::Core
 
 		static RenderLayer* getRenderLayer(uint32_t index) { return mRenderLayerList[index]; }
 		static LightLayer* getLightLayer(uint32_t index) { return mLightLayerList[index]; }
-		static void addRenderObject(uint32_t layerIndex, IRenderObejct* renderObject);
+		static void addRenderObject(uint32_t layerIndex, IRenderObject* renderObject);
 		static void addLight(uint32_t layerIndex, ILight* light);
 
 		static void add(const std::string& name, Pipeline* pl);

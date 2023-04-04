@@ -117,10 +117,22 @@ material->addUniform<UniformF>(ShaderParam::ModeSpecular, 64.0f);
 
 The[`int Version`] should be setted.The other params You can set as your wish.
 
+### **管线位置 Blend**
+Forward管线位置
+Forward Pipeline Position
+```cpp
+"Background"    Forward::Background
+"Opaque"        Forward::Geometry
+"Alpha"         Forward::AlphaTest
+"OpaqueLast"    Forward::OpaqueLast
+"Transparent"   Forward::Transparent
+"Overlay"       Forward::Overlay
+```
+
 ### **混合 Blend**
 混合参数 BlendFunc
 
-```c
+```cpp
 "0"         ZERO
 "1"         ONE
 "Src"       SRC_COLOR

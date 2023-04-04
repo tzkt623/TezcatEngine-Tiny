@@ -13,6 +13,7 @@
 namespace tezcat::Tiny::Core
 {
 	class Texture;
+	class TexttureCube;
 	class PipelineQueue;
 	class TINY_API Shader
 	{
@@ -132,6 +133,7 @@ namespace tezcat::Tiny::Core
 		virtual void setMat4(UniformID& uniform, float* data) = 0;
 
 		virtual void setTexture2D(UniformID& uniform, Texture2D* data) = 0;
+		virtual void setTextureCube(UniformID& uniform, TextureCube* data) = 0;
 
 	private:
 		std::string mName;

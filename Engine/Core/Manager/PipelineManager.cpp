@@ -40,7 +40,7 @@ namespace tezcat::Tiny::Core
 // 		}
 	}
 
-	void PipelineManager::addRenderObject(uint32_t layerIndex, IRenderObejct* renderObject)
+	void PipelineManager::addRenderObject(uint32_t layerIndex, IRenderObject* renderObject)
 	{
 		mRenderLayerList[layerIndex]->addRenderObejct(renderObject);
 	}

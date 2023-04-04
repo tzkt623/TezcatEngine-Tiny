@@ -7,26 +7,26 @@
 namespace tezcat::Tiny::Core
 {
 	Image::Image()
-		: m_Width(0)
-		, m_Height(0)
-		, m_Channels(0)
-		, m_Data(nullptr)
+		: mWidth(0)
+		, mHeight(0)
+		, mChannels(0)
+		, mData(nullptr)
 	{
 
 	}
 
 	Image::~Image()
 	{
-		stbi_image_free(m_Data);
+		stbi_image_free(mData);
 	}
 
-	void Image::openFile(const std::string& path)
+	void Image::openFile(const std::string& path, bool flip)
 	{
-		stbi_set_flip_vertically_on_load(true);
-		m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_Channels, 0);
-		if (m_Data == nullptr)
+		stbi_set_flip_vertically_on_load(flip);
+		mData = stbi_load(path.c_str(), &mWidth, &mHeight, &mChannels, 0);
+		if (mData == nullptr)
 		{
-			std::cout << "图片加载出错" << path << std::endl;
+			std::cout << "Image Load Error: " << path << std::endl;
 		}
 	}
 }
