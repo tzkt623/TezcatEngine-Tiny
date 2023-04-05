@@ -5,6 +5,23 @@
 
 namespace tezcat::Tiny::Core
 {
+	enum class TINY_API DataType : uint32_t
+	{
+		Byte = 0,
+		UByte,
+		Short,
+		UShort,
+		Int32,
+		UInt32,
+		Int64,
+		UInt64,
+		Float32,
+		Float64,
+		UInt_24_8,
+
+		Count
+	};
+
 	enum class TINY_API TextureType : uint32_t
 	{
 		Texture1D = 0,
@@ -13,16 +30,53 @@ namespace tezcat::Tiny::Core
 		TextureCube,
 		Texture1DA,
 		Texture2DA,
+		TextureBuffer2D,
+		TextureRenderBuffer2D,
 
 		Count
 	};
 
 	enum class TINY_API TextureWrap : uint32_t
 	{
-		Tex_REPEAT = 0,
-		Tex_MIRRORED_REPEAT,
-		Tex_CLAMP_TO_EDGE,
-		Tex_CLAMP_TO_BORDER,
+		Repeat = 0,
+		Mirrored_Repeat,
+		Clamp_To_Edge,
+		Clamp_To_Border,
+
+		Count
+	};
+
+	enum class TINY_API TextureFilter : uint32_t
+	{
+		Nearest = 0,
+		Linear,
+
+		Count
+	};
+
+	enum class TINY_API TextureChannel : uint32_t
+	{
+		None = 0,
+		R,
+		RG,
+		RGB,
+		RGBA,
+		//internal only
+		Depth16,
+		//internal only
+		Depth24,
+		//internal only
+		Depth32,
+		//internal only
+		Depth32f,
+		//not internal only
+		Depth_Stencil,
+		//internal only
+		Depth24_Stencil8,
+		//internal only
+		Depth32f_Stencil8,
+		//internal only
+		Stencil8,
 
 		Count
 	};
@@ -36,22 +90,6 @@ namespace tezcat::Tiny::Core
 		Triangles,
 		Triangles_Strip,
 		Triangles_Fan,
-
-		Count
-	};
-
-	enum class TINY_API TextureFilter : uint32_t
-	{
-		Tex_NEAREST = 0,
-		Tex_LINEAR,
-
-		Count
-	};
-
-	enum class TINY_API TextureChannel : uint32_t
-	{
-		Tex_RGB = 0,
-		Tex_RGBA,
 
 		Count
 	};
@@ -149,6 +187,7 @@ namespace tezcat::Tiny::Core
 		}
 	};
 
+	using DataTypeWrapper = TinyValueConventor<DataType, uint32_t>;
 	using TexTypeWrapper = TinyValueConventor<TextureType, uint32_t>;
 	using TexWrapWrapper = TinyValueConventor<TextureWrap, uint32_t>;
 	using TexFilterWrapper = TinyValueConventor<TextureFilter, uint32_t>;
@@ -160,6 +199,8 @@ namespace tezcat::Tiny::Core
 
 	struct TINY_API ContextMap
 	{
+		static std::array<DataTypeWrapper, (std::size_t)DataType::Count> DataTypeArray;
+
 		/// <summary>
 		///	Texture1D
 		/// Texture2D

@@ -2,34 +2,61 @@
 
 namespace tezcat::Tiny::Core
 {
+	std::array<DataTypeWrapper, (std::size_t)DataType::Count> ContextMap::DataTypeArray =
+	{
+		DataTypeWrapper(DataType::Byte,			0),
+		DataTypeWrapper(DataType::UByte,		0),
+		DataTypeWrapper(DataType::Short,		0),
+		DataTypeWrapper(DataType::UShort,		0),
+		DataTypeWrapper(DataType::Int32,		0),
+		DataTypeWrapper(DataType::UInt32,		0),
+		DataTypeWrapper(DataType::Int64,		0),
+		DataTypeWrapper(DataType::UInt64,		0),
+		DataTypeWrapper(DataType::Float32,		0),
+		DataTypeWrapper(DataType::Float64,		0),
+		DataTypeWrapper(DataType::UInt_24_8,	0),
+	};
+
 	std::array<TexTypeWrapper, (std::size_t)TextureType::Count> ContextMap::TextureTypeArray =
 	{
-		TexTypeWrapper(TextureType::Texture1D,		0),
-		TexTypeWrapper(TextureType::Texture2D,		0),
-		TexTypeWrapper(TextureType::Texture3D,		0),
-		TexTypeWrapper(TextureType::TextureCube,	0),
-		TexTypeWrapper(TextureType::Texture1DA,		0),
-		TexTypeWrapper(TextureType::Texture2DA,		0)
+		TexTypeWrapper(TextureType::Texture1D,					0),
+		TexTypeWrapper(TextureType::Texture2D,					0),
+		TexTypeWrapper(TextureType::Texture3D,					0),
+		TexTypeWrapper(TextureType::TextureCube,				0),
+		TexTypeWrapper(TextureType::Texture1DA,					0),
+		TexTypeWrapper(TextureType::Texture2DA,					0),
+		TexTypeWrapper(TextureType::TextureBuffer2D,			0),
+		TexTypeWrapper(TextureType::TextureRenderBuffer2D,		0),
 	};
 
 	std::array<TexWrapWrapper, (std::size_t)TextureWrap::Count> ContextMap::TextureWrapArray =
 	{
-		TexWrapWrapper(TextureWrap::Tex_REPEAT,				0),
-		TexWrapWrapper(TextureWrap::Tex_MIRRORED_REPEAT,	0),
-		TexWrapWrapper(TextureWrap::Tex_CLAMP_TO_EDGE,		0),
-		TexWrapWrapper(TextureWrap::Tex_CLAMP_TO_BORDER,	0)
+		TexWrapWrapper(TextureWrap::Repeat,				0),
+		TexWrapWrapper(TextureWrap::Mirrored_Repeat,	0),
+		TexWrapWrapper(TextureWrap::Clamp_To_Edge,		0),
+		TexWrapWrapper(TextureWrap::Clamp_To_Border,	0)
 	};
 
 	std::array<TexFilterWrapper, (std::size_t)TextureFilter::Count> ContextMap::TextureFilterArray =
 	{
-		TexFilterWrapper(TextureFilter::Tex_NEAREST,	0),
-		TexFilterWrapper(TextureFilter::Tex_LINEAR,		0)
+		TexFilterWrapper(TextureFilter::Nearest,	0),
+		TexFilterWrapper(TextureFilter::Linear,		0)
 	};
 
 	std::array<TexChannelWrapper, (std::size_t)TextureChannel::Count> ContextMap::TextureChannelArray =
 	{
-		TexChannelWrapper(TextureChannel::Tex_RGB,	0),
-		TexChannelWrapper(TextureChannel::Tex_RGBA,	0)
+		TexChannelWrapper(TextureChannel::None,					0),
+		TexChannelWrapper(TextureChannel::R,					0),
+		TexChannelWrapper(TextureChannel::RG,					0),
+		TexChannelWrapper(TextureChannel::RGB,					0),
+		TexChannelWrapper(TextureChannel::RGBA,					0),
+		TexChannelWrapper(TextureChannel::Depth16,				0),
+		TexChannelWrapper(TextureChannel::Depth24,				0),
+		TexChannelWrapper(TextureChannel::Depth32,				0),
+		TexChannelWrapper(TextureChannel::Depth32f,				0),
+		TexChannelWrapper(TextureChannel::Depth_Stencil,		0),
+		TexChannelWrapper(TextureChannel::Depth24_Stencil8,		0),
+		TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	0),
 	};
 
 	std::array<DrawModeWrapper, (std::size_t)DrawMode::Count> ContextMap::DrawModeArray =

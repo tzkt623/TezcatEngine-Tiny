@@ -16,6 +16,7 @@ namespace tezcat::Tiny::GL
 
 	public:
 		void bind() override;
+		void unbind() override;
 		void setStateOptions() override;
 		void resetState() override;
 
@@ -37,7 +38,7 @@ namespace tezcat::Tiny::GL
 		void setInt4(const char* name, int* data) override;
 
 		void setMat3(const char* name, float* data) override;
-		void setMat4(const char* name, float* data) override;
+		void setMat4(const char* name, const float* data) override;
 
 	public:
 		void setFloat1(UniformID& uniform, float* data) override;
@@ -49,7 +50,7 @@ namespace tezcat::Tiny::GL
 		void setInt3(UniformID& uniform, int* data) override;
 		void setInt4(UniformID& uniform, int* data) override;
 		void setMat3(UniformID& uniform, float* data) override;
-		void setMat4(UniformID& uniform, float* data) override;
+		void setMat4(UniformID& uniform, const float* data) override;
 		void setTexture2D(UniformID& uniform, Texture2D* data) override;
 		void setTextureCube(UniformID& uniform, TextureCube* data) override;
 

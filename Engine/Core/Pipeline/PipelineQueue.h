@@ -21,20 +21,20 @@ namespace tezcat::Tiny::Core
 		};
 	public:
 		PipelineQueue(Queue queue, uint32_t baseOrderID)
-			: m_QueueID(queue)
-			, m_BaseOrderID(baseOrderID)
+			: mQueueID(queue)
+			, mBaseOrderID(baseOrderID)
 			, mDirty(true)
 		{
 		}
 
-		inline int getQueueID() const { return m_QueueID; }
-		inline void setQueueID(Queue queue) { m_QueueID = queue; }
-		void render(Camera* camera);
+		int getQueueID() const { return mQueueID; }
+		void setQueueID(Queue queue) { mQueueID = queue; }
+		virtual void render(Camera* camera);
 		void addPass(RenderPass* pass);
 
 	private:
-		Queue m_QueueID;
-		uint32_t m_BaseOrderID;
+		Queue mQueueID;
+		uint32_t mBaseOrderID;
 		bool mDirty;
 		std::vector<RenderPass*> mShaderList;
 

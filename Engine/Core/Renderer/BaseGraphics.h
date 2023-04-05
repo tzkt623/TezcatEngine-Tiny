@@ -11,7 +11,7 @@ namespace tezcat::Tiny::Core
 	class Engine;
 	class RenderLayer;
 	class IRenderObject;
-
+	class Camera;
 	struct ViewportInfo;
 	class TINY_API BaseGraphics
 	{
@@ -29,8 +29,8 @@ namespace tezcat::Tiny::Core
 		virtual void onRender();
 		virtual void postRender();
 	public:
-		virtual void clear() = 0;
-		virtual void updateViewport(ViewportInfo& info) = 0;
+		virtual void clear(Camera* camera) = 0;
+		virtual void setViewport(ViewportInfo& info) = 0;
 
 	public:
 		virtual void draw(IRenderObject* renderObject) = 0;

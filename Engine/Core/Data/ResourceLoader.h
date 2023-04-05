@@ -42,6 +42,11 @@ namespace tezcat::Tiny::Core
 
 	private:
 		void createSomeMode();
+		void createCube();
+		void createSphere();
+		void createSphere(int prec);
+		void createSquare();
+		void createSkybox();
 
 	protected:
 		int mWindowWidth;

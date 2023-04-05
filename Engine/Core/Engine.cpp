@@ -3,14 +3,17 @@
 #include "Manager/ShaderManager.h"
 #include "Manager/SceneManager.h"
 #include "Manager/CameraManager.h"
+#include "Manager/VertexGroupManager.h"
+#include "Manager/PipelineManager.h"
+#include "Manager/FrameBufferManager.h"
+#include "Manager/TextureManager.h"
+
 #include "Data/ResourceLoader.h"
 #include "Input/InputSystem.h"
 #include "Renderer/BaseGraphics.h"
 #include "Scene/LayerMask.h"
 #include "Component/GameObject.h"
-#include "Manager/VertexGroupManager.h"
 #include "Shader/ShaderParam.h"
-#include "Manager/PipelineManager.h"
 
 
 namespace tezcat::Tiny::Core
@@ -25,10 +28,14 @@ namespace tezcat::Tiny::Core
 		, mShaderManager(new ShaderManager())
 		, mSceneManager(new SceneManager())
 		, mCameraManager(new CameraManager())
+		, mFrameBufferManager(new FrameBufferManager())
+		, mTextureManager(new TextureManager())
 		, mInputSystem(new InputSystem())
 		, mGraphics(nullptr)
 		, mIsRunning(true)
 	{
+
+
 		new VertexGroupManager();
 	}
 

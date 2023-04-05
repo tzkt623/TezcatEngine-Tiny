@@ -44,10 +44,7 @@ namespace tezcat::Tiny::Core
 		auto& cameras = CameraMgr::getInstance()->getSortedCameraAry();
 		for (auto camera : cameras)
 		{
-			this->updateViewport(camera->getViewRect());
-			//clear权实际上应该由相机决定
-			this->clear();
-			camera->render();
+			camera->render(this);
 		}
 	}
 

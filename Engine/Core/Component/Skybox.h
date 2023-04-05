@@ -11,11 +11,10 @@ namespace tezcat::Tiny::Core
 		Skybox();
 		virtual ~Skybox();
 
+	public:
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::Skybox; }
 		DrawModeWrapper& getDrawMode() override;
 		int getVertexCount() const override;
-
-	public:
 		Material* getMaterial() const override;
 		void sendToRenderPass() override;
 		void submit(Shader* shader) override;

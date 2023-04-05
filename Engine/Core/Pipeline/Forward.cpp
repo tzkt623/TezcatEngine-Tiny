@@ -70,6 +70,7 @@ namespace tezcat::Tiny::Core
 
 		mGeometry->render(camera);
 		mAlphaTest->render(camera);
+		//#解决覆盖问题
 		mTransparent->render(camera);
 
 		mOverlay->render(camera);

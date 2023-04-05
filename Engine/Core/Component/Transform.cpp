@@ -25,6 +25,7 @@ namespace tezcat::Tiny::Core
 		, mModelMatrix(1.0f)
 		, mParent(parent)
 		, mIndex(0)
+		, mDelegateUpdate(std::bind(&Transform::updateMatrix, this))
 	{
 		if (mParent != nullptr)
 		{
@@ -57,6 +58,31 @@ namespace tezcat::Tiny::Core
 
 	void Transform::onUpdate()
 	{
+		mDelegateUpdate();
+
+		if (!mChildren.empty())
+		{
+			auto it = mChildren.begin();
+			while (it != mChildren.end())
+			{
+				auto go = (*it)->getGameObject();
+				if (go->needDelete())
+				{
+					it = mChildren.erase(it);
+					go->close();
+					delete go;
+				}
+				else
+				{
+					(*it)->update();
+					it++;
+				}
+			}
+		}
+	}
+
+	void Transform::updateMatrix()
+	{
 		if (mIsDirty)
 		{
 			mIsDirty = false;
@@ -77,26 +103,6 @@ namespace tezcat::Tiny::Core
 
 			mModelMatrix *= glm::toMat4(glm::quat(glm::radians(mLocalRotation)));
 			mModelMatrix = glm::scale(mModelMatrix, mLocalScale);
-		}
-
-		if (!mChildren.empty())
-		{
-			auto it = mChildren.begin();
-			while (it != mChildren.end())
-			{
-				auto go = (*it)->getGameObject();
-				if (go->needDelete())
-				{
-					it = mChildren.erase(it);
-					go->close();
-					delete go;
-				}
-				else
-				{
-					(*it)->update();
-					it++;
-				}
-			}
 		}
 	}
 

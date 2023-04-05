@@ -4,6 +4,8 @@
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo.jpg?raw=true)
 
+![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo.gif?raw=true)
+
 注意!本引擎使用C++20版本
 
 Notice!Tiny Use The C++20 Ver.
@@ -112,12 +114,12 @@ material->addUniform<UniformTex2D>(ShaderParam::TexColor, "../Resource/Image/dra
 material->addUniform<UniformF>(ShaderParam::ModeSpecular, 64.0f);
 ```
 
-### **默认值 default**
+### **默认值 DefaultValue**
 除了[`int Version`]为必须值,其他值均为拥有默认值的可选参数
 
 The[`int Version`] should be setted.The other params You can set as your wish.
 
-### **管线位置 Blend**
+### **管线位置 PipelineQueue**
 Forward管线位置
 Forward Pipeline Position
 ```cpp
@@ -205,6 +207,8 @@ str DepthTest = Less;
 str DepthTest = Off;
 ```
 ### **深度写入 ZWrite**
+只有在深度测试启用时才有用 Only work when DepthTest is Enabled
+
 启用 Enable
 ```c
 bool ZWrite = true;

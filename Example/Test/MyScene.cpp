@@ -25,6 +25,9 @@ void MyScene::onEnter()
 {
 	Scene::onEnter();
 
+	std::string skybox_path = "../Resource/Image/skybox/sky2_%s.jpg";
+	TextureRenderBuffer2D* buffer2D = nullptr;
+
 	if (true)
 	{
 		auto go = new GameObject("MainCamera");
@@ -38,6 +41,28 @@ void MyScene::onEnter()
 
 	if (true)
 	{
+		auto go = new GameObject("CameraFrame");
+		auto camera = go->addComponent<Camera>(false);
+		camera->setPerspective(60.0f, 0.1f, 2000.0f);
+		camera->setCullLayer(0);
+		camera->setDeep(1);
+
+		go->addComponent<Transform>();
+		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		go->getTransform()->setParent(CameraMgr::getInstance()->getMainCamera()->getTransform());
+
+		auto frameBuffer = FrameBufferMgr::getInstance()->create(Engine::getScreenWidth(), Engine::getScreenHeight(),
+			{
+				TextureBufferInfo(TextureBufferType::Color, TextureChannel::RGBA, TextureChannel::RGBA, DataType::UByte),
+				TextureBufferInfo(TextureBufferType::DepthAndStencil, TextureChannel::Depth24_Stencil8)
+			});
+
+		buffer2D = frameBuffer->getBuffer(0);
+		camera->setFrameBuffer(frameBuffer);
+	}
+
+	if (true)
+	{
 		auto go = new GameObject("Skybox");
 		go->addComponent<Transform>();
 
@@ -45,9 +70,9 @@ void MyScene::onEnter()
 		auto material = new Material("Unlit/Skybox");
 		material->addUniform<UniformTexCube>(
 			ShaderParam::TexCube
-			, "../Resource/Image/skybox/sky2_%s.jpg"
-			, TextureFilter::Tex_LINEAR
-			, TextureWrap::Tex_CLAMP_TO_BORDER);
+			, skybox_path
+			, TextureFilter::Linear
+			, TextureWrap::Clamp_To_Edge);
 		skybox->setMaterial(material);
 	}
 
@@ -81,9 +106,12 @@ void MyScene::onEnter()
 
 		auto mr1 = wife1->addComponent<MeshRenderer>();
 		auto wife1_material = new Material("Unlit/Texture");
+		// 		wife1_material->addUniform<UniformTex2D>(
+		// 			ShaderParam::TexColor
+		// 			, "../Resource/Image/reimu.jpg");
 		wife1_material->addUniform<UniformTex2D>(
 			ShaderParam::TexColor
-			, "../Resource/Image/reimu.jpg");
+			, buffer2D);
 		mr1->setMaterial(wife1_material);
 		mr1->setMesh("Square");
 
@@ -150,10 +178,10 @@ void MyScene::onEnter()
 		auto plane_material = new Material("Standard/Std1");
 		plane_material->addUniform<UniformTex2D>(
 			ShaderParam::StdMaterial::Diffuse
-			, "../Resource/Image/container.png");
+			, "../Resource/Image/stone_wall_diff.jpg");
 		plane_material->addUniform<UniformTex2D>(
 			ShaderParam::StdMaterial::Specular
-			, "../Resource/Image/container_specular.png");
+			, "../Resource/Image/stone_wall_ao.jpg");
 		plane_material->addUniform<UniformF1>(
 			ShaderParam::StdMaterial::Shininess
 			, 64.0f);
@@ -161,8 +189,40 @@ void MyScene::onEnter()
 		mr->setMesh("Square");
 	}
 
+	//----------------------------------------
+	//
+	//	Transparent
+	//
+	if (true)
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(-2000, 2000);
 
+		for (int i = 0; i < 20; i++)
+		{
+			auto go = new GameObject();
+			go->addComponent<Transform>();
+			go->getTransform()->setPosition(glm::vec3(dis(gen) / 100.0f, dis(gen) / 100.0f, dis(gen) / 100.0f));
+			go->getTransform()->setScale(glm::vec3(3.0f, 3.0f, 1.0f));
 
+			auto mr = go->addComponent<MeshRenderer>();
+			auto material = new Material("Unlit/Transparent");
+			material->addUniform<UniformTex2D>(
+				ShaderParam::TexColor
+				, "../Resource/Image/transparent_window.png");
+			material->addUniform<UniformF1>(
+				ShaderParam::ModeSpecular
+				, 64.0f);
+			mr->setMaterial(material);
+			mr->setMesh("Square");
+		}
+	}
+
+	//----------------------------------------
+	//
+	//	Cubes
+	//
 	if (true)
 	{
 		std::random_device rd;
@@ -184,13 +244,19 @@ void MyScene::onEnter()
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Standard/Std1");
 			material->addUniform<UniformTex2D>(
-				ShaderParam::TexColor
-				, "../Resource/Image/dragon.jpg");
+				ShaderParam::StdMaterial::Diffuse
+				, "../Resource/Image/metal_plate_diff.jpg");
+			material->addUniform<UniformTex2D>(
+				ShaderParam::StdMaterial::Specular
+				, "../Resource/Image/metal_plate_spec.jpg");
 			material->addUniform<UniformF1>(
-				ShaderParam::ModeSpecular
+				ShaderParam::StdMaterial::Shininess
 				, 64.0f);
+			material->addUniform<UniformTexCube>(
+				ShaderParam::TexCube
+				, skybox_path);
 			mr->setMaterial(material);
-			mr->setMesh("Cube");
+			mr->setMesh("Sphere");
 		}
 	}
 

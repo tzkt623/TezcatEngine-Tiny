@@ -12,6 +12,7 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
+        str DepthTest = Less;
         bool ZWrite = true;
         str DepthTest = Less;
         str CullFace = Back;
@@ -31,9 +32,7 @@
 
         void main()
         {
-            vec4 position =  vec4(aPos, 1.0);
-            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
-
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * vec4(aPos, 1.0);
             myUV = aUV;
         }
     }
@@ -41,7 +40,6 @@
 
     #TINY_FS_BEGIN
     {
-        in vec4 myColor;
         in vec2 myUV;
 
         uniform sampler2D TINY_TexColor;

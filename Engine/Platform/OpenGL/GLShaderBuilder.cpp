@@ -224,22 +224,22 @@ namespace tezcat::Tiny::GL
 			if (it != map.end())
 			{
 				shader->setDepthTest(ContextMap::DepthTestMap[it->second.cast<std::string>()]);
+				//ZWrite
+				it = map.find("ZWrite");
+				if (it != map.end())
+				{
+					shader->setZWrite(it->second.cast<bool>());
+				}
+				else
+				{
+					shader->setZWrite(false);
+				}
 			}
 			else
 			{
-				shader->setDepthTest(DepthTest::Less);
+				shader->setDepthTest(DepthTest::Off);
 			}
 
-			//ZWrite
-			it = map.find("ZWrite");
-			if (it != map.end())
-			{
-				shader->setZWrite(it->second.cast<bool>());
-			}
-			else
-			{
-				shader->setZWrite(false);
-			}
 
 			//Blend
 			it = map.find("Blend");

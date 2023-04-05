@@ -167,9 +167,11 @@
     <ClCompile Include="Core\Manager\CameraManager.cpp" />
     <ClCompile Include="Core\Component\Component.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
+    <ClCompile Include="Core\Manager\FrameBufferManager.cpp" />
     <ClCompile Include="Core\Manager\TextureManager.cpp" />
     <ClCompile Include="Core\Pipeline\Forward.cpp" />
     <ClCompile Include="Core\Pipeline\PipelineQueue.cpp" />
+    <ClCompile Include="Core\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Core\Component\GameObject.cpp" />
     <ClCompile Include="Core\GUI\GUI.cpp" />
@@ -196,6 +198,7 @@
     <ClCompile Include="Core\Shader\Uniform.cpp" />
     <ClCompile Include="Core\Tool\AABB.cpp" />
     <ClCompile Include="Core\Tool\FrustumCulling.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShaderBuilder.cpp" />
     <ClCompile Include="Core\Shader\ShaderParam.cpp" />
     <ClCompile Include="Core\Manager\ShaderManager.cpp" />
@@ -237,9 +240,12 @@
     <ClInclude Include="Core\Component\Component.h" />
     <ClInclude Include="Core\Head\CppHead.h" />
     <ClInclude Include="Core\Engine.h" />
+    <ClInclude Include="Core\Manager\Manager.h" />
     <ClInclude Include="Core\Manager\TextureManager.h" />
     <ClInclude Include="Core\Pipeline\Forward.h" />
     <ClInclude Include="Core\Pipeline\PipelineQueue.h" />
+    <ClInclude Include="Core\Renderer\FrameBuffer.h" />
+    <ClInclude Include="Core\Manager\FrameBufferManager.h" />
     <ClInclude Include="Core\Renderer\RenderObjectTag.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Base\BaseObject.h" />
@@ -248,6 +254,7 @@
     <ClInclude Include="Core\Tool\AABB.h" />
     <ClInclude Include="Core\Tool\DelegateCreator.h" />
     <ClInclude Include="Core\Tool\FrustumCulling.h" />
+    <ClInclude Include="Platform\OpenGL\GLFrameBuffer.h" />
     <ClInclude Include="Platform\OpenGL\GLHead.h" />
     <ClInclude Include="Core\Head\GLMHead.h" />
     <ClInclude Include="Core\GUI\GUI.h" />

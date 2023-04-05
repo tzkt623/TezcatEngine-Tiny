@@ -48,23 +48,23 @@ namespace tezcat::Tiny::Core
 		virtual bool cullGameObject(GameObject* gameObject) { return true; }
 		void submit(Shader* shader) override;
 
-		glm::vec3& getDirection() { return m_Direction; }
-		void setDirection(const glm::vec3& val) { m_Direction = val; }
+		glm::vec3& getDirection() { return mDirection; }
+		void setDirection(const glm::vec3& val) { mDirection = val; }
 
-		glm::vec3& getAmbient() { return m_Ambient; }
-		void setAmbient(const glm::vec3& val) { m_Ambient = val; }
+		glm::vec3& getAmbient() { return mAmbient; }
+		void setAmbient(const glm::vec3& val) { mAmbient = val; }
 
-		glm::vec3& getDiffuse() { return m_Diffuse; }
-		void setDiffuse(const glm::vec3& val) { m_Diffuse = val; }
+		glm::vec3& getDiffuse() { return mDiffuse; }
+		void setDiffuse(const glm::vec3& val) { mDiffuse = val; }
 
-		glm::vec3& getSpecular() { return m_Specular; }
-		void setSpecular(const glm::vec3& val) { m_Specular = val; }
+		glm::vec3& getSpecular() { return mSpecular; }
+		void setSpecular(const glm::vec3& val) { mSpecular = val; }
 
 	private:
-		glm::vec3 m_Direction;
-		glm::vec3 m_Ambient;
-		glm::vec3 m_Diffuse;
-		glm::vec3 m_Specular;
+		glm::vec3 mDirection;
+		glm::vec3 mAmbient;
+		glm::vec3 mDiffuse;
+		glm::vec3 mSpecular;
 	};
 
 
@@ -76,38 +76,38 @@ namespace tezcat::Tiny::Core
 
 		LightType getLightType() final { return LightType::Point; }
 
-		glm::vec3& getAmbient() { return m_Ambient; }
-		void setAmbient(const glm::vec3& val) { m_Ambient = val; }
+		glm::vec3& getAmbient() { return mAmbient; }
+		void setAmbient(const glm::vec3& val) { mAmbient = val; }
 
-		glm::vec3& getDiffuse() { return m_Diffuse; }
-		void setDiffuse(const glm::vec3& val) { m_Diffuse = val; }
+		glm::vec3& getDiffuse() { return mDiffuse; }
+		void setDiffuse(const glm::vec3& val) { mDiffuse = val; }
 
-		glm::vec3& getSpecular() { return m_Specular; }
-		void setSpecular(const glm::vec3& val) { m_Specular = val; }
+		glm::vec3& getSpecular() { return mSpecular; }
+		void setSpecular(const glm::vec3& val) { mSpecular = val; }
 
-		glm::vec3& getConfig() { return m_Specular; }
-		void setConfig(const glm::vec3& val) { m_Specular = val; }
+		glm::vec3& getConfig() { return mSpecular; }
+		void setConfig(const glm::vec3& val) { mSpecular = val; }
 
 		void setConfig(float constant, float linear, float quadratic)
 		{
-			m_Specular.x = constant;
-			m_Specular.y = linear;
-			m_Specular.z = quadratic;
+			mSpecular.x = constant;
+			mSpecular.y = linear;
+			mSpecular.z = quadratic;
 		}
 
 		void setConstant(float constant)
 		{
-			m_Specular.x = constant;
+			mSpecular.x = constant;
 		}
 
 		void setLinear(float linear)
 		{
-			m_Specular.y = linear;
+			mSpecular.y = linear;
 		}
 
 		void setQuadratic(float quadratic)
 		{
-			m_Specular.z = quadratic;
+			mSpecular.z = quadratic;
 		}
 
 		void submit(Shader* shader) override;
@@ -116,10 +116,10 @@ namespace tezcat::Tiny::Core
 		bool cullGameObject(GameObject* gameObject) override;
 
 	private:
-		glm::vec3 m_Ambient;
-		glm::vec3 m_Diffuse;
-		glm::vec3 m_Specular;
-		glm::vec3 m_Config;
+		glm::vec3 mAmbient;
+		glm::vec3 mDiffuse;
+		glm::vec3 mSpecular;
+		glm::vec3 mConfig;
 	};
 
 	class TINY_API SpotLight : public ComponentT<SpotLight>, public ILight

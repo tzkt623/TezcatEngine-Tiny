@@ -28,6 +28,7 @@ namespace tezcat::Tiny::Core
 		static UniformID MatrixV;
 		static UniformID MatrixM;
 		static UniformID MatrixN;
+		static UniformID MatrixSBV;
 
 		static UniformID VertexColor;
 		static UniformID TexColor;
@@ -61,6 +62,7 @@ namespace tezcat::Tiny::Core
 		struct StdMaterial
 		{
 			static UniformID Diffuse;
+			static UniformID Normal;
 			static UniformID Specular;
 			static UniformID Shininess;
 		};

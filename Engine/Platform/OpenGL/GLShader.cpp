@@ -32,24 +32,19 @@ namespace tezcat::Tiny::GL
 			glDisable(GL_CULL_FACE);
 		}
 
-		if (mEnableZWrite)
-		{
-			glDepthMask(GL_TRUE);
-		}
-		else
-		{
-			glDepthMask(GL_FALSE);
-		}
-
 		if (mDepthTest.platform != 0)
 		{
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(mDepthTest.platform);
+
 		}
 		else
 		{
 			glDisable(GL_DEPTH_TEST);
 		}
+
+		//只有在深度测试启用的情况下才有用
+		glDepthMask(mEnableZWrite ? GL_TRUE : GL_FALSE);
 
 		if (mEnableBlend)
 		{
@@ -88,6 +83,11 @@ namespace tezcat::Tiny::GL
 	void GLShader::bind()
 	{
 		glUseProgram(mProgramID);
+	}
+
+	void GLShader::unbind()
+	{
+		glUseProgram(0);
 	}
 
 	void GLShader::onApply(const UniformID::USet& uniforms)
@@ -236,7 +236,7 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix3fv(glGetUniformLocation(mProgramID, name), 1, GL_FALSE, data);
 	}
 
-	void GLShader::setMat4(UniformID& uniform, float* data)
+	void GLShader::setMat4(UniformID& uniform, const float* data)
 	{
 		if (mTinyUniformList[uniform] < 0)
 		{
@@ -245,7 +245,7 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix4fv(mTinyUniformList[uniform], 1, GL_FALSE, data);
 	}
 
-	void GLShader::setMat4(const char* name, float* data)
+	void GLShader::setMat4(const char* name, const float* data)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(mProgramID, name), 1, GL_FALSE, data);
 	}

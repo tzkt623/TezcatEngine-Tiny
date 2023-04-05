@@ -156,6 +156,9 @@
     <ClCompile Include="Core\Tool\AABB.cpp" />
     <ClCompile Include="Core\Tool\FrustumCulling.cpp" />
     <ClCompile Include="Core\Component\Skybox.cpp" />
+    <ClCompile Include="Core\Renderer\FrameBuffer.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
+    <ClCompile Include="Core\Manager\FrameBufferManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1282,6 +1285,10 @@
     <ClInclude Include="Core\Base\TinySmartPointer.h" />
     <ClInclude Include="Core\Base\BaseObject.h" />
     <ClInclude Include="Core\Component\Skybox.h" />
+    <ClInclude Include="Core\Renderer\FrameBuffer.h" />
+    <ClInclude Include="Platform\OpenGL\GLFrameBuffer.h" />
+    <ClInclude Include="Core\Manager\FrameBufferManager.h" />
+    <ClInclude Include="Core\Manager\Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

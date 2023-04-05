@@ -26,12 +26,14 @@ namespace tezcat::Tiny::Core
 
 		void addRenderObject(IRenderObject* renderObject);
 
-		inline bool isAttached() { return mInPipeline; }
-		inline void attach() { mInPipeline = true; }
-		inline void detach() { mInPipeline = false; }
+		bool isAttached() { return mInPipeline; }
+		void attach() { mInPipeline = true; }
+		void detach() { mInPipeline = false; }
 
 		ILight* getLight() const { return mLight; }
 		void setLight(ILight* val) { mLight = val; }
+
+		void sortRenderObjects(const std::function<bool(IRenderObject* a, IRenderObject* b)>& function);
 
 	public:
 		void render(Camera* camera);

@@ -12,6 +12,7 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Background;
+        str DepthTest = Less;
         bool ZWrite = false;
         str DepthTest = Less;
         str CullFace = Back;
@@ -23,15 +24,14 @@
         layout (location = 0) in vec3 aPos;
 
         uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixV;
+        uniform mat4 TINY_MatrixSBV;
 
         out vec3 myUV;
 
         void main()
         {
-            mat4 v = mat4(mat3(TINY_MatrixV));
             myUV = aPos;
-            gl_Position = TINY_MatrixP * v * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixSBV * vec4(aPos, 1.0);
         }
     }
     #TINY_VS_END

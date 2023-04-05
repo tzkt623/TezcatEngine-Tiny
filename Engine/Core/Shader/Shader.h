@@ -50,6 +50,7 @@ namespace tezcat::Tiny::Core
 		void begin();
 		void end();
 		virtual void bind() = 0;
+		virtual void unbind() = 0;
 		virtual void resetState() = 0;
 
 	public:
@@ -116,7 +117,7 @@ namespace tezcat::Tiny::Core
 		virtual void setInt4(const char* name, int* data) = 0;
 
 		virtual void setMat3(const char* name, float* data) = 0;
-		virtual void setMat4(const char* name, float* data) = 0;
+		virtual void setMat4(const char* name, const float* data) = 0;
 
 	public://快速传参
 		virtual void setFloat1(UniformID& uniform, float* data) = 0;
@@ -130,7 +131,7 @@ namespace tezcat::Tiny::Core
 		virtual void setInt4(UniformID& uniform, int* data) = 0;
 
 		virtual void setMat3(UniformID& uniform, float* data) = 0;
-		virtual void setMat4(UniformID& uniform, float* data) = 0;
+		virtual void setMat4(UniformID& uniform, const float* data) = 0;
 
 		virtual void setTexture2D(UniformID& uniform, Texture2D* data) = 0;
 		virtual void setTextureCube(UniformID& uniform, TextureCube* data) = 0;

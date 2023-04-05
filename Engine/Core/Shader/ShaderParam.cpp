@@ -7,6 +7,7 @@ namespace tezcat::Tiny::Core
 	UniformID ShaderParam::MatrixV;
 	UniformID ShaderParam::MatrixM;
 	UniformID ShaderParam::MatrixN;
+	UniformID ShaderParam::MatrixSBV;
 
 	UniformID ShaderParam::VertexColor;
 	UniformID ShaderParam::TexColor;
@@ -30,6 +31,7 @@ namespace tezcat::Tiny::Core
 	UniformID ShaderParam::LightPoint::Config;
 
 	UniformID ShaderParam::StdMaterial::Diffuse;
+	UniformID ShaderParam::StdMaterial::Normal;
 	UniformID ShaderParam::StdMaterial::Specular;
 	UniformID ShaderParam::StdMaterial::Shininess;
 
@@ -49,6 +51,7 @@ namespace tezcat::Tiny::Core
 		ShaderParam::MatrixV = "TINY_MatrixV";
 		ShaderParam::MatrixM = "TINY_MatrixM";
 		ShaderParam::MatrixN = "TINY_MatrixN";
+		ShaderParam::MatrixSBV = "TINY_MatrixSBV";
 
 		ShaderParam::VertexColor = "TINY_VertexColor";
 		ShaderParam::TexColor = "TINY_TexColor";
@@ -72,6 +75,7 @@ namespace tezcat::Tiny::Core
 		ShaderParam::LightPoint::Config = "TINY_LightPot.config";
 
 		ShaderParam::StdMaterial::Diffuse = "TINY_MatStd.diffuse";
+		ShaderParam::StdMaterial::Normal = "TINY_MatStd.normal";
 		ShaderParam::StdMaterial::Specular = "TINY_MatStd.specular";
 		ShaderParam::StdMaterial::Shininess = "TINY_MatStd.shininess";
 

@@ -28,6 +28,7 @@ namespace tezcat::Tiny::Utility
 					typeid(T).name()));
 			}
 
+			mIsAttached = true;
 			mInstance = new T(std::forward<Args>(args)...);
 		}
 
@@ -46,6 +47,8 @@ namespace tezcat::Tiny::Utility
 		{
 			if (mInstance != nullptr)
 			{
+				delete instance;
+				return;
 				throw std::logic_error(StringTool::stringFormat("SG<>: Instance must be null [%s]",
 					typeid(T).name()));
 			}

@@ -56,6 +56,11 @@ namespace tezcat::Tiny::Core
 		// 		}
 	}
 
+	void RenderPass::sortRenderObjects(const std::function<bool(IRenderObject* a, IRenderObject* b)>& function)
+	{
+		std::sort(mRenderObjects.begin(), mRenderObjects.end(), function);
+	}
+
 	void RenderPass::render(Camera* camera)
 	{
 		//#PassShaderRender

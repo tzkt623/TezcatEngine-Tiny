@@ -77,17 +77,19 @@ namespace tezcat::Tiny::Core
 		}
 		else
 		{
-			auto it = mCameraList.begin();
-			auto end = mCameraList.end();
-			while (it != end)
-			{
-				if ((*it)->getDeep() > camera->getDeep())
-				{
-					mCameraList.insert(it, camera);
-					break;
-				}
-				it++;
-			}
+			mDirty = true;
+			mCameraList.push_back(camera);
+// 			auto it = mCameraList.begin();
+// 			auto end = mCameraList.end();
+// 			while (it != end)
+// 			{
+// 				if ((*it)->getDeep() >= camera->getDeep())
+// 				{
+// 					mCameraList.insert(it, camera);
+// 					break;
+// 				}
+// 				it++;
+// 			}
 		}
 	}
 

@@ -1,24 +1,10 @@
 #include "GLTexture.h"
 #include "Core/Data/Image.h"
+#include "Core/Head/Context.h"
 
-
+using namespace tezcat::Tiny::Core;
 namespace tezcat::Tiny::GL
 {
-	GLenum TINY_API getGLTextureChannels(Image* image)
-	{
-		switch (image->getChannels())
-		{
-		case 1: return GL_RED;
-		case 2: return GL_RG;
-		case 3: return GL_RGB;
-		case 4: return GL_RGBA;
-		default:
-			break;
-		}
-
-		return GL_RGB;
-	}
-
 	//--------------------------------------------------------
 	//
 	//	Texture2D
@@ -35,14 +21,15 @@ namespace tezcat::Tiny::GL
 
 	void GLTexture2D::createTexture(Image* image)
 	{
-		GLenum source_format = getGLTextureChannels(image);
-
 		glBindTexture(GL_TEXTURE_2D, mTextureID);
+
+		mChannel = Texture::getTextureChannels(image);
+		mInternalChannel = mChannel;
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrap.platform);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrap.platform);
 
-		if (mWrap.tiny == TextureWrap::Tex_CLAMP_TO_BORDER)
+		if (mWrap.tiny == TextureWrap::Clamp_To_Border)
 		{
 			float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
@@ -51,7 +38,14 @@ namespace tezcat::Tiny::GL
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mFilter.platform);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mFilter.platform);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->getWidth(), image->getHeight(), 0, source_format, GL_UNSIGNED_BYTE, image->getData());
+		glTexImage2D(GL_TEXTURE_2D
+			, 0
+			, mInternalChannel.platform
+			, image->getWidth(), image->getHeight()
+			, 0
+			, mChannel.platform
+			, mDataType.platform
+			, image->getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -94,11 +88,11 @@ namespace tezcat::Tiny::GL
 
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
 						, 0
-						, GL_RGB
+						, Texture::getTextureChannels(&image).platform
 						, image.getWidth(), image.getHeight()
 						, 0
-						, getGLTextureChannels(&image)
-						, GL_UNSIGNED_BYTE
+						, Texture::getTextureChannels(&image).platform
+						, mDataType.platform
 						, image.getData());
 		}
 
@@ -109,6 +103,46 @@ namespace tezcat::Tiny::GL
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrap.platform);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrap.platform);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	//---------------------------------------------
+	//
+	//	Buffer2D
+	//
+	GLTextureBuffer2D::GLTextureBuffer2D()
+	{
+		glGenTextures(1, &mTextureID);
+	}
+
+	GLTextureBuffer2D::~GLTextureBuffer2D()
+	{
+		glDeleteTextures(1, &mTextureID);
+	}
+
+	void GLTextureBuffer2D::createTexture(const int& width, const int& high, const TextureChannel& internalChannel)
+	{
+
+	}
+
+	void GLTextureBuffer2D::createTexture(const int& width, const int& high, const TextureChannel& internalChannel, const TextureChannel& channel, const DataType& dataType)
+	{
+		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)internalChannel];
+		mChannel = ContextMap::TextureChannelArray[(uint32_t)channel];
+		mDataType = ContextMap::DataTypeArray[(uint32_t)dataType];
+
+		glBindTexture(GL_TEXTURE_2D, mTextureID);
+		glTexImage2D(GL_TEXTURE_2D
+			, 0
+			, mInternalChannel.platform
+			, width, high
+			, 0
+			, mChannel.platform
+			, mDataType.platform
+			, NULL);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mFilter.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mFilter.platform);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -136,6 +170,12 @@ namespace tezcat::Tiny::GL
 			break;
 		case TextureType::Texture2DA:
 			break;
+		case TextureType::TextureBuffer2D:
+			texture = new GLTextureBuffer2D();
+			break;
+		case TextureType::TextureRenderBuffer2D:
+			texture = new GLTextureRenderBuffer2D();
+			break;
 		default:
 			break;
 		}
@@ -144,5 +184,23 @@ namespace tezcat::Tiny::GL
 		texture->setFilter(filter);
 		texture->setWrap(wrap);
 		return texture;
+	}
+
+	GLTextureRenderBuffer2D::GLTextureRenderBuffer2D()
+	{
+		glGenRenderbuffers(1, &mTextureID);
+	}
+
+	GLTextureRenderBuffer2D::~GLTextureRenderBuffer2D()
+	{
+		glDeleteRenderbuffers(1, &mTextureID);
+	}
+
+	void GLTextureRenderBuffer2D::createTexture(const int& width, const int& high, const TextureChannel& internalChannel)
+	{
+		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)internalChannel];
+		glBindRenderbuffer(GL_RENDERBUFFER, mTextureID);
+		glRenderbufferStorage(GL_RENDERBUFFER, mInternalChannel.platform, width, high);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}
 }

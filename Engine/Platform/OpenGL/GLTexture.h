@@ -1,6 +1,7 @@
 #pragma once
-#include "Core/Renderer/Texture.h"
 #include "GLHead.h"
+
+#include "Core/Renderer/Texture.h"
 #include "Core/Head/ConfigHead.h"
 #include "Core/Manager/TextureManager.h"
 
@@ -16,7 +17,7 @@ namespace tezcat::Tiny::GL
 		void createTexture(Image* image) override;
 	};
 
-	class GLTextureCube : public TextureCube
+	class TINY_API GLTextureCube : public TextureCube
 	{
 	public:
 		GLTextureCube();
@@ -28,8 +29,34 @@ namespace tezcat::Tiny::GL
 
 	};
 
+	class TINY_API GLTextureRenderBuffer2D : public TextureRenderBuffer2D
+	{
+	public:
+		GLTextureRenderBuffer2D();
+		virtual ~GLTextureRenderBuffer2D();
+
+		void createTexture(const int& width, const int& high, const TextureChannel& internalChannel) override;
+
+	};
+
+	class TINY_API GLTextureBuffer2D : public TextureBuffer2D
+	{
+	public:
+		GLTextureBuffer2D();
+		virtual ~GLTextureBuffer2D();
+
+		void createTexture(const int& width, const int& high, const TextureChannel& internalChannel) override;
+		void createTexture(const int& width, const int& high, const TextureChannel& internalChannel, const TextureChannel& channel, const DataType& dataType) override;
+
+	};
 
 
+
+
+	//-----------------------------------
+	//
+	//
+	//
 	class TINY_API GLTextureCreator : public TextureCreator
 	{
 	public:

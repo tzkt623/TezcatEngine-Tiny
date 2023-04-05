@@ -3,22 +3,29 @@
 #include "Component.h"
 
 #include "../Engine.h"
-#include "../Manager/CameraManager.h"
-#include "../Pipeline/Pipeline.h"
-#include "../Component/MeshRenderer.h"
+
+#include "../Scene/LayerMask.h"
 #include "../Scene/Scene.h"
-#include "../Data/Material.h"
+
+#include "../Manager/CameraManager.h"
+#include "../Manager/PipelineManager.h"
+#include "../Manager/SceneManager.h"
+
+#include "../Component/MeshRenderer.h"
+#include "../Component/GameObject.h"
 #include "../Shader/ShaderPackage.h"
 #include "../Shader/Shader.h"
 
-#include "../Manager/SceneManager.h"
 #include "../Renderer/BaseGraphics.h"
-#include "../Component/GameObject.h"
-#include "../Scene/LayerMask.h"
+#include "../Renderer/FrameBuffer.h"
+
+#include "../Pipeline/Pipeline.h"
+#include "../Pipeline/Forward.h"
+
+#include "../Data/Material.h"
+
 
 #include "Utility/Utility.h"
-#include "../Pipeline/Forward.h"
-#include "../Manager/PipelineManager.h"
 
 
 namespace tezcat::Tiny::Core
@@ -26,6 +33,7 @@ namespace tezcat::Tiny::Core
 	Camera::Camera(Pipeline* pipeline, bool mainCamera)
 		: mUID(Utility::IDGenerator<Camera, unsigned int>::generate())
 		, mPipeline(pipeline)
+		, mFrameBuffer(nullptr)
 		, mIsMain(mainCamera)
 		, mNearFace(0.1f)
 		, mFarFace(100.0f)
@@ -44,6 +52,7 @@ namespace tezcat::Tiny::Core
 		, mPitch(0.0f)
 		, mRoll(0.0f)
 		, mViewInfo({ 0, 0, Engine::getScreenWidth(), Engine::getScreenHeight() })
+		, mClearMask(ClearOption::Color | ClearOption::Depth)
 	{
 
 	}
@@ -71,7 +80,7 @@ namespace tezcat::Tiny::Core
 
 	void Camera::onStart()
 	{
-
+		this->getTransform()->setDelegateUpdate([] {});
 	}
 
 	void Camera::onEnable()
@@ -116,6 +125,8 @@ namespace tezcat::Tiny::Core
 		{
 			mViewMatrix = this->getTransform()->getParent()->getModelMatrix() * mViewMatrix;
 		}
+
+		this->getTransform()->setModelMatrix(mViewMatrix);
 	}
 
 	void Camera::setOrtho(float near, float far)
@@ -149,17 +160,32 @@ namespace tezcat::Tiny::Core
 		mViewInfo.Height = height;
 	}
 
-	void Camera::render()
+	void Camera::render(BaseGraphics* graphics)
 	{
-		this->onUpdate();
-		mPipeline->render(this);
+		if (mFrameBuffer != nullptr)
+		{
+			mFrameBuffer->bind();
+			graphics->setViewport(mViewInfo);
+			graphics->clear(this);
+			this->onUpdate();
+			mPipeline->render(this);
+			mFrameBuffer->unbind();
+		}
+		else
+		{
+			graphics->setViewport(mViewInfo);
+			graphics->clear(this);
+			this->onUpdate();
+			mPipeline->render(this);
+		}
 	}
 
 	void Camera::submit(Shader* shader)
 	{
-		shader->setProjectionMatrix(this->getProjectionMatrix());
-		shader->setViewMatrix(this->getViewMatrix());
+		shader->setProjectionMatrix(mProjectionMatrix);
+		shader->setViewMatrix(mViewMatrix);
 		shader->setViewPosition(this->getTransform()->getPosition());
+		shader->setMat4(ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
 	}
 
 	void Camera::yawPitch(float yaw, float pitch, bool constrainPitch)
@@ -214,78 +240,5 @@ namespace tezcat::Tiny::Core
 		mWorldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f) * glm::angleAxis(glm::radians(mRoll), mFront));
 		mRight = glm::normalize(glm::cross(mFront, mWorldUp));
 		mUp = glm::normalize(glm::cross(mRight, mFront));
-	}
-
-	//----------------------------------------
-	//
-	//	layer
-	//
-
-	std::vector<Camera*> CameraLayer::m_Layers[32] = { std::vector<Camera*>() };
-	void CameraLayer::addCamera(Camera* camera)
-	{
-		// 		for (int i = 0; i < 32; i++)
-		// 		{
-		// 			if (camera->cullLayerMask(1u << i))
-		// 			{
-		// 				m_Layers[i].push_back(camera);
-		// 				return;
-		// 			}
-		// 		}
-	}
-
-	void CameraLayer::removeCamera(Camera* camera)
-	{
-		// 		for (int i = 0; i < 32; i++)
-		// 		{
-		// 			if (camera->cullLayerMask(1u << i))
-		// 			{
-		// 				auto it = std::remove(m_Layers[i].begin(), m_Layers[i].end(), camera);
-		// 				m_Layers[i].erase(it);
-		// 			}
-		// 		}
-	}
-
-	void CameraLayer::addCamera(Camera* camera, unsigned int mask)
-	{
-		int index = binarySearch(mask, 32);
-		m_Layers[index].push_back(camera);
-	}
-
-	bool CameraLayer::removeCamera(Camera* camera, unsigned int mask)
-	{
-		int index = binarySearch(mask, 32);
-		if (index != -1)
-		{
-			auto it = std::remove(m_Layers[index].begin(), m_Layers[index].end(), camera);
-			m_Layers[index].erase(it);
-			return true;
-		}
-		return false;
-	}
-
-	int CameraLayer::binarySearch(unsigned int mask, int count)
-	{
-		int min = 0;
-		int max = count - 1;
-
-		while (min <= max)
-		{
-			int mid = min + ((max - min) >> 1);
-			if (mask > (1u << mid))
-			{
-				min = mid + 1;
-			}
-			else if (mask < (1u << mid))
-			{
-				max = mid - 1;
-			}
-			else
-			{
-				return mid;
-			}
-		}
-
-		return -1;
 	}
 }

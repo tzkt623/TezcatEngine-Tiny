@@ -1,8 +1,7 @@
 #pragma once
-
+#include "../Manager/Manager.h"
 #include "../Head/CppHead.h"
 #include "../Head/Context.h"
-#include "../Head/ConfigHead.h"
 
 #include "Utility/Utility.h"
 
@@ -14,23 +13,18 @@ namespace tezcat::Tiny::Core
 	public:
 		TextureCreator() {}
 		virtual ~TextureCreator() {}
-
 		virtual Texture* create(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter, const TextureWrap& wrap) = 0;
 	};
 
-	class TINY_API TextureManager
+	class TINY_API TextureManager : public Manager<TextureCreator>
 	{
 	public:
 		TextureManager();
-		TextureManager(TextureCreator* creator);
-		~TextureManager();
+		virtual ~TextureManager();
 
-		void setCreator(TextureCreator* creator);
-
-		Texture* tryGetTexture(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter = TextureFilter::Tex_LINEAR, const TextureWrap& wrap = TextureWrap::Tex_REPEAT);
+		Texture* tryGetTexture(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter = TextureFilter::Linear, const TextureWrap& wrap = TextureWrap::Repeat);
 
 	private:
-		TextureCreator* mCreator;
 		std::unordered_map<std::string, Texture*> mTextureMap;
 	};
 

@@ -12,11 +12,9 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
+        str DepthTest = Less;
         bool ZWrite = true;
         str CullFace = Back;
-        bool Blend = false;
-        str BlendSrc = 1;
-        str BlendTar = 1-TarA;
     }
     #TINY_CFG_END
 
@@ -52,37 +50,68 @@
 
     #TINY_FS_BEGIN
     {
+        struct TINY_Std_Mat
+        {
+            sampler2D diffuse;
+            sampler2D normal;
+            sampler2D specular;
+            float shininess;
+        };
+
         in vec4 myColor;
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
 
+        uniform TINY_Std_Mat TINY_MatStd;
+        uniform samplerCube TINY_TexCube;
         uniform float TINY_AmbientStrength = 0.1f;
         uniform vec3 TINY_LightPosition = vec3(0.0f, 0.0f, 0.0f);
         uniform vec3 TINY_LightColor = vec3(1.0f, 1.0f, 1.0f);
         uniform vec3 TINY_ViewPosition;
-        uniform sampler2D TINY_TexColor;
 
         out vec4 myFinalColor;
 
-        float specularStrength = 0.5;
+        vec4 reflection(vec3 I)
+        {
+            //vec3 I = normalize(myWorldPosition - TINY_ViewPosition);
+            vec3 R = reflect(I, normalize(myNormal));
+            return vec4(texture(TINY_TexCube, R).rgb, 1.0);
+        }
+
+        vec4 refraction(vec3 I)
+        {
+            float ratio = 1.00 / 1.52;
+            //vec3 I = normalize(myWorldPosition - TINY_ViewPosition);
+            vec3 R = refract(I, normalize(myNormal), ratio);
+            return vec4(texture(TINY_TexCube, R).rgb, 1.0);
+        }
+
+        vec4 calcDirectionLight(vec3 viewDir, vec3 normal, vec3 lightDir)
+        {
+            vec3 ambient = TINY_AmbientStrength * TINY_LightColor * texture(TINY_MatStd.diffuse, myUV).rgb;
+
+            float diff = max(dot(normal, lightDir), 0.0);
+            vec3 diffuse = TINY_LightColor * texture(TINY_MatStd.diffuse, myUV).rgb * myColor.rgb * diff;
+
+            vec3 reflectDir = reflect(-lightDir, normal);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
+            vec3 specular = TINY_LightColor * texture(TINY_MatStd.specular, myUV).rrr * spec;
+
+            return vec4(ambient + diffuse + specular, 1.0f);
+            //return vec4(diffuse, 1.0f);
+            //return vec4(texture(TINY_MatStd.diffuse, myUV).rgb, 1.0f);
+        }
 
         void main()
         {
-            vec3 ambient = TINY_AmbientStrength * TINY_LightColor;
-
             vec3 normal = normalize(myNormal);
+            vec3 viewDir = normalize(TINY_ViewPosition - myWorldPosition);
             vec3 lightDir = normalize(TINY_LightPosition - myWorldPosition);
 
-            float diff = max(dot(normal, lightDir), 0.0);
-            vec3 diffuse = TINY_LightColor * texture(TINY_TexColor, myUV).rgb * vec3(myColor) * diff;
-
-            vec3 viewDir = normalize(TINY_ViewPosition - myWorldPosition);
-            vec3 reflectDir = reflect(-lightDir, normal);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
-            vec3 specular = specularStrength * spec * TINY_LightColor;
-
-            myFinalColor = vec4(ambient + diffuse + specular, 1.0f);
+            myFinalColor = calcDirectionLight(viewDir, normal, lightDir);
+            //myFinalColor = reflection();
+            //myFinalColor = refraction();
         }
     }
     #TINY_FS_END

@@ -8,22 +8,13 @@
 
 namespace tezcat::Tiny::Core
 {
-	class Camera;
-	class TINY_API CameraLayer
-	{
-	public:
-		static void addCamera(Camera* camera);
-		static void removeCamera(Camera* camera);
-
-		static void addCamera(Camera* camera, unsigned int mask);
-		static bool removeCamera(Camera* camera, unsigned int mask);
-
-	private:
-		static int binarySearch(unsigned int mask, int count);
-
-	private:
-		static std::vector<Camera*> m_Layers[32];
-	};
+	class Transform;
+	class MeshRenderer;
+	class Shader;
+	class Scene;
+	class Pipeline;
+	class FrameBuffer;
+	class BaseGraphics;
 
 	struct TINY_API ViewportInfo
 	{
@@ -33,11 +24,17 @@ namespace tezcat::Tiny::Core
 		int Height;
 	};
 
-	class Transform;
-	class MeshRenderer;
-	class Shader;
-	class Scene;
-	class Pipeline;
+	class ClearOption
+	{
+		ClearOption() = delete;
+		~ClearOption() = delete;
+	public:
+		static const uint32_t None = 0;
+		static const uint32_t Skybox = 1 << 0;
+		static const uint32_t Depth = 1 << 1;
+		static const uint32_t Color = 1 << 2;
+		static const uint32_t Stencil = 1 << 3;
+	};
 
 	/// <summary>
 	/// 相机模块
@@ -65,12 +62,21 @@ namespace tezcat::Tiny::Core
 
 		void setOrtho(float near, float far);
 		void setPerspective(float fov, float near, float far);
+		void setClearOption(uint32_t option)
+		{
+			mClearMask = option;
+		}
+		uint32_t getClearOption() const { return mClearMask; }
+
 
 		Type getViewType() { return mType; }
 		uint32_t getID() const { return mUID; }
 
 		Pipeline* getPipeline() const { return mPipeline; }
 		void setPipeline(Pipeline* val) { mPipeline = val; }
+
+		FrameBuffer* getFrameBuffer() const { return mFrameBuffer; }
+		void setFrameBuffer(FrameBuffer* val) { mFrameBuffer = val; }
 
 		void setCullLayer(uint32_t layer)
 		{
@@ -80,7 +86,7 @@ namespace tezcat::Tiny::Core
 		std::vector<uint32_t>& getCullLayerList() { return mCullLayerList; }
 		bool frustumCulling(GameObject* go) { return true; }
 
-		void render();
+		void render(BaseGraphics* graphics);
 		void submit(Shader* shader);
 	public:
 
@@ -145,9 +151,13 @@ namespace tezcat::Tiny::Core
 		float mPitch;
 		float mRoll;
 
+		//clear options
+	private:
+		uint32_t mClearMask;
 
 	private:
 		Pipeline* mPipeline;
+		FrameBuffer* mFrameBuffer;
 		std::vector<uint32_t> mCullLayerList;
 	};
 }

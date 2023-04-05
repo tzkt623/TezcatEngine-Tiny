@@ -5,16 +5,20 @@
 namespace tezcat::Tiny::Core
 {
 	Texture::Texture()
-		: Texture(TextureWrap::Tex_REPEAT, TextureFilter::Tex_LINEAR)
+		: Texture(TextureChannel::None, TextureWrap::Clamp_To_Edge, TextureFilter::Linear)
 	{
 
 	}
 
-	Texture::Texture(const TextureWrap& wrap, const TextureFilter& filter)
+	Texture::Texture(const TextureChannel& internalChannel, const TextureWrap& wrap, const TextureFilter& filter)
 		: mTextureID(0)
-		, mWrap(ContextMap::TextureWrapArray[(int)wrap])
-		, mFilter(ContextMap::TextureFilterArray[(int)filter])
+		, mWrap(ContextMap::TextureWrapArray[(uint32_t)wrap])
+		, mFilter(ContextMap::TextureFilterArray[(uint32_t)filter])
+		, mInternalChannel(ContextMap::TextureChannelArray[(uint32_t)internalChannel])
+		, mChannel(ContextMap::TextureChannelArray[(uint32_t)TextureChannel::None])
+		, mDataType(ContextMap::DataTypeArray[(uint32_t)DataType::UByte])
 	{
+
 	}
 
 	Texture::~Texture()
@@ -27,5 +31,21 @@ namespace tezcat::Tiny::Core
 		Image img;
 		img.openFile(filePath);
 		this->createTexture(&img);
+	}
+
+
+	TexChannelWrapper Texture::getTextureChannels(Image* image)
+	{
+		switch (image->getChannels())
+		{
+		case 1: return ContextMap::TextureChannelArray[(uint32_t)TextureChannel::R];
+		case 2: return ContextMap::TextureChannelArray[(uint32_t)TextureChannel::RG];
+		case 3: return ContextMap::TextureChannelArray[(uint32_t)TextureChannel::RGB];
+		case 4: return ContextMap::TextureChannelArray[(uint32_t)TextureChannel::RGBA];
+		default:
+			break;
+		}
+
+		return ContextMap::TextureChannelArray[(uint32_t)TextureChannel::None];
 	}
 }

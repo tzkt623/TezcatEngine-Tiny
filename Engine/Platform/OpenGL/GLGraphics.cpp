@@ -4,6 +4,7 @@
 #include "GLHead.h"
 #include "GLShaderBuilder.h"
 #include "GLTexture.h"
+#include "GLFrameBuffer.h"
 
 #include "WindowsEngine.h"
 
@@ -22,7 +23,9 @@ namespace tezcat::Tiny::GL
 	GLGraphics::GLGraphics()
 		: mWindow(nullptr)
 	{
-		TextureMgr::init(new GLTextureCreator());
+		TextureMgr::getInstance()->initCreator(new GLTextureCreator());
+		FrameBufferMgr::getInstance()->initCreator(new GLFrameBufferCreator());
+
 		VertexBufferCreator::attach(new GLVertexBufferCreator());
 		VertexGroupCreator::attach(new GLVertexGroupCreator());
 		ShaderBuilderCreator::attach(new GLShaderBuilderCreator());
@@ -50,16 +53,16 @@ namespace tezcat::Tiny::GL
 
 		(new GUI())->init(engine);
 
-// 		glEnable(GL_DEPTH_TEST);
-// 		glEnable(GL_CULL_FACE);
-// 		glCullFace(GL_BACK);
+		// 		glEnable(GL_DEPTH_TEST);
+		// 		glEnable(GL_CULL_FACE);
+		// 		glCullFace(GL_BACK);
 
 		GLint max;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
 	}
 
-	void GLGraphics::updateViewport(ViewportInfo& info)
+	void GLGraphics::setViewport(ViewportInfo& info)
 	{
 		glViewport(info.OX, info.OY, info.Width, info.Height);
 	}
@@ -85,11 +88,38 @@ namespace tezcat::Tiny::GL
 		glfwSwapBuffers(mWindow);
 	}
 
-	void GLGraphics::clear()
+	void GLGraphics::clear(Camera* camera)
 	{
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		glClearDepth(1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		auto option = camera->getClearOption();
+		if (option == ClearOption::None)
+		{
+			return;
+		}
+
+		GLbitfield mask = 0;
+		if ((option & ClearOption::Color) == ClearOption::Color)
+		{
+			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+			mask |= GL_COLOR_BUFFER_BIT;
+		}
+
+		if ((option & ClearOption::Depth) == ClearOption::Depth)
+		{
+			//如果深度缓冲不允许写入
+			//那么也无法clear
+			//所以这里必须要打开
+			glDepthMask(GL_TRUE);
+			glClearDepth(1.0);
+			mask |= GL_DEPTH_BUFFER_BIT;
+		}
+
+		if ((option & ClearOption::Stencil) == ClearOption::Stencil)
+		{
+			glStencilMask(0xFF);
+			mask |= GL_STENCIL_BUFFER_BIT;
+		}
+
+		glClear(mask);
 	}
 
 	void GLGraphics::draw(IRenderObject* renderObject)
@@ -133,6 +163,21 @@ namespace tezcat::Tiny::GL
 	{
 		Statistic::GPU = glGetString(GL_RENDERER);
 
+		ContextMap::DataTypeArray =
+		{
+			DataTypeWrapper(DataType::Byte,			GL_BYTE),
+			DataTypeWrapper(DataType::UByte,		GL_UNSIGNED_BYTE),
+			DataTypeWrapper(DataType::Short,		GL_SHORT),
+			DataTypeWrapper(DataType::UShort,		GL_UNSIGNED_SHORT),
+			DataTypeWrapper(DataType::Int32,		GL_INT),
+			DataTypeWrapper(DataType::UInt32,		GL_UNSIGNED_INT),
+			DataTypeWrapper(DataType::Int64,		GL_INT),
+			DataTypeWrapper(DataType::UInt64,		GL_UNSIGNED_INT),
+			DataTypeWrapper(DataType::Float32,		GL_FLOAT),
+			DataTypeWrapper(DataType::Float64,		GL_FLOAT),
+			DataTypeWrapper(DataType::UInt_24_8,	GL_UNSIGNED_INT_24_8),
+		};
+
 		ContextMap::DrawModeArray =
 		{
 			DrawModeWrapper(DrawMode::Points,			GL_POINTS),
@@ -146,32 +191,45 @@ namespace tezcat::Tiny::GL
 
 		ContextMap::TextureTypeArray =
 		{
-			TexTypeWrapper(TextureType::Texture1D,		GL_TEXTURE_1D),
-			TexTypeWrapper(TextureType::Texture2D,		GL_TEXTURE_2D),
-			TexTypeWrapper(TextureType::Texture2D,		GL_TEXTURE_3D),
-			TexTypeWrapper(TextureType::TextureCube,	GL_TEXTURE_CUBE_MAP),
-			TexTypeWrapper(TextureType::Texture1DA,		GL_TEXTURE_1D_ARRAY),
-			TexTypeWrapper(TextureType::Texture2DA,		GL_TEXTURE_2D_ARRAY)
+			TexTypeWrapper(TextureType::Texture1D,					GL_TEXTURE_1D),
+			TexTypeWrapper(TextureType::Texture2D,					GL_TEXTURE_2D),
+			TexTypeWrapper(TextureType::Texture2D,					GL_TEXTURE_3D),
+			TexTypeWrapper(TextureType::TextureCube,				GL_TEXTURE_CUBE_MAP),
+			TexTypeWrapper(TextureType::Texture1DA,					GL_TEXTURE_1D_ARRAY),
+			TexTypeWrapper(TextureType::Texture2DA,					GL_TEXTURE_2D_ARRAY),
+			TexTypeWrapper(TextureType::TextureBuffer2D,			GL_TEXTURE_2D),
+			TexTypeWrapper(TextureType::TextureRenderBuffer2D,		GL_RENDERBUFFER),
 		};
 
 		ContextMap::TextureFilterArray =
 		{
-			TexFilterWrapper(TextureFilter::Tex_NEAREST, GL_NEAREST),
-			TexFilterWrapper(TextureFilter::Tex_NEAREST, GL_LINEAR),
+			TexFilterWrapper(TextureFilter::Nearest, GL_NEAREST),
+			TexFilterWrapper(TextureFilter::Nearest, GL_LINEAR),
 		};
 
 		ContextMap::TextureWrapArray =
 		{
-			TexWrapWrapper(TextureWrap::Tex_REPEAT,				GL_REPEAT),
-			TexWrapWrapper(TextureWrap::Tex_MIRRORED_REPEAT,	GL_MIRRORED_REPEAT),
-			TexWrapWrapper(TextureWrap::Tex_CLAMP_TO_EDGE,		GL_CLAMP_TO_EDGE),
-			TexWrapWrapper(TextureWrap::Tex_CLAMP_TO_BORDER,	GL_CLAMP_TO_BORDER)
+			TexWrapWrapper(TextureWrap::Repeat,				GL_REPEAT),
+			TexWrapWrapper(TextureWrap::Mirrored_Repeat,	GL_MIRRORED_REPEAT),
+			TexWrapWrapper(TextureWrap::Clamp_To_Edge,		GL_CLAMP_TO_EDGE),
+			TexWrapWrapper(TextureWrap::Clamp_To_Border,	GL_CLAMP_TO_BORDER)
 		};
 
 		ContextMap::TextureChannelArray =
 		{
-			TexChannelWrapper(TextureChannel::Tex_RGB,	GL_RGB),
-			TexChannelWrapper(TextureChannel::Tex_RGBA, GL_RGBA)
+			TexChannelWrapper(TextureChannel::None,	0),
+			TexChannelWrapper(TextureChannel::R,					GL_RED),
+			TexChannelWrapper(TextureChannel::RG,					GL_RG),
+			TexChannelWrapper(TextureChannel::RGB,					GL_RGB),
+			TexChannelWrapper(TextureChannel::RGBA,					GL_RGBA),
+			TexChannelWrapper(TextureChannel::Depth16,				GL_DEPTH_COMPONENT16),
+			TexChannelWrapper(TextureChannel::Depth24,				GL_DEPTH_COMPONENT24),
+			TexChannelWrapper(TextureChannel::Depth32,				GL_DEPTH_COMPONENT32),
+			TexChannelWrapper(TextureChannel::Depth32f,				GL_DEPTH_COMPONENT32F),
+			TexChannelWrapper(TextureChannel::Depth_Stencil,		GL_DEPTH_STENCIL),
+			TexChannelWrapper(TextureChannel::Depth24_Stencil8,		GL_DEPTH24_STENCIL8),
+			TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	GL_DEPTH32F_STENCIL8),
+			TexChannelWrapper(TextureChannel::Stencil8,				GL_STENCIL_INDEX8),
 		};
 
 		ContextMap::BlendMap =
@@ -191,7 +249,7 @@ namespace tezcat::Tiny::GL
 			{"ConstA",		BlendWrapper(Blend::ConstAlpha,				GL_CONSTANT_ALPHA)},
 			{"1-ConstA",	BlendWrapper(Blend::One_Minus_ConstAlpha,	GL_ONE_MINUS_CONSTANT_ALPHA)}
 		};
-//		std::cout << ContextMap::BlendMap.size() << std::endl;
+		//		std::cout << ContextMap::BlendMap.size() << std::endl;
 
 		ContextMap::BlendArray =
 		{
