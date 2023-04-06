@@ -7,6 +7,7 @@
 #include "Manager/PipelineManager.h"
 #include "Manager/FrameBufferManager.h"
 #include "Manager/TextureManager.h"
+#include "Manager/PipelineManager.h"
 
 #include "Data/ResourceLoader.h"
 #include "Input/InputSystem.h"
@@ -30,6 +31,7 @@ namespace tezcat::Tiny::Core
 		, mCameraManager(new CameraManager())
 		, mFrameBufferManager(new FrameBufferManager())
 		, mTextureManager(new TextureManager())
+		, mPipelineManager(new PipelineManager())
 		, mInputSystem(new InputSystem())
 		, mGraphics(nullptr)
 		, mIsRunning(true)

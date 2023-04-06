@@ -49,6 +49,7 @@ namespace tezcat::Tiny::Core
 	void Scene::addGameObject(GameObject* gameObject)
 	{
 		mNewObjectList.emplace_back(gameObject);
+		mObjectList.emplace_back(gameObject);
 	}
 
 	void Scene::addParentChangedTransform(Transform* transform)
@@ -146,4 +147,19 @@ namespace tezcat::Tiny::Core
 // 			}
 // 		}
 	}
+
+	std::vector<GameObject*> Scene::findGameObjects(const std::string& name)
+	{
+		std::vector<GameObject*> result;
+		for (auto object : mObjectList)
+		{
+			if (object->getName() == name)
+			{
+				result.push_back(object);
+			}
+		}
+
+		return result;
+	}
+
 }

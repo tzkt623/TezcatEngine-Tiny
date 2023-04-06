@@ -1,7 +1,13 @@
 #include "MyScene.h"
 #include "MyInputer.h"
 #include "MyGUI.h"
+#include "MyController.h"
 
+TextureRenderBuffer2D* MyScene::rbWorld1;
+TextureRenderBuffer2D* MyScene::rbWorld2;
+
+FrameBuffer* MyScene::fbWorld1;
+FrameBuffer* MyScene::fbWorld2;
 
 MyScene::MyScene(const std::string& name)
 	: Scene(name)
@@ -21,56 +27,108 @@ void MyScene::initGUI()
 	camera->open();
 }
 
+
+
 void MyScene::onEnter()
 {
 	Scene::onEnter();
 
-	std::string skybox_path = "../Resource/Image/skybox/sky2_%s.jpg";
-	TextureRenderBuffer2D* buffer2D = nullptr;
+	float gateWidth = 1920.0f / 4;
+	float gateHigh = 1080.0f / 4;
+
+	std::string skybox1_path = "../Resource/Image/skybox/sky1_%s.jpg";
+	std::string skybox2_path = "../Resource/Image/skybox/sky2_%s.jpg";
+
+	auto controller_go = new GameObject("Controller");
+	controller_go->addComponent<Transform>();
+	controller_go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+	controller_go->addComponent<MyController>();
 
 	if (true)
 	{
-		auto go = new GameObject("MainCamera");
+		auto go = new GameObject("World1_Camera");
 		auto camera = go->addComponent<Camera>(true);
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
 		camera->setCullLayer(0);
 
 		go->addComponent<Transform>();
-		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		go->getTransform()->setParent(controller_go->getTransform());
+
+		//world1 frame
+		fbWorld1 = FrameBufferMgr::getInstance()->create(Engine::getScreenWidth(), Engine::getScreenHeight(),
+		{
+			TextureBufferInfo(TextureBufferType::Color, TextureChannel::RGBA, TextureChannel::RGBA, DataType::UByte),
+			TextureBufferInfo(TextureBufferType::DepthAndStencil, TextureChannel::Depth24_Stencil8)
+		});
+
+		rbWorld1 = fbWorld1->getBuffer(0);
+
 	}
 
 	if (true)
 	{
-		auto go = new GameObject("CameraFrame");
+		auto go = new GameObject("World2_Camera");
 		auto camera = go->addComponent<Camera>(false);
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
-		camera->setCullLayer(0);
+		camera->setCullLayer(1);
 		camera->setDeep(1);
 
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-		go->getTransform()->setParent(CameraMgr::getInstance()->getMainCamera()->getTransform());
+		go->getTransform()->setParent(controller_go->getTransform());
 
-		auto frameBuffer = FrameBufferMgr::getInstance()->create(Engine::getScreenWidth(), Engine::getScreenHeight(),
-			{
-				TextureBufferInfo(TextureBufferType::Color, TextureChannel::RGBA, TextureChannel::RGBA, DataType::UByte),
-				TextureBufferInfo(TextureBufferType::DepthAndStencil, TextureChannel::Depth24_Stencil8)
-			});
+		fbWorld2 = FrameBufferMgr::getInstance()->create(Engine::getScreenWidth(), Engine::getScreenHeight(),
+		{
+			TextureBufferInfo(TextureBufferType::Color, TextureChannel::RGBA, TextureChannel::RGBA, DataType::UByte),
+			TextureBufferInfo(TextureBufferType::DepthAndStencil, TextureChannel::Depth24_Stencil8)
+		});
 
-		buffer2D = frameBuffer->getBuffer(0);
-		camera->setFrameBuffer(frameBuffer);
+		rbWorld2 = fbWorld2->getBuffer(0);
+		camera->setFrameBuffer(fbWorld2);
+
+
+		go = new GameObject("Skybox2");
+		go->addComponent<Transform>();
+		go->setLayerMaskIndex(1);
+
+		auto skybox = go->addComponent<Skybox>();
+		auto material = new Material("Unlit/Skybox");
+		material->addUniform<UniformTexCube>(
+			ShaderParam::TexCube
+			, skybox1_path
+			, TextureFilter::Linear
+			, TextureWrap::Clamp_To_Edge);
+		skybox->setMaterial(material);
+
+		//--------------------------
+		auto world2 = new GameObject("World1_Gate");
+		world2->setLayerMaskIndex(1);
+
+		auto tran = world2->addComponent<Transform>();
+		tran->setPosition(glm::vec3(200.0f, 0.0f, 0.0f));
+		tran->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
+		tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
+
+		auto mr1 = world2->addComponent<MeshRenderer>();
+		auto world1_material = new Material("Unlit/Texture");
+		world1_material->addUniform<UniformTex2D>(
+			ShaderParam::TexColor
+			, rbWorld1);
+		mr1->setMaterial(world1_material);
+		mr1->setMesh("Square");
 	}
 
 	if (true)
 	{
-		auto go = new GameObject("Skybox");
+		auto go = new GameObject("Skybox1");
 		go->addComponent<Transform>();
 
 		auto skybox = go->addComponent<Skybox>();
 		auto material = new Material("Unlit/Skybox");
 		material->addUniform<UniformTexCube>(
 			ShaderParam::TexCube
-			, skybox_path
+			, skybox2_path
 			, TextureFilter::Linear
 			, TextureWrap::Clamp_To_Edge);
 		skybox->setMaterial(material);
@@ -98,21 +156,18 @@ void MyScene::onEnter()
 
 	if (true)
 	{
-		auto wife1 = new GameObject();
-		auto tran = wife1->addComponent<Transform>();
-		tran->setPosition(glm::vec3(-960.0f, 0.0f, 0.0f));
+		auto world2 = new GameObject("World2_Gate");
+		auto tran = world2->addComponent<Transform>();
+		tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
 		tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-		tran->setScale(glm::vec3(1920.0f / 2, 1080.0f / 2, 1.0f));
+		tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
 
-		auto mr1 = wife1->addComponent<MeshRenderer>();
-		auto wife1_material = new Material("Unlit/Texture");
-		// 		wife1_material->addUniform<UniformTex2D>(
-		// 			ShaderParam::TexColor
-		// 			, "../Resource/Image/reimu.jpg");
-		wife1_material->addUniform<UniformTex2D>(
+		auto mr1 = world2->addComponent<MeshRenderer>();
+		auto world2_material = new Material("Unlit/Texture");
+		world2_material->addUniform<UniformTex2D>(
 			ShaderParam::TexColor
-			, buffer2D);
-		mr1->setMaterial(wife1_material);
+			, rbWorld2);
+		mr1->setMaterial(world2_material);
 		mr1->setMesh("Square");
 
 
@@ -235,11 +290,41 @@ void MyScene::onEnter()
 			go->addComponent<Transform>();
 			go->getTransform()->setPosition(glm::vec3(dis(gen) / 10.0f, dis(gen) / 10.0f, dis(gen) / 10.0f));
 
-			//				Standard/Std2 error!!!
-			//  			auto material = new Material("Standard/Std2");
-			// 				material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "../Resource/Image/container.png");
-			// 				material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "../Resource/Image/container_specular.png");
-			// 				material->addUniform<UniformF>(ShaderParam::StdMaterial::Shininess, 64.0f);
+			auto mr = go->addComponent<MeshRenderer>();
+			auto material = new Material("Standard/Std1");
+			material->addUniform<UniformTex2D>(
+				ShaderParam::StdMaterial::Diffuse
+				, "../Resource/Image/metal_plate_diff.jpg");
+			material->addUniform<UniformTex2D>(
+				ShaderParam::StdMaterial::Specular
+				, "../Resource/Image/metal_plate_spec.jpg");
+			material->addUniform<UniformF1>(
+				ShaderParam::StdMaterial::Shininess
+				, 64.0f);
+			material->addUniform<UniformTexCube>(
+				ShaderParam::TexCube
+				, skybox2_path);
+			mr->setMaterial(material);
+			mr->setMesh("Sphere");
+		}
+	}
+
+	//----------------------------------------
+//
+//	Cubes
+//
+	if (true)
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(-1000, 1000);
+
+		for (int i = 0; i < 1000; i++)
+		{
+			auto go = new GameObject();
+			go->setLayerMaskIndex(1);
+			go->addComponent<Transform>();
+			go->getTransform()->setPosition(glm::vec3(dis(gen) / 10.0f, dis(gen) / 10.0f, dis(gen) / 10.0f));
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Standard/Std1");
@@ -254,14 +339,13 @@ void MyScene::onEnter()
 				, 64.0f);
 			material->addUniform<UniformTexCube>(
 				ShaderParam::TexCube
-				, skybox_path);
+				, skybox2_path);
 			mr->setMaterial(material);
-			mr->setMesh("Sphere");
+			mr->setMesh("Cube");
 		}
 	}
 
 
 	SG<InputSystem>::getInstance()->push(MyInputer::getInstance());
-
 	this->initGUI();
 }

@@ -164,6 +164,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Test\MyController.cpp" />
     <ClCompile Include="Test\main.cpp" />
     <ClCompile Include="Test\MyGUI.cpp" />
     <ClCompile Include="Test\MyInputer.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Test\MyScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Test\MyController.h" />
     <ClInclude Include="Test\MyGUI.h" />
     <ClInclude Include="Test\MyInputer.h" />
     <ClInclude Include="Test\MyResourceLoader.h" />

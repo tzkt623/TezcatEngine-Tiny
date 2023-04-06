@@ -31,12 +31,11 @@ namespace tezcat::Tiny::Core
 
 	void Skybox::onStart()
 	{
-
+		PipelineMgr::getInstance()->addRenderObject(this->getGameObject()->getLayerMaskIndex(), this);
 	}
 
 	void Skybox::onEnable()
 	{
-		PipelineManager::addRenderObject(this->getGameObject()->getLayerMaskIndex(), this);
 	}
 
 	Material* Skybox::getMaterial() const
@@ -47,7 +46,9 @@ namespace tezcat::Tiny::Core
 	void Skybox::sendToRenderPass()
 	{
 		auto shader = mMaterial->getShaderPackage()->getShaders()[0];
-		PipelineManager::getPass(shader->getUID())->addRenderObject(this);
+		PipelineMgr::getInstance()
+			->getPass(shader->getUID())
+			->addRenderObject(this);
 	}
 
 	void Skybox::submit(Shader* shader)

@@ -1,10 +1,12 @@
-﻿#include "MyInputer.h"
+#include "MyInputer.h"
+#include "MyController.h"
 
 MyInputer::MyInputer()
-	: m_Camera(nullptr)
+	: mCamera(nullptr)
 	, m_LockMouse(true)
 	, m_LastX(0)
 	, m_LastY(0)
+	, mController(nullptr)
 {
 
 }
@@ -22,34 +24,34 @@ void MyInputer::processInput(InputSystem* system)
 	if (system->getKeyDown(GLFW_KEY_W))
 	{
 		transform = true;
-		position += m_Camera->getFront() * speed;
+		position += mController->getFront() * speed;
 	}
 	else if (system->getKeyDown(GLFW_KEY_S))
 	{
 		transform = true;
-		position -= m_Camera->getFront() * speed;
+		position -= mController->getFront() * speed;
 	}
 
 	if (system->getKeyDown(GLFW_KEY_A))
 	{
 		transform = true;
-		position -= m_Camera->getRight() * speed;
+		position -= mController->getRight() * speed;
 	}
 	else if (system->getKeyDown(GLFW_KEY_D))
 	{
 		transform = true;
-		position += m_Camera->getRight() * speed;
+		position += mController->getRight() * speed;
 	}
 
 	if (system->getKeyDown(GLFW_KEY_R))
 	{
 		transform = true;
-		position += m_Camera->getUp() * speed;
+		position += mController->getUp() * speed;
 	}
 	else if (system->getKeyDown(GLFW_KEY_F))
 	{
 		transform = true;
-		position -= m_Camera->getUp() * speed;
+		position -= mController->getUp() * speed;
 
 	}
 
@@ -87,7 +89,7 @@ void MyInputer::processInput(InputSystem* system)
 			m_LastX = current_x;
 			m_LastY = current_y;
 
-			m_Camera->yawPitch(offset_x, offset_y);
+			mController->yawPitch(offset_x, offset_y);
 		}
 	}
 	else
@@ -97,7 +99,7 @@ void MyInputer::processInput(InputSystem* system)
 
 	if (transform)
 	{
-		m_Camera->getTransform()->translate(position);
+		mController->getTransform()->translate(position);
 	}
 	else
 	{
@@ -108,11 +110,13 @@ void MyInputer::processInput(InputSystem* system)
 		// 		position.z = camZ;
 		// 		m_Camera->getTransform()->setPosition(position);
 	}
+
+	mController->updateCameraVector();
 }
 
 void MyInputer::onEnter()
 {
-	m_Camera = CameraMgr::getInstance()->getMainCamera();
+
 }
 
 void MyInputer::onExit()

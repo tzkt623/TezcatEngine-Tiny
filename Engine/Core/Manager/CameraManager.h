@@ -20,6 +20,7 @@ namespace tezcat::Tiny::Core
 		void sort();
 
 		void setMain(Camera* camera);
+		void setMain(const std::string& name);
 		void addCamera(Camera* camera);
 	private:
 		bool mDirty;
@@ -45,6 +46,7 @@ namespace tezcat::Tiny::Core
 		const std::vector<Camera*>& getSortedCameraAry() { return mData->getAllCamera(); }
 
 		void setMainCamera(Camera* camera);
+		void setMainCamera(const std::string& name);
 		void addCamera(Camera* camera);
 	private:
 		CameraData* mData;

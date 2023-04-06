@@ -80,7 +80,13 @@ namespace tezcat::Tiny::Core
 
 		void setCullLayer(uint32_t layer)
 		{
-			return mCullLayerList.push_back(layer);
+			mCullLayerList.clear();
+			mCullLayerList.push_back(layer);
+		}
+
+		void addCullLayer(uint32_t layer)
+		{
+			mCullLayerList.push_back(layer);
 		}
 
 		std::vector<uint32_t>& getCullLayerList() { return mCullLayerList; }

@@ -44,7 +44,10 @@ namespace tezcat::Tiny::Core
 		auto& cameras = CameraMgr::getInstance()->getSortedCameraAry();
 		for (auto camera : cameras)
 		{
-			camera->render(this);
+			if (camera->isEnable())
+			{
+				camera->render(this);
+			}
 		}
 	}
 

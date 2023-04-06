@@ -28,7 +28,7 @@ namespace tezcat::Tiny::Core
 
 		uint32_t getLayerMask() { return 1 << mLayerMaskIndex; }
 		uint32_t getLayerMaskIndex() { return mLayerMaskIndex; }
-		void setLayerMask(uint32_t maskIndex) { mLayerMaskIndex = 1 << maskIndex; }
+		void setLayerMaskIndex(uint32_t maskIndex) { mLayerMaskIndex = maskIndex; }
 
 	public:
 		bool needDelete() const { return mNeedDelete; }

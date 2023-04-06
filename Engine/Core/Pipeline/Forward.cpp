@@ -51,7 +51,7 @@ namespace tezcat::Tiny::Core
 		auto& cull_list = camera->getCullLayerList();
 		for (auto index : cull_list)
 		{
-			PipelineManager::getRenderLayer(index)->testWithCamera(camera);
+			PipelineMgr::getInstance()->getRenderLayer(index)->testWithCamera(camera);
 		}
 
 		//#LightCulling

@@ -2,7 +2,9 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
+#include "Utility/Singleton.h"
 
+using namespace tezcat::Tiny::Utility;
 namespace tezcat::Tiny::Core
 {
 	class BaseGraphics;
@@ -17,27 +19,33 @@ namespace tezcat::Tiny::Core
 	class TINY_API PipelineManager
 	{
 	public:
-		static void createPass(Shader* shader);
+		PipelineManager();
+		~PipelineManager();
 
-		static RenderPass* getPass(int uid) { return mPassList[uid]; }
-		static void loadAllShaderToRenderer(BaseGraphics* graphics);
+	public:
+		void createPass(Shader* shader);
 
-		static RenderLayer* getRenderLayer(uint32_t index) { return mRenderLayerList[index]; }
-		static LightLayer* getLightLayer(uint32_t index) { return mLightLayerList[index]; }
-		static void addRenderObject(uint32_t layerIndex, IRenderObject* renderObject);
-		static void addLight(uint32_t layerIndex, ILight* light);
+		RenderPass* getPass(int uid) { return mPassList[uid]; }
+		void loadAllShaderToRenderer(BaseGraphics* graphics);
 
-		static void add(const std::string& name, Pipeline* pl);
-		static Pipeline* get(const std::string& name);
+		RenderLayer* getRenderLayer(uint32_t index) { return mRenderLayerList[index]; }
+		LightLayer* getLightLayer(uint32_t index) { return mLightLayerList[index]; }
+		void addRenderObject(uint32_t layerIndex, IRenderObject* renderObject);
+		void addLight(uint32_t layerIndex, ILight* light);
+
+		void add(const std::string& name, Pipeline* pl);
+		Pipeline* get(const std::string& name);
 
 	private:
-		static std::vector<RenderPass*> mPassList;
-		static std::vector<std::tuple<Camera*, Pipeline*>> s_PipelineArray;
+		std::vector<RenderPass*> mPassList;
+		std::vector<std::tuple<Camera*, Pipeline*>> s_PipelineArray;
 
 
-		static std::vector<RenderLayer*> mRenderLayerList;
-		static std::vector<LightLayer*> mLightLayerList;
+		std::vector<RenderLayer*> mRenderLayerList;
+		std::vector<LightLayer*> mLightLayerList;
 
-		static std::unordered_map<std::string, Pipeline*> sPipelineMap;
+		std::unordered_map<std::string, Pipeline*> sPipelineMap;
 	};
+
+	using PipelineMgr = SG<PipelineManager>;
 }

@@ -15,7 +15,7 @@
         str DepthTest = Less;
         bool ZWrite = true;
         str DepthTest = Less;
-        str CullFace = Back;
+        str CullFace = Off;
     }
     #TINY_CFG_END
 

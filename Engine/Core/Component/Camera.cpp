@@ -64,12 +64,12 @@ namespace tezcat::Tiny::Core
 	}
 
 	Camera::Camera(bool mainCamera)
-		: Camera(PipelineManager::get("Forward"), mainCamera)
+		: Camera(PipelineMgr::getInstance()->get("Forward"), mainCamera)
 	{
 	}
 
 	Camera::Camera()
-		: Camera(PipelineManager::get("Forward"), true)
+		: Camera(PipelineMgr::getInstance()->get("Forward"), true)
 	{
 	}
 

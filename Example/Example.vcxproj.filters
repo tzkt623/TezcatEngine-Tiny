@@ -30,6 +30,9 @@
     <ClCompile Include="Test\MyScene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test\MyController.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test\MyGUI.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyScene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyController.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

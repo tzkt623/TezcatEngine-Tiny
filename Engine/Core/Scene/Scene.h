@@ -19,7 +19,7 @@ namespace tezcat::Tiny::Core
 	public:
 		Scene(const std::string& name);
 		virtual ~Scene();
-		inline const std::string& getName() const { return mName; }
+		const std::string& getName() const { return mName; }
 
 	public:
 		virtual void onEnter();
@@ -43,6 +43,8 @@ namespace tezcat::Tiny::Core
 
 	public:
 		inline const std::list<GameObject*> getObjectList() const { return mObjectList; }
+		std::vector<GameObject*> findGameObjects(const std::string& name);
+
 	private:
 		std::string mName;
 		std::list<GameObject*> mObjectList;

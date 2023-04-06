@@ -59,7 +59,7 @@ namespace tezcat::Tiny::Core
 		auto& shaders = mMainMaterial->getShaderPackage()->getShaders();
 		for (auto s : shaders)
 		{
-			PipelineManager::getPass(s->getUID())->addRenderObject(this);
+			PipelineMgr::getInstance()->getPass(s->getUID())->addRenderObject(this);
 		}
 	}
 
@@ -71,7 +71,6 @@ namespace tezcat::Tiny::Core
 
 	void MeshRenderer::onEnable()
 	{
-		PipelineManager::addRenderObject(this->getGameObject()->getLayerMaskIndex(), this);
 	}
 
 	void MeshRenderer::onDisable()
@@ -81,7 +80,7 @@ namespace tezcat::Tiny::Core
 
 	void MeshRenderer::onStart()
 	{
-
+		PipelineMgr::getInstance()->addRenderObject(this->getGameObject()->getLayerMaskIndex(), this);
 	}
 
 	int MeshRenderer::getVertexCount() const

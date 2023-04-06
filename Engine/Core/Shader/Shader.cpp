@@ -44,7 +44,7 @@ namespace tezcat::Tiny::Core
 	void Shader::apply()
 	{
 		ShaderMgr::getInstance()->addShader(this);
-		PipelineManager::createPass(this);
+		PipelineMgr::getInstance()->createPass(this);
 	}
 
 	void Shader::apply(const UniformID::USet& uniforms)

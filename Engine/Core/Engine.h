@@ -12,6 +12,7 @@ namespace tezcat::Tiny::Core
 	class LightManager;
 	class BaseGraphics;
 	class FrameBufferManager;
+	class PipelineManager;
 	class TextureManager;
 	class TINY_API Engine
 	{
@@ -44,6 +45,7 @@ namespace tezcat::Tiny::Core
 		CameraManager* mCameraManager;
 		FrameBufferManager* mFrameBufferManager;
 		TextureManager* mTextureManager;
+		PipelineManager* mPipelineManager;
 
 
 		InputSystem* mInputSystem;

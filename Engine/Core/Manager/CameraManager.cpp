@@ -22,6 +22,11 @@ namespace tezcat::Tiny::Core
 		mData->setMain(camera);
 	}
 
+	void CameraManager::setMainCamera(const std::string& name)
+	{
+		mData->setMain(name);
+	}
+
 	Camera* CameraManager::getCamera(int index)
 	{
 		return mData->getCamera(index);
@@ -91,6 +96,8 @@ namespace tezcat::Tiny::Core
 // 				it++;
 // 			}
 		}
+
+		mCameraWithName.emplace(camera->getGameObject()->getName(), camera);
 	}
 
 	Camera* CameraData::getCamera(const std::string& name)
@@ -129,5 +136,14 @@ namespace tezcat::Tiny::Core
 		}
 
 		mMain = camera;
+	}
+
+	void CameraData::setMain(const std::string& name)
+	{
+		auto it = mCameraWithName.find(name);
+		if (it != mCameraWithName.end())
+		{
+			this->setMain(it->second);
+		}
 	}
 }

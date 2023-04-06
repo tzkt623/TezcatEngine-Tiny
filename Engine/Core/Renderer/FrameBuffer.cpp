@@ -12,6 +12,7 @@ namespace tezcat::Tiny::Core
 
 	FrameBuffer::~FrameBuffer()
 	{
+		mBuffers.clear();
 	}
 
 	TextureRenderBuffer2D* FrameBuffer::getBuffer(const int& index)
