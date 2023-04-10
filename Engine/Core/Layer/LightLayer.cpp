@@ -16,7 +16,7 @@ namespace tezcat::Tiny::Core
 
 	void LightLayer::addLight(PointLight* light)
 	{
-		m_LightList.emplace_back(light);
+		mLightList.emplace_back(light);
 	}
 
 	void LightLayer::addLight(SpotLight* light)
@@ -43,20 +43,20 @@ namespace tezcat::Tiny::Core
 
 	bool LightLayer::testGameObject(Pipeline* pipeline, IRenderObject* renderObject)
 	{
-		if (m_LightList.empty())
+		if (mLightList.empty())
 		{
 			return false;
 		}
 
 		//#RenderLayerCull
-		auto it = m_LightList.begin();
-		auto end = m_LightList.end();
+		auto it = mLightList.begin();
+		auto end = mLightList.end();
 		while (it != end)
 		{
 			auto com = dynamic_cast<Component*>(*it);
 			if (com->isEnable())
 			{
-				if ((*it)->cullGameObject(dynamic_cast<Component*>(renderObject)->getGameObject()))
+				if ((*it)->culling(com->getGameObject()))
 				{
 //					pipeline->addPassLightingTestRenderObject(*it, renderObject);
 				}
@@ -64,8 +64,8 @@ namespace tezcat::Tiny::Core
 			}
 			else
 			{
-				it = m_LightList.erase(it);
-				end = m_LightList.end();
+				it = mLightList.erase(it);
+				end = mLightList.end();
 			}
 		}
 

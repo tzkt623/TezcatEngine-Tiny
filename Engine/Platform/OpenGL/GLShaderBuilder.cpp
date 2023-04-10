@@ -406,9 +406,9 @@ namespace tezcat::Tiny::GL
 		shader->attachShader(shader_id);
 	}
 
-	ShaderPackage* GLShaderBuilderCreator::create(const char* filePath)
+	ShaderPackage* GLShaderCreator::create(const std::string& filePath)
 	{
-		GLShaderBuilder().loadFromFile(filePath);
+		GLShaderBuilder().loadFromFile(filePath.c_str());
 		return nullptr;
 	}
 }

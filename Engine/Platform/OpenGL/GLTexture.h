@@ -14,7 +14,7 @@ namespace tezcat::Tiny::GL
 		GLTexture2D();
 		virtual ~GLTexture2D();
 
-		void createTexture(Image* image) override;
+		void create(const Image& img, const TextureInfo& info) override;
 	};
 
 	class TINY_API GLTextureCube : public TextureCube
@@ -23,7 +23,7 @@ namespace tezcat::Tiny::GL
 		GLTextureCube();
 		~GLTextureCube();
 
-		void createTexture(const std::string& filePath) override;
+		void create(const std::array<Image, 6>& images, const TextureInfo& info) override;
 
 	private:
 
@@ -35,8 +35,9 @@ namespace tezcat::Tiny::GL
 		GLTextureRenderBuffer2D();
 		virtual ~GLTextureRenderBuffer2D();
 
-		void createTexture(const int& width, const int& high, const TextureChannel& internalChannel) override;
-
+		void create(const int& width
+			, const int& high
+			, const TextureChannel& internalChannel) override;
 	};
 
 	class TINY_API GLTextureBuffer2D : public TextureBuffer2D
@@ -45,9 +46,18 @@ namespace tezcat::Tiny::GL
 		GLTextureBuffer2D();
 		virtual ~GLTextureBuffer2D();
 
-		void createTexture(const int& width, const int& high, const TextureChannel& internalChannel) override;
-		void createTexture(const int& width, const int& high, const TextureChannel& internalChannel, const TextureChannel& channel, const DataType& dataType) override;
+		void create(const int& width
+			, const int& high
+			, const TextureChannel& internalChannel) override;
 
+		void create(const int& width
+			, const int& high
+			, const TextureChannel& internalChannel
+			, const TextureChannel& channel
+			, const DataType& dataType) override;
+
+		void create(const int& width, const int& high
+			, const TextureBufferInfo& info) override;
 	};
 
 
@@ -61,8 +71,13 @@ namespace tezcat::Tiny::GL
 	{
 	public:
 		GLTextureCreator() {}
-		~GLTextureCreator() {}
+		virtual ~GLTextureCreator() {}
 
-		Texture* create(const std::string& filePath, const TextureType& textureType, const TextureFilter& filter, const TextureWrap& wrap) override;
+
+	protected:
+		Texture2D* create2D() override;
+		TextureCube* createCube() override;
+		TextureRenderBuffer2D* createRenderBuffer2D() override;
+		TextureBuffer2D* createBuffer2D() override;
 	};
 }

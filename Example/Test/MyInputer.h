@@ -23,11 +23,10 @@ public:
 	void setController(MyController* val) { mController = val; }
 
 private:
-	bool m_LockMouse;
-	float m_LastX;
-	float m_LastY;
+	bool mLockMouse;
+	float mLastX;
+	float mLastY;
 
-	Camera* mCamera;
 	MyController* mController;
 };
 

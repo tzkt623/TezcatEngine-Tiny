@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/Texture;
+    str Name = Unlit/Transparent;
 }
 #TINY_HEAD_END
 
@@ -8,14 +8,16 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Texture;
+        str Name = Transparent;
         int Version = 330;
-        int OrderID = 0;
-        str Queue = Opaque;
+        int OrderID = 50;
+        str Queue = Transparent;
         str DepthTest = Less;
-        bool ZWrite = true;
-        str DepthTest = Less;
+        bool ZWrite = false;
         str CullFace = Off;
+        bool Blend = true;
+        str BlendSrc = SrcA;
+        str BlendTar = 1-SrcA;
     }
     #TINY_CFG_END
 
@@ -45,9 +47,24 @@
         uniform sampler2D TINY_TexColor;
         out vec4 myFinalColor;
 
+        float near = 0.1; 
+        float far  = 2000.0; 
+
+        float linearizeDepth(float depth) 
+        {
+            float z = depth * 2.0 - 1.0; // back to NDC 
+            return (2.0 * near * far) / (far + near - z * (far - near));    
+        }
+
         void main()
         {
-            myFinalColor = texture(TINY_TexColor, myUV);
+            vec4 fcolor = texture(TINY_TexColor, myUV);
+//            if(fcolor.a < 0.1)
+//            {
+//                discard;
+//            }
+            myFinalColor = fcolor;
+            //myFinalColor = vec4(vec3(linearizeDepth(gl_FragCoord.z) / far), 1.0);
         }
     }
     #TINY_FS_END

@@ -27,17 +27,22 @@ namespace tezcat::Tiny::Core
 		/// 加载场景
 		/// 执行顺序3
 		/// </summary>
-		virtual void prepareScene(Engine* engine);
+		virtual void prepareGame(Engine* engine);
 		virtual void initYourShaderParam() {}
 
 	public:
 		int getWindowHeight() const { return mWindowHeight; }
 		int getWindowWidth() const { return mWindowWidth; }
 
-		const std::string& getName()
+		const std::string& getName() const
 		{
 			static std::string name(mGameName.begin(), mGameName.end());
 			return name;
+		}
+
+		const std::string& getResourceFolderName() const
+		{
+			return mResourceFolderName;
 		}
 
 	private:
@@ -53,5 +58,6 @@ namespace tezcat::Tiny::Core
 		int mWindowHeight;
 
 		std::u8string mGameName;
+		std::string mResourceFolderName;
 	};
 }

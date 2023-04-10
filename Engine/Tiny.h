@@ -5,6 +5,7 @@
 
 #include "Core/GUI/GUIWidget.h"
 
+#include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/Texture.h"
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/RenderObject.h"
@@ -13,6 +14,7 @@
 #include "Core/Manager/CameraManager.h"
 #include "Core/Manager/TextureManager.h"
 #include "Core/Manager/FrameBufferManager.h"
+#include "Core/Manager/PipelineManager.h"
 
 #include "Core/Scene/Scene.h"
 

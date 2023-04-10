@@ -137,7 +137,8 @@ namespace tezcat::Tiny::Core
 	struct TINY_API UniformTex2D : public UniformT<Texture2D*>
 	{
 		using UniformT<Texture2D*>::UniformT;
-		UniformTex2D(const UniformID& id, const std::string& filePath, const TextureFilter& filter = TextureFilter::Linear, const TextureWrap& wrap = TextureWrap::Repeat);
+		UniformTex2D(const UniformID& id, const std::string& name);
+
 
 		inline UniformType getType() final { return UniformType::Tex2D; }
 		void submit(Transform* transform, Shader* shader) override;
@@ -146,7 +147,7 @@ namespace tezcat::Tiny::Core
 	struct TINY_API UniformTexCube : public UniformT<TextureCube*>
 	{
 		using UniformT<TextureCube*>::UniformT;
-		UniformTexCube(const UniformID& id, const std::string& filePath, const TextureFilter& filter = TextureFilter::Linear, const TextureWrap& wrap = TextureWrap::Clamp_To_Edge);
+		UniformTexCube(const UniformID& id, const std::string & name);
 
 
 		inline UniformType getType() final { return UniformType::TexCube; }

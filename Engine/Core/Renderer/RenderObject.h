@@ -2,6 +2,7 @@
 #include "../Component/Component.h"
 #include "../Head/ConfigHead.h"
 #include "../Head/Context.h"
+#include "RenderConfig.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -11,17 +12,15 @@ namespace tezcat::Tiny::Core
 		Texture,
 		RenderTexture,
 		Skybox,
-		Light
-	};
-
-	enum class TINY_API RenderViewerType
-	{
-		Camera,
 		Light,
+		Camera,
+		ShadowMap
 	};
 
 	class Shader;
 	class Material;
+	class Pipeline;
+	class FrameBuffer;
 
 	/// <summary>
 	/// 可渲染的目标
@@ -29,94 +28,173 @@ namespace tezcat::Tiny::Core
 	class TINY_API IRenderObject
 	{
 	public:
+		IRenderObject() = default;
+
+		/*
+		 * Author:	HCL
+		 * Info:	2023|4|9
+		 *
+		 */
 		virtual ~IRenderObject() = default;
+
+		/*
+		 * Info:		HCL|2023|4|8
+		 * Access:
+		 * Returns:
+		 * Qualifier:
+		 * Parameter:
+		 * Comment:
+		 */
 		virtual RenderObjectType getRenderObjectType() = 0;
-		virtual Material* getMaterial() const = 0;
 
 		/// <summary>
 		/// 把自己发送到对应的管线中
 		/// </summary>
-		virtual void sendToRenderPass() = 0;
-		/// <summary>
-		/// 发送数据到shader
-		/// </summary>
+		virtual void sendToRenderPass() {}
+
+		/*
+		* Info:		HCL|2023|4|8
+		* Access:		virtual public
+		* Returns:		void
+		* Qualifier:
+		* Comment: 开始渲染
+		*/
+		virtual void beginRender() {}
+
+		/*
+		* Info:		HCL|2023|4|8
+		* Access:		virtual public
+		* Returns:		void
+		* Qualifier:
+		* Parameter:	Shader * shader
+		* Comment: 向shader提交数据
+		*/
 		virtual void submit(Shader* shader) = 0;
 
-		/// <summary>
-		/// 绘制方式
-		/// 索引or顶点
-		/// </summary>
+		/*
+		* Info:		HCL|2023|4|8
+		* Access:		virtual public
+		* Returns:		void
+		* Qualifier:
+		* Comment: 结束渲染
+		*/
+		virtual void endRender() {}
+
+
+	};
+
+	class TINY_API IRenderMesh : public IRenderObject
+	{
+	public:
+		IRenderMesh() = default;
+		virtual ~IRenderMesh() = default;
+
+
+		RenderObjectType getRenderObjectType() override { return RenderObjectType::MeshRenderer; }
+
+
+		/*
+		 * Author:	HCL
+		 * Info:	2023|4|8
+		 * 材质
+		 */
+		virtual Material* getMaterial() const { return nullptr; }
+
+		/*
+		 * Author:	HCL
+		 * Info:	2023|4|9
+		 * 绘制方式 索引or顶点
+		 */
 		virtual DrawModeWrapper& getDrawMode() = 0;
 
-		/// <summary>
-		/// 顶点数量
-		/// </summary>
+		/*
+		 * Author:	HCL
+		 * Info:	2023|4|9
+		 * 顶点数量
+		 */
 		virtual int getVertexCount() const { return 0; }
 
-		/// <summary>
-		/// 索引数量
-		/// </summary>
+
+		/*
+		 * Author:	HCL
+		 * Info:	2023|4|9
+		 * 索引数量
+		 */
 		virtual int getIndexCount() const { return 0; }
 	};
 
-	// 	class TINY_API RenderObejct : public ComponentT<RenderObejct>, public IRenderObejct
-	// 	{
-	// 	public:
-	// 		virtual ~RenderObejct() = default;
-	// 	};
-
-	class TINY_API IRenderViewer
+	class TINY_API IRenderObserver : public IRenderObject
 	{
 	public:
-		IRenderViewer()
-			: m_CullMask(0)
+		IRenderObserver()
+			: mCullMask(0)
+			, mFrameBuffer(nullptr)
+			, mPipeline(nullptr)
 		{
 
 		}
 
-		virtual ~IRenderViewer() = default;
-		virtual void submit(Shader* shader) = 0;
-		virtual RenderViewerType getRenderViewerType() = 0;
-		virtual bool cullGameObject(GameObject* gameObject) = 0;
-
-		bool cullLayerMask(uint32_t layerMask) { return (m_CullMask & layerMask) == layerMask; }
-
-		void setCullLayerMask(uint32_t mask)
+		IRenderObserver(Pipeline* pipeline)
+			: mCullMask(0)
+			, mFrameBuffer(nullptr)
+			, mPipeline(pipeline)
 		{
-			m_CullMask = mask;
-			this->refreshCullMask();
+
 		}
 
-		void addCullLayerMask(uint32_t mask)
+		virtual ~IRenderObserver() = default;
+
+		virtual bool culling(GameObject* gameObject) { return true; }
+
+		bool cullLayerMask(uint32_t index)
 		{
-			m_CullMask |= mask;
-			this->refreshCullMask();
+			auto mask = 1 << index;
+			return (mCullMask & mask) == mask;
 		}
 
-		void removeCullLayerMask(uint32_t mask)
+		void setCullLayer(uint32_t index)
 		{
-			m_CullMask &= ~mask;
-			this->refreshCullMask();
+			mCullMask = 1 << index;
+			mCullLayerList.clear();
+			mCullLayerList.push_back(index);
 		}
 
-		const std::vector<uint32_t>& getCullLayerList() const { return m_CullLayerList; }
+		void addCullLayer(uint32_t index)
+		{
+			mCullMask |= (1 << index);
+			mCullLayerList.push_back(index);
+		}
+
+		void removeCullLayer(uint32_t index)
+		{
+			mCullMask &= (1 << index);
+			mCullLayerList.erase(std::find(mCullLayerList.begin(), mCullLayerList.end(), index));
+		}
+
+		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
+
+		Pipeline* getPipeline() const { return mPipeline; }
+		void setPipeline(Pipeline* val) { mPipeline = val; }
+
+		FrameBuffer* getFrameBuffer() const { return mFrameBuffer; }
+		void setFrameBuffer(FrameBuffer* val) { mFrameBuffer = val; }
+
+		void setViewRect(int x, int y, int width, int height)
+		{
+			mViewInfo.OX = x;
+			mViewInfo.OY = y;
+			mViewInfo.Width = width;
+			mViewInfo.Height = height;
+		}
+		ViewportInfo& getViewRect() { return mViewInfo; }
+
+	protected:
+		Pipeline* mPipeline;
+		FrameBuffer* mFrameBuffer;
+		ViewportInfo mViewInfo;
 
 	private:
-		void refreshCullMask()
-		{
-			m_CullLayerList.clear();
-			for (int i = 0; i < 32; i++)
-			{
-				if (m_CullMask & (1u << i))
-				{
-					m_CullLayerList.emplace_back(1u << i);
-				}
-			}
-		}
-
-
-	private:
-		uint32_t m_CullMask;
-		std::vector<uint32_t> m_CullLayerList;
+		uint32_t mCullMask;
+		std::vector<uint32_t> mCullLayerList;
 	};
 }

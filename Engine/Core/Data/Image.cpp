@@ -15,6 +15,15 @@ namespace tezcat::Tiny::Core
 
 	}
 
+	Image::Image(Image&& other)
+		: mWidth(other.mWidth)
+		, mHeight(other.mWidth)
+		, mChannels(other.mWidth)
+		, mData(other.mData)
+	{
+		other.mData = nullptr;
+	}
+
 	Image::~Image()
 	{
 		stbi_image_free(mData);

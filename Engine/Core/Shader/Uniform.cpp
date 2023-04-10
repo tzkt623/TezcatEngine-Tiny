@@ -60,8 +60,8 @@ namespace tezcat::Tiny::Core
 		shader->setMat4(this->ID, glm::value_ptr(value));
 	}
 
-	UniformTex2D::UniformTex2D(const UniformID& id, const std::string& filePath, const TextureFilter& filter, const TextureWrap& wrap)
-		: UniformT(id, (Texture2D*)TextureMgr::getInstance()->tryGetTexture(filePath, TextureType::Texture2D, filter, wrap))
+	UniformTex2D::UniformTex2D(const UniformID& id, const std::string& name)
+		: UniformT(id, (Texture2D*)TextureMgr::getInstance()->findTexture(name))
 	{
 
 	}
@@ -71,8 +71,8 @@ namespace tezcat::Tiny::Core
 		shader->setTexture2D(this->ID, this->value);
 	}
 
-	UniformTexCube::UniformTexCube(const UniformID& id, const std::string& filePath, const TextureFilter& filter, const TextureWrap& wrap)
-		: UniformT(id, (TextureCube*)TextureMgr::getInstance()->tryGetTexture(filePath, TextureType::TextureCube, filter, wrap))
+	UniformTexCube::UniformTexCube(const UniformID& id, const std::string& name)
+		: UniformT(id, (TextureCube*)TextureMgr::getInstance()->findTexture(name))
 	{
 
 	}

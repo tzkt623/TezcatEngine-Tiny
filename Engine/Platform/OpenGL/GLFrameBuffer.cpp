@@ -5,17 +5,23 @@
 namespace tezcat::Tiny::GL
 {
 	GLFrameBuffer::GLFrameBuffer()
+		: mColorCount(0)
 	{
 		glGenFramebuffers(1, &mBufferID);
 	}
 
 	GLFrameBuffer::~GLFrameBuffer()
 	{
-
+		glDeleteFramebuffers(1, &mBufferID);
 	}
 
 	void GLFrameBuffer::bind()
 	{
+		if (mControlRenderSize)
+		{
+			glViewport(mViewportInfo.OX, mViewportInfo.OY, mViewportInfo.Width, mViewportInfo.Height);
+		}
+
 		glBindFramebuffer(GL_FRAMEBUFFER, mBufferID);
 	}
 
@@ -24,33 +30,20 @@ namespace tezcat::Tiny::GL
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void GLFrameBuffer::create(TextureRenderBuffer2D* targetBuffer2D)
+	void GLFrameBuffer::createTextureBuffer(TextureBuffer2D* tex)
 	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER
-			, GL_COLOR_ATTACHMENT0
-			, GL_TEXTURE_2D
-			, targetBuffer2D->getTextureID()
-			, 0);
-	}
-
-	void GLFrameBuffer::createTextureBuffer(const int& width, const int& high, const TextureBufferInfo& info, int& colorCountor)
-	{
-		auto tex = new GLTextureBuffer2D();
-		tex->createTexture(width, high, info.internalChannel, info.channel, info.dataType);
-		mBuffers.push_back(tex);
-
-		switch (info.bufferType)
+		switch (tex->getBufferType())
 		{
-		case TextureBufferType::Color:
+		case TextureBufferType::ColorComponent:
 		{
 			glFramebufferTexture2D(GL_FRAMEBUFFER
-				, GL_COLOR_ATTACHMENT0 + colorCountor++
+				, GL_COLOR_ATTACHMENT0 + mColorCount++
 				, GL_TEXTURE_2D
 				, tex->getTextureID()
 				, 0);
 			break;
 		}
-		case TextureBufferType::Depth:
+		case TextureBufferType::DepthComponent:
 		{
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 				, GL_DEPTH_ATTACHMENT
@@ -59,7 +52,7 @@ namespace tezcat::Tiny::GL
 				, 0);
 			break;
 		}
-		case TextureBufferType::Stencil:
+		case TextureBufferType::StencilCompoent:
 		{
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 				, GL_STENCIL_ATTACHMENT
@@ -68,7 +61,7 @@ namespace tezcat::Tiny::GL
 				, 0);
 			break;
 		}
-		case TextureBufferType::DepthAndStencil:
+		case TextureBufferType::DepthStencilComponent:
 		{
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 				, GL_DEPTH_STENCIL_ATTACHMENT
@@ -82,15 +75,11 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLFrameBuffer::createRenderBuffer(const int& width, const int& high, const TextureBufferInfo& info)
+	void GLFrameBuffer::createRenderBuffer(TextureRenderBuffer2D* tex)
 	{
-		auto tex = new GLTextureRenderBuffer2D();
-		tex->createTexture(width, high, info.internalChannel);
-		mBuffers.push_back(tex);
-
-		switch (info.bufferType)
+		switch (tex->getBufferType())
 		{
-		case TextureBufferType::Depth:
+		case TextureBufferType::DepthComponent:
 		{
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER
 				, GL_DEPTH_ATTACHMENT
@@ -98,7 +87,7 @@ namespace tezcat::Tiny::GL
 				, tex->getTextureID());
 			break;
 		}
-		case TextureBufferType::Stencil:
+		case TextureBufferType::StencilCompoent:
 		{
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER
 				, GL_STENCIL_ATTACHMENT
@@ -106,7 +95,7 @@ namespace tezcat::Tiny::GL
 				, tex->getTextureID());
 			break;
 		}
-		case TextureBufferType::DepthAndStencil:
+		case TextureBufferType::DepthStencilComponent:
 		{
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER
 				, GL_DEPTH_STENCIL_ATTACHMENT
@@ -119,21 +108,31 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLFrameBuffer::create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos)
+	void GLFrameBuffer::attach(TextureRenderBuffer2D* buffer)
+	{
+		if (buffer->getTextureType() == TextureType::TextureRenderBuffer2D)
+		{
+			this->createRenderBuffer(buffer);
+		}
+		else
+		{
+			this->createTextureBuffer((TextureBuffer2D*)buffer);
+		}
+
+		mBuffers.push_back(buffer);
+	}
+
+	void GLFrameBuffer::build(const std::function<void(FrameBuffer*) >& function)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, mBufferID);
 
-		int color_index = 0;
-		for (const auto& item : infos)
+		function(this);
+
+		//如果没有ColorBuffer,需要关闭颜色通道
+		if (mColorCount < 1)
 		{
-			if (item.isCache)
-			{
-				this->createRenderBuffer(width, high, item);
-			}
-			else
-			{
-				this->createTextureBuffer(width, high, item, color_index);
-			}
+			glDrawBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
 		}
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -144,10 +143,13 @@ namespace tezcat::Tiny::GL
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	FrameBuffer* GLFrameBufferCreator::create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos)
+	//-----------------------------------------------------
+	//
+	//	Creator
+	//
+	FrameBuffer* GLFrameBufferCreator::createFrameBuffer()
 	{
-		auto buffer = new GLFrameBuffer();
-		buffer->create(width, high, infos);
-		return buffer;
+		return new GLFrameBuffer();
 	}
+
 }

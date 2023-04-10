@@ -2,10 +2,9 @@
 #include "MyController.h"
 
 MyInputer::MyInputer()
-	: mCamera(nullptr)
-	, m_LockMouse(true)
-	, m_LastX(0)
-	, m_LastY(0)
+	: mLockMouse(true)
+	, mLastX(0)
+	, mLastY(0)
 	, mController(nullptr)
 {
 
@@ -54,15 +53,14 @@ void MyInputer::processInput(InputSystem* system)
 		position -= mController->getUp() * speed;
 
 	}
-
-	// 	if (system->getKeyDown(GLFW_KEY_Q))
-	// 	{
-	// 		m_Camera->roll(-speed);
-	// 	}
-	// 	else if (system->getKeyDown(GLFW_KEY_E))
-	// 	{
-	// 		m_Camera->roll(speed);
-	// 	}
+// 	if (system->getKeyDown(GLFW_KEY_Q))
+// 	{
+// 		mController->roll(-speed);
+// 	}
+// 	else if (system->getKeyDown(GLFW_KEY_E))
+// 	{
+// 		mController->roll(speed);
+// 	}
 
 	float current_x;
 	float current_y;
@@ -72,29 +70,29 @@ void MyInputer::processInput(InputSystem* system)
 
 	if (system->getMouseButtonDown(GLFW_MOUSE_BUTTON_2))
 	{
-		if (m_LockMouse)
+		if (mLockMouse)
 		{
-			m_LockMouse = false;
-			m_LastX = current_x;
-			m_LastY = current_y;
+			mLockMouse = false;
+			mLastX = current_x;
+			mLastY = current_y;
 		}
 		else
 		{
-			float offset_x = current_x - m_LastX;
-			float offset_y = m_LastY - current_y;
+			float offset_x = current_x - mLastX;
+			float offset_y = mLastY - current_y;
 
 			Statistic::mouseOffset.x = offset_x;
 			Statistic::mouseOffset.y = offset_y;
 
-			m_LastX = current_x;
-			m_LastY = current_y;
+			mLastX = current_x;
+			mLastY = current_y;
 
 			mController->yawPitch(offset_x, offset_y);
 		}
 	}
 	else
 	{
-		m_LockMouse = true;
+		mLockMouse = true;
 	}
 
 	if (transform)
@@ -111,7 +109,7 @@ void MyInputer::processInput(InputSystem* system)
 		// 		m_Camera->getTransform()->setPosition(position);
 	}
 
-	mController->updateCameraVector();
+	mController->updateVector();
 }
 
 void MyInputer::onEnter()
@@ -144,19 +142,19 @@ void MyInputer::mouseScrollPosCallBack(double xOffset, double yOffset)
 	float xpos = static_cast<float>(xOffset);
 	float ypos = static_cast<float>(yOffset);
 
-	if (m_LockMouse)
+	if (mLockMouse)
 	{
-		m_LastX = xpos;
-		m_LastY = ypos;
-		m_LockMouse = false;
+		mLastX = xpos;
+		mLastY = ypos;
+		mLockMouse = false;
 		return;
 	}
 
-	float xoffset = xpos - m_LastX;
-	float yoffset = m_LastY - ypos; // reversed since y-coordinates go from bottom to top
+	float xoffset = xpos - mLastX;
+	float yoffset = mLastY - ypos; // reversed since y-coordinates go from bottom to top
 
-	m_LastX = xpos;
-	m_LastY = ypos;
+	mLastX = xpos;
+	mLastY = ypos;
 
 	//	m_Camera->ProcessMouseMovement(xoffset, yoffset);
 }

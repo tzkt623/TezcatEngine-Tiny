@@ -21,6 +21,6 @@ namespace tezcat::Tiny::Core
 		bool testGameObject(Pipeline* pipeline, IRenderObject* renderObject);
 
 	private:
-		std::list<ILight *> m_LightList;
+		std::list<ILight *> mLightList;
 	};
 }

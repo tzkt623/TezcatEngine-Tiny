@@ -31,11 +31,11 @@ namespace tezcat::Tiny::Core
 	};
 
 
-	class TINY_API ShaderBuilderCreatorImp
+	class TINY_API ShaderCreator
 	{
 	public:
-		virtual ShaderPackage* create(const char* filePath) = 0;
+		virtual ShaderPackage* create(const std::string& filePath) = 0;
 	};
 
-	using ShaderBuilderCreator = DelegateCreator<ShaderBuilderCreatorImp, ShaderPackage>;
+	using ShaderLoader = DelegateCreator<ShaderCreator, ShaderPackage>;
 }

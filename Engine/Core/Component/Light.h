@@ -16,13 +16,14 @@ namespace tezcat::Tiny::Core
 	};
 
 	class Shader;
-	class TINY_API ILight
+	class FrameBuffer;
+	class TINY_API ILight : public IRenderObserver
 	{
 	public:
 		virtual ~ILight() = default;
 		virtual LightType getLightType() = 0;
-		virtual void submit(Shader* shader) = 0;
-		virtual bool cullGameObject(GameObject* gameObject) = 0;
+		RenderObjectType getRenderObjectType() final { return RenderObjectType::Light; }
+		virtual void render(BaseGraphics* graphics) {}
 	};
 
 // 	class TINY_API Light : public ComponentT<Light>, public ILight
@@ -41,11 +42,8 @@ namespace tezcat::Tiny::Core
 
 		LightType getLightType() final { return LightType::Directional; }
 
-		void onEnable() override;
-		void onDisable() override;
-
 	public:
-		virtual bool cullGameObject(GameObject* gameObject) { return true; }
+		void render(BaseGraphics* graphics) override;
 		void submit(Shader* shader) override;
 
 		glm::vec3& getDirection() { return mDirection; }
@@ -59,6 +57,10 @@ namespace tezcat::Tiny::Core
 
 		glm::vec3& getSpecular() { return mSpecular; }
 		void setSpecular(const glm::vec3& val) { mSpecular = val; }
+
+	protected:
+		void onEnable() override;
+		void onDisable() override;
 
 	private:
 		glm::vec3 mDirection;
@@ -111,9 +113,10 @@ namespace tezcat::Tiny::Core
 		}
 
 		void submit(Shader* shader) override;
+
+	protected:
 		void onEnable() override;
 		void onDisable() override;
-		bool cullGameObject(GameObject* gameObject) override;
 
 	private:
 		glm::vec3 mAmbient;
@@ -129,7 +132,6 @@ namespace tezcat::Tiny::Core
 		virtual ~SpotLight();
 
 		LightType getLightType() final { return LightType::Spot; }
-		bool cullGameObject(GameObject* gameObject) override { return true; }
 
 	private:
 

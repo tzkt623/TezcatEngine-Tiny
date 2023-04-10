@@ -14,8 +14,6 @@ namespace tezcat::Tiny::Core
 		PassVertexGroup(VertexGroup* vao);
 		~PassVertexGroup();
 		void addRenderObject(MeshRenderer* renderAgent);
-		void render(Shader* shader);
-		void render(Shader* shader, DrawModeWrapper& drawMode);
 		bool empty() const { return mMeshRendererList.empty(); }
 
 	private:

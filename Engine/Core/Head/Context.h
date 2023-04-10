@@ -61,6 +61,7 @@ namespace tezcat::Tiny::Core
 		RG,
 		RGB,
 		RGBA,
+		Depth,
 		//internal only
 		Depth16,
 		//internal only
@@ -77,6 +78,23 @@ namespace tezcat::Tiny::Core
 		Depth32f_Stencil8,
 		//internal only
 		Stencil8,
+
+		Count
+	};
+
+	//颜色缓冲区
+	enum class TINY_API ColorBuffer : uint32_t
+	{
+		None = 0,
+		A0,
+		A1,
+		B0,
+		B1,
+		AX,
+		BX,
+		X0,
+		X1,
+		All,
 
 		Count
 	};
@@ -150,7 +168,7 @@ namespace tezcat::Tiny::Core
 	{
 		Position = 0,
 		Normal,
-		Color,
+		ColorComponent,
 		UV
 	};
 
@@ -192,6 +210,7 @@ namespace tezcat::Tiny::Core
 	using TexWrapWrapper = TinyValueConventor<TextureWrap, uint32_t>;
 	using TexFilterWrapper = TinyValueConventor<TextureFilter, uint32_t>;
 	using TexChannelWrapper = TinyValueConventor<TextureChannel, uint32_t>;
+	using ColorBufferWrapper = TinyValueConventor<ColorBuffer, uint32_t>;
 	using DrawModeWrapper = TinyValueConventor<DrawMode, uint32_t>;
 	using CullFaceWrapper = TinyValueConventor<CullFace, uint32_t>;
 	using BlendWrapper = TinyValueConventor<Blend, uint32_t>;
@@ -230,6 +249,11 @@ namespace tezcat::Tiny::Core
 		/// Tex_RGBA
 		/// </summary>
 		static std::array<TexChannelWrapper, (std::size_t)TextureChannel::Count> TextureChannelArray;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		static std::array<ColorBufferWrapper, (std::size_t)ColorBuffer::Count> ColorBufferArray;
 
 		/// <summary>
 		/// Points

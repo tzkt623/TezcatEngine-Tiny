@@ -5,7 +5,7 @@
 #include "Core/Manager/CameraManager.h"
 #include "Core/Data/ResourceLoader.h"
 #include "Core/Input/InputSystem.h"
-#include "Core/Scene/LayerMask.h"
+#include "Core/Renderer/LayerMask.h"
 #include "Core/Component/GameObject.h"
 #include "Core/GUI/GUI.h"
 

@@ -20,6 +20,36 @@ namespace tezcat::Tiny::GL
 		glAttachShader(mProgramID, id);
 	}
 
+	void GLShader::bind()
+	{
+		glUseProgram(mProgramID);
+	}
+
+	void GLShader::unbind()
+	{
+		glUseProgram(0);
+	}
+
+	void GLShader::onApply(const UniformID::USet& uniforms)
+	{
+		glLinkProgram(mProgramID);
+
+		int success;
+		char infoLog[512];
+		glGetProgramiv(mProgramID, GL_LINK_STATUS, &success);
+		if (!success)
+		{
+			glGetProgramInfoLog(mProgramID, 512, nullptr, infoLog);
+		}
+
+		for (auto& uniform_id : uniforms)
+		{
+			mTinyUniformList[uniform_id.getUID()] = glGetUniformLocation(mProgramID, uniform_id.getStringData());
+		}
+
+		glUseProgram(0);
+	}
+
 	void GLShader::setStateOptions()
 	{
 		if (mCullFace.platform != 0)
@@ -78,36 +108,6 @@ namespace tezcat::Tiny::GL
 		{
 			glUniform3fv(mTinyUniformList[ShaderParam::ViewPosition], 1, glm::value_ptr(position));
 		}
-	}
-
-	void GLShader::bind()
-	{
-		glUseProgram(mProgramID);
-	}
-
-	void GLShader::unbind()
-	{
-		glUseProgram(0);
-	}
-
-	void GLShader::onApply(const UniformID::USet& uniforms)
-	{
-		glLinkProgram(mProgramID);
-
-		int success;
-		char infoLog[512];
-		glGetProgramiv(mProgramID, GL_LINK_STATUS, &success);
-		if (!success)
-		{
-			glGetProgramInfoLog(mProgramID, 512, nullptr, infoLog);
-		}
-
-		for (auto& uniform_id : uniforms)
-		{
-			mTinyUniformList[uniform_id.getUID()] = glGetUniformLocation(mProgramID, uniform_id.getStringData());
-		}
-
-		glUseProgram(0);
 	}
 
 	void GLShader::setFloat1(const char* name, float* data)

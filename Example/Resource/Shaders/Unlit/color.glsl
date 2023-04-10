@@ -10,7 +10,7 @@
     {
         str Name = Color;
         int Version = 330;
-        int OrderID = 0;
+        int OrderID = 50;
         str Queue = Opaque;
         str DepthTest = Less;
         bool ZWrite = true;

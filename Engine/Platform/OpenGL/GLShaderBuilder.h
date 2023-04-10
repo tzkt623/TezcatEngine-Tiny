@@ -49,10 +49,10 @@ namespace tezcat::Tiny::GL
 	};
 
 
-	class TINY_API GLShaderBuilderCreator : public ShaderBuilderCreatorImp
+	class TINY_API GLShaderCreator : public ShaderCreator
 	{
 	public:
-		ShaderPackage* create(const char* filePath) override;
+		ShaderPackage* create(const std::string& filePath) override;
 	};
 }
 

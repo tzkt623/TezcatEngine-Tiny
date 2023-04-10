@@ -5,11 +5,14 @@
 namespace tezcat::Tiny::Core
 {
 	class VertexGroup;
-	class Skybox : public ComponentT<Skybox>, IRenderObject
+	class Skybox : public ComponentT<Skybox>, public IRenderMesh
 	{
 	public:
 		Skybox();
 		virtual ~Skybox();
+
+
+
 
 	public:
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::Skybox; }
@@ -19,7 +22,8 @@ namespace tezcat::Tiny::Core
 		void sendToRenderPass() override;
 		void submit(Shader* shader) override;
 		void setMaterial(Material* material) { mMaterial = material; }
-
+		void beginRender() override;
+		void endRender() override;
 
 	protected:
 		void onStart() override;

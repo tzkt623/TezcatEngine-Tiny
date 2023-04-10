@@ -138,8 +138,8 @@ namespace tezcat::Tiny::Core
 
 	private:
 		std::string mName;
-		int mOrderID;
 		int mUID;
+		int mOrderID;
 		int mVersion;
 
 		PipelineQueue::Queue mRenderQueue;

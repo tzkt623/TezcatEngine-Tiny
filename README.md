@@ -1,6 +1,6 @@
 # TezcatEngine-Tiny
 
-# **引擎二周目进行中**
+## **引擎二周目进行中**
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo1.jpg?raw=true)
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo2.jpg?raw=true)
@@ -9,45 +9,215 @@
 
 Notice!Tiny Use The C++20 Ver.
 
-具体使用方法请看Example.
-
-Please check the Example project to know more info.
-
 ## **代码结构 Code**
 
 因为我用unity比较多,就模仿了他的结构,现在的结构是这样
 
-i am a Unity user, so Tiny look like this
-```cpp
-auto elden_ring2 = new GameObject();
-elden_ring2->addComponent<Transform>();
-elden_ring2->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 960.0f));
-elden_ring2->getTransform()->setRotation(glm::vec3(0.0f, -180.0f, 0.0f));
-elden_ring2->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1));
+I am a Unity user, so i image that and make Tiny looks like this
 
-auto mre2 = elden_ring2->addComponent<MeshRenderer>();
-auto elden_ring2_material = new Material("Unlit/Texture");
-elden_ring2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "../Resource/Image/eldenring2.jpg");
-mre2->setMaterial(elden_ring2_material);
-mre2->setMesh("Square");
+```cpp
+auto go = new GameObject("World1_Camera");
+auto camera = go->addComponent<Camera>(true);
+camera->setPerspective(60.0f, 0.1f, 2000.0f);
+camera->setCullLayer(0);
+
+go->addComponent<Transform>();
+go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+go->getTransform()->setParent(controller_go->getTransform());
+
+//-------------------------------------
+go = new GameObject("Skybox1");
+go->addComponent<Transform>();
+
+auto skybox = go->addComponent<Skybox>();
+auto material = new Material("Unlit/Skybox");
+material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
+skybox->setMaterial(material);
 
 //---------------------------------------------------------
+auto world2 = new GameObject("World2_Gate");
+auto tran = world2->addComponent<Transform>();
+tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
+tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
 
-auto plane = new GameObject();
-plane->addComponent<Transform>();
-plane->getTransform()->setPosition(glm::vec3(0.0f, -20.0f, 0.0f));
-plane->getTransform()->setRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-plane->getTransform()->setScale(glm::vec3(10.0f, 10.0f, 1));
-
-auto mr = plane->addComponent<MeshRenderer>();
-auto plane_material = new Material("Standard/Std2");
-plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "../Resource/Image/container.png");
-plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "../Resource/Image/container_specular.png");
-plane_material->addUniform<UniformF>(ShaderParam::StdMaterial::Shininess, 64.0f);
-mr->setMaterial(plane_material);
-mr->setMesh("Square");
+auto mr1 = world2->addComponent<MeshRenderer>();
+auto world2_material = new Material("Unlit/Texture");
+world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
+mr1->setMaterial(world2_material);
+mr1->setMesh("Square");
 ```
 
+## **创建游戏对象 Create GameObjects**
+
+- 创建相机
+  Create a Camera
+
+```cpp
+//gameobject will auto load into current scene
+auto go = new GameObject("World1_Camera");
+//attach a Camera component
+auto camera = go->addComponent<Camera>(true);
+camera->setPerspective(60.0f, 0.1f, 2000.0f);
+//set culling layer, other layers will not render
+camera->setCullLayer(0);
+//attach a Transform component
+go->addComponent<Transform>();
+go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+go->getTransform()->setParent(controller_go->getTransform());
+```
+
+- 创建天空盒
+  Create a Skybox
+
+```cpp
+auto go = new GameObject("Skybox1");
+//set layer, a camera just render objects with thesame layer id
+go->setLayerMaskIndex(1);
+go->addComponent<Transform>();
+
+//attach a Skybox component
+auto skybox = go->addComponent<Skybox>();
+//load Material with ShaderName(Buildin Shader)
+auto material = new Material("Unlit/Skybox");
+//add a UniformValue to auto update value in shader
+//note that [skybox_2] is a [SkyboxName] auto loaded in [TextureManager], not the imagefile(.jpg.png....) name
+material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
+skybox->setMaterial(material);
+```
+
+- 创建一个游戏物体(传送门)
+  Create a GameObject(JumpGate)
+
+```cpp
+//default layer is 0
+auto world2 = new GameObject("World2_Gate");
+auto tran = world2->addComponent<Transform>();
+tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
+tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
+
+auto mr1 = world2->addComponent<MeshRenderer>();
+auto world2_material = new Material("Unlit/Texture");
+//note that [RB_World2] is a [FrameBuffer] created in [TextureManager] by yourself
+world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
+mr1->setMaterial(world2_material);
+mr1->setMesh("Square");
+```
+
+- 创建一个帧缓冲
+  Create a FrameBuffer
+
+```cpp
+auto fb = FrameBufferMgr::getInstance()->create(
+    //Name for find
+    "FB_World1",
+    //width, high
+    Engine::getScreenWidth(), Engine::getScreenHeight(),
+    {
+        //Create a ColorBuffer Setting
+        TextureBufferInfo(
+            //a Name for find(manager flag is true like this)
+            "RB_World1"
+            //Buffer Type(FrameBuffer Component)
+            , TextureBufferType::ColorComponent
+            //Internal Format
+            , TextureChannel::RGBA
+            //Format
+            , TextureChannel::RGBA
+            //Data Type
+            , DataType::UByte
+            //a flag for cache this texutreBuffer in [TextureManager] to find
+            , true),
+        //Create a write-only Buffer Setting for DepthAndStencil
+        TextureBufferInfo(
+            //a Name for find(manager flag is false so noneffective)
+            "DS_World1"
+            //Buffer Type(FrameBuffer Component)
+            , TextureBufferType::DepthStencilComponent
+            //Internal Format
+            , TextureChannel::Depth24_Stencil8)
+    });
+
+//let camera render objects to this framebuffer
+camera->setFrameBuffer(fb);
+
+//also you can find this framebuffer like
+fb = FrameBufferMgr::getInstance()->find("FB_World1");
+
+//set nullptr will switch render to mainframe
+camera->setFrameBuffer(nullptr);
+```
+
+**具体使用方法请看Example.**
+
+**Please check the Example project to get more infos.**
+
+## **资源管理 Resouce Manage**
+
+注意! .exe文件必须和资源文件夹处于同一目录下
+
+Attention! The .exe file must be in the same directory as the resource folder
+
+1. 继承并实现`ResourceLoader`类
+   Inherit and implement the `ResourceLoader` class
+
+    ```cpp
+    class MyResourceLoader : public ResourceLoader
+    {
+    public:
+        MyResourceLoader();
+
+        void prepareEngine(Engine* engine) override; 
+        void prepareResource(Engine* engine) override;
+        void prepareGame(Engine* engine) override;
+        void initYourShaderParam() override;
+    };
+    ```
+
+    `prepareEngine`,`prepareResource`,`prepareScene`三个方法会按此顺序依次执行
+    `prepareEngine`,`prepareResource`,`prepareScene`are invoked in this order
+
+2. 设置自己的资源文件夹名称,程序名称,屏幕大小
+   Set your **ResourceFolder Name, ProgramName, ScreenSize**
+
+    ```cpp
+    void MyResourceLoader::prepareEngine(Engine* engine)
+    {
+        ResourceLoader::prepareEngine(engine);
+        mResourceFolderName = "Resource";
+        mGameName = u8"YesIndeed,玩上老头环了!!!!!";
+        mWindowWidth = 1920;
+        mWindowHeight = 1080;
+    }
+    ```
+
+3. 加载资源文件
+   Load resource files
+
+    ```cpp
+    void MyResourceLoader::prepareResource(Engine* engine)
+    {
+        ResourceLoader::prepareResource(engine);
+        //设置图片文件夹名称自动加载所有图片文件
+        //注意,不同文件夹下面的图片文件也不能重名
+        //Set ImageFolder to auto load all images
+        //Note that the image files under different folders also must not have the same name
+        TextureMgr::getInstance()->loadResource("/Image");
+    }
+    ```
+
+4. 加载第一个游戏
+   Load Game
+
+    ```cpp
+    void MyResourceLoader::prepareGame(Engine* engine)
+    {
+        ResourceLoader::prepareGame(engine);
+        SG<SceneManager>::getInstance()->prepareScene(new MyScene("MyScene"));
+        SG<SceneManager>::getInstance()->pushScene("MyScene");
+    }
+    ```
 
 ## **材质结构 Material**
 
@@ -97,11 +267,12 @@ struct StdMaterial
 Current Buildin Material Values
 
 |    TinyType     |  CommonType   |
-| :-------------: | :-----------: |
+|:---------------:|:-------------:|
 |  UniformI[1-4]  |   int[1-4]    |
 |  UniformF[1-4]  |  float[1-4]   |
 | UniformMat[3-4] | glm::mat[3-4] |
 |  UniformTex2D   |   Texture2D   |
+| UniformTexCube  |  TextureCube  |
 
 给一个object添加一个材质之后一定要记得添加材质对应的参数,贴图,数值等等
 
@@ -114,13 +285,15 @@ material->addUniform<UniformF>(ShaderParam::ModeSpecular, 64.0f);
 ```
 
 ### **默认值 DefaultValue**
+
 除了[`int Version`]为必须值,其他值均为拥有默认值的可选参数
 
 The[`int Version`] should be setted.The other params You can set as your wish.
 
 ### **管线位置 PipelineQueue**
-Forward管线位置
-Forward Pipeline Position
+
+Forward管线位置 ForwardPipeline Position
+
 ```cpp
 "Background"    Forward::Background
 "Opaque"        Forward::Geometry
@@ -131,6 +304,7 @@ Forward Pipeline Position
 ```
 
 ### **混合 Blend**
+
 混合参数 BlendFunc
 
 ```cpp
@@ -140,7 +314,7 @@ Forward Pipeline Position
 "1-Src"     ONE_MINUS_SRC_COLOR
 "Tar"       DST_COLOR
 "1-Tar"     ONE_MINUS_DST_COLOR
-"SrcA"	    SRC_ALPHA
+"SrcA"      SRC_ALPHA
 "1-SrcA"    ONE_MINUS_SRC_ALPHA
 "TarA"      DST_ALPHA
 "1-TarA"    ONE_MINUS_DST_ALPHA
@@ -152,7 +326,7 @@ Forward Pipeline Position
 
 启用混合 EnableBlend
 
-```c
+```cpp
 bool Blend = true;
 str BlendSrc = 1;
 str BlendTar = 1-TarA;
@@ -160,13 +334,15 @@ str BlendTar = 1-TarA;
 
 关闭混合 DisableBlend
 
-```c
+```cpp
 bool Blend = false;
 ```
 
 ### **表面剔除 Cullface**
+
 剔除参数 Cullface
-```c
+
+```cpp
 "Off"       Disable
 "Front"     FRONT
 "Back"      BACK
@@ -174,18 +350,22 @@ bool Blend = false;
 ```
 
 启用剔除 EnableCullface
-```c
+
+```cpp
 str CullFace = Back;
 ```
 
 关闭剔除
-```c
+
+```cpp
 str CullFace = Off;
 ```
 
 ### **深度测试 DepthTest**
+
 测试参数
-```c
+
+```cpp
 "Off"               Off
 "Always"            Always
 "Never"             Never
@@ -198,27 +378,35 @@ str CullFace = Off;
 ```
 
 启用 Enable
-```c
+
+```cpp
 str DepthTest = Less;
 ```
+
 关闭 Disable
-```c
+
+```cpp
 str DepthTest = Off;
 ```
+
 ### **深度写入 ZWrite**
+
 只有在深度测试启用时才有用 Only work when DepthTest is Enabled
 
 启用 Enable
-```c
+
+```cpp
 bool ZWrite = true;
 ```
 
 关闭 Disable
-```c
+
+```cpp
 bool ZWrite = false;
 ```
 
 ### **示例 example**
+
 ```glsl
 #TINY_HEAD_BEGIN
 {

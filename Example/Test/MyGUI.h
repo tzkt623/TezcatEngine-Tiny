@@ -59,6 +59,6 @@ private:
 	GUIDragFloat3* m_Up;
 	GUIDragFloat3* m_Right;
 	GUIDragFloat3* m_Front;
-	Camera* m_MainCamera;
+	Camera* mMainCamera;
 };
 

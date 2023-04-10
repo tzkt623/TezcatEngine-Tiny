@@ -55,9 +55,9 @@ namespace tezcat::Tiny::Core
 		if (mDirty)
 		{
 			mDirty = false;
-			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera a, Camera b)->auto
+			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera* a, Camera* b)->auto
 			{
-				return a.getDeep() < b.getDeep();
+				return a->getDeep() < b->getDeep();
 			});
 		}
 
@@ -121,9 +121,9 @@ namespace tezcat::Tiny::Core
 		if (mDirty)
 		{
 			mDirty = false;
-			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera a, Camera b)->auto
+			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera* a, Camera* b)->auto
 			{
-				return a.getDeep() < b.getDeep();
+				return a->getDeep() < b->getDeep();
 			});
 		}
 	}

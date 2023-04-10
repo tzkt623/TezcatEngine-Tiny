@@ -7,12 +7,18 @@
 using namespace tezcat::Tiny::Utility;
 namespace tezcat::Tiny::Core
 {
-	class FrameBuffer;
+	class TextureRenderBuffer2D;
 	struct TextureBufferInfo;
+
+	class FrameBuffer;
 	class TINY_API FrameBufferCreator
 	{
 	public:
-		virtual FrameBuffer* create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos) = 0;
+		FrameBuffer* create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos);
+		FrameBuffer* createShadowMap(const int& width, const int& high);
+
+	protected:
+		virtual FrameBuffer* createFrameBuffer() = 0;
 	};
 
 
@@ -22,7 +28,13 @@ namespace tezcat::Tiny::Core
 		FrameBufferManager();
 		virtual ~FrameBufferManager();
 
-		FrameBuffer* create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos);
+		FrameBuffer* create(const std::string& name, const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos);
+		FrameBuffer* createShadowMap(const std::string& name, const int& width, const int& high);
+
+		FrameBuffer* find(const std::string& name);
+
+	private:
+		FrameBuffer* addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer);
 
 	private:
 		std::unordered_map<std::string, FrameBuffer*> mBufferUMap;

@@ -1,34 +1,24 @@
 #include "RenderPass.h"
 #include "../Pipeline/PassVertexGroup.h"
+#include "../Head/GLMHead.h"
 
 #include "../Shader/Shader.h"
 #include "../Component/Camera.h"
 #include "../Component/Transform.h"
 #include "../Component/MeshRenderer.h"
 #include "../Component/Light.h"
-#include "../Head/GLMHead.h"
 #include "../Manager/LightManager.h"
-#include "../Statistic.h"
 #include "../Renderer/VertexGroup.h"
+#include "../Renderer/BaseGraphics.h"
+#include "../Renderer/RenderObject.h"
+
+#include "../Statistic.h"
 
 
 namespace tezcat::Tiny::Core
 {
 	RenderPass::RenderPass(Shader* shader)
-		: RenderPass(shader, nullptr)
-	{
-
-	}
-
-	RenderPass::RenderPass(Shader* shader, ILight* light)
-		: RenderPass(shader, light, DrawMode::Triangles)
-	{
-
-	}
-
-	RenderPass::RenderPass(Shader* shader, ILight* light, DrawMode drawMode)
 		: mShader(shader)
-		, mLight(light)
 	{
 
 	}
@@ -38,37 +28,18 @@ namespace tezcat::Tiny::Core
 		mShader = nullptr;
 	}
 
-	void RenderPass::addRenderObject(IRenderObject* renderObject)
+	void RenderPass::addRenderMesh(IRenderMesh* renderMesh)
 	{
-		mRenderObjects.push_back(renderObject);
-
-		// 		auto vao = meshRenderer->getVertexGroup();
-		// 		auto it = mVAOWithID.find(vao->getUID());
-		// 		if (it == mVAOWithID.end())
-		// 		{
-		// 			auto pass = new PassVertexGroup(vao);
-		// 			pass->addMeshRenderer(meshRenderer);
-		// 			mVAOWithID.emplace(vao, pass);
-		// 		}
-		// 		else
-		// 		{
-		// 			it->second->addMeshRenderer(meshRenderer);
-		// 		}
+		mRenderObjects.push_back(renderMesh);
 	}
 
-	void RenderPass::sortRenderObjects(const std::function<bool(IRenderObject* a, IRenderObject* b)>& function)
+	void RenderPass::sortRenderObjects(const std::function<bool(IRenderMesh* a, IRenderMesh* b)>& function)
 	{
 		std::sort(mRenderObjects.begin(), mRenderObjects.end(), function);
 	}
 
-	void RenderPass::render(Camera* camera)
+	void RenderPass::render(BaseGraphics* graphics, IRenderObserver* renderObserver)
 	{
-		//#PassShaderRender
-// 		if (mVAOWithID.empty())
-// 		{
-// 			return;
-// 		}
-
 		if (mRenderObjects.empty())
 		{
 			return;
@@ -81,34 +52,60 @@ namespace tezcat::Tiny::Core
 		// the same shader
 		mShader->bind();
 
-		if (camera != nullptr)
+		//Observer which render this pass
+		if (renderObserver != nullptr)
 		{
-			camera->submit(mShader);
+			renderObserver->submit(mShader);
 		}
 
-		//实际上应该是shader自己去找它需要的灯光数据
-		//而不是灯光传数据
-		if (mLight)
+		auto dir_light = LightMgr::getInstance()->getDirectionalLight();
+		if (dir_light != nullptr)
 		{
-			mLight->submit(mShader);
+			dir_light->submit(mShader);
 		}
+
 
 		for (auto ro : mRenderObjects)
 		{
+			ro->beginRender();
 			ro->submit(mShader);
+			graphics->draw(ro);
+			ro->endRender();
 		}
 
 		mRenderObjects.clear();
+	}
 
-		// 		auto it = mVAOWithID.begin();
-		// 		while (it != mVAOWithID.end())
-		// 		{
-		// 			auto vao_pass = (*it++).second;
-		// 			if (!vao_pass->empty())
-		// 			{
-		// 				vao_pass->render(mShader);
-		// 			}
-		// 		}
+	void RenderPass::renderShadowMap(BaseGraphics* graphics, IRenderObserver* renderObserver)
+	{
+		if (mRenderObjects.empty())
+		{
+			return;
+		}
+
+		Statistic::PassCount += 1;
+		Statistic::DrawCall += static_cast<int>(mRenderObjects.size());
+
+		mShader->setStateOptions();
+		// the same shader
+		mShader->bind();
+
+		//Observer which render this pass
+		if (renderObserver != nullptr)
+		{
+			renderObserver->submit(mShader);
+		}
+
+		//相机的matrix他自己已经先传了
+		for (auto ro : mRenderObjects)
+		{
+			ro->beginRender();
+			mShader->setModelMatrix(ro->getModelMatrix());
+			graphics->draw(ro);
+			ro->endRender();
+		}
+
+		mRenderObjects.clear();
 	}
 
 	int RenderPass::getOrderID() const

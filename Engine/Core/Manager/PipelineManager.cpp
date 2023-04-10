@@ -1,26 +1,35 @@
 #include "PipelineManager.h"
 #include "../Shader/Shader.h"
+
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/BaseGraphics.h"
+#include "../Renderer/RenderObject.h"
+
 #include "../Layer/RenderLayer.h"
 #include "../Layer/LightLayer.h"
+
 #include "../Component/Light.h"
+#include "../Component/Camera.h"
 #include "../Pipeline/Forward.h"
+
+#include "LightManager.h"
+#include "CameraManager.h"
+
 
 namespace tezcat::Tiny::Core
 {
 	PipelineManager::PipelineManager()
 	{
-		mPassList.reserve(64);
-		mRenderLayerList.reserve(32);
+		SG<PipelineManager>::attach(this);
+
+		mRenderPassAry.reserve(64);
+		mRenderLayerAry.reserve(32);
 		for (int i = 0; i < 32; i++)
 		{
-			mRenderLayerList.push_back(new RenderLayer());
+			mRenderLayerAry.push_back(new RenderLayer());
 		}
 
-		sPipelineMap.emplace("Forward", new Forward());
-
-		SG<PipelineManager>::attach(this);
+		this->add("Forward", new Forward());
 	}
 
 	PipelineManager::~PipelineManager()
@@ -30,49 +39,95 @@ namespace tezcat::Tiny::Core
 
 	void PipelineManager::createPass(Shader* shader)
 	{
-		while (mPassList.size() <= shader->getUID())
+		while (mRenderPassAry.size() <= shader->getUID())
 		{
-			mPassList.push_back(nullptr);
+			mRenderPassAry.push_back(nullptr);
 		}
 
 		auto pass = new RenderPass(shader);
-		mPassList[shader->getUID()] = pass;
-		sPipelineMap["Forward"]->addPass(pass);
-	}
-
-	void PipelineManager::loadAllShaderToRenderer(BaseGraphics* graphics)
-	{
-		// 		auto pipelineGroup = graphics->currentPipeline();
-		// 
-		// 		for (auto pass : mPassList)
-		// 		{
-		// 			pipelineGroup->addPass(pass);
-		// 		}
+		mRenderPassAry[shader->getUID()] = pass;
+		mPipelineUMap["Forward"]->addPass(pass);
 	}
 
 	void PipelineManager::addRenderObject(uint32_t layerIndex, IRenderObject* renderObject)
 	{
-		mRenderLayerList[layerIndex]->addRenderObejct(renderObject);
+		mRenderLayerAry[layerIndex]->addRenderObejct(renderObject);
 	}
 
 	void PipelineManager::addLight(uint32_t layerIndex, ILight* light)
 	{
-		mLightLayerList[layerIndex]->addLight(light);
+		mLightLayerAry[layerIndex]->addLight(light);
 	}
 
-	void PipelineManager::add(const std::string& name, Pipeline* pl)
+
+	void PipelineManager::addCastShadowObject(IRenderMesh* renderMesh)
 	{
-		sPipelineMap.emplace(name, pl);
+
+	}
+
+
+	uint32_t PipelineManager::add(const std::string& name, Pipeline* pl)
+	{
+		uint32_t index = mPipelineAry.size();
+		mPipelineAry.push_back(pl);
+		mPipelineUMap.emplace(name, index);
+		return index;
 	}
 
 	Pipeline* PipelineManager::get(const std::string& name)
 	{
-		auto pl = sPipelineMap.find(name);
-		if (pl != sPipelineMap.end())
+		auto pl = mPipelineUMap.find(name);
+		if (pl != mPipelineUMap.end())
 		{
 			return pl->second;
 		}
 
 		return nullptr;
+	}
+
+
+	//#有问题
+	void PipelineManager::setShadowPass(bool value)
+	{
+		if (value)
+		{
+			auto it = mPipelineUMap.find("ShadowMap");
+			if (it != mPipelineUMap.end())
+			{
+
+			}
+		}
+		else
+		{
+			mShadowPass = nullptr;
+		}
+	}
+	void PipelineManager::preRender(BaseGraphics* graphics)
+	{
+		//render shadow map
+		if (mShadowPass != nullptr)
+		{
+			auto dir_light = LightMgr::getInstance()->getDirectionalLight();
+			dir_light->render(graphics);
+			mShadowPass->render(graphics, dir_light);
+		}
+	}
+
+	void PipelineManager::render(BaseGraphics* graphics)
+	{
+		//#PipelineManager::render
+		auto& cameras = CameraMgr::getInstance()->getSortedCameraAry();
+		for (auto camera : cameras)
+		{
+			if (camera->isEnable())
+			{
+				camera->render(graphics);
+			}
+		}
+	}
+
+	void PipelineManager::postRender(BaseGraphics* graphics)
+	{
+
 	}
 }

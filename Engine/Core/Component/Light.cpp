@@ -4,6 +4,7 @@
 #include "../Shader/Shader.h"
 #include "../Manager/LightManager.h"
 #include "../Component/GameObject.h"
+#include "../Renderer/BaseGraphics.h"
 
 
 namespace tezcat::Tiny::Core
@@ -50,6 +51,19 @@ namespace tezcat::Tiny::Core
 
 	}
 
+	void DirectionalLight::render(BaseGraphics* graphics)
+	{
+		if (graphics->isEnableShadow())
+		{
+			graphics->bindShadowMap();
+			graphics->setViewport(mViewInfo);
+			graphics->clear(this);
+			this->onUpdate();
+			mPipeline->render(graphics, this);
+			graphics->unbindShadowMap();
+		}
+	}
+
 	//------------------------------------------------------------------------
 	PointLight::PointLight()
 		: mAmbient(0.2f)
@@ -81,13 +95,7 @@ namespace tezcat::Tiny::Core
 
 	void PointLight::onDisable()
 	{
-		
-	}
 
-	bool PointLight::cullGameObject(GameObject* gameObject)
-	{
-		gameObject->getTransform()->getPosition();
-		return false;
 	}
 
 	//------------------------------------------------------------------------
@@ -100,4 +108,5 @@ namespace tezcat::Tiny::Core
 	{
 
 	}
+
 }

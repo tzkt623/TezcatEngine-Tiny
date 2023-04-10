@@ -3,17 +3,21 @@
 #include "Utility/Utility.h"
 
 #include "../Data/Material.h"
+#include "../Component/GameObject.h"
+#include "../Pipeline/Pipeline.h"
+
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
+#include "../Shader/Uniform.h"
+
 #include "../Renderer/VertexGroup.h"
-#include "../Pipeline/Pipeline.h"
 #include "../Renderer/RenderPass.h"
+#include "../Renderer/VertexBuffer.h"
+
 #include "../Manager/PipelineManager.h"
 #include "../Manager/VertexGroupManager.h"
-#include "../Renderer/BaseGraphics.h"
-#include "../Component/GameObject.h"
-#include "../Shader/Uniform.h"
-#include "../Renderer/VertexBuffer.h"
+
+
 
 namespace tezcat::Tiny::Core
 {
@@ -34,6 +38,7 @@ namespace tezcat::Tiny::Core
 		, mDrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
 		, mMainMaterial(nullptr)
 		, mHasIndex(false)
+		, mIsCastShadow(false)
 	{
 		if (mVertexGroup)
 		{
@@ -46,27 +51,27 @@ namespace tezcat::Tiny::Core
 		mVertexGroup = nullptr;
 	}
 
-	void MeshRenderer::submit(Shader* shader)
+	int MeshRenderer::getVertexCount() const
 	{
-		mVertexGroup->bind();
-		mMainMaterial->submit(this->getTransform(), shader);
-		Graphics::getInstance()->draw(this);
-		mVertexGroup->unbind();
+		return mVertexGroup->getVertexCount();
 	}
 
-	void MeshRenderer::sendToRenderPass()
+	int MeshRenderer::getIndexCount() const
 	{
-		auto& shaders = mMainMaterial->getShaderPackage()->getShaders();
-		for (auto s : shaders)
-		{
-			PipelineMgr::getInstance()->getPass(s->getUID())->addRenderObject(this);
-		}
+		return mVertexGroup->getIndexCount();
 	}
 
 	void MeshRenderer::setMesh(const std::string& meshName)
 	{
 		mVertexGroup = VertexGroupMgr::getInstance()->getVertexGroup(meshName);
 		mHasIndex = mVertexGroup->getIndexCount() > 0;
+	}
+
+	void MeshRenderer::addMaterialConfig()
+	{
+		//		m_MainMaterial->addUniform<UniformMode>();
+		mMainMaterial->addUniform<UniformMatrixM>(ShaderParam::MatrixM);
+		mMainMaterial->addUniform<UniformMatrixN>(ShaderParam::MatrixN);
 	}
 
 	void MeshRenderer::onEnable()
@@ -80,23 +85,37 @@ namespace tezcat::Tiny::Core
 
 	void MeshRenderer::onStart()
 	{
-		PipelineMgr::getInstance()->addRenderObject(this->getGameObject()->getLayerMaskIndex(), this);
+		if (mIsCastShadow)
+		{
+			PipelineMgr::getInstance()->addCastShadowObject(this);
+		}
+
+		PipelineMgr::getInstance()->addRenderObject(this->getGameObject()->getLayerIndex(), this);
 	}
 
-	int MeshRenderer::getVertexCount() const
+	void MeshRenderer::sendToRenderPass()
 	{
-		return mVertexGroup->getVertexCount();
+		auto& shaders = mMainMaterial->getShaderPackage()->getShaders();
+		for (auto s : shaders)
+		{
+			PipelineMgr::getInstance()
+				->getPass(s->getUID())
+				->addRenderMesh(this);
+		}
 	}
 
-	int MeshRenderer::getIndexCount() const
+	void MeshRenderer::beginRender()
 	{
-		return mVertexGroup->getIndexCount();
+		mVertexGroup->bind();
 	}
 
-	void MeshRenderer::addMaterialConfig()
+	void MeshRenderer::submit(Shader* shader)
 	{
-		//		m_MainMaterial->addUniform<UniformMode>();
-		mMainMaterial->addUniform<UniformMatrixM>(ShaderParam::MatrixM);
-		mMainMaterial->addUniform<UniformMatrixN>(ShaderParam::MatrixN);
+		mMainMaterial->submit(this->getTransform(), shader);
+	}
+
+	void MeshRenderer::endRender()
+	{
+		mVertexGroup->unbind();
 	}
 }

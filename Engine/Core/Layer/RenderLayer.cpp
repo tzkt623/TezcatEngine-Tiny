@@ -44,7 +44,7 @@ namespace tezcat::Tiny::Core
 			auto com = (Component*)(*it);
 			if (com->isEnable())
 			{
-				if (camera->frustumCulling(com->getGameObject()))
+				if (camera->culling(com->getGameObject()))
 				{
 					(*it)->sendToRenderPass();
 				}

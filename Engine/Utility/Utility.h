@@ -7,6 +7,7 @@
 #include "IDGenerator.h"
 #include "Singleton.h"
 #include "Event.h"
+#include "FileTool.h"
 
 namespace tezcat::Tiny {}
 namespace tezcat::Tiny::Core {}

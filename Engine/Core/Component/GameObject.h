@@ -27,7 +27,7 @@ namespace tezcat::Tiny::Core
 		void exitScene();
 
 		uint32_t getLayerMask() { return 1 << mLayerMaskIndex; }
-		uint32_t getLayerMaskIndex() { return mLayerMaskIndex; }
+		uint32_t getLayerIndex() { return mLayerMaskIndex; }
 		void setLayerMaskIndex(uint32_t maskIndex) { mLayerMaskIndex = maskIndex; }
 
 	public:

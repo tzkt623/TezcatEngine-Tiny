@@ -22,34 +22,4 @@ namespace tezcat::Tiny::Core
 	{
 		mMeshRendererList.push_back(meshRenderer);
 	}
-
-	void PassVertexGroup::render(Shader* shader)
-	{
-		// 同一个VAO
-		mDelegateVertexGroup->bind();
-		Statistic::DrawCall += static_cast<int>(mMeshRendererList.size());
-
-		for (auto renderer : mMeshRendererList)
-		{
-			renderer->submit(shader);
-			Graphics::getInstance()->draw(renderer);
-		}
-
-		mMeshRendererList.clear();
-	}
-
-	void PassVertexGroup::render(Shader* shader, DrawModeWrapper& drawMode)
-	{
-		// 同一个VAO
-		mDelegateVertexGroup->bind();
-		Statistic::DrawCall += static_cast<int>(mMeshRendererList.size());
-
-		for (auto renderer : mMeshRendererList)
-		{
-			renderer->submit(shader);
-			Graphics::getInstance()->draw(renderer->getVertexGroup(), drawMode);
-		}
-
-		mMeshRendererList.clear();
-	}
 }

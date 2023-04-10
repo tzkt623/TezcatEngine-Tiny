@@ -7,6 +7,7 @@ namespace tezcat::Tiny::Core
 {
 	class Camera;
 	class RenderPass;
+	class BaseGraphics;
 	class TINY_API PipelineQueue
 	{
 	public:
@@ -19,27 +20,23 @@ namespace tezcat::Tiny::Core
 			Transparent,
 			Overlay
 		};
+
 	public:
-		PipelineQueue(Queue queue, uint32_t baseOrderID)
-			: mQueueID(queue)
-			, mBaseOrderID(baseOrderID)
-			, mDirty(true)
-		{
-		}
+		PipelineQueue(const Queue& queue, const uint32_t& baseOrderID);
 
 		int getQueueID() const { return mQueueID; }
-		void setQueueID(Queue queue) { mQueueID = queue; }
-		virtual void render(Camera* camera);
+		void setQueueID(const Queue& queue) { mQueueID = queue; }
 		void addPass(RenderPass* pass);
+		virtual void render(BaseGraphics* graphics, Camera* camera);
 
 	private:
+		bool mDirty;
 		Queue mQueueID;
 		uint32_t mBaseOrderID;
-		bool mDirty;
 		std::vector<RenderPass*> mShaderList;
 
 	public:
-		static Queue getQueue(const std::string& name)
+		inline static Queue getQueue(const std::string& name)
 		{
 			return sQueueMap[name];
 		}

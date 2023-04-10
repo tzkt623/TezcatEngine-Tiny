@@ -10,7 +10,7 @@
     {
         str Name = Std2/Base;
         int Version = 330;
-        int OrderID = 0;
+        int OrderID = 50;
         str Queue = Opaque;
         bool ZWrite = true;
         str CullFace = Back;

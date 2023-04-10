@@ -10,7 +10,8 @@ public:
 
 public:
 	void yawPitch(float yaw, float pitch, bool constrainPitch = true);
-	void updateCameraVector();
+	void roll(float roll);
+	void updateVector();
 
 	glm::vec3& getFront() { return mFront; }
 	glm::vec3& getUp() { return mUp; }

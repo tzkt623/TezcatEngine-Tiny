@@ -615,14 +615,14 @@ namespace detail
 	GLM_FUNC_QUALIFIER uint32 packF3x9_E1x5(vec3 const& v)
 	{
 		float const SharedExpMax = (pow(2.0f, 9.0f - 1.0f) / pow(2.0f, 9.0f)) * pow(2.0f, 31.f - 15.f);
-		vec3 const Color = clamp(v, 0.0f, SharedExpMax);
-		float const MaxColor = max(Color.x, max(Color.y, Color.z));
+		vec3 const ColorComponent = clamp(v, 0.0f, SharedExpMax);
+		float const MaxColor = max(ColorComponent.x, max(ColorComponent.y, ColorComponent.z));
 
 		float const ExpSharedP = max(-15.f - 1.f, floor(log2(MaxColor))) + 1.0f + 15.f;
 		float const MaxShared = floor(MaxColor / pow(2.0f, (ExpSharedP - 15.f - 9.f)) + 0.5f);
 		float const ExpShared = equal(MaxShared, pow(2.0f, 9.0f), epsilon<float>()) ? ExpSharedP + 1.0f : ExpSharedP;
 
-		uvec3 const ColorComp(floor(Color / pow(2.f, (ExpShared - 15.f - 9.f)) + 0.5f));
+		uvec3 const ColorComp(floor(ColorComponent / pow(2.f, (ExpShared - 15.f - 9.f)) + 0.5f));
 
 		detail::u9u9u9e5 Unpack;
 		Unpack.data.x = ColorComp.x;
@@ -644,10 +644,10 @@ namespace detail
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<4, T, Q> packRGBM(vec<3, T, Q> const& rgb)
 	{
-		vec<3, T, Q> const Color(rgb * static_cast<T>(1.0 / 6.0));
-		T Alpha = clamp(max(max(Color.x, Color.y), max(Color.z, static_cast<T>(1e-6))), static_cast<T>(0), static_cast<T>(1));
+		vec<3, T, Q> const ColorComponent(rgb * static_cast<T>(1.0 / 6.0));
+		T Alpha = clamp(max(max(ColorComponent.x, ColorComponent.y), max(ColorComponent.z, static_cast<T>(1e-6))), static_cast<T>(0), static_cast<T>(1));
 		Alpha = ceil(Alpha * static_cast<T>(255.0)) / static_cast<T>(255.0);
-		return vec<4, T, Q>(Color / Alpha, Alpha);
+		return vec<4, T, Q>(ColorComponent / Alpha, Alpha);
 	}
 
 	template<typename T, qualifier Q>

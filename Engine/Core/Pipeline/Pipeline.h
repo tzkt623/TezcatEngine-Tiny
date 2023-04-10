@@ -16,7 +16,7 @@ namespace tezcat::Tiny::Core
 	class Camera;
 	class RenderPass;
 	class BaseGraphics;
-
+	class IRenderObserver;
 
 	class TINY_API Pipeline
 	{
@@ -27,13 +27,10 @@ namespace tezcat::Tiny::Core
 		virtual PipelineType getType() { return PipelineType::Error; }
 
 		virtual void init() = 0;
-		virtual void render(Camera* camera) = 0;
+		virtual void render(BaseGraphics* graphics, Camera* camera) = 0;
+		virtual void render(BaseGraphics* graphics, IRenderObserver* renderObject) {}
 		virtual void addPass(RenderPass* pass) = 0;
 
-		BaseGraphics* getGraphics() const { return mGraphics; }
-		void setGraphics(BaseGraphics* val) { mGraphics = val; }
-
-	protected:
-		BaseGraphics* mGraphics;
+		virtual void setShadowCast() = 0;
 	};
 }

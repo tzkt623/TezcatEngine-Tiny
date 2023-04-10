@@ -50,6 +50,7 @@ namespace tezcat::Tiny::Core
 		TexChannelWrapper(TextureChannel::RG,					0),
 		TexChannelWrapper(TextureChannel::RGB,					0),
 		TexChannelWrapper(TextureChannel::RGBA,					0),
+		TexChannelWrapper(TextureChannel::Depth,				0),
 		TexChannelWrapper(TextureChannel::Depth16,				0),
 		TexChannelWrapper(TextureChannel::Depth24,				0),
 		TexChannelWrapper(TextureChannel::Depth32,				0),
@@ -58,6 +59,21 @@ namespace tezcat::Tiny::Core
 		TexChannelWrapper(TextureChannel::Depth24_Stencil8,		0),
 		TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	0),
 	};
+
+	std::array<ColorBufferWrapper, (std::size_t)ColorBuffer::Count> ContextMap::ColorBufferArray =
+	{
+		ColorBufferWrapper(ColorBuffer::None,	0),
+		ColorBufferWrapper(ColorBuffer::A0,		0),
+		ColorBufferWrapper(ColorBuffer::A1,		0),
+		ColorBufferWrapper(ColorBuffer::B0,		0),
+		ColorBufferWrapper(ColorBuffer::B1,		0),
+		ColorBufferWrapper(ColorBuffer::AX,		0),
+		ColorBufferWrapper(ColorBuffer::BX,		0),
+		ColorBufferWrapper(ColorBuffer::X0,		0),
+		ColorBufferWrapper(ColorBuffer::X1,		0),
+		ColorBufferWrapper(ColorBuffer::All,	0)
+	};
+
 
 	std::array<DrawModeWrapper, (std::size_t)DrawMode::Count> ContextMap::DrawModeArray =
 	{
@@ -155,4 +171,6 @@ namespace tezcat::Tiny::Core
 		{"Main",		LightMode::Main },
 		{"Addition",	LightMode::Addition }
 	};
+
+
 }

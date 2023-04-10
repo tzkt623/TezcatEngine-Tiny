@@ -9,13 +9,24 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		Image();
+		Image(Image&& other);
 		~Image();
 
-		void openFile(const std::string& path, bool flip = true);
-		inline int getWidth() const { return mWidth; }
-		inline int getHeight() const { return mHeight; }
-		inline int getChannels() const { return mChannels; }
-		inline unsigned char* getData() { return mData; }
+		void openFile(const std::string& path, bool flip = false);
+		inline const int& getWidth() const { return mWidth; }
+		inline const int& getHeight() const { return mHeight; }
+		inline const int& getChannels() const { return mChannels; }
+		inline unsigned char* getData() const { return mData; }
+
+		Image& operator=(Image&& other) noexcept
+		{
+			mWidth = other.mWidth;
+			mHeight = other.mHeight;
+			mChannels = other.mChannels;
+			mData = other.mData;
+			other.mData = nullptr;
+			return *this;
+		}
 
 	private:
 		int mWidth;

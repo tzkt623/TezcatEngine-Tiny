@@ -33,6 +33,9 @@ namespace tezcat::Tiny::Core
 
 	void Material::submit(Transform* transform, Shader* shader)
 	{
+		//主动传送自身的所有可能变量
+		//然而理论上,应该让shader来挑选自己需要的数据
+		//可以避免大量冗余操作
 		shader->resetState();
 		for (auto uniform : mUniforms)
 		{

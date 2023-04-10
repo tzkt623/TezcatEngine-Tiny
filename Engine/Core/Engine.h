@@ -23,6 +23,7 @@ namespace tezcat::Tiny::Core
 	public:
 		bool init(ResourceLoader* loader);
 		void run();
+		BaseGraphics* getGraphics() { return mGraphics; }
 
 	protected:
 		virtual bool preInit(ResourceLoader* loader);
@@ -38,6 +39,7 @@ namespace tezcat::Tiny::Core
 		virtual void onUpdate();
 
 		virtual BaseGraphics* createGraphics() = 0;
+
 	protected:
 		ShaderManager* mShaderManager;
 		LightManager* mLightManager;
@@ -46,8 +48,6 @@ namespace tezcat::Tiny::Core
 		FrameBufferManager* mFrameBufferManager;
 		TextureManager* mTextureManager;
 		PipelineManager* mPipelineManager;
-
-
 		InputSystem* mInputSystem;
 		ResourceLoader* mResourceLoader;
 

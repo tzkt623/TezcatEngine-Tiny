@@ -3,12 +3,6 @@
 #include "MyGUI.h"
 #include "MyController.h"
 
-TextureRenderBuffer2D* MyScene::rbWorld1;
-TextureRenderBuffer2D* MyScene::rbWorld2;
-
-FrameBuffer* MyScene::fbWorld1;
-FrameBuffer* MyScene::fbWorld2;
-
 MyScene::MyScene(const std::string& name)
 	: Scene(name)
 {
@@ -36,56 +30,96 @@ void MyScene::onEnter()
 	float gateWidth = 1920.0f / 4;
 	float gateHigh = 1080.0f / 4;
 
-	std::string skybox1_path = "../Resource/Image/skybox/sky1_%s.jpg";
-	std::string skybox2_path = "../Resource/Image/skybox/sky2_%s.jpg";
-
 	auto controller_go = new GameObject("Controller");
 	controller_go->addComponent<Transform>();
 	controller_go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
 	controller_go->addComponent<MyController>();
 
+	//shadow map
+	if (true)
+	{
+		auto go = new GameObject("ShadowMap");
+		auto camera = go->addComponent<Camera>(true);
+		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+		camera->setOrtho(0.1f, 2000.0f);
+		camera->setPipeline(PipelineMgr::getInstance()->get("Shadow"));
+		camera->setCullLayer(0);
+
+
+		go->addComponent<Transform>();
+		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		go->getTransform()->setParent(controller_go->getTransform());
+	}
+
 	if (true)
 	{
 		auto go = new GameObject("World1_Camera");
 		auto camera = go->addComponent<Camera>(true);
+		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
+		camera->setPipeline(PipelineMgr::getInstance()->get("Forward"));
 		camera->setCullLayer(0);
+
 
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		go->getTransform()->setParent(controller_go->getTransform());
 
-		//world1 frame
-		fbWorld1 = FrameBufferMgr::getInstance()->create(Engine::getScreenWidth(), Engine::getScreenHeight(),
-		{
-			TextureBufferInfo(TextureBufferType::Color, TextureChannel::RGBA, TextureChannel::RGBA, DataType::UByte),
-			TextureBufferInfo(TextureBufferType::DepthAndStencil, TextureChannel::Depth24_Stencil8)
-		});
+		FrameBufferMgr::getInstance()->create(
+			"FB_World1",
+			Engine::getScreenWidth(), Engine::getScreenHeight(),
+			{
+				TextureBufferInfo("RB_World1"
+					, TextureBufferType::ColorComponent
+					, TextureChannel::RGBA
+					, TextureChannel::RGBA
+					, DataType::UByte
+					, true),
+				TextureBufferInfo("DS_World1"
+					, TextureBufferType::DepthStencilComponent
+					, TextureChannel::Depth24_Stencil8)
+			});
 
-		rbWorld1 = fbWorld1->getBuffer(0);
+		go = new GameObject("Skybox1");
+		go->setLayerMaskIndex(0);
+		go->addComponent<Transform>();
 
+		auto skybox = go->addComponent<Skybox>();
+		auto material = new Material("Unlit/Skybox");
+		material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
+		skybox->setMaterial(material);
 	}
 
 	if (true)
 	{
 		auto go = new GameObject("World2_Camera");
 		auto camera = go->addComponent<Camera>(false);
+		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
+		camera->setPipeline(PipelineMgr::getInstance()->get("Forward"));
 		camera->setCullLayer(1);
-		camera->setDeep(1);
+		camera->setDepth(1);
 
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		go->getTransform()->setParent(controller_go->getTransform());
 
-		fbWorld2 = FrameBufferMgr::getInstance()->create(Engine::getScreenWidth(), Engine::getScreenHeight(),
-		{
-			TextureBufferInfo(TextureBufferType::Color, TextureChannel::RGBA, TextureChannel::RGBA, DataType::UByte),
-			TextureBufferInfo(TextureBufferType::DepthAndStencil, TextureChannel::Depth24_Stencil8)
-		});
+		auto fb = FrameBufferMgr::getInstance()->create(
+			"FB_World2",
+			Engine::getScreenWidth(), Engine::getScreenHeight(),
+			{
+				TextureBufferInfo("RB_World2"
+					, TextureBufferType::ColorComponent
+					, TextureChannel::RGBA
+					, TextureChannel::RGBA
+					, DataType::UByte
+					, true),
+				TextureBufferInfo("DS_World2"
+					, TextureBufferType::DepthStencilComponent
+					, TextureChannel::Depth24_Stencil8)
+			});
 
-		rbWorld2 = fbWorld2->getBuffer(0);
-		camera->setFrameBuffer(fbWorld2);
+		camera->setFrameBuffer(fb);
 
 
 		go = new GameObject("Skybox2");
@@ -94,11 +128,7 @@ void MyScene::onEnter()
 
 		auto skybox = go->addComponent<Skybox>();
 		auto material = new Material("Unlit/Skybox");
-		material->addUniform<UniformTexCube>(
-			ShaderParam::TexCube
-			, skybox1_path
-			, TextureFilter::Linear
-			, TextureWrap::Clamp_To_Edge);
+		material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_1");
 		skybox->setMaterial(material);
 
 		//--------------------------
@@ -112,39 +142,22 @@ void MyScene::onEnter()
 
 		auto mr1 = world2->addComponent<MeshRenderer>();
 		auto world1_material = new Material("Unlit/Texture");
-		world1_material->addUniform<UniformTex2D>(
-			ShaderParam::TexColor
-			, rbWorld1);
+		world1_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World1");
 		mr1->setMaterial(world1_material);
 		mr1->setMesh("Square");
 	}
 
 	if (true)
 	{
-		auto go = new GameObject("Skybox1");
-		go->addComponent<Transform>();
-
-		auto skybox = go->addComponent<Skybox>();
-		auto material = new Material("Unlit/Skybox");
-		material->addUniform<UniformTexCube>(
-			ShaderParam::TexCube
-			, skybox2_path
-			, TextureFilter::Linear
-			, TextureWrap::Clamp_To_Edge);
-		skybox->setMaterial(material);
-	}
-
-	if (true)
-	{
 		auto direction_light_go = new GameObject();
 		direction_light_go->addComponent<Transform>();
-		direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-		direction_light_go->getTransform()->setScale(glm::vec3(4.0f));
+		direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 0.0f));
+		direction_light_go->getTransform()->setScale(glm::vec3(10.0f));
 
 		auto mr = direction_light_go->addComponent<MeshRenderer>();
 		auto light_material = new Material("Unlit/Color");
 		mr->setMaterial(light_material);
-		mr->setMesh("Cube");
+		mr->setMesh("Sphere");
 
 		auto dir_light = direction_light_go->addComponent<DirectionalLight>();
 		dir_light->setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
@@ -164,9 +177,7 @@ void MyScene::onEnter()
 
 		auto mr1 = world2->addComponent<MeshRenderer>();
 		auto world2_material = new Material("Unlit/Texture");
-		world2_material->addUniform<UniformTex2D>(
-			ShaderParam::TexColor
-			, rbWorld2);
+		world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
 		mr1->setMaterial(world2_material);
 		mr1->setMesh("Square");
 
@@ -180,9 +191,7 @@ void MyScene::onEnter()
 
 		auto mr2 = wife2->addComponent<MeshRenderer>();
 		auto wife_material2 = new Material("Unlit/Texture");
-		wife_material2->addUniform<UniformTex2D>(
-			ShaderParam::TexColor
-			, "../Resource/Image/wifu.jpg");
+		wife_material2->addUniform<UniformTex2D>(ShaderParam::TexColor, "wife");
 		mr2->setMaterial(wife_material2);
 		mr2->setMesh("Square");
 
@@ -196,9 +205,7 @@ void MyScene::onEnter()
 
 		auto mre1 = elden_ring1->addComponent<MeshRenderer>();
 		auto elden_ring1_material = new Material("Unlit/Texture");
-		elden_ring1_material->addUniform<UniformTex2D>(
-			ShaderParam::TexColor
-			, "../Resource/Image/eldenring1.jpg");
+		elden_ring1_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "eldenring1");
 		mre1->setMaterial(elden_ring1_material);
 		mre1->setMesh("Square");
 
@@ -211,9 +218,7 @@ void MyScene::onEnter()
 
 		auto mre2 = elden_ring2->addComponent<MeshRenderer>();
 		auto elden_ring2_material = new Material("Unlit/Texture");
-		elden_ring2_material->addUniform<UniformTex2D>(
-			ShaderParam::TexColor
-			, "../Resource/Image/eldenring2.jpg");
+		elden_ring2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "eldenring2");
 		mre2->setMaterial(elden_ring2_material);
 		mre2->setMesh("Square");
 	}
@@ -231,15 +236,9 @@ void MyScene::onEnter()
 		auto mr = plane->addComponent<MeshRenderer>();
 		//Standard/Std2 error!!!
 		auto plane_material = new Material("Standard/Std1");
-		plane_material->addUniform<UniformTex2D>(
-			ShaderParam::StdMaterial::Diffuse
-			, "../Resource/Image/stone_wall_diff.jpg");
-		plane_material->addUniform<UniformTex2D>(
-			ShaderParam::StdMaterial::Specular
-			, "../Resource/Image/stone_wall_ao.jpg");
-		plane_material->addUniform<UniformF1>(
-			ShaderParam::StdMaterial::Shininess
-			, 64.0f);
+		plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
+		plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
+		plane_material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
 		mr->setMaterial(plane_material);
 		mr->setMesh("Square");
 	}
@@ -263,12 +262,8 @@ void MyScene::onEnter()
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Unlit/Transparent");
-			material->addUniform<UniformTex2D>(
-				ShaderParam::TexColor
-				, "../Resource/Image/transparent_window.png");
-			material->addUniform<UniformF1>(
-				ShaderParam::ModeSpecular
-				, 64.0f);
+			material->addUniform<UniformTex2D>(ShaderParam::TexColor, "transparent_window");
+			material->addUniform<UniformF1>(ShaderParam::ModeSpecular, 64.0f);
 			mr->setMaterial(material);
 			mr->setMesh("Square");
 		}
@@ -292,27 +287,19 @@ void MyScene::onEnter()
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Standard/Std1");
-			material->addUniform<UniformTex2D>(
-				ShaderParam::StdMaterial::Diffuse
-				, "../Resource/Image/metal_plate_diff.jpg");
-			material->addUniform<UniformTex2D>(
-				ShaderParam::StdMaterial::Specular
-				, "../Resource/Image/metal_plate_spec.jpg");
-			material->addUniform<UniformF1>(
-				ShaderParam::StdMaterial::Shininess
-				, 64.0f);
-			material->addUniform<UniformTexCube>(
-				ShaderParam::TexCube
-				, skybox2_path);
+			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "metal_plate_diff");
+			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "metal_plate_spec");
+			material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
+			material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
 			mr->setMaterial(material);
 			mr->setMesh("Sphere");
 		}
 	}
 
 	//----------------------------------------
-//
-//	Cubes
-//
+	//
+	//	Cubes
+	//
 	if (true)
 	{
 		std::random_device rd;
@@ -328,18 +315,10 @@ void MyScene::onEnter()
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Standard/Std1");
-			material->addUniform<UniformTex2D>(
-				ShaderParam::StdMaterial::Diffuse
-				, "../Resource/Image/metal_plate_diff.jpg");
-			material->addUniform<UniformTex2D>(
-				ShaderParam::StdMaterial::Specular
-				, "../Resource/Image/metal_plate_spec.jpg");
-			material->addUniform<UniformF1>(
-				ShaderParam::StdMaterial::Shininess
-				, 64.0f);
-			material->addUniform<UniformTexCube>(
-				ShaderParam::TexCube
-				, skybox2_path);
+			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "metal_plate_diff");
+			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "metal_plate_spec");
+			material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
+			material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
 			mr->setMaterial(material);
 			mr->setMesh("Cube");
 		}

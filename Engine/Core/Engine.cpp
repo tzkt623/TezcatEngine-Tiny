@@ -12,10 +12,11 @@
 #include "Data/ResourceLoader.h"
 #include "Input/InputSystem.h"
 #include "Renderer/BaseGraphics.h"
-#include "Scene/LayerMask.h"
+#include "Renderer/LayerMask.h"
 #include "Component/GameObject.h"
 #include "Shader/ShaderParam.h"
 
+#include "Utility/Utility.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -36,7 +37,6 @@ namespace tezcat::Tiny::Core
 		, mGraphics(nullptr)
 		, mIsRunning(true)
 	{
-
 
 		new VertexGroupManager();
 	}
@@ -91,6 +91,7 @@ namespace tezcat::Tiny::Core
 		Graphics::attach(mGraphics);
 		mGraphics->init(this);
 
+		FileTool::init(mResourceLoader->getResourceFolderName());
 		mResourceLoader->prepareResource(this);
 		return true;
 	}
@@ -98,7 +99,7 @@ namespace tezcat::Tiny::Core
 	bool Engine::postInit(ResourceLoader* loader)
 	{
 		mSceneManager->init();
-		mResourceLoader->prepareScene(this);
+		mResourceLoader->prepareGame(this);
 		return true;
 	}
 	void Engine::beforeLoop()

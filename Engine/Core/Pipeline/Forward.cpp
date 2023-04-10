@@ -45,35 +45,37 @@ namespace tezcat::Tiny::Core
 		mOverlay = new PipelineQueue(PipelineQueue::Overlay, 6000);
 	}
 
-	void Forward::render(Camera* camera)
+	void Forward::render(BaseGraphics* graphics, Camera* camera)
 	{
 		//#CameraCulling
 		auto& cull_list = camera->getCullLayerList();
 		for (auto index : cull_list)
 		{
-			PipelineMgr::getInstance()->getRenderLayer(index)->testWithCamera(camera);
+			PipelineMgr::getInstance()
+				->getRenderLayer(index)
+				->testWithCamera(camera);
 		}
 
-		//#LightCulling
-// 		auto &points = LightMgr::getInstance()->getPointLights();
-// 		for (auto point : points)
-// 		{
-// 			auto& list = point->getCullLayerList();
-// 			for (auto index : list)
-// 			{
-// 				PipelineManager::getRenderLayer(index)->testVisibleObjects(point);
-// 			}
-// 		}
+		//Shadow和Camera一样都是世界的观察者
+		//所以renderpass如何确定是哪个观察者进来观察
+		//如果是灯光进来观察,说明是渲染阴影,那么只需要object提供顶点数据
+		//那就是说要有一个observer列表,用于对当前的所有observer进行一个排序
+		//然后按照顺序依次进来渲染
+		if (graphics->isEnableShadow())
+		{
+			auto dir_light = LightMgr::getInstance()->getDirectionalLight();
+			mShadowMap->render(graphics, dir_light);
+		}
+		
+		
+		mBackground->render(graphics, camera);
 
-
-		mBackground->render(camera);
-
-		mGeometry->render(camera);
-		mAlphaTest->render(camera);
+		mGeometry->render(graphics, camera);
+		mAlphaTest->render(graphics, camera);
 		//#解决覆盖问题
-		mTransparent->render(camera);
+		mTransparent->render(graphics, camera);
 
-		mOverlay->render(camera);
+		mOverlay->render(graphics, camera);
 	}
 
 	void Forward::addPass(RenderPass* pass)

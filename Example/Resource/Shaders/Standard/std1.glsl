@@ -10,7 +10,7 @@
     {
         str Name = STD1;
         int Version = 330;
-        int OrderID = 0;
+        int OrderID = 50;
         str Queue = Opaque;
         str DepthTest = Less;
         bool ZWrite = true;
@@ -50,7 +50,7 @@
 
     #TINY_FS_BEGIN
     {
-        struct TINY_Std_Mat
+        struct StdMaterial
         {
             sampler2D diffuse;
             sampler2D normal;
@@ -58,12 +58,22 @@
             float shininess;
         };
 
+        struct LightDirection
+        {
+            vec3 direction;
+            vec3 ambient;
+            vec3 diffuse;
+            vec3 specular;
+        };
+
         in vec4 myColor;
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
 
-        uniform TINY_Std_Mat TINY_MatStd;
+        uniform StdMaterial TINY_MatStd;
+        uniform LightDirection TINY_LightDir;
+
         uniform samplerCube TINY_TexCube;
         uniform float TINY_AmbientStrength = 0.1f;
         uniform vec3 TINY_LightPosition = vec3(0.0f, 0.0f, 0.0f);

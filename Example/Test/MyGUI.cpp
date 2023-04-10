@@ -92,7 +92,7 @@ MyMainCameraWindow::MyMainCameraWindow() :
 	m_Right(new GUIDragFloat3(u8"右方(Right)")),
 	m_Up(new GUIDragFloat3(u8"上方(Up)")),
 	m_Front(new GUIDragFloat3(u8"前方(Front)")),
-	m_MainCamera(nullptr)
+	mMainCamera(nullptr)
 {
 
 }
@@ -103,7 +103,7 @@ MyMainCameraWindow::~MyMainCameraWindow()
 
 void MyMainCameraWindow::init()
 {
-	m_MainCamera = SG<CameraManager>::getInstance()->getMainCamera();
+	mMainCamera = SG<CameraManager>::getInstance()->getMainCamera();
 
 	this->addChild(m_Info);
 	this->addChild(mPosition);
@@ -114,7 +114,7 @@ void MyMainCameraWindow::init()
 
 	mPosition->postFunction = [this](float* data)
 	{
-		m_MainCamera->getTransform()->setPosition(data);
+		mMainCamera->getTransform()->setPosition(data);
 	};
 
 
@@ -126,20 +126,21 @@ void MyMainCameraWindow::init()
 
 void MyMainCameraWindow::onUpdate()
 {
+	mMainCamera = SG<CameraManager>::getInstance()->getMainCamera();
 	m_Info->setData(StringTool::fromU8(u8"操作<CTRL>\n[W A S D]\n[R:Up] [F:Down]"));
 
-	auto position = m_MainCamera->getTransform()->getPosition();
+	auto position = mMainCamera->getTransform()->getPosition();
 	mPosition->setFloat3(glm::value_ptr(position));
 
-	auto rotation = m_MainCamera->getTransform()->getRotation();
+	auto rotation = mMainCamera->getTransform()->getRotation();
 	m_Rotation->setFloat3(glm::value_ptr(rotation));
 
-	auto up = m_MainCamera->getUp();
+	auto up = mMainCamera->getUp();
 	m_Up->setFloat3(glm::value_ptr(up));
 
-	auto front = m_MainCamera->getFront();
+	auto front = mMainCamera->getFront();
 	m_Front->setFloat3(glm::value_ptr(front));
 
-	auto right = m_MainCamera->getRight();
+	auto right = mMainCamera->getRight();
 	m_Right->setFloat3(glm::value_ptr(right));
 }

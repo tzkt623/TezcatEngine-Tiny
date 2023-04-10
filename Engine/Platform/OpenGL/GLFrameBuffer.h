@@ -16,13 +16,15 @@ namespace tezcat::Tiny::GL
 		void bind() override;
 		void unbind() override;
 
-		void create(TextureRenderBuffer2D* targetBuffer2D) override;
-		void create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos) override;
+		void attach(TextureRenderBuffer2D* buffer) override;
+		void build(const std::function<void(FrameBuffer*) >& function) override;
 
 	private:
-		void createTextureBuffer(const int& width, const int& high, const TextureBufferInfo& info, int& colorCountor);
-		void createRenderBuffer(const int& width, const int& high, const TextureBufferInfo& info);
+		void createTextureBuffer(TextureBuffer2D* tex);
+		void createRenderBuffer(TextureRenderBuffer2D* tex);
 
+	private:
+		uint32_t mColorCount;
 	};
 
 	//-------------------------------------------------
@@ -32,7 +34,7 @@ namespace tezcat::Tiny::GL
 
 	class TINY_API GLFrameBufferCreator : public FrameBufferCreator
 	{
-	public:
-		FrameBuffer* create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos) override;
+	protected:
+		FrameBuffer* createFrameBuffer() override;
 	};
 }

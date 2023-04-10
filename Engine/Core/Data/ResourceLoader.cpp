@@ -20,12 +20,12 @@ namespace tezcat::Tiny::Core
 
 	void ResourceLoader::prepareResource(Engine* engine)
 	{
-		ShaderBuilderCreator::create("../Resource/Shaders/Standard/std2.glsl");
-		ShaderBuilderCreator::create("../Resource/Shaders/Standard/std1.glsl");
-		ShaderBuilderCreator::create("../Resource/Shaders/Unlit/color.glsl");
-		ShaderBuilderCreator::create("../Resource/Shaders/Unlit/texture.glsl");
-		ShaderBuilderCreator::create("../Resource/Shaders/Unlit/skybox.glsl");
-		ShaderBuilderCreator::create("../Resource/Shaders/Unlit/transparent.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std1.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/skybox.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/transparent.glsl");
 
 		this->createSomeMode();
 	}
@@ -35,7 +35,7 @@ namespace tezcat::Tiny::Core
 
 	}
 
-	void ResourceLoader::prepareScene(Engine* engine)
+	void ResourceLoader::prepareGame(Engine* engine)
 	{
 	}
 

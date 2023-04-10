@@ -1,11 +1,11 @@
 #include "FrameBuffer.h"
 
-
 namespace tezcat::Tiny::Core
 {
 	FrameBuffer::FrameBuffer()
 		: mBufferID(-1)
 		, mBuffers()
+		, mViewportInfo(0, 0, 0, 0)
 	{
 
 	}

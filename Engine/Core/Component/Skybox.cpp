@@ -31,7 +31,7 @@ namespace tezcat::Tiny::Core
 
 	void Skybox::onStart()
 	{
-		PipelineMgr::getInstance()->addRenderObject(this->getGameObject()->getLayerMaskIndex(), this);
+		PipelineMgr::getInstance()->addRenderObject(this->getGameObject()->getLayerIndex(), this);
 	}
 
 	void Skybox::onEnable()
@@ -48,15 +48,12 @@ namespace tezcat::Tiny::Core
 		auto shader = mMaterial->getShaderPackage()->getShaders()[0];
 		PipelineMgr::getInstance()
 			->getPass(shader->getUID())
-			->addRenderObject(this);
+			->addRenderMesh(this);
 	}
 
 	void Skybox::submit(Shader* shader)
 	{
-		mVertexGroup->bind();
-		mMaterial->submit(this->getTransform(), shader);
-		Graphics::getInstance()->draw(this);
-		mVertexGroup->unbind();
+		mMaterial->submit(this->getTransform(), shader);		
 	}
 
 	DrawModeWrapper& Skybox::getDrawMode()
@@ -67,5 +64,15 @@ namespace tezcat::Tiny::Core
 	int Skybox::getVertexCount() const
 	{
 		return mVertexGroup->getVertexCount();
+	}
+
+	void Skybox::beginRender()
+	{
+		mVertexGroup->bind();
+	}
+
+	void Skybox::endRender()
+	{
+		mVertexGroup->unbind();
 	}
 }

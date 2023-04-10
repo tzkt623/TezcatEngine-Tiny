@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/Skybox;
+    str Name = Unlit/ShadowMap;
 }
 #TINY_HEAD_END
 
@@ -8,13 +8,12 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Skybox;
+        str Name = ShadowMap;
         int Version = 330;
         int OrderID = 0;
-        str Queue = Background;
+        str Queue = Opaque;
         str DepthTest = Less;
-        bool ZWrite = false;
-        str DepthTest = Less;
+        bool ZWrite = true;
         str CullFace = Back;
     }
     #TINY_CFG_END
@@ -24,27 +23,21 @@
         layout (location = 0) in vec3 aPos;
 
         uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixSBV;
-
-        out vec3 myUV;
+        uniform mat4 TINY_MatrixV;
+        uniform mat4 TINY_MatrixM;
 
         void main()
         {
-            myUV = aPos;
-            gl_Position = TINY_MatrixP * TINY_MatrixSBV * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * vec4(aPos, 1.0);
         }
     }
     #TINY_VS_END
 
     #TINY_FS_BEGIN
     {
-        in vec3 myUV;
-        uniform samplerCube TINY_TexCube;
-        out vec4 myFinalColor;
-
         void main()
         {
-            myFinalColor = texture(TINY_TexCube, myUV);
+            //gl_FragDepth = gl_FragCoord.z;
         }
     }
     #TINY_FS_END

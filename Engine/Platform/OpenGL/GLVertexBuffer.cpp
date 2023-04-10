@@ -47,8 +47,8 @@ namespace tezcat::Tiny::GL
 			glBindBuffer(GL_ARRAY_BUFFER, mVBOArray[vbo_index++]);
 			glBufferData(GL_ARRAY_BUFFER, meshData->colorSize(), meshData->colors.data(), GL_STATIC_DRAW);
 
-			glVertexAttribPointer(VertexMask::Color, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
-			glEnableVertexAttribArray(VertexMask::Color);
+			glVertexAttribPointer(VertexMask::ColorComponent, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
+			glEnableVertexAttribArray(VertexMask::ColorComponent);
 		}
 
 		if (!meshData->uv.empty())
