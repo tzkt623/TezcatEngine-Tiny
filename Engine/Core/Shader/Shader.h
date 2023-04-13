@@ -125,6 +125,7 @@ namespace tezcat::Tiny::Core
 		virtual void setFloat3(UniformID& uniform, float* data) = 0;
 		virtual void setFloat4(UniformID& uniform, float* data) = 0;
 
+		virtual void setInt1(UniformID& uniform, const int& data) = 0;
 		virtual void setInt1(UniformID& uniform, int* data) = 0;
 		virtual void setInt2(UniformID& uniform, int* data) = 0;
 		virtual void setInt3(UniformID& uniform, int* data) = 0;

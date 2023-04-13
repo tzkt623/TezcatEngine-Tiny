@@ -11,7 +11,7 @@ public:
 public:
 	void yawPitch(float yaw, float pitch, bool constrainPitch = true);
 	void roll(float roll);
-	void updateVector();
+	void updateVector(Transform* transform);
 
 	glm::vec3& getFront() { return mFront; }
 	glm::vec3& getUp() { return mUp; }

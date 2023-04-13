@@ -39,6 +39,7 @@ namespace tezcat::Tiny::Core
 		static UniformID ViewPosition;
 		static UniformID AmbientStrength;
 		static UniformID ModeSpecular;
+		static UniformID EnableShadow;
 
 		struct LightDirection
 		{

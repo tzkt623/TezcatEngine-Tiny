@@ -205,7 +205,7 @@ namespace tezcat::Tiny::GL
 			}
 			else
 			{
-				shader->setRenderQueue(PipelineQueue::Queue::Geometry);
+				shader->setRenderQueue(PipelineQueue::Queue::None);
 			}
 
 			//LightMode

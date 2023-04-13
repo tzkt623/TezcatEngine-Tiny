@@ -15,7 +15,7 @@ namespace tezcat::Tiny::Core
 		~Transform();
 
 		//用来解决相机矩阵的问题
-		void setDelegateUpdate(const std::function<void()>& function)
+		void setDelegateUpdate(const std::function<void(Transform*)>& function)
 		{
 			mDelegateUpdate = function;
 		}
@@ -135,7 +135,7 @@ namespace tezcat::Tiny::Core
 		void onEnable() override;
 		void onDisable() override;
 		void onUpdate() override;
-		void updateMatrix();
+		void updateMatrix(Transform* self);
 
 	private:
 		uint32_t mIndex;
@@ -150,6 +150,6 @@ namespace tezcat::Tiny::Core
 
 		glm::mat4x4 mModelMatrix;
 
-		std::function<void()> mDelegateUpdate;
+		std::function<void(Transform*)> mDelegateUpdate;
 	};
 }

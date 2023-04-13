@@ -1,6 +1,6 @@
 #include "BaseGraphics.h"
 #include "RenderObject.h"
-
+#include "ShadowRenderer.h"
 
 #include "../Manager/CameraManager.h"
 #include "../Manager/LightManager.h"
@@ -43,35 +43,28 @@ namespace tezcat::Tiny::Core
 	{
 		Statistic::DrawCall = 0;
 		Statistic::PassCount = 0;
-
-		PipelineMgr::getInstance()->preRender(this);
 	}
 
 	void BaseGraphics::onRender()
 	{
-		//#BaseGraphics::onRender
-		PipelineMgr::getInstance()->render(this);
+		//#PipelineManager::render
+		auto& cameras = CameraMgr::getInstance()->getSortedCameraAry();
+		for (auto camera : cameras)
+		{
+			if (camera->isEnable())
+			{
+				camera->render(this);
+			}
+		}
 	}
 
 	void BaseGraphics::postRender()
 	{
-		PipelineMgr::getInstance()->postRender(this);
+
 	}
 
-	void BaseGraphics::createShadowRenderer(const std::string& texName, int width, int height)
+	void BaseGraphics::setShadowMap(int width, int height)
 	{
-		FrameBufferMgr::getInstance()->createShadowMap(texName, width, height);
-		PipelineMgr::getInstance()->setShadowPass(true);
+		ShadowRenderer::init(0, 0, width, height);
 	}
-
-	bool BaseGraphics::bindShadowMap()
-	{
-		throw std::logic_error("The method or operation is not implemented.");
-	}
-
-	bool BaseGraphics::isEnableShadow()
-	{
-		throw std::logic_error("The method or operation is not implemented.");
-	}
-
 }

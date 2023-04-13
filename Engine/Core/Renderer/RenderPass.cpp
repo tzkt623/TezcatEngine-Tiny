@@ -3,11 +3,14 @@
 #include "../Head/GLMHead.h"
 
 #include "../Shader/Shader.h"
+#include "../Manager/LightManager.h"
+#include "../Pipeline/Pipeline.h"
+
 #include "../Component/Camera.h"
 #include "../Component/Transform.h"
 #include "../Component/MeshRenderer.h"
 #include "../Component/Light.h"
-#include "../Manager/LightManager.h"
+
 #include "../Renderer/VertexGroup.h"
 #include "../Renderer/BaseGraphics.h"
 #include "../Renderer/RenderObject.h"
@@ -17,95 +20,19 @@
 
 namespace tezcat::Tiny::Core
 {
+	std::vector<RenderPass*> RenderPass::sPassAry;
+	std::unordered_map<std::string, RenderPass*> RenderPass::sPassDict;
+
+
 	RenderPass::RenderPass(Shader* shader)
 		: mShader(shader)
 	{
-
+		Pipeline::addPassStatic(this);
 	}
 
 	RenderPass::~RenderPass()
 	{
 		mShader = nullptr;
-	}
-
-	void RenderPass::addRenderMesh(IRenderMesh* renderMesh)
-	{
-		mRenderObjects.push_back(renderMesh);
-	}
-
-	void RenderPass::sortRenderObjects(const std::function<bool(IRenderMesh* a, IRenderMesh* b)>& function)
-	{
-		std::sort(mRenderObjects.begin(), mRenderObjects.end(), function);
-	}
-
-	void RenderPass::render(BaseGraphics* graphics, IRenderObserver* renderObserver)
-	{
-		if (mRenderObjects.empty())
-		{
-			return;
-		}
-
-		Statistic::PassCount += 1;
-		Statistic::DrawCall += static_cast<int>(mRenderObjects.size());
-
-		mShader->setStateOptions();
-		// the same shader
-		mShader->bind();
-
-		//Observer which render this pass
-		if (renderObserver != nullptr)
-		{
-			renderObserver->submit(mShader);
-		}
-
-		auto dir_light = LightMgr::getInstance()->getDirectionalLight();
-		if (dir_light != nullptr)
-		{
-			dir_light->submit(mShader);
-		}
-
-
-		for (auto ro : mRenderObjects)
-		{
-			ro->beginRender();
-			ro->submit(mShader);
-			graphics->draw(ro);
-			ro->endRender();
-		}
-
-		mRenderObjects.clear();
-	}
-
-	void RenderPass::renderShadowMap(BaseGraphics* graphics, IRenderObserver* renderObserver)
-	{
-		if (mRenderObjects.empty())
-		{
-			return;
-		}
-
-		Statistic::PassCount += 1;
-		Statistic::DrawCall += static_cast<int>(mRenderObjects.size());
-
-		mShader->setStateOptions();
-		// the same shader
-		mShader->bind();
-
-		//Observer which render this pass
-		if (renderObserver != nullptr)
-		{
-			renderObserver->submit(mShader);
-		}
-
-		//相机的matrix他自己已经先传了
-		for (auto ro : mRenderObjects)
-		{
-			ro->beginRender();
-			mShader->setModelMatrix(ro->getModelMatrix());
-			graphics->draw(ro);
-			ro->endRender();
-		}
-
-		mRenderObjects.clear();
 	}
 
 	int RenderPass::getOrderID() const
@@ -127,4 +54,97 @@ namespace tezcat::Tiny::Core
 	{
 		return mShader;
 	}
+
+	void RenderPass::addRenderMesh(IRenderMesh* renderMesh)
+	{
+		mRenderMeshList.push_back(renderMesh);
+	}
+
+	void RenderPass::sortRenderObjects(const std::function<bool(IRenderMesh* a, IRenderMesh* b)>& function)
+	{
+		std::sort(mRenderMeshList.begin(), mRenderMeshList.end(), function);
+	}
+
+	void RenderPass::render(BaseGraphics* graphics)
+	{
+		for (auto ro : mRenderMeshList)
+		{
+			ro->beginRender();
+			ro->submitModelMatrix(mShader);
+			ro->submit(mShader);
+			graphics->draw(ro);
+			ro->endRender();
+		}
+
+		mRenderMeshList.clear();
+	}
+
+	void RenderPass::renderMeshOnly(BaseGraphics* graphics)
+	{
+		for (auto ro : mRenderMeshList)
+		{
+			ro->beginRender();
+			ro->submitModelMatrix(mShader);
+			graphics->draw(ro);
+			ro->endRender();
+		}
+
+		mRenderMeshList.clear();
+	}
+	//
+	//
+	//
+	RenderPass* RenderPass::create(Shader* shader)
+	{
+		auto result = sPassDict.try_emplace(shader->getName(), nullptr);
+		if (result.second)
+		{
+			while (sPassAry.size() <= shader->getUID())
+			{
+				sPassAry.push_back(nullptr);
+			}
+			auto pass = new RenderPass(shader);
+			sPassAry[shader->getUID()] = pass;
+			result.first->second = pass;
+			return pass;
+		}
+		else
+		{
+			throw std::logic_error("Shader : the same name!!!!");
+		}
+	}
+
+	RenderPass* RenderPass::get(Shader* shader)
+	{
+		return sPassAry[shader->getUID()];
+	}
+
+	RenderPass* RenderPass::get(const std::string& name)
+	{
+		auto it = sPassDict.find(name);
+		if (it != sPassDict.end())
+		{
+			return (*it).second;
+		}
+
+		return nullptr;
+	}
+
+	bool RenderPass::checkState()
+	{
+		if (mRenderMeshList.empty())
+		{
+			return false;
+		}
+
+		mShader->setStateOptions();
+		//The same shader
+		mShader->bind();
+
+		Statistic::PassCount += 1;
+		Statistic::DrawCall += static_cast<int>(mRenderMeshList.size());
+
+		return true;
+	}
+
 }

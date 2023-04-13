@@ -24,6 +24,9 @@ namespace tezcat::Tiny::Core
 			Perspective
 		};
 
+
+
+
 	public:
 		//创建一个forward主相机
 		Camera();
@@ -40,14 +43,21 @@ namespace tezcat::Tiny::Core
 
 		void setOrtho(float near, float far);
 		void setPerspective(float fov, float near, float far);
-		void setClearOption(uint32_t option) { mClearMask = option; }
-		const uint32_t getClearOption() const { return mClearMask; }
+		void setClearOption(ClearOption option) { mClearMask = option; }
+		const ClearOption getClearOption() const { return mClearMask; }
 
 		Type getViewType() { return mType; }
 		uint32_t getID() const { return mUID; }
 
 		void render(BaseGraphics* graphics);
 		void submit(Shader* shader) override;
+		void submitViewMatrix(Shader* shader) override;
+		void beginRender() override;
+		void endRender() override;
+
+
+		Pipeline* getPipeline() const { return mPipeline; }
+		void setPipeline(Pipeline* val) { mPipeline = val; }
 
 	public:
 		glm::mat4x4& getProjectionMatrix() { return mProjectionMatrix; }
@@ -61,7 +71,7 @@ namespace tezcat::Tiny::Core
 		int getDeep() const { return mDepth; }
 		void setDepth(int val) { mDepth = val; }
 		float getFOV() { return mFOV; }
-		float getAspect() { return mAspect; }
+		float getAspect() { return (float)mViewInfo.Width / (float)mViewInfo.Height; }
 		float getNear() { return mNearFace; }
 		float getFar() { return mFarFace; }
 
@@ -80,7 +90,7 @@ namespace tezcat::Tiny::Core
 
 	private:
 		void updateVector();
-
+		void updateTransform(Transform* transform);
 	private:
 		int mDepth;
 		bool mIsMain;
@@ -107,6 +117,7 @@ namespace tezcat::Tiny::Core
 
 		//clear options
 	private:
-		uint32_t mClearMask;
+		ClearOption mClearMask;
+		Pipeline* mPipeline;
 	};
 }

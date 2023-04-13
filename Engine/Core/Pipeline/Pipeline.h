@@ -17,20 +17,29 @@ namespace tezcat::Tiny::Core
 	class RenderPass;
 	class BaseGraphics;
 	class IRenderObserver;
+	class PipelineQueue;
 
 	class TINY_API Pipeline
 	{
 	public:
 		Pipeline();
-		~Pipeline();
+		virtual ~Pipeline();
 
 		virtual PipelineType getType() { return PipelineType::Error; }
 
-		virtual void init() = 0;
 		virtual void render(BaseGraphics* graphics, Camera* camera) = 0;
-		virtual void render(BaseGraphics* graphics, IRenderObserver* renderObject) {}
-		virtual void addPass(RenderPass* pass) = 0;
+		virtual void render(BaseGraphics* graphics, IRenderObserver* renderObject) = 0;
+		void addPass(RenderPass* pass);
 
-		virtual void setShadowCast() = 0;
+	public:
+		static void addPassStatic(RenderPass* pass);
+
+	protected:
+		static PipelineQueue* sBackground;
+		static PipelineQueue* sGeometry;
+		static PipelineQueue* sAlphaTest;
+		static PipelineQueue* sOpaqueLast;
+		static PipelineQueue* sTransparent;
+		static PipelineQueue* sOverlay;
 	};
 }

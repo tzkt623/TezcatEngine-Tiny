@@ -21,9 +21,9 @@ namespace tezcat::Tiny::Core
 		ShaderPackage* findPackage(const std::string& name);
 
 	private:
-		std::unordered_map<std::string, ShaderPackage*> m_ShaderPackageWithName;
-		std::vector<ShaderPackage*> m_ShaderPackageWithID;
-		std::vector<Shader*> m_AllShaderList;
+		std::unordered_map<std::string, ShaderPackage*> mShaderPackageDict;
+		std::vector<ShaderPackage*> mShaderPackageAry;
+		std::vector<Shader*> mAllShaderList;
 	};
 
 	using ShaderMgr = SG<ShaderManager>;

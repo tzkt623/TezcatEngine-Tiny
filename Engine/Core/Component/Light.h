@@ -45,6 +45,7 @@ namespace tezcat::Tiny::Core
 	public:
 		void render(BaseGraphics* graphics) override;
 		void submit(Shader* shader) override;
+		void submitViewMatrix(Shader* shader) override;
 
 		glm::vec3& getDirection() { return mDirection; }
 		void setDirection(const glm::vec3& val) { mDirection = val; }

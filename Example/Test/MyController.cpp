@@ -24,13 +24,13 @@ MyController::~MyController()
 
 void MyController::onStart()
 {
-	this->getTransform()->setDelegateUpdate([]() {});
+	this->getTransform()->setDelegateUpdate(std::bind(&MyController::updateVector, this, std::placeholders::_1));
 }
 
 void MyController::onEnable()
 {
 	MyInputer::getInstance()->setController(this);
-	this->startLogic(std::bind(&MyController::warp, this));
+	//	this->startLogic(std::bind(&MyController::warp, this));
 }
 
 void MyController::warp()
@@ -121,18 +121,18 @@ void MyController::roll(float roll)
 {
 	mRoll = roll;
 	mWorldUp = glm::normalize(mWorldUp * glm::angleAxis(glm::radians(mRoll), mFront));
-// 	mRoll += roll;
-// 	if (mRoll > 360.0f)
-// 	{
-// 		mRoll -= 360.0f;
-// 	}
-// 	else if (mRoll < 360.0)
-// 	{
-// 		mRoll += 360.0f;
-// 	}
+	// 	mRoll += roll;
+	// 	if (mRoll > 360.0f)
+	// 	{
+	// 		mRoll -= 360.0f;
+	// 	}
+	// 	else if (mRoll < 360.0)
+	// 	{
+	// 		mRoll += 360.0f;
+	// 	}
 }
 
-void MyController::updateVector()
+void MyController::updateVector(Transform* transform)
 {
 	glm::vec3 front;
 	front.x = glm::cos(glm::radians(mYaw)) * glm::cos(glm::radians(mPitch));
@@ -143,13 +143,13 @@ void MyController::updateVector()
 	mRight = glm::normalize(glm::cross(mFront, mWorldUp));
 	mUp = glm::normalize(glm::cross(mRight, mFront));
 
-	auto& matrix = this->getTransform()->getModelMatrix();
-	auto position = this->getTransform()->getPosition();
+	auto& matrix = transform->getModelMatrix();
+	auto& position = transform->getPosition();
 	matrix = glm::lookAt(position, position + mFront, mUp);
 
-	if (this->getTransform()->getParent() != nullptr)
+	if (transform->getParent() != nullptr)
 	{
-		matrix = this->getTransform()->getParent()->getModelMatrix() * matrix;
+		matrix = transform->getParent()->getModelMatrix() * matrix;
 	}
 }
 

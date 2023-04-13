@@ -8,6 +8,7 @@
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/VertexGroup.h"
 #include "../Renderer/BaseGraphics.h"
+#include "../Layer/RenderLayer.h"
 
 #include "../Manager/VertexGroupManager.h"
 
@@ -31,7 +32,7 @@ namespace tezcat::Tiny::Core
 
 	void Skybox::onStart()
 	{
-		PipelineMgr::getInstance()->addRenderObject(this->getGameObject()->getLayerIndex(), this);
+		RenderLayer::addRenderObejct(this->getGameObject()->getLayerIndex(), this);
 	}
 
 	void Skybox::onEnable()
@@ -43,17 +44,19 @@ namespace tezcat::Tiny::Core
 		return mMaterial;
 	}
 
-	void Skybox::sendToRenderPass()
+	void Skybox::sendToRenderPass(const RenderPassType& passType)
 	{
+		if (passType != RenderPassType::Default)
+		{
+			return;
+		}
 		auto shader = mMaterial->getShaderPackage()->getShaders()[0];
-		PipelineMgr::getInstance()
-			->getPass(shader->getUID())
-			->addRenderMesh(this);
+		RenderPass::get(shader)->addRenderMesh(this);
 	}
 
 	void Skybox::submit(Shader* shader)
 	{
-		mMaterial->submit(this->getTransform(), shader);		
+		mMaterial->submit(this->getTransform(), shader);
 	}
 
 	DrawModeWrapper& Skybox::getDrawMode()

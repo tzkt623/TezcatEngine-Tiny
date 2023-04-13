@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/Depth;
+    str Name = Unlit/ColorDepth;
 }
 #TINY_HEAD_END
 
@@ -8,16 +8,13 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Depth;
+        str Name = ColorDepth;
         int Version = 330;
         int OrderID = 50;
-        str Queue = Transparent;
+        str Queue = Opaque;
         str DepthTest = Less;
-        bool ZWrite = false;
-        str CullFace = Off;
-        bool Blend = true;
-        str BlendSrc = SrcA;
-        str BlendTar = 1-SrcA;
+        bool ZWrite = true;
+        str CullFace = Back;
     }
     #TINY_CFG_END
 
@@ -28,8 +25,6 @@
         uniform mat4 TINY_MatrixP;
         uniform mat4 TINY_MatrixV;
         uniform mat4 TINY_MatrixM;
-
-        out vec2 myUV;
 
         void main()
         {

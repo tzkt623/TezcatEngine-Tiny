@@ -23,9 +23,12 @@ namespace tezcat::Tiny::Core
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std1.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color_depth.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture_depth.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/skybox.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/transparent.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/shadow_map.glsl");
 
 		this->createSomeMode();
 	}

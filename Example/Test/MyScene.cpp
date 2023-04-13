@@ -35,22 +35,6 @@ void MyScene::onEnter()
 	controller_go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
 	controller_go->addComponent<MyController>();
 
-	//shadow map
-	if (true)
-	{
-		auto go = new GameObject("ShadowMap");
-		auto camera = go->addComponent<Camera>(true);
-		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
-		camera->setOrtho(0.1f, 2000.0f);
-		camera->setPipeline(PipelineMgr::getInstance()->get("Shadow"));
-		camera->setCullLayer(0);
-
-
-		go->addComponent<Transform>();
-		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-		go->getTransform()->setParent(controller_go->getTransform());
-	}
-
 	if (true)
 	{
 		auto go = new GameObject("World1_Camera");
@@ -90,7 +74,7 @@ void MyScene::onEnter()
 		skybox->setMaterial(material);
 	}
 
-	if (true)
+	if (false)
 	{
 		auto go = new GameObject("World2_Camera");
 		auto camera = go->addComponent<Camera>(false);
@@ -151,7 +135,7 @@ void MyScene::onEnter()
 	{
 		auto direction_light_go = new GameObject();
 		direction_light_go->addComponent<Transform>();
-		direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 0.0f));
+		direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 60.0f, 0.0f));
 		direction_light_go->getTransform()->setScale(glm::vec3(10.0f));
 
 		auto mr = direction_light_go->addComponent<MeshRenderer>();
@@ -161,13 +145,28 @@ void MyScene::onEnter()
 
 		auto dir_light = direction_light_go->addComponent<DirectionalLight>();
 		dir_light->setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
-		dir_light->setDiffuse(glm::vec3(1.0f, 0.0f, 0.0f));
+		dir_light->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
 		dir_light->setAmbient(glm::vec3(0.1f));
-		dir_light->setSpecular(glm::vec3(0.5f));
+		dir_light->setSpecular(glm::vec3(1.0f));
 	}
 
-
 	if (true)
+	{
+		auto depth = new GameObject();
+		depth->addComponent<Transform>();
+		depth->getTransform()->setPosition(glm::vec3(960.0f, 0.0f, 0.0f));
+		depth->getTransform()->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
+		depth->getTransform()->setScale(glm::vec3(1024.0f, 1024.0f, 1.0f));
+		//depth->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1.0f));
+
+		auto mr2 = depth->addComponent<MeshRenderer>();
+		auto depth_material = new Material("Unlit/ColorDepth");
+//		depth_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "Shadow");
+		mr2->setMaterial(depth_material);
+		mr2->setMesh("Square");
+	}
+
+	if (false)
 	{
 		auto world2 = new GameObject("World2_Gate");
 		auto tran = world2->addComponent<Transform>();
@@ -247,7 +246,7 @@ void MyScene::onEnter()
 	//
 	//	Transparent
 	//
-	if (true)
+	if (false)
 	{
 		std::random_device rd;
 		std::mt19937 gen(rd());
@@ -271,7 +270,7 @@ void MyScene::onEnter()
 
 	//----------------------------------------
 	//
-	//	Cubes
+	//	Cubes 0
 	//
 	if (true)
 	{
@@ -298,9 +297,9 @@ void MyScene::onEnter()
 
 	//----------------------------------------
 	//
-	//	Cubes
+	//	Cubes 1
 	//
-	if (true)
+	if (false)
 	{
 		std::random_device rd;
 		std::mt19937 gen(rd());

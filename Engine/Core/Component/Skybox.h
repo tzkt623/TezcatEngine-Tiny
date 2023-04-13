@@ -19,7 +19,7 @@ namespace tezcat::Tiny::Core
 		DrawModeWrapper& getDrawMode() override;
 		int getVertexCount() const override;
 		Material* getMaterial() const override;
-		void sendToRenderPass() override;
+		void sendToRenderPass(const RenderPassType& passType) override;
 		void submit(Shader* shader) override;
 		void setMaterial(Material* material) { mMaterial = material; }
 		void beginRender() override;

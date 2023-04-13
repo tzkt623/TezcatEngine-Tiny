@@ -13,6 +13,14 @@
 
 namespace tezcat::Tiny::Core
 {
+	std::array<RenderLayer*, 32> RenderLayer::sLayerAry =
+	{
+		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),
+		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),
+		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),
+		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer()
+	};
+
 	RenderLayer::RenderLayer()
 		: mIndex(-1)
 	{
@@ -29,14 +37,15 @@ namespace tezcat::Tiny::Core
 		mRenderObjectList.emplace_back(renderObject);
 	}
 
-	void RenderLayer::testWithCamera(Camera* camera)
+
+
+	void RenderLayer::culling(IRenderObserver* renderObserver, const RenderPassType& passType)
 	{
 		if (mRenderObjectList.empty())
 		{
 			return;
 		}
 
-		//#RenderLayerCulling
 		auto it = mRenderObjectList.begin();
 		auto end = mRenderObjectList.end();
 		while (it != end)
@@ -44,21 +53,12 @@ namespace tezcat::Tiny::Core
 			auto com = (Component*)(*it);
 			if (com->isEnable())
 			{
-				if (camera->culling(com->getGameObject()))
+				if (renderObserver->culling(com->getGameObject()))
 				{
-					(*it)->sendToRenderPass();
+					(*it)->sendToRenderPass(passType);
 				}
 			}
 			it++;
 		}
-	}
-
-	void RenderLayer::testVisibleObjects(ILight* light)
-	{
-// 		auto pass = new PassShader(light->getShader(), light);
-// 		for (auto object : mVisibleRenderObjectList)
-// 		{
-// 			pass->addMeshRenderer(object);
-// 		}
 	}
 }

@@ -44,7 +44,15 @@ namespace tezcat::Tiny::GL
 
 		for (auto& uniform_id : uniforms)
 		{
-			mTinyUniformList[uniform_id.getUID()] = glGetUniformLocation(mProgramID, uniform_id.getStringData());
+			//std::cout << uniform_id.getString() << std::endl;
+			if (uniform_id.getUID() < mTinyUniformList.size())
+			{
+				mTinyUniformList[uniform_id.getUID()] = glGetUniformLocation(mProgramID, uniform_id.getStringData());
+			}
+			else
+			{
+				std::invalid_argument(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", uniform_id.getStringData()));
+			}
 		}
 
 		glUseProgram(0);
@@ -178,6 +186,15 @@ namespace tezcat::Tiny::GL
 	void GLShader::setInt1(const char* name, int* data)
 	{
 		glUniform1iv(glGetUniformLocation(mProgramID, name), 1, data);
+	}
+
+	void GLShader::setInt1(UniformID& uniform, const int& data)
+	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+		glUniform1i(mTinyUniformList[uniform], data);
 	}
 
 	void GLShader::setInt2(UniformID& uniform, int* data)

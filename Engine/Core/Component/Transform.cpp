@@ -25,7 +25,7 @@ namespace tezcat::Tiny::Core
 		, mModelMatrix(1.0f)
 		, mParent(parent)
 		, mIndex(0)
-		, mDelegateUpdate(std::bind(&Transform::updateMatrix, this))
+		, mDelegateUpdate(std::bind(&Transform::updateMatrix, this, std::placeholders::_1))
 	{
 		if (mParent != nullptr)
 		{
@@ -58,7 +58,7 @@ namespace tezcat::Tiny::Core
 
 	void Transform::onUpdate()
 	{
-		mDelegateUpdate();
+		mDelegateUpdate(this);
 
 		if (!mChildren.empty())
 		{
@@ -81,7 +81,7 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	void Transform::updateMatrix()
+	void Transform::updateMatrix(Transform* self)
 	{
 		if (mIsDirty)
 		{

@@ -49,7 +49,8 @@ namespace tezcat::Tiny::Core
 		, mYaw(-90.0f)
 		, mPitch(0.0f)
 		, mRoll(0.0f)
-		, mClearMask((uint32_t)ClearOption::Color | (uint32_t)ClearOption::Depth)
+		, mClearMask(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth))
+		, mPipeline(pipeline)
 	{
 
 	}
@@ -77,7 +78,7 @@ namespace tezcat::Tiny::Core
 
 	void Camera::onStart()
 	{
-		this->getTransform()->setDelegateUpdate([] {});
+		this->getTransform()->setDelegateUpdate(std::bind(&Camera::updateTransform, this, std::placeholders::_1));
 	}
 
 	void Camera::onEnable()
@@ -88,6 +89,41 @@ namespace tezcat::Tiny::Core
 	void Camera::onDisable()
 	{
 
+	}
+
+	//注意处理这个函数的调用位置
+	void Camera::updateTransform(Transform* transform)
+	{
+		if (mPMatDirty)
+		{
+			mPMatDirty = false;
+			switch (mType)
+			{
+			case Type::Ortho:
+				mProjectionMatrix = glm::ortho(
+					(float)mViewInfo.OX, (float)mViewInfo.Width,
+					(float)mViewInfo.OY, (float)mViewInfo.Height,
+					mNearFace, mFarFace);
+				break;
+			case Type::Perspective:
+				mProjectionMatrix = glm::perspective(
+					glm::radians(mFOV),
+					(float)mViewInfo.Width / (float)mViewInfo.Height,
+					mNearFace, mFarFace);
+				break;
+			default:
+				break;
+			}
+		}
+
+		auto& position = transform->getPosition();
+		auto& viewMat4 = transform->getModelMatrix();
+		viewMat4 = glm::lookAt(position, position + mFront, mUp);
+
+		if (transform->getParent() != nullptr)
+		{
+			viewMat4 = transform->getParent()->getModelMatrix() * viewMat4;
+		}
 	}
 
 	//注意处理这个函数的调用位置
@@ -115,7 +151,7 @@ namespace tezcat::Tiny::Core
 			}
 		}
 
-		auto position = this->getTransform()->getPosition();
+		auto& position = this->getTransform()->getPosition();
 		mViewMatrix = glm::lookAt(position, position + mFront, mUp);
 
 		if (this->getTransform()->getParent() != nullptr)
@@ -151,30 +187,37 @@ namespace tezcat::Tiny::Core
 
 	void Camera::render(BaseGraphics* graphics)
 	{
-		if (mFrameBuffer != nullptr)
-		{
-			mFrameBuffer->bind();
-			graphics->setViewport(mViewInfo);
-			graphics->clear(this);
-			this->onUpdate();
-			mPipeline->render(graphics, this);
-			mFrameBuffer->unbind();
-		}
-		else
-		{
-			graphics->setViewport(mViewInfo);
-			graphics->clear(this);
-			this->onUpdate();
-			mPipeline->render(graphics, this);
-		}
+		mPipeline->render(graphics, this);
 	}
 
 	void Camera::submit(Shader* shader)
 	{
+
+	}
+
+	void Camera::submitViewMatrix(Shader* shader)
+	{
+		auto& view_model = this->getTransform()->getModelMatrix();
 		shader->setProjectionMatrix(mProjectionMatrix);
-		shader->setViewMatrix(mViewMatrix);
+		shader->setViewMatrix(view_model);
 		shader->setViewPosition(this->getTransform()->getPosition());
-		shader->setMat4(ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
+		shader->setMat4(ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(view_model))));
+	}
+
+	void Camera::beginRender()
+	{
+		if (mFrameBuffer != nullptr)
+		{
+			mFrameBuffer->bind();
+		}
+	}
+
+	void Camera::endRender()
+	{
+		if (mFrameBuffer != nullptr)
+		{
+			mFrameBuffer->unbind();
+		}
 	}
 
 	void Camera::yawPitch(float yaw, float pitch, bool constrainPitch)
@@ -213,7 +256,7 @@ namespace tezcat::Tiny::Core
 
 	void Camera::updateVector()
 	{
-		glm::vec3 front;
+		glm::vec3 front(0.0f);
 		front.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch));
 		front.y = sin(glm::radians(mPitch));
 		front.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));

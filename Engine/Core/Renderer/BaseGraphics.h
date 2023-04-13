@@ -3,6 +3,7 @@
 #include "../Head/Context.h"
 #include "../Shader/Uniform.h"
 #include "Utility/Utility.h"
+#include "RenderConfig.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -20,8 +21,10 @@ namespace tezcat::Tiny::Core
 	public:
 		BaseGraphics();
 		virtual ~BaseGraphics() = 0;
+
+	public:
 		void render();
-		void createShadowRenderer(const std::string& texName, int width, int height);
+		void setShadowMap(int width, int height);
 
 	public:
 		virtual void init(Engine* engine) = 0;
@@ -31,26 +34,13 @@ namespace tezcat::Tiny::Core
 		virtual void onRender();
 		virtual void postRender();
 	public:
-		virtual void clear(Camera* camera) = 0;
+		virtual void clear(const ClearOption& option) = 0;
 		virtual void setViewport(ViewportInfo& info) = 0;
 
 	public:
 		virtual void draw(IRenderMesh* renderMesh) = 0;
 		virtual void draw(MeshRenderer* renderer) = 0;
 		virtual void draw(VertexGroup* group, DrawModeWrapper drawMode) = 0;
-
-		bool bindShadowMap();
-		bool isEnableShadow();
-
-		void setShadowMap(int width, int height)
-		{
-			mShadowMapWidth = width;
-			mShadowMapHeight = height;
-		}
-
-	private:
-		int mShadowMapWidth;
-		int mShadowMapHeight;
 	};
 
 	using Graphics = SG<BaseGraphics>;

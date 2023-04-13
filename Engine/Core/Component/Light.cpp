@@ -11,7 +11,7 @@ namespace tezcat::Tiny::Core
 {
 	//------------------------------------------------------------------------
 	DirectionalLight::DirectionalLight()
-		: mDirection(-1.0f, -1.0f, -1.0f)
+		: mDirection(0.0f, 0.0f, 0.0f)
 		, mAmbient(0.1f)
 		, mDiffuse(1.0f)
 		, mSpecular(0.2f)
@@ -53,15 +53,12 @@ namespace tezcat::Tiny::Core
 
 	void DirectionalLight::render(BaseGraphics* graphics)
 	{
-		if (graphics->isEnableShadow())
-		{
-			graphics->bindShadowMap();
-			graphics->setViewport(mViewInfo);
-			graphics->clear(this);
-			this->onUpdate();
-			mPipeline->render(graphics, this);
-			graphics->unbindShadowMap();
-		}
+
+	}
+
+	void DirectionalLight::submitViewMatrix(Shader* shader)
+	{
+
 	}
 
 	//------------------------------------------------------------------------

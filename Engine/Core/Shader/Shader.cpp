@@ -1,8 +1,8 @@
 #include "Shader.h"
 #include "Utility/Utility.h"
 
-#include "../Manager/PipelineManager.h"
 #include "../Manager/ShaderManager.h"
+#include "../Renderer/RenderPass.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -44,7 +44,7 @@ namespace tezcat::Tiny::Core
 	void Shader::apply()
 	{
 		ShaderMgr::getInstance()->addShader(this);
-		PipelineMgr::getInstance()->createPass(this);
+		RenderPass::create(this);
 	}
 
 	void Shader::apply(const UniformID::USet& uniforms)

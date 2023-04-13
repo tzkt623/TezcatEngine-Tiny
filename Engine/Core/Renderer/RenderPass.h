@@ -15,9 +15,11 @@ namespace tezcat::Tiny::Core
 	class IRenderMesh;
 	class IRenderObserver;
 
-	/// <summary>
-	/// 
-	/// </summary>
+	/*
+	* @Author: HCL
+	* @Info: 2023|4|11
+	*
+	*/
 	class TINY_API RenderPass
 	{
 	public:
@@ -30,14 +32,40 @@ namespace tezcat::Tiny::Core
 		const std::string& getName() const;
 		Shader* getShader();
 
+
 	public:
 		void addRenderMesh(IRenderMesh* renderObject);
 		void sortRenderObjects(const std::function<bool(IRenderMesh* a, IRenderMesh* b)>& function);
-		virtual void render(BaseGraphics* graphics, IRenderObserver* renderObserver);
+		/*
+		* @Author: HCL
+		* @Info: 2023|4|13
+		* 正常渲染
+		*/
+		void render(BaseGraphics* graphics);
+
+
+		/*
+		* @Author: HCL
+		* @Info: 2023|4|13
+		* 只渲染mesh
+		*/
+		void renderMeshOnly(BaseGraphics* graphics);
+
+		bool checkState();
+
 
 	private:
 		Shader* mShader;
-		std::vector<IRenderMesh*> mRenderObjects;
+		std::vector<IRenderMesh*> mRenderMeshList;
+
+	public:
+		static RenderPass* create(Shader* shader);
+		static RenderPass* get(Shader* shader);
+		static RenderPass* get(const std::string& name);
+
+	private:
+		static std::vector<RenderPass*> sPassAry;
+		static std::unordered_map<std::string, RenderPass*> sPassDict;
 	};
 }
 

@@ -175,8 +175,8 @@ Attention! The .exe file must be in the same directory as the resource folder
     };
     ```
 
-    `prepareEngine`,`prepareResource`,`prepareScene`三个方法会按此顺序依次执行
-    `prepareEngine`,`prepareResource`,`prepareScene`are invoked in this order
+    `prepareEngine`,`prepareResource`,`prepareGame`三个方法会按此顺序依次执行
+    `prepareEngine`,`prepareResource`,`prepareGame`are invoked in this order
 
 2. 设置自己的资源文件夹名称,程序名称,屏幕大小
    Set your **ResourceFolder Name, ProgramName, ScreenSize**
@@ -207,8 +207,8 @@ Attention! The .exe file must be in the same directory as the resource folder
     }
     ```
 
-4. 加载第一个游戏
-   Load Game
+4. 加载第一个Scene
+   Load first Scene
 
     ```cpp
     void MyResourceLoader::prepareGame(Engine* engine)

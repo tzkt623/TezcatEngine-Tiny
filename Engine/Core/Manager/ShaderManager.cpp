@@ -16,26 +16,26 @@ namespace tezcat::Tiny::Core
 
 	int ShaderManager::giveUID()
 	{
-		int uid = static_cast<int>(m_ShaderPackageWithID.size());
-		m_ShaderPackageWithID.push_back(nullptr);
+		int uid = static_cast<int>(mShaderPackageAry.size());
+		mShaderPackageAry.push_back(nullptr);
 		return uid;
 	}
 
 	void ShaderManager::addShader(Shader* shader)
 	{
-		while (m_AllShaderList.size() <= shader->getUID())
+		while (mAllShaderList.size() <= shader->getUID())
 		{
-			m_AllShaderList.push_back(nullptr);
+			mAllShaderList.push_back(nullptr);
 		}
-		m_AllShaderList[shader->getUID()] = shader;
+		mAllShaderList[shader->getUID()] = shader;
 	}
 
 	void ShaderManager::addShaderPackage(ShaderPackage* shaderPackage)
 	{
-		if (m_ShaderPackageWithID[shaderPackage->getUID()] == nullptr)
+		if (mShaderPackageAry[shaderPackage->getUID()] == nullptr)
 		{
-			m_ShaderPackageWithID[shaderPackage->getUID()] = shaderPackage;
-			m_ShaderPackageWithName.emplace(shaderPackage->getName(), shaderPackage);
+			mShaderPackageAry[shaderPackage->getUID()] = shaderPackage;
+			mShaderPackageDict.emplace(shaderPackage->getName(), shaderPackage);
 		}
 		else
 		{
@@ -46,8 +46,8 @@ namespace tezcat::Tiny::Core
 
 	ShaderPackage* ShaderManager::findPackage(const std::string& name)
 	{
-		auto it = m_ShaderPackageWithName.find(name);
-		if (it != m_ShaderPackageWithName.end())
+		auto it = mShaderPackageDict.find(name);
+		if (it != mShaderPackageDict.end())
 		{
 			return it->second;
 		}

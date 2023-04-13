@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Std2/Base;
+        str Name = Std2Base;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;
@@ -86,7 +86,7 @@
         in vec3 myWorldPosition;
 
         uniform TINY_Mateial_Std TINY_MatStd;
-        uniform TINY_Light_Direction TINY_LightDir;
+        uniform TINY_Light_Direction TINY_LitDir;
         uniform vec3 TINY_ViewPosition;
     
         out vec4 myFinalColor;
@@ -117,7 +117,7 @@
             vec3 normal = normalize(myNormal);
             vec3 viewDir = normalize(TINY_ViewPosition - myWorldPosition);
 
-            vec3 dir_light = calculateDirectionLight(TINY_LightDir, normal, viewDir);
+            vec3 dir_light = calculateDirectionLight(TINY_LitDir, normal, viewDir);
             myFinalColor = vec4(dir_light, 1.0f);
         }
     }

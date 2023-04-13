@@ -55,10 +55,6 @@ namespace tezcat::Tiny::GL
 
 		(new GUI())->init(engine);
 
-		// 		glEnable(GL_DEPTH_TEST);
-		// 		glEnable(GL_CULL_FACE);
-		// 		glCullFace(GL_BACK);
-
 		GLint max;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
@@ -137,22 +133,21 @@ namespace tezcat::Tiny::GL
 		glfwSwapBuffers(mWindow);
 	}
 
-	void GLGraphics::clear(Camera* camera)
+	void GLGraphics::clear(const ClearOption& option)
 	{
-		auto option = camera->getClearOption();
-		if (option == ClearOption::None)
+		if (option == ClearOption::CO_None)
 		{
 			return;
 		}
 
 		GLbitfield mask = 0;
-		if ((option & ClearOption::ColorComponent) == ClearOption::ColorComponent)
+		if ((option & ClearOption::CO_Color) == ClearOption::CO_Color)
 		{
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 			mask |= GL_COLOR_BUFFER_BIT;
 		}
 
-		if ((option & ClearOption::Depth) == ClearOption::Depth)
+		if ((option & ClearOption::CO_Depth) == ClearOption::CO_Depth)
 		{
 			//如果深度缓冲不允许写入
 			//那么也无法clear
@@ -162,7 +157,7 @@ namespace tezcat::Tiny::GL
 			mask |= GL_DEPTH_BUFFER_BIT;
 		}
 
-		if ((option & ClearOption::Stencil) == ClearOption::Stencil)
+		if ((option & ClearOption::CO_Stencil) == ClearOption::CO_Stencil)
 		{
 			glStencilMask(0xFF);
 			mask |= GL_STENCIL_BUFFER_BIT;

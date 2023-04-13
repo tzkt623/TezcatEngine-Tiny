@@ -50,7 +50,7 @@ namespace tezcat::Tiny::Core
 		/// <summary>
 		/// 把自己发送到对应的管线中
 		/// </summary>
-		virtual void sendToRenderPass() {}
+		virtual void sendToRenderPass(const RenderPassType& passType) {}
 
 		/*
 		* Info:		HCL|2023|4|8
@@ -94,33 +94,40 @@ namespace tezcat::Tiny::Core
 
 
 		/*
-		 * Author:	HCL
-		 * Info:	2023|4|8
-		 * 材质
-		 */
+		* @Author:	HCL
+		* @Info:	2023|4|8
+		* 材质
+		*/
 		virtual Material* getMaterial() const { return nullptr; }
 
 		/*
-		 * Author:	HCL
-		 * Info:	2023|4|9
-		 * 绘制方式 索引or顶点
-		 */
+		* @Author:	HCL
+		* @Info:	2023|4|9
+		* 绘制方式 索引or顶点
+		*/
 		virtual DrawModeWrapper& getDrawMode() = 0;
 
 		/*
-		 * Author:	HCL
-		 * Info:	2023|4|9
-		 * 顶点数量
-		 */
+		* @Author:	HCL
+		* @Info:	2023|4|9
+		* 顶点数量
+		*/
 		virtual int getVertexCount() const { return 0; }
 
 
 		/*
-		 * Author:	HCL
-		 * Info:	2023|4|9
-		 * 索引数量
-		 */
+		* @Author:	HCL
+		* @Info:	2023|4|9
+		* 索引数量
+		*/
 		virtual int getIndexCount() const { return 0; }
+
+		/*
+		* @Author: HCL
+		* @Info: 2023|4|12
+		* 提交模型矩阵数据
+		*/
+		virtual void submitModelMatrix(Shader* shader) {}
 	};
 
 	class TINY_API IRenderObserver : public IRenderObject
@@ -129,20 +136,20 @@ namespace tezcat::Tiny::Core
 		IRenderObserver()
 			: mCullMask(0)
 			, mFrameBuffer(nullptr)
-			, mPipeline(nullptr)
 		{
-
-		}
-
-		IRenderObserver(Pipeline* pipeline)
-			: mCullMask(0)
-			, mFrameBuffer(nullptr)
-			, mPipeline(pipeline)
-		{
-
+			this->setCullLayer(0);
 		}
 
 		virtual ~IRenderObserver() = default;
+
+
+		/*
+		* @Author: HCL
+		* @Info: 2023|4|12
+		* 提交观察矩阵数据
+		*/
+		virtual void submitViewMatrix(Shader* shader) {}
+
 
 		virtual bool culling(GameObject* gameObject) { return true; }
 
@@ -167,14 +174,11 @@ namespace tezcat::Tiny::Core
 
 		void removeCullLayer(uint32_t index)
 		{
-			mCullMask &= (1 << index);
+			mCullMask &= ~(1 << index);
 			mCullLayerList.erase(std::find(mCullLayerList.begin(), mCullLayerList.end(), index));
 		}
 
 		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
-
-		Pipeline* getPipeline() const { return mPipeline; }
-		void setPipeline(Pipeline* val) { mPipeline = val; }
 
 		FrameBuffer* getFrameBuffer() const { return mFrameBuffer; }
 		void setFrameBuffer(FrameBuffer* val) { mFrameBuffer = val; }
@@ -186,10 +190,9 @@ namespace tezcat::Tiny::Core
 			mViewInfo.Width = width;
 			mViewInfo.Height = height;
 		}
-		ViewportInfo& getViewRect() { return mViewInfo; }
+		ViewportInfo& getViewportInfo() { return mViewInfo; }
 
 	protected:
-		Pipeline* mPipeline;
 		FrameBuffer* mFrameBuffer;
 		ViewportInfo mViewInfo;
 

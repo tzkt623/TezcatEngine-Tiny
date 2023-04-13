@@ -25,7 +25,7 @@ namespace tezcat::Tiny::Core
 	// 		}
 	// 	};
 
-	class TINY_API Component : BaseObject
+	class TINY_API Component : public BaseObject
 	{
 		friend class GameObject;
 	public:
@@ -126,7 +126,7 @@ namespace tezcat::Tiny::Core
 	protected:
 		bool mEnable;
 
-	private:
+	protected:
 		GameObject* mGameObject;
 
 	private:

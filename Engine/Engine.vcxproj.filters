@@ -160,7 +160,7 @@
     <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
     <ClCompile Include="Core\Manager\FrameBufferManager.cpp" />
     <ClCompile Include="Utility\FileTool.cpp" />
-    <ClCompile Include="Core\Renderer\ShadowCast.cpp" />
+    <ClCompile Include="Core\Renderer\ShadowRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1293,7 +1293,7 @@
     <ClInclude Include="Core\Manager\Manager.h" />
     <ClInclude Include="Utility\FileTool.h" />
     <ClInclude Include="Core\Renderer\RenderConfig.h" />
-    <ClInclude Include="Core\Renderer\ShadowCast.h" />
+    <ClInclude Include="Core\Renderer\ShadowRenderer.h" />
     <ClInclude Include="Core\Manager\ObserverManager.h" />
   </ItemGroup>
   <ItemGroup>

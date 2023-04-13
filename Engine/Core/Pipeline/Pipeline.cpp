@@ -10,15 +10,54 @@
 
 namespace tezcat::Tiny::Core
 {
+	PipelineQueue* Pipeline::sBackground = new PipelineQueue(PipelineQueue::Background, 1000);
+	PipelineQueue* Pipeline::sGeometry = new PipelineQueue(PipelineQueue::Geometry, 2000);
+	PipelineQueue* Pipeline::sAlphaTest = new PipelineQueue(PipelineQueue::AlphaTest, 3000);
+	PipelineQueue* Pipeline::sOpaqueLast = new PipelineQueue(PipelineQueue::OpaqueLast, 4000);
+	PipelineQueue* Pipeline::sTransparent = new PipelineQueue(PipelineQueue::Transparent, 5000);
+	PipelineQueue* Pipeline::sOverlay = new PipelineQueue(PipelineQueue::Overlay, 6000);
+
 	Pipeline::Pipeline()
-		: mGraphics(nullptr)
 	{
 
 	}
 
 	Pipeline::~Pipeline()
 	{
-		mGraphics = nullptr;
+
+	}
+
+	void Pipeline::addPass(RenderPass* pass)
+	{
+		Pipeline::addPassStatic(pass);
+	}
+
+	void Pipeline::addPassStatic(RenderPass* pass)
+	{
+		auto shader = pass->getShader();
+		switch (shader->getRenderQueue())
+		{
+		case PipelineQueue::Background:
+			sBackground->addPass(pass);
+			break;
+		case PipelineQueue::Geometry:
+			sGeometry->addPass(pass);
+			break;
+		case PipelineQueue::AlphaTest:
+			sAlphaTest->addPass(pass);
+			break;
+		case PipelineQueue::OpaqueLast:
+			sOpaqueLast->addPass(pass);
+			break;
+		case PipelineQueue::Transparent:
+			sTransparent->addPass(pass);
+			break;
+		case PipelineQueue::Overlay:
+			sOverlay->addPass(pass);
+			break;
+		default:
+			break;
+		}
 	}
 }
 

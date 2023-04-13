@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Std2/Base;
+        str Name = Std2;
         int Version = 330;
         int OrderID = 50;
         str Queue = Geometry;

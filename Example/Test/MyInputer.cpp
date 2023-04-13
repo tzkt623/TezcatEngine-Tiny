@@ -109,7 +109,7 @@ void MyInputer::processInput(InputSystem* system)
 		// 		m_Camera->getTransform()->setPosition(position);
 	}
 
-	mController->updateVector();
+//	mController->updateVector();
 }
 
 void MyInputer::onEnter()

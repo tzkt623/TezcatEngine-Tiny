@@ -8,12 +8,16 @@ namespace tezcat::Tiny::Core
 	class Camera;
 	class RenderPass;
 	class BaseGraphics;
+	class ILight;
+	class IRenderObserver;
+	class Shader;
 	class TINY_API PipelineQueue
 	{
 	public:
 		enum Queue : int
 		{
-			Background = 0,
+			None = 0,
+			Background,
 			Geometry,
 			AlphaTest,
 			OpaqueLast,
@@ -27,13 +31,18 @@ namespace tezcat::Tiny::Core
 		int getQueueID() const { return mQueueID; }
 		void setQueueID(const Queue& queue) { mQueueID = queue; }
 		void addPass(RenderPass* pass);
-		virtual void render(BaseGraphics* graphics, Camera* camera);
+
+		void render(BaseGraphics* graphics, Camera* camera);
+		void render(BaseGraphics* graphics, IRenderObserver* observer, ILight* light);
+
+	private:
+		void sort();
 
 	private:
 		bool mDirty;
 		Queue mQueueID;
 		uint32_t mBaseOrderID;
-		std::vector<RenderPass*> mShaderList;
+		std::vector<RenderPass*> mRenderPassAry;
 
 	public:
 		inline static Queue getQueue(const std::string& name)

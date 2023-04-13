@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../Renderer/RenderObject.h"
 #include "../Head/Context.h"
 #include "../Head/ConfigHead.h"
@@ -24,15 +25,14 @@ namespace tezcat::Tiny::Core
 		void setMaterial(Material* val)
 		{
 			mMainMaterial = val;
-			this->addMaterialConfig();
 		}
 		void setMesh(const std::string& meshName);
 
 		void beginRender() override;
 		void endRender() override;
 		void submit(Shader* shader) override;
-		void sendToRenderPass() override;
-
+		void submitModelMatrix(Shader* shader) override;
+		void sendToRenderPass(const RenderPassType& passType) override;
 
 		DrawModeWrapper& getDrawMode() final { return mDrawMode; }
 		void setDrawMode(DrawMode val) { mDrawMode = ContextMap::DrawModeArray[(int)val]; }
@@ -46,14 +46,10 @@ namespace tezcat::Tiny::Core
 		void onDisable() override;
 		void onStart() override;
 
-
 	private:
-		void addMaterialConfig();
-
-	private:
-		DrawModeWrapper mDrawMode;
 		bool mIsCastShadow;
 		bool mHasIndex;
+		DrawModeWrapper mDrawMode;
 		VertexGroup* mVertexGroup;
 		Material* mMainMaterial;
 	};

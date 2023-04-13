@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/ShadowMap;
+    str Name = Unlit/Shadow;
 }
 #TINY_HEAD_END
 
@@ -8,10 +8,10 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = ShadowMap;
+        str Name = Shadow;
         int Version = 330;
         int OrderID = 0;
-        str Queue = Opaque;
+        str Queue = None;
         str DepthTest = Less;
         bool ZWrite = true;
         str CullFace = Back;

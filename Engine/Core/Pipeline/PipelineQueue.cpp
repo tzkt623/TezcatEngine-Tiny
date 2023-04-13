@@ -1,11 +1,13 @@
 #include "PipelineQueue.h"
 #include "../Renderer/RenderPass.h"
 #include "../Component/Camera.h"
+#include "../Component/Light.h"
 
 namespace tezcat::Tiny::Core
 {
 	std::unordered_map<std::string, PipelineQueue::Queue> PipelineQueue::sQueueMap =
 	{
+		{"None",		Queue::None},
 		{"Background",	Queue::Background},
 		{"Opaque",		Queue::Geometry},
 		{"Alpha",		Queue::AlphaTest},
@@ -24,25 +26,50 @@ namespace tezcat::Tiny::Core
 
 	void PipelineQueue::render(BaseGraphics* graphics, Camera* camera)
 	{
-		if (mDirty)
-		{
-			mDirty = false;
-			std::sort(mShaderList.begin(), mShaderList.end()
-				, [](RenderPass* a, RenderPass* b)
-				{
-					return a->getOrderID() < b->getOrderID();
-				});
-		}
+		this->sort();
 
-		for (auto pass : mShaderList)
+		for (auto pass : mRenderPassAry)
 		{
-			pass->render(graphics, camera);
+			if (pass->checkState())
+			{
+				camera->submitViewMatrix(pass->getShader());
+				pass->render(graphics);
+			}
+		}
+	}
+
+	void PipelineQueue::render(BaseGraphics* graphics, IRenderObserver* observer, ILight* light)
+	{
+		this->sort();
+
+		for (auto pass : mRenderPassAry)
+		{
+			if (pass->checkState())
+			{
+				observer->submitViewMatrix(pass->getShader());
+				light->submitViewMatrix(pass->getShader());
+				light->submit(pass->getShader());
+				pass->render(graphics);
+			}
 		}
 	}
 
 	void PipelineQueue::addPass(RenderPass* pass)
 	{
-		mShaderList.push_back(pass);
 		mDirty = true;
+		mRenderPassAry.push_back(pass);
+	}
+
+	void PipelineQueue::sort()
+	{
+		if (mDirty)
+		{
+			mDirty = false;
+			std::sort(mRenderPassAry.begin(), mRenderPassAry.end()
+				, [](RenderPass* a, RenderPass* b)
+				{
+					return a->getOrderID() < b->getOrderID();
+				});
+		}
 	}
 }
