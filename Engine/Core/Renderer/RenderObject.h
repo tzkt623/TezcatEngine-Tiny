@@ -133,13 +133,7 @@ namespace tezcat::Tiny::Core
 	class TINY_API IRenderObserver : public IRenderObject
 	{
 	public:
-		IRenderObserver()
-			: mCullMask(0)
-			, mFrameBuffer(nullptr)
-		{
-			this->setCullLayer(0);
-		}
-
+		IRenderObserver();
 		virtual ~IRenderObserver() = default;
 
 

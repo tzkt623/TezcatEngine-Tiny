@@ -8,6 +8,10 @@ namespace tezcat::Tiny::Core
 	UniformID ShaderParam::MatrixM;
 	UniformID ShaderParam::MatrixN;
 	UniformID ShaderParam::MatrixSBV;
+	UniformID ShaderParam::MatrixLit;
+
+	UniformID ShaderParam::ViewPosition;
+	UniformID ShaderParam::ViewNearFar;
 
 	UniformID ShaderParam::VertexColor;
 	UniformID ShaderParam::TexColor;
@@ -15,7 +19,6 @@ namespace tezcat::Tiny::Core
 
 	UniformID ShaderParam::LightPosition;
 	UniformID ShaderParam::LightColor;
-	UniformID ShaderParam::ViewPosition;
 	UniformID ShaderParam::ModeSpecular;
 	UniformID ShaderParam::AmbientStrength;
 	UniformID ShaderParam::EnableShadow;
@@ -54,16 +57,20 @@ namespace tezcat::Tiny::Core
 		ShaderParam::MatrixM = "TINY_MatrixM";
 		ShaderParam::MatrixN = "TINY_MatrixN";
 		ShaderParam::MatrixSBV = "TINY_MatrixSBV";
+		ShaderParam::MatrixLit = "TINY_MatrixLit";
+
+		ShaderParam::ViewPosition = "TINY_ViewPosition";
+		ShaderParam::ViewNearFar = "TINY_ViewNearFar";
+
 
 		//3
 		ShaderParam::VertexColor = "TINY_VertexColor";
 		ShaderParam::TexColor = "TINY_TexColor";
 		ShaderParam::TexCube = "TINY_TexCube";
 
-		//6
+		//5
 		ShaderParam::LightPosition = "TINY_LightPosition";
 		ShaderParam::LightColor = "TINY_LightColor";
-		ShaderParam::ViewPosition = "TINY_ViewPosition";
 		ShaderParam::ModeSpecular = "TINY_ModeSpecular";
 		ShaderParam::AmbientStrength = "TINY_AmbientStrength";
 		ShaderParam::EnableShadow = "TINY_EnableShadow";

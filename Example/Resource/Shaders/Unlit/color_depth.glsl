@@ -36,19 +36,17 @@
     #TINY_FS_BEGIN
     {
         out vec4 myFinalColor;
-
-        float near = 0.1; 
-        float far  = 2000.0; 
+        uniform vec2 TINY_ViewNearFar;
 
         float linearizeDepth(float depth) 
         {
             float z = depth * 2.0 - 1.0; // back to NDC 
-            return (2.0 * near * far) / (far + near - z * (far - near));    
+            return (2.0 * TINY_ViewNearFar.x * TINY_ViewNearFar.y) / (TINY_ViewNearFar.y + TINY_ViewNearFar.x - z * (TINY_ViewNearFar.y - TINY_ViewNearFar.x));    
         }
 
         void main()
         {
-            myFinalColor = vec4(vec3(linearizeDepth(gl_FragCoord.z) / far), 1.0);
+            myFinalColor = vec4(vec3(linearizeDepth(gl_FragCoord.z) / TINY_ViewNearFar.y), 1.0);
         }
     }
     #TINY_FS_END

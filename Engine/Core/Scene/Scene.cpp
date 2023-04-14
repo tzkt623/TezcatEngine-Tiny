@@ -52,11 +52,6 @@ namespace tezcat::Tiny::Core
 		mObjectList.emplace_back(gameObject);
 	}
 
-	void Scene::addParentChangedTransform(Transform* transform)
-	{
-		mParentChangedTransformList.push_back(transform);
-	}
-
 	void Scene::addTransform(Transform* transform)
 	{
 		mTransformList.emplace_back(transform);

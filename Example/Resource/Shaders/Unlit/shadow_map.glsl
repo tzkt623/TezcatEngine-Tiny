@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/Shadow;
+    str Name = Unlit/ShadowMap;
 }
 #TINY_HEAD_END
 
@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Shadow;
+        str Name = ShadowMap;
         int Version = 330;
         int OrderID = 0;
         str Queue = None;
@@ -22,13 +22,12 @@
     {
         layout (location = 0) in vec3 aPos;
 
-        uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixV;
+        uniform mat4 TINY_MatrixLit;
         uniform mat4 TINY_MatrixM;
-
+        
         void main()
         {
-            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixLit * TINY_MatrixM * vec4(aPos, 1.0);
         }
     }
     #TINY_VS_END

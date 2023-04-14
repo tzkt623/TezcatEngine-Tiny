@@ -200,24 +200,22 @@ namespace tezcat::Tiny::Core
 		auto& view_model = this->getTransform()->getModelMatrix();
 		shader->setProjectionMatrix(mProjectionMatrix);
 		shader->setViewMatrix(view_model);
-		shader->setViewPosition(this->getTransform()->getPosition());
+
+		//glm::vec3 world_position(0.0f);
+		//this->getTransform()->transformPoint(this->getTransform()->getPosition(), world_position);
+
+		shader->setViewPosition(this->getTransform()->getWorldPosition());
 		shader->setMat4(ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(view_model))));
 	}
 
 	void Camera::beginRender()
 	{
-		if (mFrameBuffer != nullptr)
-		{
-			mFrameBuffer->bind();
-		}
+		FrameBuffer::bind(mFrameBuffer);
 	}
 
 	void Camera::endRender()
 	{
-		if (mFrameBuffer != nullptr)
-		{
-			mFrameBuffer->unbind();
-		}
+		FrameBuffer::unbind(mFrameBuffer);
 	}
 
 	void Camera::yawPitch(float yaw, float pitch, bool constrainPitch)

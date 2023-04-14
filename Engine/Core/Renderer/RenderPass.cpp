@@ -127,7 +127,7 @@ namespace tezcat::Tiny::Core
 			return (*it).second;
 		}
 
-		return nullptr;
+		throw std::invalid_argument("No Pass Named: " + name);
 	}
 
 	bool RenderPass::checkState()

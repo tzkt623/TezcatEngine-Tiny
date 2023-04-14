@@ -42,7 +42,8 @@ namespace tezcat::Tiny::Core
 
 
 	public:
-		inline const std::list<GameObject*> getObjectList() const { return mObjectList; }
+		inline const std::list<GameObject*>& getObjectList() const { return mObjectList; }
+		inline const std::list<Transform*>& getTransformList() const { return mTransformList; }
 		std::vector<GameObject*> findGameObjects(const std::string& name);
 
 	private:
@@ -50,7 +51,6 @@ namespace tezcat::Tiny::Core
 		std::list<GameObject*> mObjectList;
 		std::list<GameObject*> mNewObjectList;
 
-		std::list<Transform*> mParentChangedTransformList;
 		std::list<Transform*> mTransformList;
 
 		std::unordered_map<void*, std::function<void()>> mLogicList;

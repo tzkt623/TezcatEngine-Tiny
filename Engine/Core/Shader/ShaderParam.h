@@ -29,6 +29,10 @@ namespace tezcat::Tiny::Core
 		static UniformID MatrixM;
 		static UniformID MatrixN;
 		static UniformID MatrixSBV;
+		static UniformID MatrixLit;
+
+		static UniformID ViewPosition;
+		static UniformID ViewNearFar;
 
 		static UniformID VertexColor;
 		static UniformID TexColor;
@@ -36,7 +40,6 @@ namespace tezcat::Tiny::Core
 
 		static UniformID LightPosition;
 		static UniformID LightColor;
-		static UniformID ViewPosition;
 		static UniformID AmbientStrength;
 		static UniformID ModeSpecular;
 		static UniformID EnableShadow;

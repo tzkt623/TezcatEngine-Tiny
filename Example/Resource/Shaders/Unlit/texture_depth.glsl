@@ -43,20 +43,18 @@
         in vec2 myUV;
 
         uniform sampler2D TINY_TexColor;
-
-        float near = 0.1; 
-        float far  = 2000.0; 
+        uniform vec2 TINY_ViewNearFar;
 
         float linearizeDepth(float depth) 
         {
-            float z = depth * 2.0 - 1.0; // back to NDC 
-            return (2.0 * near * far) / (far + near - z * (far - near));    
+            float z = depth * 2.0 - 1.0; // back to NDC
+            return (2.0 * TINY_ViewNearFar.x * TINY_ViewNearFar.y) / (TINY_ViewNearFar.y + TINY_ViewNearFar.x - z * (TINY_ViewNearFar.y - TINY_ViewNearFar.x));    
         }
 
         void main()
         {
-            float z = linearizeDepth(texture(TINY_TexColor, myUV).r);
-            myFinalColor = vec4(z,z,z, 1.0f);
+            float z = texture(TINY_TexColor, myUV).r;
+            myFinalColor = vec4(z, z, z, 1.0f);
         }
     }
     #TINY_FS_END

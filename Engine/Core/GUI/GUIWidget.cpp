@@ -1,5 +1,4 @@
 #include "GUIWidget.h"
-#include "../Head/ImGuiHead.h"
 #include "Utility/Utility.h"
 #include "GUI.h"
 
@@ -182,4 +181,32 @@ namespace tezcat::Tiny::Core
 	{
 		ImGui::Text(mData.c_str());
 	}
+
+	//------------------------------
+	GUIImage::GUIImage(const std::u8string& name)
+		: GUIWidget(name)
+	{
+
+	}
+
+
+	void GUIImage::onRender()
+	{
+
+	}
+
+	void GUIImage::onUpdate()
+	{
+	}
+
+	GUIImage::~GUIImage()
+	{
+
+	}
+
+	void GUIImage::refresh()
+	{
+
+	}
+
 }

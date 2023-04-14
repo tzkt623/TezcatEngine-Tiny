@@ -166,8 +166,6 @@ namespace tezcat::Tiny::Core
 		mesh_data->colors.resize(vertices_num, glm::vec4(1.0f));
 		mesh_data->indices.resize(indices_num, 0);
 
-
-
 		for (int i = 0; i <= prec; i++)
 		{
 			for (int j = 0; j <= prec; j++)
@@ -181,7 +179,6 @@ namespace tezcat::Tiny::Core
 				mesh_data->normals[i * (prec + 1) + j] = glm::vec3(x, y, z);
 			}
 		}
-
 
 		for (int i = 0; i < prec; i++)
 		{

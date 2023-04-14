@@ -27,6 +27,7 @@ namespace tezcat::Tiny::Core
 	FrameBuffer* FrameBufferCreator::createShadowMap(const int& width, const int& high)
 	{
 		FrameBuffer* buffer = this->createFrameBuffer();
+
 		buffer->build([&](FrameBuffer* self)
 		{
 			auto tex = TextureMgr::getInstance()->createBuffer2D(width, high
@@ -60,16 +61,18 @@ namespace tezcat::Tiny::Core
 	FrameBuffer* FrameBufferManager::create(const std::string& name, const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos)
 	{
 		auto frame = mCreator->create(width, high, infos);
-		return this->addFrameBuffer(name, frame);
+		this->addFrameBuffer(name, frame);
+		return frame;
 	}
 
 	FrameBuffer* FrameBufferManager::createShadowMap(const std::string& name, const int& width, const int& high)
 	{
 		auto frame = mCreator->createShadowMap(width, high);
-		return this->addFrameBuffer(name, frame);
+		this->addFrameBuffer(name, frame);
+		return frame;
 	}
 
-	FrameBuffer* FrameBufferManager::addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer)
+	void FrameBufferManager::addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer)
 	{
 		auto flag = mBufferUMap.try_emplace(name, nullptr);
 		if (flag.second)
@@ -80,8 +83,6 @@ namespace tezcat::Tiny::Core
 		{
 			delete frameBuffer;
 		}
-
-		return flag.first->second;
 	}
 
 	FrameBuffer* FrameBufferManager::find(const std::string& name)

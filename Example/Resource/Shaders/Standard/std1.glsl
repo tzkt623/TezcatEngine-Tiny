@@ -39,7 +39,7 @@
         {
             vec4 position =  vec4(aPos, 1.0);
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
-            
+
             myColor = aColor;
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
@@ -75,8 +75,6 @@
         uniform LightDirection TINY_LitDir;
 
         uniform samplerCube TINY_TexCube;
-        uniform float TINY_AmbientStrength = 0.1f;
-        uniform vec3 TINY_LightPosition = vec3(0.0f, 0.0f, 0.0f);
         uniform vec3 TINY_ViewPosition;
 
         out vec4 myFinalColor;
@@ -96,19 +94,18 @@
             return vec4(texture(TINY_TexCube, R).rgb, 1.0);
         }
 
-        vec4 calcDirectionLight(vec3 viewDir, vec3 normal)
+        vec3 calcDirectionLight(LightDirection lit, vec3 viewDir, vec3 normal)
         {
-            vec3 ambient = TINY_LitDir.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
-
-            vec3 light_dir = normalize(-TINY_LitDir.direction);
+            vec3 light_dir = normalize(-lit.direction);
             float diff = max(dot(normal, light_dir), 0.0);
-            vec3 diffuse = TINY_LitDir.diffuse * texture(TINY_MatStd.diffuse, myUV).rgb * myColor.rgb * diff;
+            vec3 reflect_dir = reflect(-light_dir, normal);
+            float spec = pow(max(dot(viewDir, reflect_dir), 0.0), TINY_MatStd.shininess);
 
-            vec3 reflectDir = reflect(-light_dir, normal);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), TINY_MatStd.shininess);
-            vec3 specular = TINY_LitDir.specular * texture(TINY_MatStd.specular, myUV).rrr * spec;
+            vec3 ambient = lit.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 diffuse = lit.diffuse * diff * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 specular = lit.specular * spec * texture(TINY_MatStd.specular, myUV).rrr;
 
-            return vec4(ambient + diffuse + specular, 1.0f);
+            return ambient + diffuse + specular;
             //return vec4(diffuse, 1.0f);
             //return vec4(texture(TINY_MatStd.diffuse, myUV).rgb, 1.0f);
         }
@@ -116,10 +113,10 @@
         void main()
         {
             vec3 normal = normalize(myNormal);
-            vec3 viewDir = normalize(TINY_ViewPosition - myWorldPosition);
-            vec3 lightDir = normalize(TINY_LightPosition - myWorldPosition);
+            vec3 view_dir = normalize(TINY_ViewPosition - myWorldPosition);
 
-            myFinalColor = calcDirectionLight(viewDir, normal);
+            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
+            //myFinalColor = mix(calcDirectionLight(TINY_LitDir, viewDir, normal), reflection(-viewDir), 0.2f);
             //myFinalColor = reflection(-viewDir);
             //myFinalColor = refraction();
         }

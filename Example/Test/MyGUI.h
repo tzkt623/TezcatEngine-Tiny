@@ -23,6 +23,7 @@ private:
 	GUIText* m_LabelDrawCall;
 	GUIDragFloat2* m_MousePosition;
 	GUIDragFloat2* m_MouseOffset;
+	GUIImage* mImageDepth;
 };
 
 class MyObjectWindow : public GUIWindow

@@ -28,6 +28,7 @@
         uniform mat4 TINY_MatrixM;
 
         out vec4 myColor;
+        out vec4 myWorldPosition;
 
         void main()
         {
@@ -35,6 +36,7 @@
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
             
             myColor = aColor;
+            myWorldPosition = TINY_MatrixM * position;
         }
     }
     #TINY_VS_END
@@ -42,12 +44,13 @@
     #TINY_FS_BEGIN
     {
         in vec4 myColor;
-
+        in vec4 myWorldPosition;
         out vec4 myFinalColor;
 
         void main()
         {
-            myFinalColor = myColor;
+            //myFinalColor = myColor;
+            myFinalColor = vec4(myWorldPosition.xyz / myWorldPosition.w, 1.0f);
         } 
     }
     #TINY_FS_END

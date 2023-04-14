@@ -11,6 +11,7 @@ MyInfoWindow::MyInfoWindow()
 	, m_LabelDrawCall(new GUIText(u8"DrawCall"))
 	, m_MousePosition(new GUIDragFloat2(u8"MousePosition"))
 	, m_MouseOffset(new GUIDragFloat2(u8"MouseOffset"))
+	, mImageDepth(new GUIImage(u8"DepthImage"))
 {
 
 }
@@ -25,6 +26,7 @@ MyInfoWindow::~MyInfoWindow()
 	delete m_LabelMemory;
 	delete m_LabelRenderTime;
 	delete m_LabelLogicTime;
+	delete mImageDepth;
 }
 
 void MyInfoWindow::init()
@@ -39,6 +41,7 @@ void MyInfoWindow::init()
 	this->addChild(m_LabelDrawCall);
 	this->addChild(m_MousePosition);
 	this->addChild(m_MouseOffset);
+	this->addChild(mImageDepth);
 }
 
 void MyInfoWindow::onUpdate()
@@ -55,6 +58,8 @@ void MyInfoWindow::onUpdate()
 
 	m_MousePosition->setFloat2(glm::value_ptr(Statistic::mousePosition));
 	m_MouseOffset->setFloat2(glm::value_ptr(Statistic::mouseOffset));
+	
+	mImageDepth->refresh();
 }
 
 
@@ -80,7 +85,11 @@ void MyObjectWindow::init()
 
 void MyObjectWindow::onUpdate()
 {
-
+// 	auto& list = SceneMgr::getInstance()->getCurrentScene()->getObjectList();
+// 	for (auto tran : list)
+// 	{
+// 		ImGui::Text(tran->getName().c_str());
+// 	}
 }
 
 //------------------------------------

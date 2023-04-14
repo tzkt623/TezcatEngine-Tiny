@@ -146,6 +146,16 @@ namespace tezcat::Tiny::GL
 		glUniform2fv(mTinyUniformList[uniform], 1, data);
 	}
 
+	void GLShader::setFloat2(UniformID& uniform, const glm::vec2& data)
+	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+
+		glUniform2f(mTinyUniformList[uniform], data.x, data.y);
+	}
+
 	void GLShader::setFloat3(const char* name, float* data)
 	{
 		glUniform3fv(glGetUniformLocation(mProgramID, name), 1, data);
@@ -265,6 +275,16 @@ namespace tezcat::Tiny::GL
 	void GLShader::setMat4(const char* name, const float* data)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(mProgramID, name), 1, GL_FALSE, data);
+	}
+
+	void GLShader::setMat4(UniformID& uniform, const glm::mat4& mat4)
+	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+
+		glUniformMatrix4fv(mTinyUniformList[uniform], 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
 	void GLShader::setTexture2D(UniformID& uniform, Texture2D* data)

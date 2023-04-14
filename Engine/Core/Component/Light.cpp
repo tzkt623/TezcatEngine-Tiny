@@ -35,6 +35,7 @@ namespace tezcat::Tiny::Core
 
 	void DirectionalLight::submit(Shader* shader)
 	{
+		mDirection = glm::normalize(this->getTransform()->getForward());
 		shader->setFloat3(ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
 		shader->setFloat3(ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
 		shader->setFloat3(ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));

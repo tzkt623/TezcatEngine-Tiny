@@ -25,7 +25,7 @@ namespace tezcat::Tiny::Core
 		mViewInfo.Height = height;
 
 		//shadow pass
-		mPass = RenderPass::get("Shadow");
+		mPass = RenderPass::get("ShadowMap");
 		//shadow framebuffer
 		mFrameBuffer = FrameBufferMgr::getInstance()->create("Shadow",
 			mViewInfo.Width, mViewInfo.Height,
@@ -33,40 +33,55 @@ namespace tezcat::Tiny::Core
 				//shadow texture
 				TextureBufferInfo("Shadow"
 					, TextureBufferType::DepthComponent
+					, TextureFilter::Nearest
+					, TextureWrap::Repeat
 					, TextureChannel::Depth
 					, TextureChannel::Depth
 					, DataType::Float32
+					, false
 					, true)
 			});
 	}
 
 	void ShadowRenderer::beginRender()
 	{
-		mFrameBuffer->bind();
+		FrameBuffer::bind(mFrameBuffer);
 	}
 
 	void ShadowRenderer::endRender()
 	{
-		mFrameBuffer->unbind();
+		FrameBuffer::unbind(mFrameBuffer);
 	}
 
 	void ShadowRenderer::render(BaseGraphics* graphics, ILight* light)
 	{
 		if (mPass->checkState())
 		{
-			graphics->clear(ClearOption::CO_Depth);
 			graphics->setViewport(mViewInfo);
+			graphics->clear(ClearOption::CO_Depth);
+
+			const float near = 0.1f;
+			const float far = 2000.0f;
 
 			auto shader = mPass->getShader();
-			auto lm4 = glm::ortho(mViewInfo.OX, mViewInfo.Width, mViewInfo.OX, mViewInfo.Height);
-			shader->setProjectionMatrix(lm4);
 
-			auto com = dynamic_cast<DirectionalLight*>(light);
-			glm::mat4 lightView = glm::lookAt(com->getTransform()->getPosition()
-				, com->getDirection()
-				, com->getTransform()->getUp());
+			float half_w = mViewInfo.Width / 2.0f;
+			float half_h = mViewInfo.Width / 2.0f;
+			auto light_projection = glm::ortho(
+				-half_w, half_w,
+				-half_h, half_h,
+				near, far);
 
-			shader->setModelMatrix(com->getTransform()->getModelMatrix());
+			auto lit_dir = (DirectionalLight*)(light);
+			auto lit_transform = lit_dir->getTransform();
+			glm::mat4 lightView = glm::lookAt(
+				lit_transform->getWorldPosition(),
+				lit_transform->getWorldPosition() + lit_transform->getForward(),
+				lit_transform->getUp());
+
+			auto lpv = light_projection * lightView;
+			shader->setMat4(ShaderParam::MatrixLit, lpv);
+
 			mPass->renderMeshOnly(graphics);
 		}
 	}
@@ -80,4 +95,6 @@ namespace tezcat::Tiny::Core
 	{
 		mPass->addRenderMesh(mesh);
 	}
+
+
 }

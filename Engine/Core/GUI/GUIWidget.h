@@ -1,6 +1,7 @@
 #pragma once
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
+#include "../Head/ImGuiHead.h"
 
 #include "Utility/Utility.h"
 
@@ -124,7 +125,7 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		GUIDragFloat2(const std::u8string& name);
-		~GUIDragFloat2();
+		virtual ~GUIDragFloat2();
 
 		void setFloat2(float x, float y)
 		{
@@ -154,7 +155,7 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		GUIDragFloat3(const std::u8string& name);
-		~GUIDragFloat3();
+		virtual ~GUIDragFloat3();
 
 		void setFloat3(float x, float y, float z)
 		{
@@ -186,7 +187,7 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		GUIText(const std::u8string& name);
-		~GUIText();
+		virtual ~GUIText();
 
 		void setData(const char* data)
 		{
@@ -203,5 +204,20 @@ namespace tezcat::Tiny::Core
 
 	private:
 		std::string mData;
+	};
+
+	class TINY_API GUIImage : public GUIWidget
+	{
+	public:
+		GUIImage(const std::u8string& name);
+		virtual ~GUIImage();
+
+		void refresh();
+
+	protected:
+		void onRender() override;
+		void onUpdate() override;
+
+	private:
 	};
 }

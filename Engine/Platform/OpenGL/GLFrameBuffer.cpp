@@ -17,18 +17,13 @@ namespace tezcat::Tiny::GL
 
 	void GLFrameBuffer::bind()
 	{
-		if (mControlRenderSize)
-		{
-			glViewport(mViewportInfo.OX, mViewportInfo.OY, mViewportInfo.Width, mViewportInfo.Height);
-		}
-
 		glBindFramebuffer(GL_FRAMEBUFFER, mBufferID);
 	}
 
-	void GLFrameBuffer::unbind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
+// 	void GLFrameBuffer::unbind()
+// 	{
+//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//  {
 
 	void GLFrameBuffer::createTextureBuffer(TextureBuffer2D* tex)
 	{
@@ -151,5 +146,47 @@ namespace tezcat::Tiny::GL
 	{
 		return new GLFrameBuffer();
 	}
+
+	GLFrameBufferCreator::GLFrameBufferCreator()
+	{
+		FrameBuffer::setDefaultBuffer(new GLFrameBufferDefault());
+	}
+
+
+	//------------------------------------------------------
+	//
+	//
+	//
+
+	GLFrameBufferDefault::GLFrameBufferDefault()
+	{
+		mBufferID = 0;
+	}
+
+	GLFrameBufferDefault::~GLFrameBufferDefault()
+	{
+
+	}
+
+	void GLFrameBufferDefault::bind()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, mBufferID);
+	}
+
+// 	void GLFrameBufferDefault::unbind()
+// 	{
+// 		throw std::logic_error("The method or operation is not implemented.");
+// 	}
+
+	void GLFrameBufferDefault::attach(TextureRenderBuffer2D* buffer)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void GLFrameBufferDefault::build(const std::function<void(FrameBuffer*) >& function)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
 
 }

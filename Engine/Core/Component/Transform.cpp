@@ -101,7 +101,7 @@ namespace tezcat::Tiny::Core
 			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.y, YAxis);
 			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.z, ZAxis);
 
-			mModelMatrix *= glm::toMat4(glm::quat(glm::radians(mLocalRotation)));
+			mModelMatrix = mModelMatrix * glm::mat4_cast(glm::quat(glm::radians(mLocalRotation)));
 			mModelMatrix = glm::scale(mModelMatrix, mLocalScale);
 		}
 	}

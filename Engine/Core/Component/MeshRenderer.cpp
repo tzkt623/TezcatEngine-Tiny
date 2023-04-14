@@ -122,8 +122,9 @@ namespace tezcat::Tiny::Core
 	{
 		auto& model_mat4 = this->getTransform()->getModelMatrix();
 		shader->setMat4(ShaderParam::MatrixM, glm::value_ptr(model_mat4));
-		auto mat = glm::mat3(glm::transpose(glm::inverse(model_mat4)));
-		shader->setMat3(ShaderParam::MatrixN, glm::value_ptr(mat));
+		glm::mat3 itm(model_mat4);
+		itm = glm::inverseTranspose(itm);
+		shader->setMat3(ShaderParam::MatrixN, glm::value_ptr(itm));
 	}
 
 	void MeshRenderer::endRender()

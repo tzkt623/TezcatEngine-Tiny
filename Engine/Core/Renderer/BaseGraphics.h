@@ -35,7 +35,7 @@ namespace tezcat::Tiny::Core
 		virtual void postRender();
 	public:
 		virtual void clear(const ClearOption& option) = 0;
-		virtual void setViewport(ViewportInfo& info) = 0;
+		virtual void setViewport(const ViewportInfo& info) = 0;
 
 	public:
 		virtual void draw(IRenderMesh* renderMesh) = 0;

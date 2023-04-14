@@ -118,10 +118,12 @@ namespace tezcat::Tiny::Core
 
 		virtual void setMat3(const char* name, float* data) = 0;
 		virtual void setMat4(const char* name, const float* data) = 0;
+		virtual void setMat4(UniformID& uniform, const glm::mat4& mat4) = 0;
 
 	public://快速传参
 		virtual void setFloat1(UniformID& uniform, float* data) = 0;
 		virtual void setFloat2(UniformID& uniform, float* data) = 0;
+		virtual void setFloat2(UniformID& uniform, const glm::vec2& data) = 0;
 		virtual void setFloat3(UniformID& uniform, float* data) = 0;
 		virtual void setFloat4(UniformID& uniform, float* data) = 0;
 

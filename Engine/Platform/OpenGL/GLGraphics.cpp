@@ -107,7 +107,7 @@ namespace tezcat::Tiny::GL
 		get_default_color_buffer(max);
 	}
 
-	void GLGraphics::setViewport(ViewportInfo& info)
+	void GLGraphics::setViewport(const ViewportInfo& info)
 	{
 		glViewport(info.OX, info.OY, info.Width, info.Height);
 	}

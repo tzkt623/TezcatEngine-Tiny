@@ -34,10 +34,12 @@ namespace tezcat::Tiny::Core
 		FrameBuffer* find(const std::string& name);
 
 	private:
-		FrameBuffer* addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer);
+		void addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer);
 
 	private:
 		std::unordered_map<std::string, FrameBuffer*> mBufferUMap;
+
+
 	};
 
 

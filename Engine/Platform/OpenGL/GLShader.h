@@ -39,11 +39,13 @@ namespace tezcat::Tiny::GL
 
 		void setMat3(const char* name, float* data) override;
 		void setMat4(const char* name, const float* data) override;
+		void setMat4(UniformID& uniform, const glm::mat4& mat4) override;
 
 	public:
 
 		void setFloat1(UniformID& uniform, float* data) override;
 		void setFloat2(UniformID& uniform, float* data) override;
+		void setFloat2(UniformID& uniform, const glm::vec2& data) override;
 		void setFloat3(UniformID& uniform, float* data) override;
 		void setFloat4(UniformID& uniform, float* data) override;
 
