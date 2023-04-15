@@ -20,12 +20,10 @@
 
     #TINY_VS_BEGIN
     {
+        #include "tiny_vs_base"
+
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec4 aColor;
-
-        uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixV;
-        uniform mat4 TINY_MatrixM;
 
         out vec4 myColor;
         out vec4 myWorldPosition;
@@ -50,7 +48,8 @@
         void main()
         {
             //myFinalColor = myColor;
-            myFinalColor = vec4(myWorldPosition.xyz / myWorldPosition.w, 1.0f);
+            myFinalColor = vec4(vec3(242,141,0)/255.0, 1.0);
+            //myFinalColor = vec4(myWorldPosition.xyz / myWorldPosition.w, 1.0f);
         } 
     }
     #TINY_FS_END

@@ -23,7 +23,7 @@ namespace tezcat::Tiny::Core
 		TextureInfo(const std::string& name)
 			: TextureInfo(name
 				, TextureFilter::Linear
-				, TextureWrap::Clamp_To_Edge
+				, TextureWrap::Repeat
 				, TextureChannel::None
 				, TextureChannel::None
 				, DataType::UByte
@@ -37,7 +37,7 @@ namespace tezcat::Tiny::Core
 		/// </summary>
 		TextureInfo(const std::string& name
 			, const TextureChannel& internalChannel
-			, const TextureWrap& wrap = TextureWrap::Clamp_To_Edge
+			, const TextureWrap& wrap = TextureWrap::Repeat
 			, const TextureFilter& filter = TextureFilter::Linear)
 			: TextureInfo(name
 				, filter
@@ -91,7 +91,7 @@ namespace tezcat::Tiny::Core
 			: TextureBufferInfo(name
 				, bufferType
 				, TextureFilter::Linear
-				, TextureWrap::Clamp_To_Edge
+				, TextureWrap::Repeat
 				, internalChannel
 				, internalChannel
 				, DataType::UByte
@@ -113,7 +113,7 @@ namespace tezcat::Tiny::Core
 			: TextureBufferInfo(name
 				, bufferType
 				, TextureFilter::Linear
-				, TextureWrap::Clamp_To_Edge
+				, TextureWrap::Repeat
 				, internalChannel
 				, channel
 				, dataType

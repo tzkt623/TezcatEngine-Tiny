@@ -8,7 +8,7 @@ namespace tezcat::Tiny::Core
 	std::deque<uint32_t> Texture::sFreeUIDs;
 
 	Texture::Texture()
-		: Texture(TextureChannel::None, TextureWrap::Clamp_To_Edge, TextureFilter::Linear, false)
+		: Texture(TextureChannel::None, TextureWrap::Repeat, TextureFilter::Linear, false)
 	{
 
 	}

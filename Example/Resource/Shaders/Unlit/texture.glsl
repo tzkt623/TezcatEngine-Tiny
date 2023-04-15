@@ -21,12 +21,10 @@
 
     #TINY_VS_BEGIN
     {
+        #include "tiny_vs_base"
+
         layout (location = 0) in vec3 aPos;
         layout (location = 3) in vec2 aUV;
-
-        uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixV;
-        uniform mat4 TINY_MatrixM;
 
         out vec2 myUV;
 
@@ -40,9 +38,9 @@
 
     #TINY_FS_BEGIN
     {
-        in vec2 myUV;
+        #include "tiny_fs_texture"
 
-        uniform sampler2D TINY_TexColor;
+        in vec2 myUV;
         out vec4 myFinalColor;
 
         void main()

@@ -28,13 +28,13 @@ namespace tezcat::Tiny::Core
 		mPass = RenderPass::get("ShadowMap");
 		//shadow framebuffer
 		mFrameBuffer = FrameBufferMgr::getInstance()->create("Shadow",
-			mViewInfo.Width, mViewInfo.Height,
+			width, height,
 			{
 				//shadow texture
 				TextureBufferInfo("Shadow"
 					, TextureBufferType::DepthComponent
 					, TextureFilter::Nearest
-					, TextureWrap::Repeat
+					, TextureWrap::Clamp_To_Border
 					, TextureChannel::Depth
 					, TextureChannel::Depth
 					, DataType::Float32
@@ -57,31 +57,12 @@ namespace tezcat::Tiny::Core
 	{
 		if (mPass->checkState())
 		{
+			auto shader = mPass->getShader();
+
 			graphics->setViewport(mViewInfo);
 			graphics->clear(ClearOption::CO_Depth);
 
-			const float near = 0.1f;
-			const float far = 2000.0f;
-
-			auto shader = mPass->getShader();
-
-			float half_w = mViewInfo.Width / 2.0f;
-			float half_h = mViewInfo.Width / 2.0f;
-			auto light_projection = glm::ortho(
-				-half_w, half_w,
-				-half_h, half_h,
-				near, far);
-
-			auto lit_dir = (DirectionalLight*)(light);
-			auto lit_transform = lit_dir->getTransform();
-			glm::mat4 lightView = glm::lookAt(
-				lit_transform->getWorldPosition(),
-				lit_transform->getWorldPosition() + lit_transform->getForward(),
-				lit_transform->getUp());
-
-			auto lpv = light_projection * lightView;
-			shader->setMat4(ShaderParam::MatrixLit, lpv);
-
+			light->submitViewMatrix(shader);
 			mPass->renderMeshOnly(graphics);
 		}
 	}

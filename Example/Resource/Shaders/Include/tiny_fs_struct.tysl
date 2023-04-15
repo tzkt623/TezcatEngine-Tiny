@@ -1,0 +1,31 @@
+struct StdMaterial
+{
+    sampler2D diffuse;
+    sampler2D normal;
+    sampler2D specular;
+    float shininess;
+};
+
+struct LightDirection
+{
+    vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+struct LightPoint
+{
+    vec3 position;  
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+uniform StdMaterial TINY_MatStd;
+uniform LightDirection TINY_LitDir;

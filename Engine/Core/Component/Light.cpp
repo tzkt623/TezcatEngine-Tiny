@@ -15,6 +15,7 @@ namespace tezcat::Tiny::Core
 		, mAmbient(0.1f)
 		, mDiffuse(1.0f)
 		, mSpecular(0.2f)
+		, mViewMatrix(1.0f)
 	{
 
 	}
@@ -24,6 +25,7 @@ namespace tezcat::Tiny::Core
 		, mAmbient(ambient)
 		, mDiffuse(diffuse)
 		, mSpecular(specular)
+		, mViewMatrix(1.0f)
 	{
 
 	}
@@ -59,7 +61,19 @@ namespace tezcat::Tiny::Core
 
 	void DirectionalLight::submitViewMatrix(Shader* shader)
 	{
+		this->updateObserverMatrix();
+		auto lpv = mProjectionMatrix * this->getViewMatrix();
+		shader->setMat4(ShaderParam::MatrixLit, lpv);
+	}
 
+	glm::mat4& DirectionalLight::getViewMatrix()
+	{
+		auto transform = this->getTransform();
+		mViewMatrix = glm::lookAt(
+			transform->getWorldPosition(),
+			transform->getWorldPosition() + transform->getForward(),
+			transform->getUp());
+		return mViewMatrix;
 	}
 
 	//------------------------------------------------------------------------

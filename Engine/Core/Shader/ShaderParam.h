@@ -37,12 +37,13 @@ namespace tezcat::Tiny::Core
 		static UniformID VertexColor;
 		static UniformID TexColor;
 		static UniformID TexCube;
+		static UniformID TexDepth;
 
-		static UniformID LightPosition;
-		static UniformID LightColor;
-		static UniformID AmbientStrength;
-		static UniformID ModeSpecular;
-		static UniformID EnableShadow;
+// 		static UniformID LightPosition;
+// 		static UniformID LightColor;
+//		static UniformID AmbientStrength;
+// 		static UniformID ModeSpecular;
+//		static UniformID EnableShadow;
 
 		struct LightDirection
 		{

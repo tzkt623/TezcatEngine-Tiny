@@ -23,12 +23,10 @@
 
     #TINY_VS_BEGIN
     {
+        #include "tiny_vs_base"
+
         layout (location = 0) in vec3 aPos;
         layout (location = 3) in vec2 aUV;
-
-        uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixV;
-        uniform mat4 TINY_MatrixM;
 
         out vec2 myUV;
 
@@ -42,19 +40,10 @@
 
     #TINY_FS_BEGIN
     {
+        #include "tiny_fs_texture"
+
         in vec2 myUV;
-
-        uniform sampler2D TINY_TexColor;
         out vec4 myFinalColor;
-
-        float near = 0.1; 
-        float far  = 2000.0; 
-
-        float linearizeDepth(float depth) 
-        {
-            float z = depth * 2.0 - 1.0; // back to NDC 
-            return (2.0 * near * far) / (far + near - z * (far - near));    
-        }
 
         void main()
         {

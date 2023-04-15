@@ -33,7 +33,7 @@ namespace tezcat::Tiny::GL
 
 		if (mWrap.tiny == TextureWrap::Clamp_To_Border)
 		{
-			float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 		}
 
@@ -153,6 +153,12 @@ namespace tezcat::Tiny::GL
 			, mChannel.platform
 			, mDataType.platform
 			, NULL);
+
+		if (mWrap.tiny == TextureWrap::Clamp_To_Border)
+		{
+			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+		}
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrap.platform);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrap.platform);

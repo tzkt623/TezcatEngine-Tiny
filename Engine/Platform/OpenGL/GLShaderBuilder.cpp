@@ -288,9 +288,40 @@ namespace tezcat::Tiny::GL
 			std::string shader_content(result[1]);
 			std::sregex_iterator end;
 
-			//删除注释
-			std::regex regex_comment(R"(//+.*;)");
+			//------------------------------------------------------------
+			//
+			//	删除注释
+			//	包括//型 和 /**/型
+			//
+			std::regex regex_comment(R"(/\*[\s\S]*\*/|//.*)");
 			shader_content = std::regex_replace(shader_content, regex_comment, "");
+
+			//------------------------------------------------------------
+			//
+			//	分析Include
+			//
+			//
+			std::vector<std::string> include_ary;
+			std::regex regex_include(R"(#include\s*\"(\S+)\"\s*)");
+			for (auto struct_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_include); struct_i != end; struct_i++)
+			{
+				std::string include_name = (*struct_i)[1];
+				include_ary.emplace_back(include_name);
+			}
+
+			if (!include_ary.empty())
+			{
+				//组合shader
+				shader_content = std::regex_replace(shader_content, regex_include, "");
+
+				std::string inlcude_data;
+				for (auto& s : include_ary)
+				{
+					inlcude_data += ShaderCreator::getIncludeContent(s);
+				}
+
+				shader_content = inlcude_data + shader_content;
+			}
 
 			//------------------------------------------------------------
 			//
@@ -358,6 +389,11 @@ namespace tezcat::Tiny::GL
 				delete pair.second;
 			}
 
+			//------------------------------------------------------
+			//
+			//	写入shader头
+			//
+			//
 			shader_content = "#version " + std::to_string(shader->getVersion()) + " core\n\r" + shader_content;
 			switch (shaderType)
 			{

@@ -17,7 +17,8 @@ namespace tezcat::Tiny::Utility
 
 		static void loadFiles(const std::string& path, std::unordered_map<std::string, std::string>& outFiles);
 
-	private:
+		static std::string loadText(const std::string& path);
+
 		static void findAllFiles(const std::string& path, std::unordered_map<std::string, std::string>& outFiles);
 
 	private:

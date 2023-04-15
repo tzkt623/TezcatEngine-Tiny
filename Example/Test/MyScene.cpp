@@ -114,41 +114,61 @@ void MyScene::onEnter()
 		auto material = new Material("Unlit/Skybox");
 		material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_1");
 		skybox->setMaterial(material);
+	}
 
-		//--------------------------
-		auto world2 = new GameObject("World1_Gate");
-		world2->setLayerMaskIndex(1);
+	if (false)
+	{
+		auto world1 = new GameObject("World1_Gate");
+		world1->setLayerMaskIndex(1);
 
-		auto tran = world2->addComponent<Transform>();
-		tran->setPosition(glm::vec3(200.0f, 0.0f, 0.0f));
-		tran->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
-		tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
+		auto tran1 = world1->addComponent<Transform>();
+		tran1->setPosition(glm::vec3(200.0f, 0.0f, 0.0f));
+		tran1->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
+		tran1->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
 
-		auto mr1 = world2->addComponent<MeshRenderer>();
+		auto mr1 = world1->addComponent<MeshRenderer>();
 		auto world1_material = new Material("Unlit/Texture");
 		world1_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World1");
 		mr1->setMaterial(world1_material);
 		mr1->setMesh("Square");
+
+
+		auto world2 = new GameObject("World2_Gate");
+		auto tran2 = world2->addComponent<Transform>();
+		tran2->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
+		tran2->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+		tran2->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
+
+		auto mr2 = world2->addComponent<MeshRenderer>();
+		auto world2_material = new Material("Unlit/Texture");
+		world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
+		mr2->setMaterial(world2_material);
+		mr2->setMesh("Square");
 	}
 
-	//区域光
+	//方向光
+	//方向光的位置理论上不应该影响阴影投射
 	if (true)
 	{
 		auto direction_light_go = new GameObject();
 		direction_light_go->addComponent<Transform>();
-		direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 60.0f, 0.0f));
-		direction_light_go->getTransform()->setScale(glm::vec3(10.0f));
-		direction_light_go->getTransform()->setRotation(-90.0f, 0.0f, 0.0f);
+		direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 600.0f));
+		direction_light_go->getTransform()->setScale(glm::vec3(100.0f));
+		direction_light_go->getTransform()->setRotation(-60.0f, 0.0f, 0.0f);
 
 		auto mr = direction_light_go->addComponent<MeshRenderer>();
 		auto light_material = new Material("Unlit/Color");
 		mr->setMaterial(light_material);
-		mr->setMesh("Cube");
+		mr->setMesh("Sphere");
 
 		auto dir_light = direction_light_go->addComponent<DirectionalLight>();
+		dir_light->setOrtho(0.1f, 2000.0f);
+		dir_light->setViewRect(0, 0, 1024, 1024);
+
+
 		dir_light->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
 		dir_light->setAmbient(glm::vec3(0.5f));
-		dir_light->setSpecular(glm::vec3(1.0f, 1.0f, 1.0f));
+		dir_light->setSpecular(glm::vec3(0.5f));
 	}
 
 	//灯光深度图
@@ -169,26 +189,13 @@ void MyScene::onEnter()
 		mr->setMesh("Square");
 	}
 
-	if (false)
+	if (true)
 	{
-		auto world2 = new GameObject("World2_Gate");
-		auto tran = world2->addComponent<Transform>();
-		tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
-		tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-		tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
-
-		auto mr1 = world2->addComponent<MeshRenderer>();
-		auto world2_material = new Material("Unlit/Texture");
-		world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
-		mr1->setMaterial(world2_material);
-		mr1->setMesh("Square");
-
-
 		//-------------------------------------------------
 		auto wife2 = new GameObject();
 		wife2->addComponent<Transform>();
-		wife2->getTransform()->setPosition(glm::vec3(960.0f, 0.0f, 0.0f));
-		wife2->getTransform()->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
+		wife2->getTransform()->setPosition(glm::vec3(-960.0f, 0.0f, 0.0f));
+		wife2->getTransform()->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
 		wife2->getTransform()->setScale(glm::vec3(1920.0f / 2, 1080.0f / 2, 1.0f));
 
 		auto mr2 = wife2->addComponent<MeshRenderer>();
@@ -235,8 +242,8 @@ void MyScene::onEnter()
 		auto plane = new GameObject();
 		plane->addComponent<Transform>();
 		plane->getTransform()->setPosition(glm::vec3(0.0f, -20.0f, 0.0f));
-		plane->getTransform()->setRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-		plane->getTransform()->setScale(glm::vec3(100.0f, 100.0f, 1.0f));
+		plane->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+		plane->getTransform()->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
 		auto mr = plane->addComponent<MeshRenderer>();
 		//Standard/Std2 error!!!
@@ -244,8 +251,9 @@ void MyScene::onEnter()
 		plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
 		plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
 		plane_material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
+		plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
 		mr->setMaterial(plane_material);
-		mr->setMesh("Square");
+		mr->setMesh("Plane");
 	}
 
 	//----------------------------------------
@@ -268,7 +276,6 @@ void MyScene::onEnter()
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Unlit/Transparent");
 			material->addUniform<UniformTex2D>(ShaderParam::TexColor, "transparent_window");
-			material->addUniform<UniformF1>(ShaderParam::ModeSpecular, 64.0f);
 			mr->setMaterial(material);
 			mr->setMesh("Square");
 		}
@@ -283,6 +290,7 @@ void MyScene::onEnter()
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> dis(-520, 520);
+		std::uniform_int_distribution<> dis_ro(0, 359);
 
 		for (int i = 0; i < 1000; i++)
 		{
@@ -290,6 +298,7 @@ void MyScene::onEnter()
 			go->addComponent<Transform>();
 			go->getTransform()->setPosition(glm::vec3(dis(gen), dis(gen), dis(gen)));
 			go->getTransform()->setScale(glm::vec3(10.0f));
+			go->getTransform()->setRotation(glm::vec3(dis_ro(gen), dis_ro(gen), dis_ro(gen)));
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Standard/Std1");
@@ -297,9 +306,10 @@ void MyScene::onEnter()
 			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "metal_plate_spec");
 			material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
 			material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
+			material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
 			mr->setMaterial(material);
-			//mr->setMesh("Cube");
-			mr->setMesh("Sphere");
+			mr->setMesh("Cube");
+			//mr->setMesh("Sphere");
 		}
 	}
 

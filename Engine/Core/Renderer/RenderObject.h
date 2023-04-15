@@ -1,8 +1,10 @@
 #pragma once
+#include "RenderConfig.h"
+
 #include "../Component/Component.h"
 #include "../Head/ConfigHead.h"
 #include "../Head/Context.h"
-#include "RenderConfig.h"
+#include "../Head/GLMHead.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -133,6 +135,13 @@ namespace tezcat::Tiny::Core
 	class TINY_API IRenderObserver : public IRenderObject
 	{
 	public:
+		enum class Type
+		{
+			Ortho,
+			Perspective
+		};
+
+	public:
 		IRenderObserver();
 		virtual ~IRenderObserver() = default;
 
@@ -176,19 +185,28 @@ namespace tezcat::Tiny::Core
 
 		FrameBuffer* getFrameBuffer() const { return mFrameBuffer; }
 		void setFrameBuffer(FrameBuffer* val) { mFrameBuffer = val; }
+		void setViewRect(int x, int y, int width, int height);
 
-		void setViewRect(int x, int y, int width, int height)
-		{
-			mViewInfo.OX = x;
-			mViewInfo.OY = y;
-			mViewInfo.Width = width;
-			mViewInfo.Height = height;
-		}
 		ViewportInfo& getViewportInfo() { return mViewInfo; }
+		glm::mat4& getProjectionMatrix() { return mProjectionMatrix; }
+
+		virtual glm::mat4& getViewMatrix() = 0;
+		void setOrtho(float near, float far);
+		void setPerspective(float fov, float near, float far);
+		void updateObserverMatrix();
 
 	protected:
 		FrameBuffer* mFrameBuffer;
 		ViewportInfo mViewInfo;
+
+	protected:
+		Type mType;
+		float mNearFace;
+		float mFarFace;
+		float mFOV;
+
+		glm::mat4 mProjectionMatrix;
+		bool mPMatDirty;
 
 	private:
 		uint32_t mCullMask;

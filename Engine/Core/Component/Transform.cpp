@@ -1,5 +1,4 @@
 #include "Transform.h"
-#include "../Manager/SceneManager.h"
 #include "../Scene/Scene.h"
 #include "../Component/GameObject.h"
 #include "Utility/Utility.h"
@@ -42,13 +41,13 @@ namespace tezcat::Tiny::Core
 	{
 		if (mParent == nullptr)
 		{
-			SceneMgr::getInstance()->getCurrentScene()->addTransform(this);
+			mGameObject->getScene()->addTransform(this);
 		}
 	}
 
 	void Transform::onEnable()
 	{
-		this->getGameObject()->mTransform = this;
+		mGameObject->mTransform = this;
 	}
 
 	void Transform::onDisable()
@@ -195,10 +194,12 @@ namespace tezcat::Tiny::Core
 		//如果传入的父节点为空,说明需要添加到Scene中
 		if (mParent == nullptr)
 		{
-			SceneMgr::getInstance()->getCurrentScene()->addTransform(this);
+			mIndex = 0;
+			mGameObject->getScene()->addTransform(this);
 		}
 		else
 		{
+			mIndex = mParent->mIndex + 1;
 			mParent->addChild(this);
 		}
 	}

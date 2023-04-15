@@ -68,4 +68,18 @@ namespace tezcat::Tiny::Utility
 			throw std::logic_error("load path must a dir");
 		}
 	}
+
+	std::string FileTool::loadText(const std::string& path)
+	{
+		std::string data;
+		std::fstream io(path, std::ios::in | std::ios::binary);
+		if (io.is_open())
+		{
+			std::stringstream buf;
+			buf << io.rdbuf();
+			data = buf.str();
+		}
+		io.close();
+		return data;
+	}
 }

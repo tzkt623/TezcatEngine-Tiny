@@ -34,13 +34,7 @@ namespace tezcat::Tiny::Core
 		: IRenderObserver()
 		, mUID(Utility::IDGenerator<Camera, unsigned int>::generate())
 		, mIsMain(mainCamera)
-		, mNearFace(0.1f)
-		, mFarFace(100.0f)
-		, mFOV(60.0f)
-		, mProjectionMatrix(1.0f)
-		, mViewMatrix(1.0f)
-		, mType(Type::Perspective)
-		, mPMatDirty(true)
+		//, mViewMatrix(1.0f)
 		, mDepth(0)
 		, mFront(0.0f, 0.0f, -1.0f)
 		, mUp(0.0f, 1.0f, 0.0f)
@@ -152,31 +146,13 @@ namespace tezcat::Tiny::Core
 		}
 
 		auto& position = this->getTransform()->getPosition();
-		mViewMatrix = glm::lookAt(position, position + mFront, mUp);
-
-		if (this->getTransform()->getParent() != nullptr)
-		{
-			mViewMatrix = this->getTransform()->getParent()->getModelMatrix() * mViewMatrix;
-		}
-
-		this->getTransform()->setModelMatrix(mViewMatrix);
-	}
-
-	void Camera::setOrtho(float near, float far)
-	{
-		mType = Type::Ortho;
-		mNearFace = near;
-		mFarFace = far;
-		mPMatDirty = true;
-	}
-
-	void Camera::setPerspective(float fov, float near, float far)
-	{
-		mType = Type::Perspective;
-		mFOV = fov;
-		mNearFace = near;
-		mFarFace = far;
-		mPMatDirty = true;
+		// 		mViewMatrix = glm::lookAt(position, position + mFront, mUp);
+		// 
+		// 		if (this->getTransform()->getParent() != nullptr)
+		// 		{
+		// 			mViewMatrix = this->getTransform()->getParent()->getModelMatrix() * mViewMatrix;
+		// 		}
+		//		this->getTransform()->setModelMatrix(mViewMatrix);
 	}
 
 	void Camera::setMain()
@@ -277,4 +253,10 @@ namespace tezcat::Tiny::Core
 		//mRight = glm::normalize(glm::cross(mFront, crrrent_up));
 		//mUp = glm::normalize(glm::cross(mRight, mFront));
 	}
+
+	glm::mat4& Camera::getViewMatrix()
+	{
+		return mGameObject->getTransform()->getModelMatrix();
+	}
+
 }

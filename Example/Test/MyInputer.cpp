@@ -16,7 +16,7 @@ MyInputer::~MyInputer()
 
 void MyInputer::processInput(InputSystem* system)
 {
-	float speed = 10 * Engine::getDeltaTime();
+	float speed = 100 * Engine::getDeltaTime();
 	bool transform = false;
 	glm::vec3 position(0.0f);
 

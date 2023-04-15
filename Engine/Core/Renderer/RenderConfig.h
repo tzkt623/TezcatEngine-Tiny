@@ -30,7 +30,7 @@ namespace tezcat::Tiny::Core
 		}
 	};
 
-	enum ClearOption : uint32_t
+	enum TINY_API ClearOption : unsigned int
 	{
 		CO_None = 0,
 		CO_Skybox = 1 << 0,

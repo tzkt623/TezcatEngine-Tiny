@@ -21,11 +21,9 @@
 
     #TINY_VS_BEGIN
     {
+        #include "tiny_vs_skybox"
+
         layout (location = 0) in vec3 aPos;
-
-        uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixSBV;
-
         out vec3 myUV;
 
         void main()
@@ -38,8 +36,9 @@
 
     #TINY_FS_BEGIN
     {
+        #include "tiny_fs_texture"
+        
         in vec3 myUV;
-        uniform samplerCube TINY_TexCube;
         out vec4 myFinalColor;
 
         void main()

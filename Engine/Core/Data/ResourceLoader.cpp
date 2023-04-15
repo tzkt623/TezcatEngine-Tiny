@@ -20,8 +20,10 @@ namespace tezcat::Tiny::Core
 
 	void ResourceLoader::prepareResource(Engine* engine)
 	{
-		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
+		ShaderCreator::loadIncludeFiles(FileTool::getRootResDir() + "/Shaders/Include");
+
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std1.glsl");
+		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color_depth.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture.glsl");
@@ -29,6 +31,8 @@ namespace tezcat::Tiny::Core
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/skybox.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/transparent.glsl");
 		ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/shadow_map.glsl");
+
+		ShaderCreator::clearIncludeFiles();
 
 		this->createSomeMode();
 	}
@@ -47,6 +51,7 @@ namespace tezcat::Tiny::Core
 		this->createCube();
 		this->createSphere();
 		this->createSquare();
+		this->createPlane();
 		this->createSkybox();
 	}
 
@@ -226,6 +231,40 @@ namespace tezcat::Tiny::Core
 		mesh_data->normals.emplace_back(0.0f, 0.0f, 1.0f);
 		mesh_data->normals.emplace_back(0.0f, 0.0f, 1.0f);
 		mesh_data->normals.emplace_back(0.0f, 0.0f, 1.0f);
+
+		mesh_data->apply();
+	}
+
+	void ResourceLoader::createPlane()
+	{
+		auto mesh_data = new MeshData("Plane");
+		mesh_data->vertices.emplace_back(-300.0f, 0.0f, 300.0f);	//
+		mesh_data->vertices.emplace_back(300.0f, 0.0f, 300.0f);	//
+		mesh_data->vertices.emplace_back(300.0f, 0.0f, -300.0f);		//
+		mesh_data->vertices.emplace_back(-300.0f, 0.0f, -300.0f);	//
+
+		mesh_data->indices.emplace_back(0);
+		mesh_data->indices.emplace_back(1);
+		mesh_data->indices.emplace_back(3);
+
+		mesh_data->indices.emplace_back(1);
+		mesh_data->indices.emplace_back(2);
+		mesh_data->indices.emplace_back(3);
+
+		mesh_data->colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+		mesh_data->colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+		mesh_data->colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+		mesh_data->colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+
+		mesh_data->uv.emplace_back(0.0f, 0.0f);
+		mesh_data->uv.emplace_back(1.0f, 0.0f);
+		mesh_data->uv.emplace_back(1.0f, 1.0f);
+		mesh_data->uv.emplace_back(0.0f, 1.0f);
+
+		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
+		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
+		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
+		mesh_data->normals.emplace_back(0.0f, 1.0f, 0.0f);
 
 		mesh_data->apply();
 	}

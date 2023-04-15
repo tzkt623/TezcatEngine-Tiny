@@ -2,9 +2,7 @@
 #include "../Renderer/RenderObject.h"
 
 #include "../Head/CppHead.h"
-#include "../Head/GLMHead.h"
 #include "../Shader/Shader.h"
-#include "../Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -41,6 +39,7 @@ namespace tezcat::Tiny::Core
 		virtual ~DirectionalLight();
 
 		LightType getLightType() final { return LightType::Directional; }
+		glm::mat4& getViewMatrix() override;
 
 	public:
 		void render(BaseGraphics* graphics) override;
@@ -68,6 +67,7 @@ namespace tezcat::Tiny::Core
 		glm::vec3 mAmbient;
 		glm::vec3 mDiffuse;
 		glm::vec3 mSpecular;
+		glm::mat4 mViewMatrix;
 	};
 
 
@@ -88,29 +88,29 @@ namespace tezcat::Tiny::Core
 		glm::vec3& getSpecular() { return mSpecular; }
 		void setSpecular(const glm::vec3& val) { mSpecular = val; }
 
-		glm::vec3& getConfig() { return mSpecular; }
-		void setConfig(const glm::vec3& val) { mSpecular = val; }
+		glm::vec3& getConfig() { return mConfig; }
+		void setConfig(const glm::vec3& val) { mConfig = val; }
 
 		void setConfig(float constant, float linear, float quadratic)
 		{
-			mSpecular.x = constant;
-			mSpecular.y = linear;
-			mSpecular.z = quadratic;
+			mConfig.x = constant;
+			mConfig.y = linear;
+			mConfig.z = quadratic;
 		}
 
 		void setConstant(float constant)
 		{
-			mSpecular.x = constant;
+			mConfig.x = constant;
 		}
 
 		void setLinear(float linear)
 		{
-			mSpecular.y = linear;
+			mConfig.y = linear;
 		}
 
 		void setQuadratic(float quadratic)
 		{
-			mSpecular.z = quadratic;
+			mConfig.z = quadratic;
 		}
 
 		void submit(Shader* shader) override;
@@ -124,6 +124,7 @@ namespace tezcat::Tiny::Core
 		glm::vec3 mDiffuse;
 		glm::vec3 mSpecular;
 		glm::vec3 mConfig;
+
 	};
 
 	class TINY_API SpotLight : public ComponentT<SpotLight>, public ILight

@@ -20,10 +20,10 @@
 
     #TINY_VS_BEGIN
     {
-        layout (location = 0) in vec3 aPos;
+        #include "tiny_vs_base"
+        #include "tiny_vs_shadow"
 
-        uniform mat4 TINY_MatrixLit;
-        uniform mat4 TINY_MatrixM;
+        layout (location = 0) in vec3 aPos;
         
         void main()
         {

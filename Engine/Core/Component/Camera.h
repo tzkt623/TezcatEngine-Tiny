@@ -2,7 +2,6 @@
 #include "Component.h"
 
 #include "../Head/CppHead.h"
-#include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
 
 #include "../Renderer/RenderObject.h"
@@ -18,16 +17,6 @@ namespace tezcat::Tiny::Core
 	class TINY_API Camera : public ComponentT<Camera>, public IRenderObserver
 	{
 	public:
-		enum class Type
-		{
-			Ortho,
-			Perspective
-		};
-
-
-
-
-	public:
 		//创建一个forward主相机
 		Camera();
 		//创建一个forward相机
@@ -41,8 +30,7 @@ namespace tezcat::Tiny::Core
 
 		RenderObjectType getRenderObjectType() override { return RenderObjectType::Camera; }
 
-		void setOrtho(float near, float far);
-		void setPerspective(float fov, float near, float far);
+
 		void setClearOption(ClearOption option) { mClearMask = option; }
 		const ClearOption getClearOption() const { return mClearMask; }
 
@@ -60,8 +48,7 @@ namespace tezcat::Tiny::Core
 		void setPipeline(Pipeline* val) { mPipeline = val; }
 
 	public:
-		glm::mat4x4& getProjectionMatrix() { return mProjectionMatrix; }
-		glm::mat4x4& getViewMatrix() { return mViewMatrix; }
+		glm::mat4& getViewMatrix() override;
 
 	public:
 		bool isMain() const { return mIsMain; }
@@ -97,15 +84,8 @@ namespace tezcat::Tiny::Core
 		uint32_t mUID;
 
 	private:
-		Type mType;
 
-		float mNearFace;
-		float mFarFace;
-		float mFOV;
-		bool mPMatDirty;
-
-		glm::mat4x4 mProjectionMatrix;
-		glm::mat4x4 mViewMatrix;
+		//glm::mat4x4 mViewMatrix;
 	private:
 		glm::vec3 mFront;
 		glm::vec3 mUp;

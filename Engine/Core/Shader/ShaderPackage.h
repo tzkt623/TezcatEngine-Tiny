@@ -35,6 +35,14 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		virtual ShaderPackage* create(const std::string& filePath) = 0;
+
+		static void loadIncludeFiles(const std::string& path);
+		static std::string getIncludeContent(std::string& name);
+
+	private:
+		static std::unordered_map<std::string, std::string> sIncludeFileDict;
+	public:
+		static void clearIncludeFiles();
 	};
 
 	using ShaderLoader = DelegateCreator<ShaderCreator, ShaderPackage>;

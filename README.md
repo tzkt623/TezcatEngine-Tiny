@@ -2,8 +2,8 @@
 
 ## **引擎二周目进行中**
 
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo1.jpg?raw=true)
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/Resource/Image/logo2.jpg?raw=true)
+![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
+![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
 
 注意!本引擎使用C++20版本
 
@@ -229,45 +229,46 @@ ShaderBuilder can auto scan all GLSL Uniform value except array type.
 
 Tiny Current Buildin Uniform Values
 
-```cpp
-static UniformID Empty;
+独立型变量 individual variable
 
-static UniformID MatrixP;
-static UniformID MatrixV;
-static UniformID MatrixM;
-static UniformID MatrixN;
+|   TinyName   | CommonType  |       Useage        |
+| :----------: | :---------: | :-----------------: |
+|   MatrixP    |    mat4     |    ProjectionMat    |
+|   MatrixV    |    mat4     |       ViewMat       |
+|   MatrixM    |    mat4     |      ModelMat       |
+|   MatrixN    |    mat3     |      NormalMat      |
+|  MatrixSBV   |    mat4     |    SkyboxViewMat    |
+|  MatrixLit   |    mat4     |   LightSpacePVMat   |
+| ViewPosition |    vec3     |    ViewPosition     |
+| ViewNearFar  |    vec2     | View`s Near And Far |
+| VertexColor  |    vec4     |   Vertex`s Color    |
+|   TexColor   |  Texture2D  |   Color`s Texture   |
+|   TexCube    | TextureCube |   Cube`s Texture    |
+|   TexDepth   |  Texture2D  |   Depth`s Texture   |
 
-static UniformID VertexColor;
-static UniformID TexColor;
-
-static UniformID LightPosition;
-static UniformID LightColor;
-static UniformID ViewPosition;
-static UniformID AmbientStrength;
-static UniformID ModeSpecular;
-
-struct LightDirection
-{
-    static UniformID Direction;
-    static UniformID Ambient;
-    static UniformID Diffuse;
-    static UniformID Specular;
-};
-
-struct StdMaterial
-{
-    static UniformID Diffuse;
-    static UniformID Specular;
-    static UniformID Shininess;
-};
-```
+结构型变量 struct variable
+|         TinyName          | CommonType |       Useage        |
+| :-----------------------: | :--------: | :-----------------: |
+|   StdMaterial::Diffuse    | Texture2D  |  Diffuse`s Texture  |
+|    StdMaterial::Normal    | Texture2D  |  Normal`s Texture   |
+|   StdMaterial::Specular   | Texture2D  | Specular`s Texture  |
+|  StdMaterial::Shininess   |   float    | Specular  Shininess |
+| LightDirection::Direction |    vec3    |                     |
+|  LightDirection::Ambient  |    vec3    |                     |
+|  LightDirection::Diffuse  |    vec3    |                     |
+| LightDirection::Specular  |    vec3    |                     |
+|   LightPoint::Position    |    vec3    |                     |
+|    LightPoint::Ambient    |    vec3    |                     |
+|    LightPoint::Diffuse    |    vec3    |                     |
+|   LightPoint::Specular    |    vec3    |                     |
+|    LightPoint::Config     |    vec3    |                     |
 
 **目前内建材质变量类型有**(后续会慢慢添加)
 
 Current Buildin Material Values
 
 |    TinyType     |  CommonType   |
-|:---------------:|:-------------:|
+| :-------------: | :-----------: |
 |  UniformI[1-4]  |   int[1-4]    |
 |  UniformF[1-4]  |  float[1-4]   |
 | UniformMat[3-4] | glm::mat[3-4] |
@@ -279,18 +280,75 @@ Current Buildin Material Values
 notice! add uniform value to your material for the gameobject.
 
 ```cpp
-auto material = new Material("Standard/Std1");
-material->addUniform<UniformTex2D>(ShaderParam::TexColor, "../Resource/Image/dragon.jpg");
-material->addUniform<UniformF>(ShaderParam::ModeSpecular, 64.0f);
+auto plane_material = new Material("Standard/Std1");
+//texture is auto loaded in manager,so just put it`s name in function
+plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
+plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
+plane_material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
+//also texture buffer is cached in manager, just put it`s name in here
+plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
+
+auto mr = plane->addComponent<MeshRenderer>();
+mr->setMaterial(plane_material);
 ```
 
-### **默认值 DefaultValue**
+## **着色器 Shader**
 
-除了[`int Version`]为必须值,其他值均为拥有默认值的可选参数
+现在着色器构建器采用组合头文件的方式来自动生成着色器文件
 
-The[`int Version`] should be setted.The other params You can set as your wish.
+ShaderBuilder now combine header files to automatically generate a shader file
 
-### **管线位置 PipelineQueue**
+```cpp
+void ResourceLoader::prepareResource(Engine* engine)
+{
+  ShaderCreator::loadIncludeFiles(FileTool::getRootResDir() + "/Shaders/Include");
+
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std1.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color_depth.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture_depth.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/skybox.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/transparent.glsl");
+  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/shadow_map.glsl");
+
+  ShaderCreator::clearIncludeFiles();
+
+  this->createSomeMode();
+}
+```
+
+你可以在Include文件夹中建立一些通用头文件,避免在各个着色器文件中重复书写
+
+You can create generic header files in the `Include` folder to avoid duplicating each shader file
+
+头文件虽然支持重复包含,但请不要这样做
+
+Header files support repetitive inclusion, but do not do so
+
+着色器文件支持//和/**/两种注释
+
+The shader file supports both // and /**/
+
+```glsl
+file tiny_vs_base.tysl 
+uniform mat4 TINY_MatrixP;
+uniform mat4 TINY_MatrixV;
+uniform mat4 TINY_MatrixM;
+uniform mat3 TINY_MatrixN;
+
+file tiny_vs_shadow.tysl
+uniform mat4 TINY_MatrixLit;
+
+file any shader you need
+#TINY_VS_BEGIN
+{
+    #include "tiny_vs_base"
+    #include "tiny_vs_shadow"
+    ..........
+}
+```
 
 Forward管线位置 ForwardPipeline Position
 
@@ -405,12 +463,16 @@ bool ZWrite = true;
 bool ZWrite = false;
 ```
 
-### **示例 example**
+### **默认值 DefaultValue**
+
+除了[`int Version`]为必须值,其他值均为拥有默认值的可选参数
+
+The[`int Version`] should be setted.The other params You can set as your wish.
 
 ```glsl
 #TINY_HEAD_BEGIN
 {
-    str Name = Standard/Std2;
+    str Name = Standard/Std1;
 }
 #TINY_HEAD_END
 
@@ -418,99 +480,148 @@ bool ZWrite = false;
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Std2;
+        str Name = Std1;
         int Version = 330;
-        int OrderID = 0;
+        int OrderID = 50;
         str Queue = Opaque;
-        bool Lighting = true;
         str DepthTest = Less;
         bool ZWrite = true;
         str CullFace = Back;
-        bool Blend = false;
-        str BlendSrc = 1;
-        str BlendTar = 1-TarA;
     }
     #TINY_CFG_END
 
     #TINY_VS_BEGIN
     {
+        #include "tiny_vs_base"
+        #include "tiny_vs_shadow"
+
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
         layout (location = 2) in vec4 aColor;
         layout (location = 3) in vec2 aUV;
 
-        uniform mat4 TINY_MatrixP;
-        uniform mat4 TINY_MatrixV;
-        uniform mat4 TINY_MatrixM;
-        uniform mat3 TINY_MatrixN;
-
         out vec4 myColor;
         out vec2 myUV;
         out vec3 myNormal;
         out vec3 myWorldPosition;
+        out vec4 myLightPosition;
 
         void main()
         {
             vec4 position =  vec4(aPos, 1.0);
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
-            
+
             myColor = aColor;
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
             myWorldPosition = vec3(TINY_MatrixM * position);
+            myLightPosition = TINY_MatrixLit * vec4(myWorldPosition, 1.0f);
         }
     }
     #TINY_VS_END
 
     #TINY_FS_BEGIN
     {
-        struct TINY_Mateial_Std
-        {
-            sampler2D diffuse;
-            sampler2D specular;
-            float shininess;
-        };
-
-        struct TINY_Light_Direction
-        {
-            vec3 direction;
-            vec3 ambient;
-            vec3 diffuse;
-            vec3 specular;
-        };
+        #include "tiny_fs_struct"
+        #include "tiny_fs_camera"
+        #include "tiny_fs_texture"
 
         in vec4 myColor;
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
-
-        uniform TINY_Mateial_Std TINY_MatStd;
-        uniform TINY_Light_Direction TINY_LightDir;
-        uniform vec3 TINY_ViewPosition;
-    
+        in vec4 myLightPosition;
+        
         out vec4 myFinalColor;
 
-        vec3 calculateDirectionLight(TINY_Light_Direction light, vec3 normal, vec3 viewDir)
+        vec4 reflection(vec3 I)
         {
-            vec3 light_dir = normalize(-light.direction);
+            //vec3 I = normalize(myWorldPosition - TINY_ViewPosition);
+            vec3 R = reflect(I, normalize(myNormal));
+            return vec4(texture(TINY_TexCube, R).rgb, 1.0);
+        }
+
+        vec4 refraction(vec3 I)
+        {
+            float ratio = 1.00 / 1.52;
+            //vec3 I = normalize(myWorldPosition - TINY_ViewPosition);
+            vec3 R = refract(I, normalize(myNormal), ratio);
+            return vec4(texture(TINY_TexCube, R).rgb, 1.0);
+        }
+
+        float calcShadow(vec4 lightPosition, vec3 normal, vec3 lightDir)
+        {
+            // 执行透视除法
+            vec3 projCoords = lightPosition.xyz / lightPosition.w;
+            // 变换到[0,1]的范围
+            projCoords = projCoords * 0.5 + 0.5;
+
+            //超出投影的远平面范围
+            if(projCoords.z > 1.0)
+            {
+                return 0.0;
+            }
+
+            // 取得最近点的深度(使用[0,1]范围下的lightPosition当坐标)
+            float closestDepth = texture(TINY_TexDepth, projCoords.xy).r; 
+            // 取得当前片段在光源视角下的深度
+            float currentDepth = projCoords.z;
+
+            float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+
+            // 检查当前片段是否在阴影中
+            //float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+
+            // PCF
+            float shadow = 0.0;
+            vec2 texelSize = 1.0 / textureSize(TINY_TexDepth, 0);
+            for(int x = -1; x <= 1; ++x)
+            {
+                for(int y = -1; y <= 1; ++y)
+                {
+                    float pcfDepth = texture(TINY_TexDepth, projCoords.xy + vec2(x, y) * texelSize).r; 
+                    shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+                }    
+            }
+            shadow /= 9.0;
+
+            return shadow;
+        }
+
+        vec3 calcDirectionLight(LightDirection lit, vec3 viewDir, vec3 normal)
+        {
+            vec3 light_dir = normalize(-lit.direction);
+
             float diff = max(dot(normal, light_dir), 0.0);
-            vec3 reflect_dir = reflect(-light_dir, normal);
-            float spec = pow(max(dot(viewDir, reflect_dir), 0.0), TINY_MatStd.shininess);
 
-            vec3 ambient = light.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
-            vec3 diffuse = light.diffuse * diff * texture(TINY_MatStd.diffuse, myUV).rgb;
-            vec3 specular = light.specular * spec * texture(TINY_MatStd.specular, myUV).rgb;
+            //vec3 reflect_dir = reflect(-light_dir, normal);
+            vec3 halfwayDir = normalize(light_dir + viewDir); 
+            //float spec = pow(max(dot(viewDir, reflect_dir), 0.0), TINY_MatStd.shininess);
+            float spec = pow(max(dot(normal, halfwayDir), 0.0), TINY_MatStd.shininess);
 
-            return ambient + diffuse + specular;
+            vec3 ambient = lit.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 diffuse = lit.diffuse * diff * texture(TINY_MatStd.diffuse, myUV).rgb;
+            vec3 specular = lit.specular * spec * texture(TINY_MatStd.specular, myUV).rrr;
+
+            // shadow
+            float shadow = calcShadow(myLightPosition, normal, light_dir);
+            vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
+
+            return lighting;
+            //return ambient + diffuse + specular;
+            //return vec4(diffuse, 1.0f);
+            //return vec4(texture(TINY_MatStd.diffuse, myUV).rgb, 1.0f);
         }
 
         void main()
         {
             vec3 normal = normalize(myNormal);
-            vec3 viewDir = normalize(TINY_ViewPosition - myWorldPosition);
+            vec3 view_dir = normalize(TINY_ViewPosition - myWorldPosition);
 
-            vec3 dir_light = calculateDirectionLight(TINY_LightDir, normal, viewDir);
-            myFinalColor = vec4(dir_light, 1.0f);
+            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
+            //myFinalColor = mix(calcDirectionLight(TINY_LitDir, viewDir, normal), reflection(-viewDir), 0.2f);
+            //myFinalColor = reflection(-viewDir);
+            //myFinalColor = refraction();
         }
     }
     #TINY_FS_END
