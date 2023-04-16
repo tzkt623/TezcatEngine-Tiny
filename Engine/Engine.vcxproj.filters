@@ -10,7 +10,7 @@
     <ClCompile Include="Core\Renderer\RenderCommand.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Renderer\VertexGroup.cpp">
+    <ClCompile Include="Core\Renderer\Vertex.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\Renderer\RenderObject.cpp">
@@ -76,7 +76,7 @@
     <ClCompile Include="Core\Component\MeshRenderer.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Manager\VertexGroupManager.cpp">
+    <ClCompile Include="Core\Manager\VertexManager.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\Shader\ShaderParam.cpp">
@@ -243,7 +243,7 @@
     <ClInclude Include="Core\Renderer\RenderCommand.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Renderer\VertexGroup.h">
+    <ClInclude Include="Core\Renderer\Vertex.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\Renderer\RenderObject.h">
@@ -1188,7 +1188,7 @@
     <ClInclude Include="Core\Component\MeshRenderer.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Manager\VertexGroupManager.h">
+    <ClInclude Include="Core\Manager\VertexManager.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\Shader\ShaderParam.h">
@@ -1277,7 +1277,7 @@
     <ClInclude Include="Utility\IDGenerator.h" />
     <ClInclude Include="Utility\Event.h" />
     <ClInclude Include="Utility\Singleton.h" />
-    <ClInclude Include="Core\Tool\DelegateCreator.h" />
+    <ClInclude Include="Utility\DelegateCreator.h" />
     <ClInclude Include="Core\Pipeline\Forward.h" />
     <ClInclude Include="Core\Pipeline\PipelineQueue.h" />
     <ClInclude Include="Core\Layer\LightLayer.h" />

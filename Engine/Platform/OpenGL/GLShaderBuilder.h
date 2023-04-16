@@ -2,7 +2,7 @@
 #include "Core/Head/CppHead.h"
 #include "Core/Head/ConfigHead.h"
 #include "Core/Shader/Uniform.h"
-#include "Core/Shader/ShaderPackage.h"
+#include "Core/Manager/ShaderManager.h"
 
 namespace tezcat::Tiny::GL
 {
@@ -34,13 +34,13 @@ namespace tezcat::Tiny::GL
 		GLShaderBuilder();
 		~GLShaderBuilder();
 		GLShader* loadFromFile(const char* filePath);
+		ShaderPackage* splitPackage(std::string& content);
 
 	private:
 		void loadFromData(GLShader* shader, const char* data, uint32_t shaderType);
 		void parseShaders(GLShader* shader, std::string& content, UniformID::USet& uniformArray);
 		void parseShaderConfig(GLShader* shader, std::string& content);
 		void parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType, UniformID::USet& uniformArray);
-		void splitPackage(std::string& content);
 		void splitPasses(ShaderPackage* pack, std::string& content);
 		ShaderPackage* parsePackageHead(std::string& content);
 

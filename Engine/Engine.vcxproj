@@ -206,10 +206,10 @@
     <ClCompile Include="Core\Manager\ShaderManager.cpp" />
     <ClCompile Include="Core\Base\TinyObject.cpp" />
     <ClCompile Include="Core\Component\Transform.cpp" />
-    <ClCompile Include="Core\Renderer\VertexGroup.cpp" />
+    <ClCompile Include="Core\Renderer\Vertex.cpp" />
     <ClCompile Include="Core\Statistic.cpp" />
     <ClCompile Include="Core\Renderer\Texture.cpp" />
-    <ClCompile Include="Core\Manager\VertexGroupManager.cpp" />
+    <ClCompile Include="Core\Manager\VertexManager.cpp" />
     <ClCompile Include="Core\Shader\ShaderPackage.cpp" />
     <ClCompile Include="Core\Manager\PipelineManager.cpp" />
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
@@ -257,7 +257,7 @@
     <ClInclude Include="Core\Component\GameObject.h" />
     <ClInclude Include="Core\Shader\Uniform.h" />
     <ClInclude Include="Core\Tool\AABB.h" />
-    <ClInclude Include="Core\Tool\DelegateCreator.h" />
+    <ClInclude Include="Utility\DelegateCreator.h" />
     <ClInclude Include="Core\Tool\FrustumCulling.h" />
     <ClInclude Include="Utility\FileTool.h" />
     <ClInclude Include="Platform\OpenGL\GLFrameBuffer.h" />
@@ -290,10 +290,10 @@
     <ClInclude Include="Core\Manager\ShaderManager.h" />
     <ClInclude Include="Core\Base\TinyObject.h" />
     <ClInclude Include="Core\Component\Transform.h" />
-    <ClInclude Include="Core\Renderer\VertexGroup.h" />
+    <ClInclude Include="Core\Renderer\Vertex.h" />
     <ClInclude Include="Core\Statistic.h" />
     <ClInclude Include="Core\Renderer\Texture.h" />
-    <ClInclude Include="Core\Manager\VertexGroupManager.h" />
+    <ClInclude Include="Core\Manager\VertexManager.h" />
     <ClInclude Include="Core\Shader\ShaderPackage.h" />
     <ClInclude Include="Core\Manager\PipelineManager.h" />
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />

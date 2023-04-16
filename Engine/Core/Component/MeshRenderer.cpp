@@ -11,62 +11,57 @@
 #include "../Shader/ShaderPackage.h"
 #include "../Shader/Uniform.h"
 
-#include "../Renderer/VertexGroup.h"
+#include "../Renderer/Vertex.h"
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/VertexBuffer.h"
 #include "../Renderer/ShadowRenderer.h"
 
 #include "../Manager/PipelineManager.h"
-#include "../Manager/VertexGroupManager.h"
+#include "../Manager/VertexManager.h"
 
 
 
 namespace tezcat::Tiny::Core
 {
 	MeshRenderer::MeshRenderer()
-		: MeshRenderer((VertexGroup*)nullptr)
+		: MeshRenderer((Vertex*)nullptr)
 	{
 
 	}
 
 	MeshRenderer::MeshRenderer(MeshData* meshData)
-		: MeshRenderer(VertexGroupCreator::create(meshData))
+		: MeshRenderer(VertexMgr::getInstance()->createVertex(meshData))
 	{
 
 	}
 
-	MeshRenderer::MeshRenderer(VertexGroup* vg)
-		: mVertexGroup(vg)
+	MeshRenderer::MeshRenderer(Vertex* vertex)
+		: mVertex(vertex)
 		, mDrawMode(ContextMap::DrawModeArray[(uint32_t)DrawMode::Triangles])
 		, mMainMaterial(nullptr)
-		, mHasIndex(false)
 		, mIsCastShadow(true)
 	{
-		if (mVertexGroup)
-		{
-			mHasIndex = mVertexGroup->getIndexCount() > 0;
-		}
+
 	}
 
 	MeshRenderer::~MeshRenderer()
 	{
-		mVertexGroup = nullptr;
+		mVertex = nullptr;
 	}
 
 	int MeshRenderer::getVertexCount() const
 	{
-		return mVertexGroup->getVertexCount();
+		return mVertex->getVertexCount();
 	}
 
 	int MeshRenderer::getIndexCount() const
 	{
-		return mVertexGroup->getIndexCount();
+		return mVertex->getIndexCount();
 	}
 
 	void MeshRenderer::setMesh(const std::string& meshName)
 	{
-		mVertexGroup = VertexGroupMgr::getInstance()->getVertexGroup(meshName);
-		mHasIndex = mVertexGroup->getIndexCount() > 0;
+		mVertex = VertexMgr::getInstance()->getVertex(meshName);
 	}
 
 	void MeshRenderer::onEnable()
@@ -110,7 +105,7 @@ namespace tezcat::Tiny::Core
 
 	void MeshRenderer::beginRender()
 	{
-		mVertexGroup->bind();
+		mVertex->bind();
 	}
 
 	void MeshRenderer::submit(Shader* shader)
@@ -129,6 +124,6 @@ namespace tezcat::Tiny::Core
 
 	void MeshRenderer::endRender()
 	{
-		mVertexGroup->unbind();
+		mVertex->unbind();
 	}
 }

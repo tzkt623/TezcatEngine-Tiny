@@ -160,6 +160,7 @@ camera->setFrameBuffer(nullptr);
 Attention! The .exe file must be in the same directory as the resource folder
 
 1. 继承并实现`ResourceLoader`类
+
    Inherit and implement the `ResourceLoader` class
 
     ```cpp
@@ -176,9 +177,11 @@ Attention! The .exe file must be in the same directory as the resource folder
     ```
 
     `prepareEngine`,`prepareResource`,`prepareGame`三个方法会按此顺序依次执行
+
     `prepareEngine`,`prepareResource`,`prepareGame`are invoked in this order
 
 2. 设置自己的资源文件夹名称,程序名称,屏幕大小
+
    Set your **ResourceFolder Name, ProgramName, ScreenSize**
 
     ```cpp
@@ -193,6 +196,7 @@ Attention! The .exe file must be in the same directory as the resource folder
     ```
 
 3. 加载资源文件
+
    Load resource files
 
     ```cpp
@@ -208,6 +212,7 @@ Attention! The .exe file must be in the same directory as the resource folder
     ```
 
 4. 加载第一个Scene
+
    Load first Scene
 
     ```cpp
@@ -281,11 +286,11 @@ notice! add uniform value to your material for the gameobject.
 
 ```cpp
 auto plane_material = new Material("Standard/Std1");
-//texture is auto loaded in manager,so just put it`s name in function
+//texture is auto loaded by manager,so just put it`s name in function
 plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
 plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
 plane_material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
-//also texture buffer is cached in manager, just put it`s name in here
+//also texturebuffer is cached by manager, just put it`s name in here
 plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
 
 auto mr = plane->addComponent<MeshRenderer>();
@@ -301,21 +306,21 @@ ShaderBuilder now combine header files to automatically generate a shader file
 ```cpp
 void ResourceLoader::prepareResource(Engine* engine)
 {
-  ShaderCreator::loadIncludeFiles(FileTool::getRootResDir() + "/Shaders/Include");
+    ShaderMgr::getInstance()->loadIncludeFiles(FileTool::getRootResDir() + "/Shaders/Include");
 
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std1.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/color_depth.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/texture_depth.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/skybox.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/transparent.glsl");
-  ShaderLoader::create(FileTool::getRootResDir() + "/Shaders/Unlit/shadow_map.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Standard/std1.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/color.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/color_depth.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/texture.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/texture_depth.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/skybox.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/transparent.glsl");
+    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/shadow_map.glsl");
 
-  ShaderCreator::clearIncludeFiles();
+    ShaderMgr::getInstance()->clearIncludeFiles();
 
-  this->createSomeMode();
+    this->createSomeMode();
 }
 ```
 
@@ -350,7 +355,7 @@ file any shader you need
 }
 ```
 
-Forward管线位置 ForwardPipeline Position
+### **管线位置 Pipeline Position**
 
 ```cpp
 "Background"    Forward::Background

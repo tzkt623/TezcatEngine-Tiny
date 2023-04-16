@@ -96,10 +96,6 @@ namespace tezcat::Tiny::Core
 			}
 
 			mModelMatrix = glm::translate(mModelMatrix, mLocalPosition);
-			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.x, XAxis);
-			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.y, YAxis);
-			// 			mModelMatrix = glm::rotate(mModelMatrix, m_Rotation.z, ZAxis);
-
 			mModelMatrix = mModelMatrix * glm::mat4_cast(glm::quat(glm::radians(mLocalRotation)));
 			mModelMatrix = glm::scale(mModelMatrix, mLocalScale);
 		}
@@ -203,4 +199,40 @@ namespace tezcat::Tiny::Core
 			mParent->addChild(this);
 		}
 	}
+
+	void Transform::markDirty()
+	{
+		//只要父节点更新
+		//那么子节点必须更新
+		if (!mIsDirty)
+		{
+			mIsDirty = true;
+			mGameObject->getScene()->addUpdateTransform(this);
+
+			if (!mChildren.empty())
+			{
+				for (auto c : mChildren)
+				{
+					c->markDirty();
+				}
+			}
+		}
+	}
+
+	void Transform::markDirty2()
+	{
+		if ((mMask & 1) == 0)
+		{
+			mMask |= 1;
+
+			if (!mChildren.empty())
+			{
+				for (auto c : mChildren)
+				{
+					c->markDirty2();
+				}
+			}
+		}
+	}
+
 }

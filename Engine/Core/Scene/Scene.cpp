@@ -98,6 +98,15 @@ namespace tezcat::Tiny::Core
 			}
 		}
 
+// 		if (!mUpdateTransformList.empty())
+// 		{
+//			std::sort(mUpdateTransformList.begin(), mUpdateTransformList.end(),
+//				[](Transform* a, Transform* b)
+//				{
+//					return a->getIndex() < b->getIndex();
+//				});
+// 		}
+
 		//#TransformUpdate
 		auto it = mTransformList.begin();
 		auto end = mTransformList.end();
@@ -157,4 +166,14 @@ namespace tezcat::Tiny::Core
 		return result;
 	}
 
+	uint32_t Scene::addUpdateTransform(Transform* transform)
+	{
+		mUpdateTransformList.emplace_back(transform);
+		return mUpdateTransformList.size() - 1;
+	}
+
+	void Scene::setUpdateTransform(const uint32_t& index, Transform* transform)
+	{
+		mUpdateTransformList[index] = transform;
+	}
 }

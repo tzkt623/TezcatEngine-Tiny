@@ -25,6 +25,7 @@ namespace tezcat::Tiny::Core
 			mModelMatrix = mat4;
 		}
 
+		const uint32_t& getIndex() const { return mIndex; }
 	public:
 		glm::vec3& getPosition() { return mLocalPosition; }
 		void setPosition(const glm::vec3& val)
@@ -33,12 +34,12 @@ namespace tezcat::Tiny::Core
 			mLocalPosition = val;
 		}
 
-		void setPosition(float val[3])
+		void setPosition(const float& x, const float& y, const float& z)
 		{
 			mIsDirty = true;
-			mLocalPosition.x = val[0];
-			mLocalPosition.y = val[1];
-			mLocalPosition.z = val[2];
+			mLocalPosition.x = x;
+			mLocalPosition.y = y;
+			mLocalPosition.z = z;
 		}
 
 		glm::vec3& getRotation() { return mLocalRotation; }
@@ -48,7 +49,7 @@ namespace tezcat::Tiny::Core
 			mLocalRotation = val;
 		}
 
-		void setRotation(float x, float y, float z)
+		void setRotation(const float& x, const float& y, const float& z)
 		{
 			mIsDirty = true;
 			mLocalRotation.x = x;
@@ -104,6 +105,8 @@ namespace tezcat::Tiny::Core
 		inline glm::mat4x4& getModelMatrix() { return mModelMatrix; }
 		glm::mat4 getWorldToLocalMatrix();
 
+
+
 		void transformPoint(glm::vec3& localPosition);
 		void transformPoint(const glm::vec3& localPosition, glm::vec3& worldPosition);
 		void transformVector(glm::vec3& localVector);
@@ -135,7 +138,12 @@ namespace tezcat::Tiny::Core
 		void onEnable() override;
 		void onDisable() override;
 		void onUpdate() override;
+
 		void updateMatrix(Transform* self);
+
+	private:
+		void markDirty();
+		void markDirty2();
 
 	private:
 		uint32_t mIndex;
@@ -144,6 +152,7 @@ namespace tezcat::Tiny::Core
 
 	private:
 		bool mIsDirty;
+		uint32_t mMask;
 		glm::vec3 mLocalPosition;
 		glm::vec3 mLocalRotation;
 		glm::vec3 mLocalScale;

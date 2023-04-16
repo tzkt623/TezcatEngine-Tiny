@@ -1,7 +1,11 @@
 #pragma once
 
+#include "../Head/Context.h"
+
 namespace tezcat::Tiny::Core
 {
+	class MeshData;
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -11,6 +15,12 @@ namespace tezcat::Tiny::Core
 		RenderCommand();
 		virtual ~RenderCommand();
 
+		const DrawModeWrapper& getDrawMode() { return mDrawMode; }
+		void setDrawMode(DrawMode val);
+
+	private:
+		MeshData* mMeshData;
+		DrawModeWrapper mDrawMode;
 	};
 }
 

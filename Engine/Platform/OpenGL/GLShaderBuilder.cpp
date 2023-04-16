@@ -1,9 +1,10 @@
 #include "GLShaderBuilder.h"
 #include "GLShader.h"
 #include "GLHead.h"
-#include "Core/Manager/ShaderManager.h"
 #include "Core/Head/Context.h"
+#include "Core/Manager/ShaderManager.h"
 #include "Core/Pipeline/PipelineQueue.h"
+#include "Core/Shader/ShaderPackage.h"
 
 
 namespace tezcat::Tiny::GL
@@ -112,7 +113,7 @@ namespace tezcat::Tiny::GL
 		return shader;
 	}
 
-	void GLShaderBuilder::splitPackage(std::string& content)
+	ShaderPackage* GLShaderBuilder::splitPackage(std::string& content)
 	{
 		std::string head, passes;
 		if (splitConfig(content, head, passes, R"(#TINY_HEAD_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_HEAD_END)"))
@@ -120,7 +121,11 @@ namespace tezcat::Tiny::GL
 			auto pack = this->parsePackageHead(head);
 			this->splitPasses(pack, passes);
 			pack->apply();
+
+			return pack;
 		}
+
+		throw std::logic_error("Build Shader Error!");
 	}
 
 	ShaderPackage* GLShaderBuilder::parsePackageHead(std::string& content)
@@ -317,7 +322,7 @@ namespace tezcat::Tiny::GL
 				std::string inlcude_data;
 				for (auto& s : include_ary)
 				{
-					inlcude_data += ShaderCreator::getIncludeContent(s);
+					inlcude_data += ShaderMgr::getInstance()->getIncludeContent(s);
 				}
 
 				shader_content = inlcude_data + shader_content;
@@ -444,7 +449,8 @@ namespace tezcat::Tiny::GL
 
 	ShaderPackage* GLShaderCreator::create(const std::string& filePath)
 	{
-		GLShaderBuilder().loadFromFile(filePath.c_str());
-		return nullptr;
+		auto data = FileTool::loadText(filePath);
+		GLShaderBuilder builder;
+		return builder.splitPackage(data);
 	}
 }

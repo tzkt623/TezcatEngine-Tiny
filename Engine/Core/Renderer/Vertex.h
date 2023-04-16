@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Head/CppHead.h"
-#include "../Tool/DelegateCreator.h"
 #include "../Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
@@ -12,11 +11,11 @@ namespace tezcat::Tiny::Core
 	/// <summary>
 	/// 对应gl的VAO
 	/// </summary>
-	class TINY_API VertexGroup
+	class TINY_API Vertex
 	{
 	public:
-		VertexGroup();
-		virtual ~VertexGroup();
+		Vertex();
+		virtual ~Vertex();
 
 	public:
 		std::string getName() const { return mName; }
@@ -24,6 +23,8 @@ namespace tezcat::Tiny::Core
 		int getVertexCount() const { return mVertexCount; }
 		int getIndexCount() const { return mIndexCount; }
 		unsigned int getUID() const { return mUID; }
+
+		void addChild(Vertex* vertex);
 
 	public:
 		virtual void init(MeshData* mesh) = 0;
@@ -38,14 +39,16 @@ namespace tezcat::Tiny::Core
 		int mIndexCount;
 
 		VertexBuffer* mVertexBuffer;
+
+		std::vector<Vertex*>* mChildren;
 	};
 
-	class VertexGroupCreatorImp
+	class TINY_API VertexGroupCreatorImp
 	{
 	public:
 		virtual ~VertexGroupCreatorImp() = default;
-		virtual VertexGroup* create(MeshData* meshData) = 0;
+		virtual Vertex* create(MeshData* meshData) = 0;
 	};
 
-	using VertexGroupCreator = DelegateCreator<VertexGroupCreatorImp, VertexGroup>;
+	//using VertexGroupCreator = DelegateCreator<VertexGroupCreatorImp, Vertex>;
 }

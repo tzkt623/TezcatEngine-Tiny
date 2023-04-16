@@ -27,7 +27,7 @@ namespace tezcat::Tiny::GL
 		void clear(const ClearOption& option) override;
 		void draw(IRenderMesh* renderMesh) override;
 		void draw(MeshRenderer* renderer) override;
-		void draw(VertexGroup* group, DrawModeWrapper drawMode) override;
+		void draw(Vertex* group, DrawModeWrapper drawMode) override;
 
 	private:
 		void initContext();

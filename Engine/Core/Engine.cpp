@@ -3,7 +3,7 @@
 #include "Manager/ShaderManager.h"
 #include "Manager/SceneManager.h"
 #include "Manager/CameraManager.h"
-#include "Manager/VertexGroupManager.h"
+#include "Manager/VertexManager.h"
 #include "Manager/PipelineManager.h"
 #include "Manager/FrameBufferManager.h"
 #include "Manager/TextureManager.h"
@@ -33,12 +33,13 @@ namespace tezcat::Tiny::Core
 		, mFrameBufferManager(new FrameBufferManager())
 		, mTextureManager(new TextureManager())
 		, mPipelineManager(new PipelineManager())
+		, mVertexManager(new VertexManager())
 		, mInputSystem(new InputSystem())
 		, mGraphics(nullptr)
 		, mIsRunning(true)
 	{
 
-		new VertexGroupManager();
+		new VertexManager();
 	}
 
 	Engine::~Engine()

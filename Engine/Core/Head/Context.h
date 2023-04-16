@@ -164,11 +164,11 @@ namespace tezcat::Tiny::Core
 		Addition
 	};
 
-	enum TINY_API VertexMask : uint32_t
+	enum TINY_API VertexPosition : uint32_t
 	{
 		Position = 0,
 		Normal,
-		ColorComponent,
+		Color,
 		UV
 	};
 

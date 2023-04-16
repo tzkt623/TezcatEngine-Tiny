@@ -6,7 +6,7 @@
 
 namespace tezcat::Tiny::Core
 {
-	class VertexGroup;
+	class Vertex;
 	class Shader;
 	class Material;
 	class MeshData;
@@ -15,11 +15,11 @@ namespace tezcat::Tiny::Core
 	public:
 		MeshRenderer();
 		MeshRenderer(MeshData* meshData);
-		MeshRenderer(VertexGroup* vg);
+		MeshRenderer(Vertex* vg);
 		virtual ~MeshRenderer();
 
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::MeshRenderer; }
-		VertexGroup* getVertexGroup() const { return mVertexGroup; }
+		Vertex* getVertexGroup() const { return mVertex; }
 
 		Material* getMaterial() const override { return mMainMaterial; }
 		void setMaterial(Material* val)
@@ -37,9 +37,10 @@ namespace tezcat::Tiny::Core
 		DrawModeWrapper& getDrawMode() final { return mDrawMode; }
 		void setDrawMode(DrawMode val) { mDrawMode = ContextMap::DrawModeArray[(int)val]; }
 
-		bool hasIndex() const { return mHasIndex; }
 		int getVertexCount() const final;
 		int getIndexCount() const final;
+
+		void setCastShadow(bool val) { mIsCastShadow = val; }
 
 	protected:
 		void onEnable() override;
@@ -48,9 +49,8 @@ namespace tezcat::Tiny::Core
 
 	private:
 		bool mIsCastShadow;
-		bool mHasIndex;
 		DrawModeWrapper mDrawMode;
-		VertexGroup* mVertexGroup;
+		Vertex* mVertex;
 		Material* mMainMaterial;
 	};
 }

@@ -73,4 +73,16 @@ namespace tezcat::Tiny::Core
 			}
 		}
 	}
+
+	void IRenderObserver::setFrameBuffer(FrameBuffer* val)
+	{
+		if (val == nullptr)
+		{
+			mFrameBuffer = FrameBuffer::getDefaultBuffer();
+		}
+		else
+		{
+			mFrameBuffer = val;
+		}
+	}
 }

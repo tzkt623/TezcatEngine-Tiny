@@ -184,15 +184,16 @@ namespace tezcat::Tiny::Core
 		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
 
 		FrameBuffer* getFrameBuffer() const { return mFrameBuffer; }
-		void setFrameBuffer(FrameBuffer* val) { mFrameBuffer = val; }
-		void setViewRect(int x, int y, int width, int height);
+		void setFrameBuffer(FrameBuffer* val);
 
+		void setViewRect(int x, int y, int width, int height);
 		ViewportInfo& getViewportInfo() { return mViewInfo; }
 		glm::mat4& getProjectionMatrix() { return mProjectionMatrix; }
 
-		virtual glm::mat4& getViewMatrix() = 0;
 		void setOrtho(float near, float far);
 		void setPerspective(float fov, float near, float far);
+
+		virtual glm::mat4& getViewMatrix() = 0;
 		void updateObserverMatrix();
 
 	protected:

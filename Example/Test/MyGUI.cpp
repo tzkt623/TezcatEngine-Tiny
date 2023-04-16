@@ -123,7 +123,7 @@ void MyMainCameraWindow::init()
 
 	mPosition->postFunction = [this](float* data)
 	{
-		mMainCamera->getTransform()->setPosition(data);
+		mMainCamera->getTransform()->setPosition(data[0], data[1], data[2]);
 	};
 
 

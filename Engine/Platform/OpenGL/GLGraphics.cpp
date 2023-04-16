@@ -27,16 +27,12 @@ namespace tezcat::Tiny::GL
 	{
 		TextureMgr::getInstance()->initCreator(new GLTextureCreator());
 		FrameBufferMgr::getInstance()->initCreator(new GLFrameBufferCreator());
-
-		VertexBufferCreator::attach(new GLVertexBufferCreator());
-		VertexGroupCreator::attach(new GLVertexGroupCreator());
-		ShaderLoader::attach(new GLShaderCreator());
+		VertexMgr::getInstance()->initCreator(new GLVertexCreator());
+		ShaderMgr::getInstance()->initCreator(new GLShaderCreator());
 	}
 
 	GLGraphics::~GLGraphics()
 	{
-		VertexBufferCreator::destroy();
-		VertexGroupCreator::destroy();
 		mWindow = nullptr;
 	}
 
@@ -180,7 +176,7 @@ namespace tezcat::Tiny::GL
 
 	void GLGraphics::draw(MeshRenderer* renderer)
 	{
-		if (renderer->hasIndex())
+		if (renderer->getIndexCount() > 0)
 		{
 			glDrawElements(renderer->getDrawMode().platform, renderer->getIndexCount(), GL_UNSIGNED_INT, nullptr);
 		}
@@ -190,7 +186,7 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLGraphics::draw(VertexGroup* group, DrawModeWrapper drawMode)
+	void GLGraphics::draw(Vertex* group, DrawModeWrapper drawMode)
 	{
 		if (group->getIndexCount() > 0)
 		{

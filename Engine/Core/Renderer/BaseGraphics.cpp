@@ -15,6 +15,8 @@
 #include "../Component/MeshRenderer.h"
 #include "../Component/Light.h"
 
+#include "../Data/MeshData.h"
+
 #include "../Statistic.h"
 
 
@@ -67,4 +69,13 @@ namespace tezcat::Tiny::Core
 	{
 		ShadowRenderer::init(0, 0, width, height);
 	}
+
+	void BaseGraphics::drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color)
+	{
+		MeshData* meshdata = new MeshData();
+		meshdata->vertices.emplace_back(begin);
+		meshdata->vertices.emplace_back(end);
+
+	}
+
 }

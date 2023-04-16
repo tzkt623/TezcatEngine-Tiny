@@ -37,8 +37,6 @@ namespace tezcat::Tiny::Core
 		mRenderObjectList.emplace_back(renderObject);
 	}
 
-
-
 	void RenderLayer::culling(IRenderObserver* renderObserver, const RenderPassType& passType)
 	{
 		if (mRenderObjectList.empty())
@@ -50,7 +48,7 @@ namespace tezcat::Tiny::Core
 		auto end = mRenderObjectList.end();
 		while (it != end)
 		{
-			auto com = (Component*)(*it);
+			auto com = dynamic_cast<Component*>(*it);
 			if (com->isEnable())
 			{
 				if (renderObserver->culling(com->getGameObject()))

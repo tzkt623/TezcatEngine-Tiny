@@ -4,11 +4,11 @@
 
 namespace tezcat::Tiny::GL
 {
-	GLVertexBuffer::GLVertexBuffer(MeshData* meshData)
+	GLVertexBuffer::GLVertexBuffer()
 		: mVBOSize(0)
 		, mVBOArray(nullptr)
 	{
-		this->init(meshData);
+
 	}
 
 	GLVertexBuffer::~GLVertexBuffer()
@@ -29,8 +29,8 @@ namespace tezcat::Tiny::GL
 			glBindBuffer(GL_ARRAY_BUFFER, mVBOArray[vbo_index++]);
 			glBufferData(GL_ARRAY_BUFFER, meshData->vertexSize(), meshData->vertices.data(), GL_STATIC_DRAW);
 
-			glVertexAttribPointer(VertexMask::Position, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-			glEnableVertexAttribArray(VertexMask::Position);
+			glVertexAttribPointer(VertexPosition::Position, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+			glEnableVertexAttribArray(VertexPosition::Position);
 		}
 
 		if (!meshData->normals.empty())
@@ -38,8 +38,8 @@ namespace tezcat::Tiny::GL
 			glBindBuffer(GL_ARRAY_BUFFER, mVBOArray[vbo_index++]);
 			glBufferData(GL_ARRAY_BUFFER, meshData->normalSize(), meshData->normals.data(), GL_STATIC_DRAW);
 
-			glVertexAttribPointer(VertexMask::Normal, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-			glEnableVertexAttribArray(VertexMask::Normal);
+			glVertexAttribPointer(VertexPosition::Normal, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+			glEnableVertexAttribArray(VertexPosition::Normal);
 		}
 
 		if (!meshData->colors.empty())
@@ -47,8 +47,8 @@ namespace tezcat::Tiny::GL
 			glBindBuffer(GL_ARRAY_BUFFER, mVBOArray[vbo_index++]);
 			glBufferData(GL_ARRAY_BUFFER, meshData->colorSize(), meshData->colors.data(), GL_STATIC_DRAW);
 
-			glVertexAttribPointer(VertexMask::ColorComponent, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
-			glEnableVertexAttribArray(VertexMask::ColorComponent);
+			glVertexAttribPointer(VertexPosition::Color, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
+			glEnableVertexAttribArray(VertexPosition::Color);
 		}
 
 		if (!meshData->uv.empty())
@@ -56,8 +56,8 @@ namespace tezcat::Tiny::GL
 			glBindBuffer(GL_ARRAY_BUFFER, mVBOArray[vbo_index++]);
 			glBufferData(GL_ARRAY_BUFFER, meshData->uvSize(), meshData->uv.data(), GL_STATIC_DRAW);
 
-			glVertexAttribPointer(VertexMask::UV, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
-			glEnableVertexAttribArray(VertexMask::UV);
+			glVertexAttribPointer(VertexPosition::UV, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+			glEnableVertexAttribArray(VertexPosition::UV);
 		}
 
 		if (!meshData->indices.empty())
@@ -68,27 +68,23 @@ namespace tezcat::Tiny::GL
 	}
 
 	//
-	GLVertexGroup::GLVertexGroup(MeshData* meshData)
+	GLVertex::GLVertex()
 	{
-		this->init(meshData);
+		glGenVertexArrays(1, &mUID);
 	}
 
-	GLVertexGroup::~GLVertexGroup()
+	GLVertex::~GLVertex()
 	{
+		glDeleteVertexArrays(1, &mUID);
 		delete mVertexBuffer;
 	}
 
-	void GLVertexGroup::init(MeshData* meshData)
+	void GLVertex::init(MeshData* meshData)
 	{
-		if (mUID != 0)
-		{
-			return;
-		}
-
-		glGenVertexArrays(1, &mUID);
 		glBindVertexArray(mUID);
 
-		mVertexBuffer = new GLVertexBuffer(meshData);
+		mVertexBuffer = new GLVertexBuffer();
+		mVertexBuffer->init(meshData);
 
 		glBindVertexArray(0);
 
@@ -97,24 +93,41 @@ namespace tezcat::Tiny::GL
 		mIndexCount = static_cast<int>(meshData->indices.size());
 	}
 
-	void GLVertexGroup::bind()
+	void GLVertex::bind()
 	{
 		glBindVertexArray(mUID);
 	}
 
-	void GLVertexGroup::unbind()
+	void GLVertex::unbind()
 	{
 		glBindVertexArray(0);
 	}
 
-	VertexBuffer* GLVertexBufferCreator::create(MeshData* meshData)
+	//-------------------------------------------------
+	//
+	//
+	//
+	//
+	GLVertexCreator::GLVertexCreator()
 	{
-		return new GLVertexBuffer(meshData);
+
 	}
 
-	VertexGroup* GLVertexGroupCreator::create(MeshData* meshData)
+	GLVertexCreator::~GLVertexCreator()
 	{
-		return new GLVertexGroup(meshData);
+
 	}
+
+	VertexBuffer* GLVertexCreator::createVertexBuffer()
+	{
+		return new GLVertexBuffer();
+	}
+
+	Vertex* GLVertexCreator::createVertex()
+	{
+		return new GLVertex();
+	}
+
+
 
 }

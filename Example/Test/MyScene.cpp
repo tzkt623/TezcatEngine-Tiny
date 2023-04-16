@@ -37,6 +37,18 @@ void MyScene::onEnter()
 
 	if (true)
 	{
+		auto go = new GameObject("InfinitePlane");
+		go->addComponent<Transform>()->setPosition(0.0f, 0.0f, 0.0f);
+		auto mr = go->addComponent<MeshRenderer>();
+		mr->setCastShadow(false);
+		mr->setMesh("GridSquare");
+		auto material = new Material("Utility/InfiniteGrid");
+		mr->setMaterial(material);
+	}
+
+
+	if (true)
+	{
 		auto go = new GameObject("World1_Camera");
 		auto camera = go->addComponent<Camera>(true);
 		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
@@ -150,7 +162,7 @@ void MyScene::onEnter()
 	//方向光的位置理论上不应该影响阴影投射
 	if (true)
 	{
-		auto direction_light_go = new GameObject();
+		auto direction_light_go = new GameObject("DirectionLight");
 		direction_light_go->addComponent<Transform>();
 		direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 600.0f));
 		direction_light_go->getTransform()->setScale(glm::vec3(100.0f));
@@ -158,6 +170,7 @@ void MyScene::onEnter()
 
 		auto mr = direction_light_go->addComponent<MeshRenderer>();
 		auto light_material = new Material("Unlit/Color");
+		mr->setCastShadow(false);
 		mr->setMaterial(light_material);
 		mr->setMesh("Sphere");
 
@@ -174,7 +187,7 @@ void MyScene::onEnter()
 	//灯光深度图
 	if (true)
 	{
-		auto lit_depth = new GameObject();
+		auto lit_depth = new GameObject("TextureDepth");
 		lit_depth->addComponent<Transform>();
 		lit_depth->getTransform()->setPosition(glm::vec3(960.0f, 0.0f, 0.0f));
 		lit_depth->getTransform()->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
@@ -189,6 +202,7 @@ void MyScene::onEnter()
 		mr->setMesh("Square");
 	}
 
+	///图片
 	if (true)
 	{
 		//-------------------------------------------------
@@ -239,7 +253,7 @@ void MyScene::onEnter()
 	//
 	if (true)
 	{
-		auto plane = new GameObject();
+		auto plane = new GameObject("Plane");
 		plane->addComponent<Transform>();
 		plane->getTransform()->setPosition(glm::vec3(0.0f, -20.0f, 0.0f));
 		plane->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -260,18 +274,18 @@ void MyScene::onEnter()
 	//
 	//	Transparent
 	//
-	if (false)
+	if (true)
 	{
 		std::random_device rd;
 		std::mt19937 gen(rd());
-		std::uniform_int_distribution<> dis(-2000, 2000);
+		std::uniform_int_distribution<> dis(-300, 300);
 
 		for (int i = 0; i < 20; i++)
 		{
 			auto go = new GameObject();
 			go->addComponent<Transform>();
-			go->getTransform()->setPosition(glm::vec3(dis(gen) / 100.0f, dis(gen) / 100.0f, dis(gen) / 100.0f));
-			go->getTransform()->setScale(glm::vec3(3.0f, 3.0f, 1.0f));
+			go->getTransform()->setPosition(glm::vec3(dis(gen), dis(gen), dis(gen)));
+			go->getTransform()->setScale(glm::vec3(30.0f, 30.0f, 1.0f));
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Unlit/Transparent");

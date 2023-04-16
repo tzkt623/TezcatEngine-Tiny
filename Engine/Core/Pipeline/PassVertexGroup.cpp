@@ -1,6 +1,6 @@
 #include "PassVertexGroup.h"
 #include "../Renderer/RenderPass.h"
-#include "../Renderer/VertexGroup.h"
+#include "../Renderer/Vertex.h"
 #include "../Statistic.h"
 #include "../Shader/Shader.h"
 #include "../Component/MeshRenderer.h"
@@ -8,7 +8,7 @@
 
 namespace tezcat::Tiny::Core
 {
-	PassVertexGroup::PassVertexGroup(VertexGroup* vg)
+	PassVertexGroup::PassVertexGroup(Vertex* vg)
 		: mDelegateVertexGroup(vg)
 	{
 

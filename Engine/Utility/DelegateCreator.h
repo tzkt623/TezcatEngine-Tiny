@@ -1,6 +1,6 @@
 #pragma once
-#include "../Head/CppHead.h"
-#include "../Head/ConfigHead.h"
+#include "Core/Head/CppHead.h"
+#include "Core/Head/ConfigHead.h"
 
 namespace tezcat::Tiny::Core
 {

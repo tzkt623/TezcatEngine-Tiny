@@ -7,17 +7,17 @@ namespace tezcat::Tiny::Core
 {
 	class MeshRenderer;
 	class Shader;
-	class VertexGroup;
+	class Vertex;
 	class TINY_API PassVertexGroup
 	{
 	public:
-		PassVertexGroup(VertexGroup* vao);
+		PassVertexGroup(Vertex* vao);
 		~PassVertexGroup();
 		void addRenderObject(MeshRenderer* renderAgent);
 		bool empty() const { return mMeshRendererList.empty(); }
 
 	private:
-		VertexGroup* mDelegateVertexGroup;
+		Vertex* mDelegateVertexGroup;
 		std::list<MeshRenderer*> mMeshRendererList;
 	};
 }

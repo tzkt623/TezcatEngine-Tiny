@@ -11,7 +11,7 @@
 #include "../Component/MeshRenderer.h"
 #include "../Component/Light.h"
 
-#include "../Renderer/VertexGroup.h"
+#include "../Renderer/Vertex.h"
 #include "../Renderer/BaseGraphics.h"
 #include "../Renderer/RenderObject.h"
 

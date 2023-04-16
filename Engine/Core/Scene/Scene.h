@@ -16,6 +16,7 @@ namespace tezcat::Tiny::Core
 	class TINY_API Scene
 	{
 		friend class GameObject;
+		friend class Transform;
 	public:
 		Scene(const std::string& name);
 		virtual ~Scene();
@@ -33,7 +34,6 @@ namespace tezcat::Tiny::Core
 	public:
 		void addLogicFunction(void* gameObject, const std::function<void()>& function);
 		void removeLogicFunction(void* gameObject);
-		void addParentChangedTransform(Transform* transform);
 		void addTransform(Transform* transform);
 
 	private:
@@ -47,17 +47,17 @@ namespace tezcat::Tiny::Core
 		std::vector<GameObject*> findGameObjects(const std::string& name);
 
 	private:
+		uint32_t addUpdateTransform(Transform* transform);
+		void setUpdateTransform(const uint32_t& index, Transform* transform);
+
+	private:
 		std::string mName;
 		std::list<GameObject*> mObjectList;
 		std::list<GameObject*> mNewObjectList;
-
 		std::list<Transform*> mTransformList;
+		std::vector<Transform*> mUpdateTransformList;
 
 		std::unordered_map<void*, std::function<void()>> mLogicList;
-
-		std::vector<RenderLayer*> m_RenderLayerList;
-		std::vector<LightLayer*> m_LightLayerList;
-
 	private:
 		//灯光数据
 		LightData* mLightData;

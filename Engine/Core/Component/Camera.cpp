@@ -182,6 +182,7 @@ namespace tezcat::Tiny::Core
 
 		shader->setViewPosition(this->getTransform()->getWorldPosition());
 		shader->setMat4(ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(view_model))));
+		shader->setFloat2(ShaderParam::ViewNearFar, glm::vec2(mNearFace, mFarFace));
 	}
 
 	void Camera::beginRender()

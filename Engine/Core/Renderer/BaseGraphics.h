@@ -1,13 +1,15 @@
 #pragma once
 #include "../Head/ConfigHead.h"
 #include "../Head/Context.h"
+#include "../Head/GLMHead.h"
+
 #include "../Shader/Uniform.h"
 #include "Utility/Utility.h"
 #include "RenderConfig.h"
 
 namespace tezcat::Tiny::Core
 {
-	class VertexGroup;
+	class Vertex;
 	class MeshRenderer;
 	class Engine;
 	class RenderLayer;
@@ -40,7 +42,10 @@ namespace tezcat::Tiny::Core
 	public:
 		virtual void draw(IRenderMesh* renderMesh) = 0;
 		virtual void draw(MeshRenderer* renderer) = 0;
-		virtual void draw(VertexGroup* group, DrawModeWrapper drawMode) = 0;
+		virtual void draw(Vertex* group, DrawModeWrapper drawMode) = 0;
+
+	public:
+		virtual void drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color = glm::vec3(0.0f, 1.0f, 0.0f));
 	};
 
 	using Graphics = SG<BaseGraphics>;

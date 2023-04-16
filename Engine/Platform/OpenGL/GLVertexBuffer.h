@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Core/Renderer/VertexBuffer.h"
-#include "Core/Renderer/VertexGroup.h"
+#include "Core/Renderer/Vertex.h"
+#include "Core/Manager/VertexManager.h"
 #include "Core/Head/GLMHead.h"
 
 using namespace tezcat::Tiny::Core;
@@ -10,10 +11,9 @@ namespace tezcat::Tiny::GL
 	class TINY_API GLVertexBuffer : public VertexBuffer
 	{
 	public:
-		GLVertexBuffer(MeshData* meshData);
+		GLVertexBuffer();
 		virtual ~GLVertexBuffer();
 
-	protected:
 		void init(MeshData* meshData) override;
 
 	private:
@@ -22,27 +22,24 @@ namespace tezcat::Tiny::GL
 	};
 
 
-	class TINY_API GLVertexGroup : public VertexGroup
+	class TINY_API GLVertex : public Vertex
 	{
 	public:
-		GLVertexGroup(MeshData* meshData);
-		virtual ~GLVertexGroup();
+		GLVertex();
+		virtual ~GLVertex();
 
-		void init(MeshData* mesh) override;
+		void init(MeshData* meshData) override;
 		void bind() override;
 		void unbind() override;
 	};
 
 
-	class TINY_API GLVertexBufferCreator : public VertexBufferCreatorImp
+	class TINY_API GLVertexCreator : public VertexCreator
 	{
 	public:
-		VertexBuffer* create(MeshData* meshData) override;
-	};
-
-	class TINY_API GLVertexGroupCreator : public VertexGroupCreatorImp
-	{
-	public:
-		VertexGroup* create(MeshData* meshData) override;
+		GLVertexCreator();
+		virtual ~GLVertexCreator();
+		VertexBuffer* createVertexBuffer() override;
+		Vertex* createVertex() override;
 	};
 }

@@ -6,11 +6,21 @@
 
 namespace tezcat::Tiny::Core
 {
+	/// <summary>
+	/// mesh数据
+	/// 只有父节点会被保存到管理器中
+	/// 子节点数据一般都是用来组成整个mesh
+	/// 所以并不需要单独存储使用
+	/// </summary>
 	class TINY_API MeshData
 	{
 	public:
+		MeshData();
 		MeshData(const std::string& name);
+		MeshData(MeshData&& other) noexcept;
 		~MeshData();
+
+		const std::string& getName() { return name; }
 
 		size_t vertexSize()
 		{
@@ -39,18 +49,25 @@ namespace tezcat::Tiny::Core
 
 		int getBufferSize();
 
-		const std::string& getName() { return mName; }
-
-		void apply();
+	public:
+		bool hasChildren() { return mChildrenData != nullptr; }
+		void addChild(MeshData* meshData);
+		const std::vector<MeshData*>& getChildren() { return *mChildrenData; }
 
 	public:
-		std::string mName;
+		MeshData& operator=(MeshData&& other) noexcept;
+
+	public:
+		std::string name;
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec4> colors;
 		std::vector<glm::vec2> uv;
 
 		std::vector<unsigned int> indices;
+
+	private:
+		std::vector<MeshData*>* mChildrenData;
 	};
 }
 

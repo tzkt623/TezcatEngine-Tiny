@@ -4,7 +4,7 @@
 
 namespace tezcat::Tiny::Core
 {
-	class VertexGroup;
+	class Vertex;
 	class Skybox : public ComponentT<Skybox>, public IRenderMesh
 	{
 	public:
@@ -32,7 +32,7 @@ namespace tezcat::Tiny::Core
 	private:
 		DrawModeWrapper mDrawMode;
 		Material* mMaterial;
-		VertexGroup* mVertexGroup;
+		Vertex* mVertexGroup;
 	};
 }
 

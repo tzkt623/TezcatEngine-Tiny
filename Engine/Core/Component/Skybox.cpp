@@ -6,16 +6,16 @@
 #include "../Shader/ShaderPackage.h"
 #include "../Manager/PipelineManager.h"
 #include "../Renderer/RenderPass.h"
-#include "../Renderer/VertexGroup.h"
+#include "../Renderer/Vertex.h"
 #include "../Renderer/BaseGraphics.h"
 #include "../Layer/RenderLayer.h"
 
-#include "../Manager/VertexGroupManager.h"
+#include "../Manager/VertexManager.h"
 
 namespace tezcat::Tiny::Core
 {
 	Skybox::Skybox()
-		: mVertexGroup(VertexGroupMgr::getInstance()->getVertexGroup("Skybox"))
+		: mVertexGroup(VertexMgr::getInstance()->getVertex("Skybox"))
 		, mDrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
 		, mMaterial(nullptr)
 	{
