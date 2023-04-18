@@ -134,6 +134,7 @@ namespace tezcat::Tiny::Core
 		virtual void setInt4(UniformID& uniform, int* data) = 0;
 
 		virtual void setMat3(UniformID& uniform, float* data) = 0;
+		virtual void setMat3(UniformID& uniform, const glm::mat3& mat3) = 0;
 		virtual void setMat4(UniformID& uniform, const float* data) = 0;
 
 		virtual void setTexture2D(UniformID& uniform, Texture2D* data) = 0;

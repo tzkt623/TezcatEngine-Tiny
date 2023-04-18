@@ -17,51 +17,53 @@ MyInputer::~MyInputer()
 void MyInputer::processInput(InputSystem* system)
 {
 	float speed = 100 * Engine::getDeltaTime();
-	bool transform = false;
+	bool flag = false;
+	auto transform = mController->getTransform();
 	glm::vec3 position(0.0f);
 
 	if (system->getKeyDown(GLFW_KEY_W))
 	{
-		transform = true;
-		position += mController->getFront() * speed;
+		flag = true;
+		position += mController->getForward() * speed;
 	}
 	else if (system->getKeyDown(GLFW_KEY_S))
 	{
-		transform = true;
-		position -= mController->getFront() * speed;
+		flag = true;
+		position -= mController->getForward() * speed;
 	}
 
 	if (system->getKeyDown(GLFW_KEY_A))
 	{
-		transform = true;
+		flag = true;
 		position -= mController->getRight() * speed;
 	}
 	else if (system->getKeyDown(GLFW_KEY_D))
 	{
-		transform = true;
+		flag = true;
 		position += mController->getRight() * speed;
 	}
 
 	if (system->getKeyDown(GLFW_KEY_R))
 	{
-		transform = true;
+		flag = true;
 		position += mController->getUp() * speed;
 	}
 	else if (system->getKeyDown(GLFW_KEY_F))
 	{
-		transform = true;
+		flag = true;
 		position -= mController->getUp() * speed;
 
 	}
-// 	if (system->getKeyDown(GLFW_KEY_Q))
-// 	{
-// 		mController->roll(-speed);
-// 	}
-// 	else if (system->getKeyDown(GLFW_KEY_E))
-// 	{
-// 		mController->roll(speed);
-// 	}
+	if (system->getKeyDown(GLFW_KEY_Q))
+	{
+		mController->roll(-speed);
+	}
+	else if (system->getKeyDown(GLFW_KEY_E))
+	{
+		mController->roll(speed);
+	}
 
+	float rollspeed = 20 * Engine::getDeltaTime();
 	float current_x;
 	float current_y;
 	system->getMousePosition(current_x, current_y);
@@ -87,7 +89,9 @@ void MyInputer::processInput(InputSystem* system)
 			mLastX = current_x;
 			mLastY = current_y;
 
-			mController->yawPitch(offset_x, offset_y);
+			mController->yawPitch(-offset_x * rollspeed, offset_y * rollspeed);
+
+			//mController->getTransform()->rotate(glm::vec3(offset_y * rollspeed, offset_x * rollspeed, 0));
 		}
 	}
 	else
@@ -95,9 +99,9 @@ void MyInputer::processInput(InputSystem* system)
 		mLockMouse = true;
 	}
 
-	if (transform)
+	if (flag)
 	{
-		mController->getTransform()->translate(position);
+		mController->translate(position);
 	}
 	else
 	{

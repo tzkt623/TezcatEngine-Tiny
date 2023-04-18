@@ -43,5 +43,10 @@ namespace tezcat::Tiny::Core
 		mChildren->push_back(vertex);
 	}
 
+	void Vertex::init(MeshData* mesh)
+	{
+		mDrawMode = mesh->drawMode;
+	}
+
 }
 

@@ -21,6 +21,18 @@ namespace tezcat::Tiny::Core
 		return mVertexUMap[name];
 	}
 
+	Vertex* VertexManager::getVertex(MeshData* meshData)
+	{
+		auto vertex = this->findVertex(meshData->getName());
+
+		if (vertex == nullptr)
+		{
+			vertex = this->createVertex(meshData);
+		}
+
+		return vertex;
+	}
+
 	void VertexManager::addMeshData(MeshData* meshData)
 	{
 		if (meshData->getName().empty())
@@ -40,6 +52,17 @@ namespace tezcat::Tiny::Core
 				delete meshData;
 			}
 		}
+	}
+
+	Vertex* VertexManager::findVertex(const std::string& name)
+	{
+		auto it = mVertexUMap.find(name);
+		if (it != mVertexUMap.end())
+		{
+			return it->second;
+		}
+
+		return nullptr;
 	}
 
 	MeshData* VertexManager::findMeshData(const std::string& name)

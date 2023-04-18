@@ -38,22 +38,6 @@ namespace tezcat::Tiny::Core
 
 	void Forward::render(BaseGraphics* graphics, Camera* camera)
 	{
-		//阴影渲染
-		//阴影不需要背景层的物体
-		auto dir_light = LightMgr::getInstance()->getDirectionalLight();
-		auto& dir_light_culls = dir_light->getCullLayerList();
-
-		//剔除到阴影通道
-		for (auto index : dir_light_culls)
-		{
-			RenderLayer::getRenderLayer(index)->culling(dir_light, RenderPassType::Shadow);
-		}
-
-		ShadowRenderer::beginRender();
-		ShadowRenderer::render(graphics, dir_light);
-		ShadowRenderer::endRender();
-
-
 		//正常渲染
 		auto& cull_list = camera->getCullLayerList();
 		for (auto index : cull_list)
@@ -69,6 +53,7 @@ namespace tezcat::Tiny::Core
 
 		sBackground->render(graphics, camera);
 
+		auto dir_light = LightMgr::getInstance()->getDirectionalLight();
 		auto& point_lights = LightMgr::getInstance()->getPointLights();
 
 		sGeometry->render(graphics, camera, dir_light);

@@ -10,6 +10,7 @@ namespace tezcat::Tiny::Core
 	UniformID ShaderParam::MatrixSBV;
 	UniformID ShaderParam::MatrixLit;
 
+	UniformID ShaderParam::ScreenLength;
 	UniformID ShaderParam::ViewPosition;
 	UniformID ShaderParam::ViewNearFar;
 
@@ -40,6 +41,16 @@ namespace tezcat::Tiny::Core
 	UniformID ShaderParam::StdMaterial::Specular;
 	UniformID ShaderParam::StdMaterial::Shininess;
 
+	UniformID ShaderParam::MatPBR_Test::Albedo;
+	UniformID ShaderParam::MatPBR_Test::Metallic;
+	UniformID ShaderParam::MatPBR_Test::Roughness;
+	UniformID ShaderParam::MatPBR_Test::AO;
+
+	UniformID ShaderParam::MatPBR_Std1::Albedo2D;
+	UniformID ShaderParam::MatPBR_Std1::Metallic2D;
+	UniformID ShaderParam::MatPBR_Std1::Roughness2D;
+	UniformID ShaderParam::MatPBR_Std1::AO2D;
+
 	UniformID ShaderParam::create(const char* propertyName)
 	{
 		return UniformID(propertyName);
@@ -60,6 +71,7 @@ namespace tezcat::Tiny::Core
 		ShaderParam::MatrixSBV = "TINY_MatrixSBV";
 		ShaderParam::MatrixLit = "TINY_MatrixLit";
 
+		ShaderParam::ScreenLength = "TINY_ScreenLength";
 		ShaderParam::ViewPosition = "TINY_ViewPosition";
 		ShaderParam::ViewNearFar = "TINY_ViewNearFar";
 
@@ -95,6 +107,18 @@ namespace tezcat::Tiny::Core
 		ShaderParam::StdMaterial::Normal = "TINY_MatStd.normal";
 		ShaderParam::StdMaterial::Specular = "TINY_MatStd.specular";
 		ShaderParam::StdMaterial::Shininess = "TINY_MatStd.shininess";
+
+		//
+		ShaderParam::MatPBR_Test::Albedo = "TINY_MatPBR_Test.albedo";
+		ShaderParam::MatPBR_Test::Metallic = "TINY_MatPBR_Test.metallic";
+		ShaderParam::MatPBR_Test::Roughness = "TINY_MatPBR_Test.roughness";
+		ShaderParam::MatPBR_Test::AO = "TINY_MatPBR_Test.ao";
+
+		//
+		ShaderParam::MatPBR_Std1::Albedo2D = "TINY_MatPBR_Std1.albedo2D";
+		ShaderParam::MatPBR_Std1::Metallic2D = "TINY_MatPBR_Std1.metallic2D";
+		ShaderParam::MatPBR_Std1::Roughness2D = "TINY_MatPBR_Std1.roughness2D";
+		ShaderParam::MatPBR_Std1::AO2D = "TINY_MatPBR_Std1.ao2D";
 
 		customIniter();
 	}

@@ -2,6 +2,7 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
+#include "../Head/Context.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -22,12 +23,13 @@ namespace tezcat::Tiny::Core
 		void setName(const std::string& val) { mName = val; }
 		int getVertexCount() const { return mVertexCount; }
 		int getIndexCount() const { return mIndexCount; }
+		DrawMode getDrawMode() const { return mDrawMode; }
 		unsigned int getUID() const { return mUID; }
 
 		void addChild(Vertex* vertex);
 
 	public:
-		virtual void init(MeshData* mesh) = 0;
+		virtual void init(MeshData* mesh);
 		virtual void bind() = 0;
 		virtual void unbind() = 0;
 
@@ -38,6 +40,7 @@ namespace tezcat::Tiny::Core
 		int mVertexCount;
 		int mIndexCount;
 
+		DrawMode mDrawMode;
 		VertexBuffer* mVertexBuffer;
 
 		std::vector<Vertex*>* mChildren;

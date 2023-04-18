@@ -29,7 +29,7 @@ void MyController::onStart()
 
 void MyController::onEnable()
 {
-	MyInputer::getInstance()->setController(this);
+//	MyInputer::getInstance()->setController(this);
 	//	this->startLogic(std::bind(&MyController::warp, this));
 }
 
@@ -87,8 +87,8 @@ void MyController::warp()
 
 void MyController::yawPitch(float yaw, float pitch, bool constrainPitch)
 {
-	yaw *= 0.2f;
-	pitch *= 0.2f;
+// 	yaw *= 0.2f;
+// 	pitch *= 0.2f;
 
 	mYaw += yaw;
 	mPitch += pitch;
@@ -143,9 +143,11 @@ void MyController::updateVector(Transform* transform)
 	mRight = glm::normalize(glm::cross(mFront, mWorldUp));
 	mUp = glm::normalize(glm::cross(mRight, mFront));
 
+	glm::mat4 m4(1.0f);
 	auto& matrix = transform->getModelMatrix();
 	auto& position = transform->getPosition();
 	matrix = glm::lookAt(position, position + mFront, mUp);
+
 
 	if (transform->getParent() != nullptr)
 	{

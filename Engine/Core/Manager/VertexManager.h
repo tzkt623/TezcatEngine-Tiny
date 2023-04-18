@@ -34,9 +34,8 @@ namespace tezcat::Tiny::Core
 		Vertex* createVertex(MeshData* meshData);
 
 	public:
-		void addVertexGroup(Vertex* vao);
-		void addVertexGroup(MeshData* meshData);
 		Vertex* getVertex(const std::string& name);
+		Vertex* getVertex(MeshData* meshData);
 
 		void addMeshData(MeshData* meshData);
 		MeshData* findMeshData(const std::string& name);
@@ -44,7 +43,7 @@ namespace tezcat::Tiny::Core
 	private:
 		VertexBuffer* createVertexBuffer(MeshData* meshData);
 		void buildChild(Vertex* vertexParent, MeshData* meshParent);
-
+		Vertex* findVertex(const std::string& name);
 	private:
 		std::unordered_map<std::string, Vertex*> mVertexUMap;
 		std::unordered_map<std::string, MeshData*> mMeshDataUMap;

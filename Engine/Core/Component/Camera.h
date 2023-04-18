@@ -65,7 +65,6 @@ namespace tezcat::Tiny::Core
 	protected:
 		void onStart() override;
 		void onEnable() override;
-		void onUpdate() override;
 		void onDisable() override;
 
 	public:
@@ -78,6 +77,7 @@ namespace tezcat::Tiny::Core
 	private:
 		void updateVector();
 		void updateTransform(Transform* transform);
+		
 	private:
 		int mDepth;
 		bool mIsMain;
@@ -94,6 +94,7 @@ namespace tezcat::Tiny::Core
 		float mYaw;
 		float mPitch;
 		float mRoll;
+		glm::mat4 mViewMatrix;
 
 		//clear options
 	private:

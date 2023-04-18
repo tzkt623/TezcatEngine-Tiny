@@ -1,6 +1,7 @@
 #pragma once
 #include "Head/GLMHead.h"
 #include "Head/ConfigHead.h"
+#include "Core/Shader/Uniform.h"
 
 namespace tezcat::Tiny
 {
@@ -20,5 +21,11 @@ namespace tezcat::Tiny
 		static size_t MemoryFree;
 
 		static size_t getMemoryUse() { return MemoryAlloc - MemoryFree; }
+
+
+		static UniformF3* MatPBR_Albedo;
+		static UniformF1* MatPBR_Roughness;
+		static UniformF1* MatPBR_Metallic;
+		static UniformF1* MatPBR_AO;
 	};
 }

@@ -161,6 +161,7 @@
     <ClCompile Include="Core\Manager\FrameBufferManager.cpp" />
     <ClCompile Include="Utility\FileTool.cpp" />
     <ClCompile Include="Core\Renderer\ShadowRenderer.cpp" />
+    <ClCompile Include="Core\Component\FlyController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1295,6 +1296,7 @@
     <ClInclude Include="Core\Renderer\RenderConfig.h" />
     <ClInclude Include="Core\Renderer\ShadowRenderer.h" />
     <ClInclude Include="Core\Manager\ObserverManager.h" />
+    <ClInclude Include="Core\Component\FlyController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

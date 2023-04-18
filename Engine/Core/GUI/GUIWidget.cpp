@@ -126,12 +126,32 @@ namespace tezcat::Tiny::Core
 		postFunction = nullptr;
 	}
 
-	//
-	GUIDragFloat2::GUIDragFloat2(const std::u8string& name) :
-		GUIDragFloat(name),
-		mData()
+	//----------------------------------------------------------
+	GUIDragFloat1::GUIDragFloat1(const std::u8string& name)
+		: GUIDragFloat(name)
+		, mData(0)
 	{
 
+	}
+
+	GUIDragFloat1::~GUIDragFloat1()
+	{
+
+	}
+
+	void GUIDragFloat1::onRender()
+	{
+		ImGui::DragFloat(this->getName(), &mData, m_Speed, m_Min, m_Max);
+		postFunction(&mData);
+	}
+
+	//
+	GUIDragFloat2::GUIDragFloat2(const std::u8string& name)
+		: GUIDragFloat(name)
+		, mData()
+	{
+		mData[0] = 0;
+		mData[1] = 0;
 	}
 
 	GUIDragFloat2::~GUIDragFloat2()
@@ -149,7 +169,9 @@ namespace tezcat::Tiny::Core
 		GUIDragFloat(name),
 		mData()
 	{
-
+		mData[0] = 0;
+		mData[1] = 0;
+		mData[2] = 0;
 	}
 
 	GUIDragFloat3::~GUIDragFloat3()
@@ -207,6 +229,28 @@ namespace tezcat::Tiny::Core
 	void GUIImage::refresh()
 	{
 
+	}
+
+
+	GUIMatrix4::GUIMatrix4(const std::u8string& name)
+		: GUIWidget(name)
+	{
+
+	}
+
+	GUIMatrix4::~GUIMatrix4()
+	{
+
+	}
+
+	void GUIMatrix4::onRender()
+	{
+		ImGui::Text(this->getName());
+		auto& d = *mData;
+		ImGui::InputFloat4("x", glm::value_ptr(d[0]));
+		ImGui::InputFloat4("y", glm::value_ptr(d[1]));
+		ImGui::InputFloat4("z", glm::value_ptr(d[2]));
+		ImGui::InputFloat4("w", glm::value_ptr(d[3]));
 	}
 
 }

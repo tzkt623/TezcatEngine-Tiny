@@ -62,6 +62,13 @@ namespace tezcat::Tiny::Core
 	void MeshRenderer::setMesh(const std::string& meshName)
 	{
 		mVertex = VertexMgr::getInstance()->getVertex(meshName);
+		this->setDrawMode(mVertex->getDrawMode());
+	}
+
+	void MeshRenderer::setMesh(MeshData* meshData)
+	{
+		mVertex = VertexMgr::getInstance()->getVertex(meshData);
+		this->setDrawMode(mVertex->getDrawMode());
 	}
 
 	void MeshRenderer::onEnable()
@@ -116,10 +123,9 @@ namespace tezcat::Tiny::Core
 	void MeshRenderer::submitModelMatrix(Shader* shader)
 	{
 		auto& model_mat4 = this->getTransform()->getModelMatrix();
-		shader->setMat4(ShaderParam::MatrixM, glm::value_ptr(model_mat4));
-		glm::mat3 itm(model_mat4);
-		itm = glm::inverseTranspose(itm);
-		shader->setMat3(ShaderParam::MatrixN, glm::value_ptr(itm));
+		shader->setMat4(ShaderParam::MatrixM, model_mat4);
+		glm::mat3 normal_matrix(model_mat4);
+		shader->setMat3(ShaderParam::MatrixN, glm::transpose(glm::inverse(normal_matrix)));
 	}
 
 	void MeshRenderer::endRender()

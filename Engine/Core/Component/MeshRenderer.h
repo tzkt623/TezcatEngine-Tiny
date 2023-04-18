@@ -27,6 +27,7 @@ namespace tezcat::Tiny::Core
 			mMainMaterial = val;
 		}
 		void setMesh(const std::string& meshName);
+		void setMesh(MeshData* meshData);
 
 		void beginRender() override;
 		void endRender() override;

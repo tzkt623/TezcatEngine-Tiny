@@ -16,6 +16,11 @@ namespace tezcat::Tiny
 
 	const unsigned char* Statistic::GPU;
 
+	UniformF3* Statistic::MatPBR_Albedo = nullptr;
+	UniformF1* Statistic::MatPBR_Metallic = nullptr;
+	UniformF1* Statistic::MatPBR_Roughness = nullptr;
+	UniformF1* Statistic::MatPBR_AO = nullptr;
+
 }
 
 

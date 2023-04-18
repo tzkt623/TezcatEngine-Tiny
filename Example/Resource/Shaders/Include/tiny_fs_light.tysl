@@ -1,11 +1,3 @@
-struct StdMaterial
-{
-    sampler2D diffuse;
-    sampler2D normal;
-    sampler2D specular;
-    float shininess;
-};
-
 struct LightDirection
 {
     vec3 direction;
@@ -27,5 +19,5 @@ struct LightPoint
     float quadratic;
 };
 
-uniform StdMaterial TINY_MatStd;
 uniform LightDirection TINY_LitDir;
+uniform LightDirection TINY_LitPoint;

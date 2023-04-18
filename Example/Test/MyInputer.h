@@ -2,7 +2,6 @@
 
 #include "Tiny.h"
 
-class MyController;
 class MyInputer : public InputerT<MyInputer>
 {
 public:
@@ -20,13 +19,13 @@ public:
 	void mouseCursorPosCallBack(double xpos, double ypos) override;
 	void mouseScrollPosCallBack(double xoffset, double yoffset) override;
 
-	void setController(MyController* val) { mController = val; }
+	void setController(FlyController* val) { mController = val; }
 
 private:
 	bool mLockMouse;
 	float mLastX;
 	float mLastY;
 
-	MyController* mController;
+	FlyController* mController;
 };
 

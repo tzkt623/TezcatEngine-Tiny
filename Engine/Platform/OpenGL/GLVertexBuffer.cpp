@@ -81,6 +81,8 @@ namespace tezcat::Tiny::GL
 
 	void GLVertex::init(MeshData* meshData)
 	{
+		Vertex::init(meshData);
+
 		glBindVertexArray(mUID);
 
 		mVertexBuffer = new GLVertexBuffer();

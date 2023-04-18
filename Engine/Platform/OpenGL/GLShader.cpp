@@ -263,6 +263,15 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix3fv(glGetUniformLocation(mProgramID, name), 1, GL_FALSE, data);
 	}
 
+	void GLShader::setMat3(UniformID& uniform, const glm::mat3& mat3)
+	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+		glUniformMatrix3fv(mTinyUniformList[uniform], 1, GL_FALSE, glm::value_ptr(mat3));
+	}
+
 	void GLShader::setMat4(UniformID& uniform, const float* data)
 	{
 		if (mTinyUniformList[uniform] < 0)

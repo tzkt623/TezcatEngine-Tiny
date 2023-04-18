@@ -23,9 +23,11 @@ namespace tezcat::Tiny::Core
 		void setModelMatrix(const glm::mat4& mat4)
 		{
 			mModelMatrix = mat4;
+			this->updateChildren();
 		}
 
 		const uint32_t& getIndex() const { return mIndex; }
+		void updateChildren();
 	public:
 		glm::vec3& getPosition() { return mLocalPosition; }
 		void setPosition(const glm::vec3& val)
@@ -102,7 +104,7 @@ namespace tezcat::Tiny::Core
 		}
 
 	public:
-		inline glm::mat4x4& getModelMatrix() { return mModelMatrix; }
+		inline glm::mat4& getModelMatrix() { return mModelMatrix; }
 		glm::mat4 getWorldToLocalMatrix();
 
 
@@ -125,6 +127,9 @@ namespace tezcat::Tiny::Core
 		bool removeChild(Transform* val);
 		size_t getChildCount() { return mChildren.size(); }
 		std::vector<Transform*>& getChildren() { return mChildren; }
+		void manualUpdateMatrix();
+
+		void update();
 
 	public:
 		void translate(const glm::vec3& offset)
@@ -133,18 +138,22 @@ namespace tezcat::Tiny::Core
 			mLocalPosition += offset;
 		}
 
+		void rotate(const glm::vec3& offset)
+		{
+			mIsDirty = true;
+			mLocalRotation += offset;
+		}
+
 	protected:
 		void onStart() override;
 		void onEnable() override;
 		void onDisable() override;
-		void onUpdate() override;
 
 		void updateMatrix(Transform* self);
 
-	private:
-		void markDirty();
-		void markDirty2();
-
+	public:
+		void forceUpdate();
+		void forceUpdateChildren();
 	private:
 		uint32_t mIndex;
 		Transform* mParent;
@@ -157,7 +166,7 @@ namespace tezcat::Tiny::Core
 		glm::vec3 mLocalRotation;
 		glm::vec3 mLocalScale;
 
-		glm::mat4x4 mModelMatrix;
+		glm::mat4 mModelMatrix;
 
 		std::function<void(Transform*)> mDelegateUpdate;
 	};

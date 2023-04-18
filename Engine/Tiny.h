@@ -21,6 +21,7 @@
 #include "Core/Component/GameObject.h"
 #include "Core/Component/Camera.h"
 #include "Core/Component/Transform.h"
+#include "Core/Component/FlyController.h"
 #include "Core/Component/MeshRenderer.h"
 #include "Core/Component/Light.h"
 #include "Core/Component/Skybox.h"

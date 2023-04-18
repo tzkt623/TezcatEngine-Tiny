@@ -23,6 +23,10 @@ private:
 	GUIText* m_LabelDrawCall;
 	GUIDragFloat2* m_MousePosition;
 	GUIDragFloat2* m_MouseOffset;
+
+
+
+
 	GUIImage* mImageDepth;
 };
 
@@ -40,6 +44,25 @@ protected:
 private:
 	GUIDragFloat3* mPosition;
 };
+
+class MyPBRWindow : public GUIWindow
+{
+public:
+	MyPBRWindow();
+	~MyPBRWindow();
+
+	void init() override;
+
+protected:
+	void onUpdate() override;
+
+private:
+	GUIDragFloat3* mAlbedo;
+	GUIDragFloat1* mMetallic;
+	GUIDragFloat1* mRoughness;
+	GUIDragFloat1* mAO;
+};
+
 
 class MyMainCameraWindow : public GUIWindow
 {
@@ -61,5 +84,8 @@ private:
 	GUIDragFloat3* m_Right;
 	GUIDragFloat3* m_Front;
 	Camera* mMainCamera;
+
+	GUIMatrix4* mViewMatrix;
+	GUIMatrix4* mModelMatrix;
 };
 

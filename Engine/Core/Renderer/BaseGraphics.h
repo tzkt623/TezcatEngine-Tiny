@@ -42,7 +42,7 @@ namespace tezcat::Tiny::Core
 	public:
 		virtual void draw(IRenderMesh* renderMesh) = 0;
 		virtual void draw(MeshRenderer* renderer) = 0;
-		virtual void draw(Vertex* group, DrawModeWrapper drawMode) = 0;
+		virtual void draw(Vertex* vertex, const DrawModeWrapper& drawMode) = 0;
 
 	public:
 		virtual void drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color = glm::vec3(0.0f, 1.0f, 0.0f));

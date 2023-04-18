@@ -3,6 +3,7 @@
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
+#include "../Head/Context.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -65,6 +66,8 @@ namespace tezcat::Tiny::Core
 		std::vector<glm::vec2> uv;
 
 		std::vector<unsigned int> indices;
+		DrawMode drawMode;
+
 
 	private:
 		std::vector<MeshData*>* mChildrenData;

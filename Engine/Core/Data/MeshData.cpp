@@ -4,6 +4,7 @@ namespace tezcat::Tiny::Core
 {
 	MeshData::MeshData()
 		: name()
+		, drawMode(DrawMode::Triangles)
 		, mChildrenData(nullptr)
 	{
 
@@ -11,6 +12,7 @@ namespace tezcat::Tiny::Core
 
 	MeshData::MeshData(const std::string& name)
 		: name(name)
+		, drawMode(DrawMode::Triangles)
 		, mChildrenData(nullptr)
 	{
 
@@ -18,6 +20,7 @@ namespace tezcat::Tiny::Core
 
 	MeshData::MeshData(MeshData&& other) noexcept
 		: name(std::move(other.name))
+		, drawMode(DrawMode::Triangles)
 		, vertices(std::move(other.vertices))
 		, normals(std::move(other.normals))
 		, colors(std::move(other.colors))

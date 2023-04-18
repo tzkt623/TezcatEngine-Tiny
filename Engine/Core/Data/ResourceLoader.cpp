@@ -25,6 +25,8 @@ namespace tezcat::Tiny::Core
 
 		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/std1.glsl");
 		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/std2.glsl");
+		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/pbr_std1.glsl");
+		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/pbr_test1.glsl");
 		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/color.glsl");
 		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/color_depth.glsl");
 		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/texture.glsl");
@@ -155,6 +157,65 @@ namespace tezcat::Tiny::Core
 	void ResourceLoader::createSphere()
 	{
 		this->createSphere(48);
+		//this->createSphere2(64, 64);
+	}
+
+	void ResourceLoader::createSphere2(uint32_t X_SEGMENTS, uint32_t Y_SEGMENTS)
+	{
+		const float PI = 3.14159265359;
+
+		std::shared_ptr<MeshData> mesh_data(new MeshData("Sphere"));
+
+		auto& positions = mesh_data->vertices;
+		auto& uv = mesh_data->uv;
+		auto& normals = mesh_data->normals;
+		auto& indices = mesh_data->indices;
+
+
+		for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
+		{
+			for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+			{
+				float xSegment = (float)x / (float)X_SEGMENTS;
+				float ySegment = (float)y / (float)Y_SEGMENTS;
+
+				float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+				float yPos = std::cos(ySegment * PI);
+				float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+
+				positions.push_back(glm::vec3(xPos, yPos, zPos));
+				uv.push_back(glm::vec2(xSegment, ySegment));
+				normals.push_back(glm::vec3(xPos, yPos, zPos));
+			}
+		}
+
+		bool oddRow = false;
+		for (unsigned int y = 0; y < Y_SEGMENTS; ++y)
+		{
+			if (!oddRow) // even rows: y == 0, y == 2; and so on
+			{
+				for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+				{
+					indices.push_back(y * (X_SEGMENTS + 1) + x);
+					indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+				}
+			}
+
+			// 这里奇偶分开添加是有道理的，奇偶分开添加，就能首位相连，自己可以拿笔画一画
+			else
+			{
+				for (int x = X_SEGMENTS; x >= 0; --x)
+				{
+					indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+					indices.push_back(y * (X_SEGMENTS + 1) + x);
+				}
+			}
+			oddRow = !oddRow;
+		}
+
+		//indices.clear();
+		mesh_data->drawMode = DrawMode::Triangles_Strip;
+		VertexMgr::getInstance()->createVertex(mesh_data.get());
 	}
 
 	void ResourceLoader::createSphere(int prec)

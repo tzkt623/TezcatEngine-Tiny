@@ -2,9 +2,11 @@
 
 #include "../Head/CppHead.h"
 #include "Platform/OpenGL/GLHead.h"
+#include "Utility/Singleton.h"
 
 struct GLFWwindow;
 
+using namespace tezcat::Tiny::Utility;
 namespace tezcat::Tiny::Core
 {
 	class Inputer;
@@ -41,5 +43,7 @@ namespace tezcat::Tiny::Core
 		double mMouseY;
 		std::stack<Inputer*> mInputerStack;
 	};
+
+	using InputSys = SG<InputSystem>;
 }
 

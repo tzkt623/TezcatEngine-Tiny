@@ -186,15 +186,15 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLGraphics::draw(Vertex* group, DrawModeWrapper drawMode)
+	void GLGraphics::draw(Vertex* vertex, const DrawModeWrapper& drawMode)
 	{
-		if (group->getIndexCount() > 0)
+		if (vertex->getIndexCount() > 0)
 		{
-			glDrawElements(drawMode.platform, group->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+			glDrawElements(drawMode.platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr);
 		}
 		else
 		{
-			glDrawArrays(drawMode.platform, 0, group->getVertexCount());
+			glDrawArrays(drawMode.platform, 0, vertex->getVertexCount());
 		}
 	}
 

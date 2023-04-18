@@ -10,7 +10,7 @@ namespace tezcat::Tiny::Core
 		{"None",		Queue::None},
 		{"Background",	Queue::Background},
 		{"Opaque",		Queue::Geometry},
-		{"Alpha",		Queue::AlphaTest},
+		{"AlphaTest",	Queue::AlphaTest},
 		{"OpaqueLast",	Queue::OpaqueLast},
 		{"Transparent", Queue::Transparent},
 		{"Overlay",		Queue::Overlay}
@@ -47,8 +47,11 @@ namespace tezcat::Tiny::Core
 			if (pass->checkState())
 			{
 				observer->submitViewMatrix(pass->getShader());
-				light->submitViewMatrix(pass->getShader());
-				light->submit(pass->getShader());
+				if (light)
+				{
+					light->submitViewMatrix(pass->getShader());
+					light->submit(pass->getShader());
+				}
 				pass->render(graphics);
 			}
 		}

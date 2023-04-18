@@ -2,6 +2,7 @@
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
 #include "../Head/ImGuiHead.h"
+#include "../Head/GLMHead.h"
 
 #include "Utility/Utility.h"
 
@@ -108,9 +109,21 @@ namespace tezcat::Tiny::Core
 		virtual ~GUIDragFloat();
 
 		std::function<void(float* data)> postFunction;
+		void setMinMax(float min, float max)
+		{
+			m_Min = min;
+			m_Max = max;
+		}
+
+		void setSpeed(float speed)
+		{
+			m_Speed = speed;
+		}
+
 
 	protected:
 		void onUpdate() override {}
+
 
 	protected:
 		float m_Speed;
@@ -119,6 +132,30 @@ namespace tezcat::Tiny::Core
 
 	private:
 		static void defaultPostFunction(float* data) {}
+	};
+
+
+	class TINY_API GUIDragFloat1 : public GUIDragFloat
+	{
+	public:
+		GUIDragFloat1(const std::u8string& name);
+		virtual ~GUIDragFloat1();
+
+		void setFloat(float x)
+		{
+			mData = x;
+		}
+
+		float getFloat()
+		{
+			return mData;
+		}
+
+	protected:
+		void onRender() override;
+
+	private:
+		float mData;
 	};
 
 	class TINY_API GUIDragFloat2 : public GUIDragFloat
@@ -181,6 +218,25 @@ namespace tezcat::Tiny::Core
 
 	private:
 		float mData[3];
+	};
+
+	class TINY_API GUIMatrix4 : public GUIWidget
+	{
+	public:
+		GUIMatrix4(const std::u8string& name);
+		virtual ~GUIMatrix4();
+
+		void setMat(glm::mat4* mat)
+		{
+			mData = mat;
+		}
+
+	protected:
+		void onRender() override;
+		void onUpdate() override {}
+
+	private:
+		glm::mat4* mData;
 	};
 
 	class TINY_API GUIText : public GUIWidget

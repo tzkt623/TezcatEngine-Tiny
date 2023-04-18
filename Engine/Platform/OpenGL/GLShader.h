@@ -55,6 +55,7 @@ namespace tezcat::Tiny::GL
 		void setInt3(UniformID& uniform, int* data) override;
 		void setInt4(UniformID& uniform, int* data) override;
 		void setMat3(UniformID& uniform, float* data) override;
+		void setMat3(UniformID& uniform, const glm::mat3& mat3) override;
 		void setMat4(UniformID& uniform, const float* data) override;
 		void setTexture2D(UniformID& uniform, Texture2D* data) override;
 		void setTextureCube(UniformID& uniform, TextureCube* data) override;

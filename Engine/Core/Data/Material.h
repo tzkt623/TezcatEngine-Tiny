@@ -23,9 +23,9 @@ namespace tezcat::Tiny::Core
 
 	public:
 		template<typename UniformType, typename... Args>
-		Uniform* addUniform(const UniformID& uniformID, Args&&... value)
+		UniformType* addUniform(const UniformID& uniformID, Args&&... value)
 		{
-			return mUniforms.emplace_back(new UniformType(uniformID, std::forward<Args>(value)...));
+			return (UniformType*)mUniforms.emplace_back(new UniformType(uniformID, std::forward<Args>(value)...));
 		}
 
 		template<typename UniformType, typename Args>

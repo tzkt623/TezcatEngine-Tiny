@@ -42,13 +42,13 @@ namespace tezcat::Tiny::Core
 		/// </summary>
 		void stopLogic();
 
-		void update()
-		{
-			if (mEnable)
-			{
-				this->onUpdate();
-			}
-		}
+// 		void update()
+// 		{
+// 			if (mEnable)
+// 			{
+// 				this->onUpdate();
+// 			}
+// 		}
 
 	protected:
 		//进入场景时执行
@@ -75,7 +75,7 @@ namespace tezcat::Tiny::Core
 
 		}
 
-		virtual void onUpdate() {}
+		//virtual void onUpdate() {}
 
 		void onDetach()
 		{

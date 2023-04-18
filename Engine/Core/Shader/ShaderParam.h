@@ -33,6 +33,7 @@ namespace tezcat::Tiny::Core
 
 		static UniformID ViewPosition;
 		static UniformID ViewNearFar;
+		static UniformID ScreenLength;
 
 		static UniformID VertexColor;
 		static UniformID TexColor;
@@ -70,6 +71,22 @@ namespace tezcat::Tiny::Core
 			static UniformID Normal;
 			static UniformID Specular;
 			static UniformID Shininess;
+		};
+
+		struct MatPBR_Test
+		{
+			static UniformID Albedo;
+			static UniformID Metallic;
+			static UniformID Roughness;
+			static UniformID AO;
+		};
+
+		struct MatPBR_Std1
+		{
+			static UniformID Albedo2D;
+			static UniformID Metallic2D;
+			static UniformID Roughness2D;
+			static UniformID AO2D;
 		};
 	};
 }

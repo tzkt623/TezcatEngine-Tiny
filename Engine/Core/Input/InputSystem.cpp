@@ -11,6 +11,7 @@ namespace tezcat::Tiny::Core
 		, mMouseY(0)
 	{
 		SG<InputSystem>::attach(this);
+
 		this->push(EmptyInputer::getInstance());
 	}
 

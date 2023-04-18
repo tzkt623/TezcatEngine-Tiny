@@ -10,9 +10,9 @@
     {
         str Name = InfiniteGrid;
         int Version = 330;
-        int OrderID = 60;
-        str Queue = Background;
-        str DepthTest = Off;
+        int OrderID = 600;
+        str Queue = Transparent;
+        str DepthTest = Less;
         bool ZWrite = true;
         bool Blend = true;
         str BlendSrc = SrcA;
@@ -33,7 +33,7 @@
         out mat4 fragView;
         out mat4 fragProj;
 
-        vec3 UnprojectPoint(float x, float y, float z, mat4 view, mat4 projection)
+        vec3 unprojectPoint(float x, float y, float z, mat4 view, mat4 projection)
         {
             mat4 viewInv = inverse(view);
             mat4 projInv = inverse(projection);
@@ -43,8 +43,8 @@
 
         void main()
         {
-            nearPoint = UnprojectPoint(aPos.x, aPos.y, 0.0, TINY_MatrixV, TINY_MatrixP);
-            farPoint = UnprojectPoint(aPos.x, aPos.y, 1.0, TINY_MatrixV, TINY_MatrixP);
+            nearPoint = unprojectPoint(aPos.x, aPos.y, 0.0, TINY_MatrixV, TINY_MatrixP);
+            farPoint = unprojectPoint(aPos.x, aPos.y, 1.0, TINY_MatrixV, TINY_MatrixP);
             fragView = TINY_MatrixV;
             fragProj = TINY_MatrixP;
 
@@ -62,7 +62,7 @@
         in mat4 fragView;
         in mat4 fragProj;
 
-        out vec4 myGirdColor;
+        out vec4 myGridColor;
 
         vec4 grid(vec3 fragPos3D, float scale)
         {
@@ -105,8 +105,9 @@
             float linearDepth = computeLinearDepth(fragPos3D);
             float fading = max(0, (0.5 - linearDepth));
 
-            myGirdColor = (grid(fragPos3D, 0.01) + grid(fragPos3D, 0.01)) * float(t > 0);
-            //myGirdColor.a = fading;
+            //myGridColor = vec4(float(t > 0), 0.0, 0.0, float(t > 0));
+            myGridColor = (grid(fragPos3D, 0.01) + grid(fragPos3D, 0.01)) * float(t > 0);
+            //myGridColor.a = fading;
         }
     }
     #TINY_FS_END

@@ -9,6 +9,22 @@ public:
 
 	void onEnter() override;
 
+	void createGates(float gateWidth, float gateHigh);
+
+	void createPaintings();
+
+	void createPlane();
+
+	void createCubes0();
+
+	void createTransparentObject();
+
+	void createInfinitePlane();
+
+	void createDirectionLight();
+
+	void createPBR();
+
 
 protected:
 	void initGUI();
