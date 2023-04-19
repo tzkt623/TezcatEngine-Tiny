@@ -111,6 +111,7 @@ namespace tezcat::Tiny::GL
 	void GLGraphics::preRender()
 	{
 		BaseGraphics::preRender();
+		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	void GLGraphics::onRender()

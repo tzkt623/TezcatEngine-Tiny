@@ -19,7 +19,7 @@ namespace tezcat::Tiny::Core
 		virtual ~MeshRenderer();
 
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::MeshRenderer; }
-		Vertex* getVertexGroup() const { return mVertex; }
+		Vertex* getVertex() const { return mVertex; }
 
 		Material* getMaterial() const override { return mMainMaterial; }
 		void setMaterial(Material* val)

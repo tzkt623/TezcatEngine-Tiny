@@ -2,6 +2,7 @@
 #include "../Renderer/RenderPass.h"
 #include "../Component/Camera.h"
 #include "../Component/Light.h"
+#include "../Manager/TextureManager.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -51,6 +52,12 @@ namespace tezcat::Tiny::Core
 				{
 					light->submitViewMatrix(pass->getShader());
 					light->submit(pass->getShader());
+
+					auto tex = TextureMgr::getInstance()->findTexture("Shadow");
+					if (tex != nullptr)
+					{
+						pass->getShader()->setTexture2D(ShaderParam::TexDepth, (Texture2D*)tex);
+					}
 				}
 				pass->render(graphics);
 			}

@@ -217,6 +217,11 @@ namespace tezcat::Tiny::Utility
 			return IDString(data);
 		}
 
+		static const std::string_view& getStringStatic(const int& id)
+		{
+			return s_StringArray[id];
+		}
+
 	private:
 		static std::unordered_map<std::string, int> sStringMap;
 		static std::vector<std::string_view> s_StringArray;

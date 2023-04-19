@@ -130,6 +130,17 @@ namespace tezcat::Tiny::GL
 			glReadBuffer(GL_NONE);
 		}
 
+		if (mColorCount > 1)
+		{
+			GLuint* colors = new GLuint[mColorCount];
+			for (uint32_t i = 0; i < mColorCount; i++)
+			{
+				colors[i] = GL_COLOR_ATTACHMENT0 + i;
+			}
+			glDrawBuffers(mColorCount, colors);
+			delete[] colors;
+		}
+
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		{
 			std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;

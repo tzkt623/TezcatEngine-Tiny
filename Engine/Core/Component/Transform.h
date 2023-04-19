@@ -128,6 +128,7 @@ namespace tezcat::Tiny::Core
 		size_t getChildCount() { return mChildren.size(); }
 		std::vector<Transform*>& getChildren() { return mChildren; }
 		void manualUpdateMatrix();
+		void markDirty() { mIsDirty = true; }
 
 		void update();
 

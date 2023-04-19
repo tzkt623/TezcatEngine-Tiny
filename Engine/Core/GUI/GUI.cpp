@@ -49,18 +49,20 @@ namespace tezcat::Tiny::Core
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(((WindowsEngine*)engine)->getGLFWWindow(), true);
 		ImGui_ImplOpenGL3_Init(glsl_version);
+
+
 	}
 
 	void GUI::render()
 	{
-		if (!m_InitList.empty())
+		if (!mInitList.empty())
 		{
-			for (auto widget : m_InitList)
+			for (auto widget : mInitList)
 			{
 				widget->init();
 			}
 
-			m_InitList.clear();
+			mInitList.clear();
 		}
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -73,12 +75,19 @@ namespace tezcat::Tiny::Core
 //  		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 //  		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
 
-		for (auto w : m_Windows)
+		for (auto w : mWindows)
 		{
 			w->update();
 		}
 
 		ImGui::Render();
+
+// 		int display_w, display_h;
+// 		glfwGetFramebufferSize(window, &display_w, &display_h);
+// 		glViewport(0, 0, display_w, display_h);
+// 		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+// 		glClear(GL_COLOR_BUFFER_BIT);
+
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

@@ -18,7 +18,7 @@
     <ClCompile Include="Test\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI.cpp">
+    <ClCompile Include="Test\MyGUI\MyGUI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Test\MyInputer.cpp">
@@ -33,9 +33,36 @@
     <ClCompile Include="Test\MyController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyObjectWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\MyGUIContext.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyLogWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyOverviewWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyViewPortWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyMainCameraWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyInfoWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyMainDockWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\MyGUI\Widget\TransformWidget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Test\MyGUI.h">
+    <ClInclude Include="Test\MyGUI\MyGUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyInputer.h">
@@ -48,6 +75,33 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyController.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyObjectWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\MyGUIContext.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyLogWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyOverviewWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyViewPortWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyMainCameraWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyInfoWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyMainDockWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Widget\TransformWidget.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

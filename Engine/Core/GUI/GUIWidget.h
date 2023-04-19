@@ -55,32 +55,10 @@ namespace tezcat::Tiny::Core
 
 	public:
 		void update() final;
-
-		void addChild(GUIWidget* child)
-		{
-			mChildren.emplace_back(child);
-		}
-
-		void removeChild(GUIWidget* child)
-		{
-			auto it = mChildren.begin();
-			while (it != mChildren.end())
-			{
-				if ((*it) == child)
-				{
-					mChildren.erase(it);
-					break;
-				}
-				it++;
-			}
-		}
 	protected:
 		virtual void beginParent() = 0;
 		virtual void endParent() = 0;
 		void onRender() override;
-
-	private:
-		std::vector<GUIWidget*> mChildren;
 	};
 
 

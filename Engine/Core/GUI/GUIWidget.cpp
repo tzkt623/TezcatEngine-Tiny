@@ -53,14 +53,11 @@ namespace tezcat::Tiny::Core
 
 	void GUIParentWidget::update()
 	{
+		this->beginParent();
+
 		this->onUpdate();
 		this->onRender();
 
-		this->beginParent();
-		for (auto w : mChildren)
-		{
-			w->update();
-		}
 		this->endParent();
 	}
 
@@ -91,7 +88,7 @@ namespace tezcat::Tiny::Core
 
 	void GUIWindow::beginParent()
 	{
-		ImGui::Begin(this->getName());
+		ImGui::Begin(this->getName(), 0);
 	}
 
 	void GUIWindow::endParent()

@@ -1,7 +1,9 @@
 #include "MyScene.h"
 #include "MyInputer.h"
-#include "MyGUI.h"
+#include "MyGUI/MyGUI.h"
 #include "MyController.h"
+
+#define CreateWindow(X) (new X)->open()
 
 MyScene::MyScene(const std::string& name)
 	: Scene(name)
@@ -11,17 +13,12 @@ MyScene::MyScene(const std::string& name)
 
 void MyScene::initGUI()
 {
-	auto info = new MyInfoWindow();
-	info->open();
-
-	auto pbr = new MyPBRWindow();
-	pbr->open();
-
-	// 	auto object = new MyObjectWindow();
-	// 	object->open();
-
-	auto camera = new MyMainCameraWindow();
-	camera->open();
+	CreateWindow(MyMainDockWindow);
+	CreateWindow(MyViewPortWindow);
+	CreateWindow(MyInfoWindow);
+	CreateWindow(MyObjectWindow);
+	CreateWindow(MyOverviewWindow);
+	CreateWindow(MyLogWindow);
 }
 
 
@@ -66,20 +63,24 @@ void MyScene::onEnter()
 		go->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 		//go->getTransform()->setParent(controller_go->getTransform());
 
-		// 		FrameBufferMgr::getInstance()->create(
-		// 			"FB_World1",
-		// 			Engine::getScreenWidth(), Engine::getScreenHeight(),
-		// 			{
-		// 				TextureBufferInfo("RB_World1"
-		// 					, TextureBufferType::ColorComponent
-		// 					, TextureChannel::RGBA
-		// 					, TextureChannel::RGBA
-		// 					, DataType::UByte
-		// 					, true),
-		// 				TextureBufferInfo("DS_World1"
-		// 					, TextureBufferType::DepthStencilComponent
-		// 					, TextureChannel::Depth24_Stencil8)
-		// 			});
+		auto frame = FrameBufferMgr::getInstance()->create(
+					"FB_World1",
+					Engine::getScreenWidth(), Engine::getScreenHeight(),
+					{
+						TextureBufferInfo("RB_World1"
+							, TextureBufferType::ColorComponent
+							, TextureChannel::RGBA
+							, TextureChannel::RGBA
+							, DataType::UByte
+							, true),
+						TextureBufferInfo("DS_World1"
+							, TextureBufferType::DepthComponent
+							, TextureChannel::Depth
+							, TextureChannel::Depth
+							, DataType::UByte
+							, true)
+					});
+		camera->setFrameBuffer(frame);
 
 		go = new GameObject("Skybox1");
 		go->setLayerMaskIndex(0);
@@ -319,7 +320,7 @@ void MyScene::createPlane()
 	plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
 	plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
 	plane_material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
-	plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
+	//plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
 	mr->setMaterial(plane_material);
 	mr->setMesh("Plane");
 }
@@ -345,7 +346,7 @@ void MyScene::createCubes0()
 		material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "metal_plate_spec");
 		material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
 		material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
-		material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
+		//material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
 		mr->setMaterial(material);
 		mr->setMesh("Cube");
 		//mr->setMesh("Sphere");
@@ -434,10 +435,10 @@ void MyScene::createPBR()
 
 	auto mr2 = go2->addComponent<MeshRenderer>();
 	auto material2 = new Material("Standard/PBRTest1");
-	Statistic::MatPBR_Albedo = material2->addUniform<UniformF3>(ShaderParam::MatPBR_Test::Albedo, glm::vec3(1.0f, 0.0f, 0.0f));
-	Statistic::MatPBR_Metallic = material2->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Metallic, 0.5f);
-	Statistic::MatPBR_Roughness = material2->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, 0.5f);
-	Statistic::MatPBR_AO = material2->addUniform<UniformF1>(ShaderParam::MatPBR_Test::AO, 0.5f);
+	material2->addUniform<UniformF3>(ShaderParam::MatPBR_Test::Albedo, glm::vec3(1.0f, 0.0f, 0.0f));
+	material2->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Metallic, 0.5f);
+	material2->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, 0.5f);
+	material2->addUniform<UniformF1>(ShaderParam::MatPBR_Test::AO, 0.5f);
 	mr2->setMaterial(material2);
 	mr2->setMesh("Sphere");
 

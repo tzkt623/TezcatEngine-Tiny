@@ -162,7 +162,7 @@ namespace tezcat::Tiny::Core
 
 	void ResourceLoader::createSphere2(uint32_t X_SEGMENTS, uint32_t Y_SEGMENTS)
 	{
-		const float PI = 3.14159265359;
+		const float PI = 3.14159265359f;
 
 		std::shared_ptr<MeshData> mesh_data(new MeshData("Sphere"));
 

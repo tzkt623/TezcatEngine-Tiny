@@ -166,14 +166,32 @@
   <ItemGroup>
     <ClCompile Include="Test\MyController.cpp" />
     <ClCompile Include="Test\main.cpp" />
-    <ClCompile Include="Test\MyGUI.cpp" />
+    <ClCompile Include="Test\MyGUI\MyGUI.cpp" />
+    <ClCompile Include="Test\MyGUI\MyGUIContext.cpp" />
+    <ClCompile Include="Test\MyGUI\Widget\TransformWidget.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyInfoWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyLogWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyMainCameraWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyMainDockWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyObjectWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyOverviewWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyViewPortWindow.cpp" />
     <ClCompile Include="Test\MyInputer.cpp" />
     <ClCompile Include="Test\MyResourceLoader.cpp" />
     <ClCompile Include="Test\MyScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test\MyController.h" />
-    <ClInclude Include="Test\MyGUI.h" />
+    <ClInclude Include="Test\MyGUI\MyGUI.h" />
+    <ClInclude Include="Test\MyGUI\MyGUIContext.h" />
+    <ClInclude Include="Test\MyGUI\Widget\TransformWidget.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyInfoWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyLogWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyMainCameraWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyMainDockWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyObjectWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyOverviewWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyViewPortWindow.h" />
     <ClInclude Include="Test\MyInputer.h" />
     <ClInclude Include="Test\MyResourceLoader.h" />
     <ClInclude Include="Test\MyScene.h" />

@@ -20,19 +20,19 @@ namespace tezcat::Tiny::Core
 
 		void addWindow(GUIWindow* window)
 		{
-			m_InitList.push_back(window);
+			mInitList.push_back(window);
 
-			m_Windows.push_back(window);
+			mWindows.push_back(window);
 		}
 
 		void removeWindow(GUIWindow* window)
 		{
-			auto it = m_Windows.begin();
-			while (it != m_Windows.end())
+			auto it = mWindows.begin();
+			while (it != mWindows.end())
 			{
 				if ((*it) == window)
 				{
-					m_Windows.erase(it);
+					mWindows.erase(it);
 					break;
 				}
 				it++;
@@ -40,8 +40,8 @@ namespace tezcat::Tiny::Core
 		}
 
 	private:
-		std::vector<GUIWindow*> m_InitList;
-		std::vector<GUIWindow*> m_Windows;
+		std::vector<GUIWindow*> mInitList;
+		std::vector<GUIWindow*> mWindows;
 		Engine* m_Engine;
 	};
 }
