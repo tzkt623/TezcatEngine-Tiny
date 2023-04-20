@@ -150,12 +150,25 @@ namespace tezcat::Tiny::Core
 
 	void ShaderManager::clearIncludeFiles()
 	{
-		mIncludeFileDict.clear();
+		//mIncludeFileDict.clear();
 	}
 
 	std::string ShaderManager::getIncludeContent(const std::string& s)
 	{
 		return mIncludeFileDict[s];
+	}
+
+	void ShaderManager::rebuildShaders()
+	{
+		for (auto p : mShaderPackageAry)
+		{
+			mCreator->rebuild(p);
+		}
+	}
+
+	void ShaderManager::rebuild(ShaderPackage* package)
+	{
+		mCreator->rebuild(package);
 	}
 }
 

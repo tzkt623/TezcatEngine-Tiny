@@ -25,82 +25,33 @@ namespace tezcat::Tiny::GL
 	GLGraphics::GLGraphics()
 		: mWindow(nullptr)
 	{
-		TextureMgr::getInstance()->initCreator(new GLTextureCreator());
+		Graphics::attach(this);
+
 		FrameBufferMgr::getInstance()->initCreator(new GLFrameBufferCreator());
+		TextureMgr::getInstance()->initCreator(new GLTextureCreator());
 		VertexMgr::getInstance()->initCreator(new GLVertexCreator());
 		ShaderMgr::getInstance()->initCreator(new GLShaderCreator());
 	}
 
 	GLGraphics::~GLGraphics()
 	{
-		mWindow = nullptr;
+//		mWindow = nullptr;
 	}
 
 	void GLGraphics::init(Engine* engine)
 	{
-		auto we = (WindowsEngine*)engine;
-		mWindow = we->getGLFWWindow();
-		glfwMakeContextCurrent(mWindow);
-		glfwSwapInterval(1);
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		{
-			throw std::logic_error("Failed to initialize GLAD");
-		}
+// 		auto we = (WindowsEngine*)engine;
+// 		mWindow = we->getGLFWWindow();
+// 		glfwMakeContextCurrent(mWindow);
+// 		glfwSwapInterval(1);
+// 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+// 		{
+// 			throw std::logic_error("Failed to initialize GLAD");
+// 		}
 
 		this->initContext();
 
-		(new GUI())->init(engine);
-
-		GLint max;
-		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
-		std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-
-		auto get_default_color_buffer = [&](GLint id)
-		{
-			switch (id)
-			{
-			case GL_NONE:
-				std::cout << "Default ColorBuffer: GL_NONE" << std::endl;
-				break;
-			case GL_FRONT_LEFT:
-				std::cout << "Default ColorBuffer: GL_FRONT_LEFT" << std::endl;
-				break;
-			case GL_FRONT_RIGHT:
-				std::cout << "Default ColorBuffer: GL_FRONT_RIGHT" << std::endl;
-				break;
-			case GL_BACK_LEFT:
-				std::cout << "Default ColorBuffer: GL_BACK_LEFT" << std::endl;
-				break;
-			case GL_BACK_RIGHT:
-				std::cout << "Default ColorBuffer: GL_BACK_RIGHT" << std::endl;
-				break;
-			case GL_FRONT:
-				std::cout << "Default ColorBuffer: GL_FRONT" << std::endl;
-				break;
-			case GL_BACK:
-				std::cout << "Default ColorBuffer: GL_BACK" << std::endl;
-				break;
-			case GL_LEFT:
-				std::cout << "Default ColorBuffer: GL_LEFT" << std::endl;
-				break;
-			case GL_RIGHT:
-				std::cout << "Default ColorBuffer: GL_RIGHT" << std::endl;
-				break;
-			case GL_FRONT_AND_BACK:
-				std::cout << "Default ColorBuffer: GL_FRONT_AND_BACK" << std::endl;
-				break;
-			default:
-				break;
-			}
-		};
-
-		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
-		std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-
-		glGetIntegerv(GL_DRAW_BUFFER, &max);
-		get_default_color_buffer(max);
-		glGetIntegerv(GL_READ_BUFFER, &max);
-		get_default_color_buffer(max);
+//		(new GUI())->init(engine);
 	}
 
 	void GLGraphics::setViewport(const ViewportInfo& info)
@@ -111,23 +62,23 @@ namespace tezcat::Tiny::GL
 	void GLGraphics::preRender()
 	{
 		BaseGraphics::preRender();
-		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	void GLGraphics::onRender()
 	{
+		glClear(GL_COLOR_BUFFER_BIT);
 		BaseGraphics::onRender();
 	}
 
 	void GLGraphics::postRender()
 	{
 		BaseGraphics::postRender();
-		SG<GUI>::getInstance()->render();
+//		SG<GUI>::getInstance()->render();
 	}
 
 	void GLGraphics::swapBuffer()
 	{
-		glfwSwapBuffers(mWindow);
+//		glfwSwapBuffers(mWindow);
 	}
 
 	void GLGraphics::clear(const ClearOption& option)

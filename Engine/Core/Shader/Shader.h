@@ -25,6 +25,8 @@ namespace tezcat::Tiny::Core
 		Shader(const std::string& name, int orderID);
 		~Shader();
 
+		virtual void create() {}
+		virtual void clear() {}
 		void apply();
 
 		inline const std::string& getName() const { return mName; }
@@ -140,6 +142,12 @@ namespace tezcat::Tiny::Core
 		virtual void setTexture2D(UniformID& uniform, Texture2D* data) = 0;
 		virtual void setTextureCube(UniformID& uniform, TextureCube* data) = 0;
 
+	public:
+		void cacheFilePath(const std::string& path)
+		{
+			mFilePath = path;
+		}
+		void rebuild(const UniformID::USet& uniforms);
 	private:
 		std::string mName;
 		int mUID;
@@ -177,7 +185,7 @@ namespace tezcat::Tiny::Core
 	protected:
 		std::unordered_map<std::string, uint32_t> mTextureID;
 		std::unordered_map<std::string, uint32_t> mUniformID;
-
 		std::vector<int> mTinyUniformList;
+		std::string mFilePath;
 	};
 }

@@ -4,9 +4,9 @@
 #include "../Head/ConfigHead.h"
 #include "Utility/Utility.h"
 
+struct GLFWwindow;
 namespace tezcat::Tiny::Core
 {
-	class Engine;
 	class GUIWindow;
 	class TINY_API GUI
 	{
@@ -16,12 +16,11 @@ namespace tezcat::Tiny::Core
 		void render();
 
 	public:
-		void init(Engine* engine);
+		void init(GLFWwindow* window);
 
 		void addWindow(GUIWindow* window)
 		{
 			mInitList.push_back(window);
-
 			mWindows.push_back(window);
 		}
 
@@ -42,7 +41,6 @@ namespace tezcat::Tiny::Core
 	private:
 		std::vector<GUIWindow*> mInitList;
 		std::vector<GUIWindow*> mWindows;
-		Engine* m_Engine;
 	};
 }
 

@@ -32,10 +32,6 @@ namespace tezcat::Tiny::Core
 	class TINY_API CameraManager
 	{
 	public:
-		Event<Camera*> eventCameraAdded;
-		Event<> eventSceneChanged;
-
-	public:
 		CameraManager();
 		void setCameraData(CameraData* data);
 
@@ -50,6 +46,9 @@ namespace tezcat::Tiny::Core
 		void addCamera(Camera* camera);
 	private:
 		CameraData* mData;
+
+	private:
+		static CameraData* sEmpty;
 	};
 
 	using CameraMgr = SG<CameraManager>;

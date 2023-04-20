@@ -200,6 +200,9 @@
     <ClCompile Include="Core\Shader\Uniform.cpp" />
     <ClCompile Include="Core\Tool\AABB.cpp" />
     <ClCompile Include="Core\Tool\FrustumCulling.cpp" />
+    <ClCompile Include="Core\Tool\Log.cpp" />
+    <ClCompile Include="Core\Event\EngineEvent.cpp" />
+    <ClCompile Include="Utility\Event.cpp" />
     <ClCompile Include="Utility\FileTool.cpp" />
     <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShaderBuilder.cpp" />
@@ -259,6 +262,8 @@
     <ClInclude Include="Core\Component\GameObject.h" />
     <ClInclude Include="Core\Shader\Uniform.h" />
     <ClInclude Include="Core\Tool\AABB.h" />
+    <ClInclude Include="Core\Tool\Log.h" />
+    <ClInclude Include="Core\Event\EngineEvent.h" />
     <ClInclude Include="Utility\DelegateCreator.h" />
     <ClInclude Include="Core\Tool\FrustumCulling.h" />
     <ClInclude Include="Utility\FileTool.h" />

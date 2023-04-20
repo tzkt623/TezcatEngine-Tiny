@@ -5,6 +5,7 @@
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Pipeline/PipelineQueue.h"
 #include "Core/Shader/ShaderPackage.h"
+#include "Core/Tool/Log.h"
 
 
 namespace tezcat::Tiny::GL
@@ -68,7 +69,8 @@ namespace tezcat::Tiny::GL
 					}
 					else
 					{
-						throw std::logic_error("GLShader: Shader Param [bool]`s string must [true] or [false]");
+						Log::error("GLShader: Shader Param [bool]`s string must [true] or [false]");
+						//throw std::logic_error("GLShader: Shader Param [bool]`s string must [true] or [false]");
 					}
 				}
 			}
@@ -91,6 +93,7 @@ namespace tezcat::Tiny::GL
 		for (auto id : mShaderIDs)
 		{
 			std::cout << "ShaderBuilder : " << id << "Deleted" << std::endl;
+			Log::engine(StringTool::stringFormat("ShaderBuilder : %d", id));
 			glDeleteShader(id);
 		}
 		mShaderIDs.clear();
@@ -107,37 +110,53 @@ namespace tezcat::Tiny::GL
 			buf << io.rdbuf();
 			data = buf.str();
 
-			this->splitPackage(data);
+			//this->splitPackage(data);
 		}
 		io.close();
 		return shader;
 	}
 
-	ShaderPackage* GLShaderBuilder::splitPackage(std::string& content)
+	void GLShaderBuilder::splitPackage(ShaderPackage* packge, std::string& content)
 	{
 		std::string head, passes;
 		if (splitConfig(content, head, passes, R"(#TINY_HEAD_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_HEAD_END)"))
 		{
-			auto pack = this->parsePackageHead(head);
-			this->splitPasses(pack, passes);
-			pack->apply();
-
-			return pack;
+			this->parsePackageHead(packge, head);
+			this->splitPasses(passes);
 		}
-
-		throw std::logic_error("Build Shader Error!");
+		else
+		{
+			Log::error("Build Shader Error!");
+			//throw std::logic_error("Build Shader Error!");
+		}
 	}
 
-	ShaderPackage* GLShaderBuilder::parsePackageHead(std::string& content)
+	void GLShaderBuilder::parsePackageHead(ShaderPackage* packge, std::string& content)
 	{
 		std::unordered_map<std::string, Any> map;
 		splitValue(content, map);
-		auto pack = new ShaderPackage();
-		pack->setConfig(map);
-		return pack;
+		packge->setConfig(map);
 	}
 
-	void GLShaderBuilder::splitPasses(ShaderPackage* pack, std::string& content)
+	void GLShaderBuilder::splitPasses(std::string& content)
+	{
+		std::regex pattern(R"(#TINY_PASS_BEGIN\s*\{\s*([\s\S]*?)\}\s*#TINY_PASS_END)");
+		std::sregex_iterator end;
+		for (auto i = std::sregex_iterator(content.begin(), content.end(), pattern); i != end; i++)
+		{
+			//UniformID::USet set;
+
+			std::string temp((*i)[1]);
+			mPassData.push_back(temp);
+			// 			auto shader = new GLShader();
+			// 			this->parseShaders(shader, temp, set);
+			// 			shader->apply(set);
+			// 
+			// 			pack->addShader(shader);
+		}
+	}
+
+	void GLShaderBuilder::splitPasses(GLShader* shader, std::string& content)
 	{
 		std::regex pattern(R"(#TINY_PASS_BEGIN\s*\{\s*([\s\S]*?)\}\s*#TINY_PASS_END)");
 		std::sregex_iterator end;
@@ -146,11 +165,8 @@ namespace tezcat::Tiny::GL
 			UniformID::USet set;
 
 			std::string temp((*i)[1]);
-			auto shader = new GLShader();
 			this->parseShaders(shader, temp, set);
 			shader->apply(set);
-
-			pack->addShader(shader);
 		}
 	}
 
@@ -177,105 +193,138 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
+	Shader* GLShaderBuilder::parseShaders(ShaderPackage* package, std::string& inContent, std::string& outShaderContent)
+	{
+		std::string config;
+		if (splitConfig(inContent, config, outShaderContent, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
+		{
+			std::unordered_map<std::string, Any> map;
+			if (splitValue(config, map))
+			{
+				auto shader = package->findShader(map["Name"].cast<std::string>());
+				this->setShaderConfig((GLShader*)shader, map);
+				return shader;
+			}
+		}
+		else
+		{
+			throw std::logic_error("GLShader: Pass Format Error");
+		}
+	}
+
+	//rebuild
+	void GLShaderBuilder::reparseShader(Shader* shader, std::string& content, UniformID::USet& uniformArray)
+	{
+		this->parseShader((GLShader*)shader
+			, content
+			, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
+			, GL_VERTEX_SHADER
+			, uniformArray);
+		this->parseShader((GLShader*)shader
+			, content
+			, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
+			, GL_FRAGMENT_SHADER
+			, uniformArray);
+	}
+
+	void GLShaderBuilder::setShaderConfig(Shader* shader, std::unordered_map<std::string, Any>& map)
+	{
+		shader->setVersion(map["Version"].cast<int>());
+		shader->setName(map["Name"].cast<std::string>());
+
+		//OrderID
+		auto it = map.find("OrderID");
+		if (it != map.end())
+		{
+			shader->setOrderID(it->second.cast<int>());
+		}
+		else
+		{
+			shader->setOrderID(2000);
+		}
+
+		//Queue
+		it = map.find("Queue");
+		if (it != map.end())
+		{
+			shader->setRenderQueue(PipelineQueue::getQueue(it->second.cast<std::string>()));
+		}
+		else
+		{
+			shader->setRenderQueue(PipelineQueue::Queue::None);
+		}
+
+		//LightMode
+		it = map.find("LightMode");
+		if (it != map.end())
+		{
+			shader->setLightMode(ContextMap::LightModeMap[it->second.cast<std::string>()]);
+		}
+		else
+		{
+			shader->setLightMode(LightMode::Unlit);
+		}
+
+		//DepthTest
+		it = map.find("DepthTest");
+		if (it != map.end())
+		{
+			shader->setDepthTest(ContextMap::DepthTestMap[it->second.cast<std::string>()]);
+			//ZWrite
+			it = map.find("ZWrite");
+			if (it != map.end())
+			{
+				shader->setZWrite(it->second.cast<bool>());
+			}
+			else
+			{
+				shader->setZWrite(false);
+			}
+		}
+		else
+		{
+			shader->setDepthTest(DepthTest::Off);
+		}
+
+
+		//Blend
+		it = map.find("Blend");
+		if (it != map.end() && it->second.cast<bool>())
+		{
+			shader->setBlend(true);
+			shader->setBlendFunction(ContextMap::BlendMap[map["BlendSrc"].cast<std::string>()]
+				, ContextMap::BlendMap[map["BlendTar"].cast<std::string>()]);
+		}
+		else
+		{
+			shader->setBlend(false);
+		}
+
+		//CullFace
+		it = map.find("CullFace");
+		if (it != map.end())
+		{
+			shader->setCullFace(ContextMap::CullFaceMap[it->second.cast<std::string>()]);
+		}
+
+		//Lighting
+		it = map.find("Lighting");
+		if (it != map.end())
+		{
+			shader->setLighting(it->second.cast<bool>());
+		}
+		else
+		{
+			shader->setLighting(false);
+		}
+	}
+
 	void GLShaderBuilder::parseShaderConfig(GLShader* shader, std::string& content)
 	{
 		std::unordered_map<std::string, Any> map;
 		if (splitValue(content, map))
 		{
-			shader->setVersion(map["Version"].cast<int>());
-
-			//Name
-			auto it = map.find("Name");
-			if (it != map.end())
-			{
-				shader->setName(it->second.cast<std::string>());
-			}
-
-			//OrderID
-			it = map.find("OrderID");
-			if (it != map.end())
-			{
-				shader->setOrderID(it->second.cast<int>());
-			}
-			else
-			{
-				shader->setOrderID(0);
-			}
-
-			//Queue
-			it = map.find("Queue");
-			if (it != map.end())
-			{
-				shader->setRenderQueue(PipelineQueue::getQueue(it->second.cast<std::string>()));
-			}
-			else
-			{
-				shader->setRenderQueue(PipelineQueue::Queue::None);
-			}
-
-			//LightMode
-			it = map.find("LightMode");
-			if (it != map.end())
-			{
-				shader->setLightMode(ContextMap::LightModeMap[it->second.cast<std::string>()]);
-			}
-			else
-			{
-				shader->setLightMode(LightMode::Unlit);
-			}
-
-			//DepthTest
-			it = map.find("DepthTest");
-			if (it != map.end())
-			{
-				shader->setDepthTest(ContextMap::DepthTestMap[it->second.cast<std::string>()]);
-				//ZWrite
-				it = map.find("ZWrite");
-				if (it != map.end())
-				{
-					shader->setZWrite(it->second.cast<bool>());
-				}
-				else
-				{
-					shader->setZWrite(false);
-				}
-			}
-			else
-			{
-				shader->setDepthTest(DepthTest::Off);
-			}
-
-
-			//Blend
-			it = map.find("Blend");
-			if (it != map.end() && it->second.cast<bool>())
-			{
-				shader->setBlend(true);
-				shader->setBlendFunction(ContextMap::BlendMap[map["BlendSrc"].cast<std::string>()]
-					, ContextMap::BlendMap[map["BlendTar"].cast<std::string>()]);
-			}
-			else
-			{
-				shader->setBlend(false);
-			}
-
-			//CullFace
-			it = map.find("CullFace");
-			if (it != map.end())
-			{
-				shader->setCullFace(ContextMap::CullFaceMap[it->second.cast<std::string>()]);
-			}
-
-			//Lighting
-			it = map.find("Lighting");
-			if (it != map.end())
-			{
-				shader->setLighting(it->second.cast<bool>());
-			}
-			else
-			{
-				shader->setLighting(false);
-			}
+			this->setShaderConfig(shader, map);
 		}
 		else
 		{
@@ -414,7 +463,9 @@ namespace tezcat::Tiny::GL
 		}
 		else
 		{
-			throw std::logic_error("GLShader: Shader Format Error");
+			//throw std::logic_error("GLShader: Shader Format Error");
+
+			Log::error("GLShader: Shader Format Error");
 		}
 	}
 
@@ -433,10 +484,12 @@ namespace tezcat::Tiny::GL
 			switch (shaderType)
 			{
 			case GL_VERTEX_SHADER:
-				std::cout << "GLShader [" + shader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
+				//std::cout << "GLShader [" + shader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
+				Log::error(StringTool::stringFormat("GLShader[%s]: [VERTEX] COMPILATION_FAILED > %s)", shader->getName(), infoLog));
 				break;
 			case GL_FRAGMENT_SHADER:
-				std::cout << "GLShader [" + shader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
+				//std::cout << "GLShader [" + shader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
+				Log::error(StringTool::stringFormat("GLShader[%s]: [FRAGMENT] COMPILATION_FAILED > %s)", shader->getName(), infoLog));
 				break;
 			default:
 				break;
@@ -447,10 +500,53 @@ namespace tezcat::Tiny::GL
 		shader->attachShader(shader_id);
 	}
 
+	//
 	ShaderPackage* GLShaderCreator::create(const std::string& filePath)
 	{
 		auto data = FileTool::loadText(filePath);
+		ShaderPackage* package = new ShaderPackage();
+
 		GLShaderBuilder builder;
-		return builder.splitPackage(data);
+		//分离出所有的pass和配置数据
+		builder.splitPackage(package, data);
+
+		//针对每一个pass生成shader
+		for (auto& data : builder.mPassData)
+		{
+			UniformID::USet uniform_ary;
+			auto shader = new GLShader();
+			shader->create();
+			builder.parseShaders(shader, data, uniform_ary);
+			shader->apply(uniform_ary);
+			package->addShader(shader);
+		}
+
+		package->apply();
+
+		mShaderPath.emplace(package->getName(), filePath);
+		return package;
 	}
+
+	//
+	void GLShaderCreator::rebuild(ShaderPackage* package)
+	{
+		auto data = FileTool::loadText(mShaderPath[package->getName()]);
+		GLShaderBuilder builder;
+		builder.splitPackage(package, data);
+		Log::engine(StringTool::stringFormat("Rebuild ShaderPackage>>> %s", package->getName().c_str()));
+
+		int index = 0;
+		//针对每一个pass生成shader
+		for (auto& data : builder.mPassData)
+		{
+			UniformID::USet uniform_ary;
+			std::string shader_content;
+			auto shader = builder.parseShaders(package, data, shader_content);
+			shader->create();
+			builder.reparseShader(shader, shader_content, uniform_ary);
+			shader->rebuild(uniform_ary);
+			Log::engine(StringTool::stringFormat("Rebuild Shader %s", shader->getName().c_str()));
+		}
+	}
+
 }

@@ -31,7 +31,11 @@ namespace tezcat::Tiny::Core
 	void ShaderPackage::apply()
 	{
 		mUID = ShaderMgr::getInstance()->giveUID();
+		this->sort();
+	}
 
+	void ShaderPackage::sort()
+	{
 		if (mShaders.size() > 1)
 		{
 			std::sort(mShaders.begin(), mShaders.end(),
@@ -40,5 +44,25 @@ namespace tezcat::Tiny::Core
 					return a->getOrderID() < b->getOrderID();
 				});
 		}
+	}
+
+	void ShaderPackage::rebuild()
+	{
+		ShaderMgr::getInstance()->rebuild(this);
+	}
+
+	Shader* ShaderPackage::findShader(const std::string& name)
+	{
+		auto it = std::find_if(mShaders.begin(), mShaders.end(), [&](Shader* a)
+		{
+			return a->getName() == name;
+		});
+
+		if (it != mShaders.end())
+		{
+			return *it;
+		}
+
+		return nullptr;
 	}
 }

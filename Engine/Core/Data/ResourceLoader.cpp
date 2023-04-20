@@ -10,6 +10,7 @@ namespace tezcat::Tiny::Core
 	ResourceLoader::ResourceLoader(RenderAPI renderAPI)
 		: mWindowWidth(0)
 		, mWindowHeight(0)
+		, mEnableVsync(true)
 	{
 		EngineConfig::sRenderAPI = renderAPI;
 	}
@@ -48,6 +49,7 @@ namespace tezcat::Tiny::Core
 
 	void ResourceLoader::prepareGame(Engine* engine)
 	{
+
 	}
 
 	void ResourceLoader::createSomeMode()

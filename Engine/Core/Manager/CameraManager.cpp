@@ -5,8 +5,10 @@
 
 namespace tezcat::Tiny::Core
 {
+	CameraData* CameraManager::sEmpty = new CameraData();
+
 	CameraManager::CameraManager()
-		: mData(nullptr)
+		: mData(sEmpty)
 	{
 		CameraMgr::attach(this);
 	}
@@ -14,7 +16,6 @@ namespace tezcat::Tiny::Core
 	void CameraManager::addCamera(Camera* camera)
 	{
 		mData->addCamera(camera);
-		eventCameraAdded.dispatch(camera);
 	}
 
 	void CameraManager::setMainCamera(Camera* camera)
@@ -40,7 +41,6 @@ namespace tezcat::Tiny::Core
 	void CameraManager::setCameraData(CameraData* data)
 	{
 		mData = data;
-		eventSceneChanged.dispatch();
 	}
 
 

@@ -4,6 +4,12 @@
 struct GLFWwindow;
 
 using namespace tezcat::Tiny::Core;
+
+namespace tezcat::Tiny::Core
+{
+	class GUI;
+}
+
 namespace tezcat::Tiny::GL
 {
 	class TINY_API WindowsEngine : public Engine
@@ -19,9 +25,9 @@ namespace tezcat::Tiny::GL
 		void endLoop() override;
 		void onUpdate() override;
 
-		bool preInit(ResourceLoader* loader) override;
-		bool onInit(ResourceLoader* loader) override;
-		bool postInit(ResourceLoader* loader) override;
+		bool preInit() override;
+		bool onInit() override;
+		bool postInit() override;
 
 		BaseGraphics* createGraphics() override;
 
@@ -38,5 +44,44 @@ namespace tezcat::Tiny::GL
 
 		double mTimeOld;
 		double mTimeNow;
+	};
+
+	/// <summary>
+	/// engine负责所有window相关的操作
+	/// graphics只负责draw
+	///
+	///	editor初始化
+	/// editor开始渲染
+	/// 并不启动engine的内容
+	/// 
+	/// </summary>
+	class TINY_API WindowsEditor : public Engine
+	{
+	public:
+		void setGLVersion(int major, int minor);
+		GUI* getGUI();
+
+	protected:
+		bool preInit() override;
+		bool onInit() override;
+		bool postInit() override;
+		void beforeLoop() override;
+		void endLoop() override;
+		void preUpdate() override;
+		void postUpdate() override;
+		void onUpdate() override;
+		BaseGraphics* createGraphics() override;
+
+
+	private:
+		GLFWwindow* mWindow;
+
+		double mTimeOld;
+		double mTimeNow;
+
+		int mGLMajor;
+		int mGLMinor;
+
+		GUI* mGUI;
 	};
 }

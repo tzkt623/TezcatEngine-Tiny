@@ -17,6 +17,7 @@ namespace tezcat::Tiny::Core
 
 	void SceneManager::init()
 	{
+
 	}
 
 	void SceneManager::pushScene(const std::string& name)
@@ -26,12 +27,28 @@ namespace tezcat::Tiny::Core
 			mScenes.top()->onPause();
 		}
 
-		auto it = m_SceneWithName.find(name);
-		if (it != m_SceneWithName.end())
+		auto it = mSceneWithName.find(name);
+		if (it != mSceneWithName.end())
 		{
 			mScenes.push(it->second);
 			it->second->onEnter();
 		}
+	}
+
+	void SceneManager::pushScene(Scene* scene)
+	{
+		if (!mScenes.empty())
+		{
+			if (mScenes.top() == scene)
+			{
+				return;
+			}
+
+			mScenes.top()->onPause();
+		}
+
+		mScenes.push(scene);
+		scene->onEnter();
 	}
 
 	void SceneManager::popScene()
@@ -43,12 +60,18 @@ namespace tezcat::Tiny::Core
 
 	void SceneManager::prepareScene(Scene* scene)
 	{
-		m_SceneWithName.emplace(scene->getName(), scene);
+		mSceneWithName.emplace(scene->getName(), scene);
 	}
 
-	void SceneManager::update()
+	bool SceneManager::update()
 	{
 		TINY_PROFILER_TIMER_OUT(Statistic::LogicTime);
+		if (mScenes.empty())
+		{
+			return false;
+		}
+
 		mScenes.top()->update();
+		return true;
 	}
 }

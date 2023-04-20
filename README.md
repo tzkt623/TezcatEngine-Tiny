@@ -3,13 +3,36 @@
 ## **引擎二周目进行中**
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
 
 注意!本引擎使用C++20版本
 
 Notice!Tiny Use The C++20 Ver.
 
-## **代码结构 Code**
+## **编辑器(Editor)**
+
+### 场景总览(Scene Overview)
+
+目前场景总览可以看到所有当前场景中的对象
+
+Now Scene Overview can show all object in current scene, and you can select one of them
+
+### 对象总览(Object Overview)
+
+目前对象总览可以看到对象上绑定的组件的信息,还可以与其互动
+
+Now Object Overview can show components bind in object when you selected
+
+### 热编译着色器(Runtime Rebuild Shader)
+
+可以在运行时重新编译着色器
+
+Now Editor an rebuild shader in runtime.
+
+主菜单->Shader->Rebuild之下选你想重新编译的,或者选all全部编译
+
+MainMenu->Shader->Rebuild, Choose your want or All
+
+## **代码结构(Code)**
 
 因为我用unity比较多,就模仿了他的结构,现在的结构是这样
 
@@ -48,7 +71,7 @@ mr1->setMaterial(world2_material);
 mr1->setMesh("Square");
 ```
 
-## **创建游戏对象 Create GameObjects**
+## **创建游戏对象(Create GameObjects)**
 
 - 创建相机
   Create a Camera

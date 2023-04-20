@@ -5,64 +5,105 @@
 
 namespace tezcat::Tiny::Utility
 {
-	//--------------------------------------
-	//
-	// Event
-	//
-#define BindEvent_0(x) std::bind(&x, this)
-#define BindEvent_1(x) std::bind(&x, this, std::placeholders::_1)
-#define BindEvent_2(x) std::bind(&x, this, std::placeholders::_1, std::placeholders::_2)
-#define BindEvent_3(x) std::bind(&x, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
-	template<typename... Args>
+#define BindEvent(x) std::bind(&x, this, std::placeholders::_1)
+
+	typedef uint32_t EventID;
+
+	struct EventData
+	{
+		EventID eventID;
+		void* userData;
+	};
+
 	class TINY_API Event
 	{
-		class Data
+		class Listener
 		{
 		public:
-			void* master;
-			std::function<void(Args...)> callback;
-		};
-	public:
-		Event() { }
-		~Event()
-		{
-			for (auto d : mList)
+			Listener()
+				: preData(nullptr)
+				, nextData{ nullptr }
+				, callback()
 			{
-				delete d;
+
 			}
-		}
+			~Listener()
+			{
+				this->preData = nullptr;
+				this->nextData = nullptr;
+			}
 
-	public:
-		void addListener(void* master, const std::function<void(Args...)>& function)
-		{
-			mList.push_back(new Data{ master, std::move(function) });
-		}
+			std::function<void(const EventData&)> callback;
 
-		bool removeListener(void* master)
-		{
-			auto result = std::find(mList.begin(), mList.end(),
-				[master](Data* data)
+			void pushBack(Listener* data)
+			{
+				this->nextData = data;
+				data->preData = this;
+			}
+
+			void pushFront(Listener* data)
+			{
+				this->preData = data;
+				data->nextData = this;
+			}
+
+			void removeSelf()
+			{
+				if (this->preData)
 				{
-					return data->master == master;
-				});
-			if (result != mList.end())
-			{
-				mList.erase(result);
-				return true;
+					this->preData->nextData = this->nextData;
+				}
+
+				if (this->nextData)
+				{
+					this->nextData->preData = this->preData;
+				}
 			}
 
-			return false;
-		}
+			Listener* preData;
+			Listener* nextData;
+		};
 
-		void dispatch(Args... args)
+		class ListenerList
 		{
-			for (auto d : mList)
+		public:
+			ListenerList() : mRoot(nullptr) {}
+			~ListenerList() {}
+
+		public:
+			void push(Listener* listener)
 			{
-				d->callback(args...);
+				if (mRoot == nullptr)
+				{
+					mRoot = listener;
+				}
+				else
+				{
+					mRoot->nextData = listener;
+					listener->preData = mRoot;
+					mRoot = listener;
+				}
 			}
-		}
+
+			Listener* mRoot;
+		};
+
+	public:
+		Event() {}
+		~Event() {}
+
+	public:
+		void init(int eventCount);
+
+	public:
+		void addListener(const EventID& eventID, void* master, const std::function<void(const EventData&)>& function);
+		bool removeListener(void* master);
+		void dispatch(const EventData& eventData);
 
 	private:
-		std::vector<Data*> mList;
+		std::vector<ListenerList*> mList;
+		std::unordered_map<void*, std::vector<Listener*>*> mListenerWithOwnerUMap;
 	};
+
+
 }

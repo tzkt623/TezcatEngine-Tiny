@@ -4,6 +4,11 @@
 #include "Core/Shader/Uniform.h"
 #include "Core/Manager/ShaderManager.h"
 
+namespace tezcat::Tiny::Core
+{
+	class Shader;
+}
+
 namespace tezcat::Tiny::GL
 {
 	/*
@@ -34,15 +39,28 @@ namespace tezcat::Tiny::GL
 		GLShaderBuilder();
 		~GLShaderBuilder();
 		GLShader* loadFromFile(const char* filePath);
-		ShaderPackage* splitPackage(std::string& content);
+
+		/// <summary>
+		/// 分离package得到各个pass和pack config
+		/// </summary>
+		void splitPackage(ShaderPackage *packge, std::string& content);
+		void splitPasses(std::string& content);
+		void parseShaders(GLShader* shader, std::string& content, UniformID::USet& uniformArray);
+		Shader* parseShaders(ShaderPackage* package, std::string& inContent, std::string& outShaderContent);
+		void reparseShader(Shader* shader, std::string& content, UniformID::USet& uniformArray);
 
 	private:
 		void loadFromData(GLShader* shader, const char* data, uint32_t shaderType);
-		void parseShaders(GLShader* shader, std::string& content, UniformID::USet& uniformArray);
 		void parseShaderConfig(GLShader* shader, std::string& content);
 		void parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType, UniformID::USet& uniformArray);
-		void splitPasses(ShaderPackage* pack, std::string& content);
-		ShaderPackage* parsePackageHead(std::string& content);
+		void splitPasses(GLShader* shader, std::string& content);
+		void parsePackageHead(ShaderPackage* packge, std::string& content);
+		void setShaderConfig(Shader* shader, std::unordered_map<std::string, Any>& map);
+
+	public:
+		std::unordered_map<std::string, Any> mConfigUMap;
+		std::vector<std::string> mPassData;
+
 
 	private:
 		std::vector<uint32_t> mShaderIDs;
@@ -53,6 +71,10 @@ namespace tezcat::Tiny::GL
 	{
 	public:
 		ShaderPackage* create(const std::string& filePath) override;
+		void rebuild(ShaderPackage* package) override;
+
+	private:
+		std::unordered_map<std::string, std::string> mShaderPath;
 	};
 }
 

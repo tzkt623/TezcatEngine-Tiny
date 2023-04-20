@@ -15,6 +15,11 @@ MyViewPortWindow::~MyViewPortWindow()
 
 }
 
+void MyViewPortWindow::begin()
+{
+	ImGui::Begin(this->getName(), 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_MenuBar);
+}
+
 void MyViewPortWindow::onUpdate()
 {
 
@@ -67,6 +72,8 @@ void MyViewPortWindow::calculate(const ImVec2& inTextureSize, const ImVec2& inWi
 
 void MyViewPortWindow::onRender()
 {
+	static bool bInfo;
+
 	if (mColorBuffer == nullptr)
 	{
 		mColorBuffer = (TextureBuffer2D*)TextureMgr::getInstance()->findTexture("RB_World1");
@@ -74,7 +81,7 @@ void MyViewPortWindow::onRender()
 
 	if (mColorBuffer)
 	{
-		ImVec2 texture_size = ImVec2(Engine::getScreenWidth(), Engine::getScreenHeight());
+		ImVec2 texture_size = ImVec2((float)Engine::getScreenWidth(), (float)Engine::getScreenHeight());
 		ImVec2 display_size, offset, uv0, uv1;
 
 		this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
@@ -86,5 +93,59 @@ void MyViewPortWindow::onRender()
 			, display_size
 			, uv0
 			, uv1);
+	}
+
+
+	if (ImGui::BeginMenuBar())
+	{
+		ImGui::MenuItem("Info", 0, &bInfo);
+		if (bInfo)
+		{
+			auto pos = ImGui::GetItemRectMin();
+			pos.y += ImGui::GetItemRectSize().y;
+			this->drawInfo(pos);
+		}
+
+		ImGui::EndMenuBar();
+	}
+}
+
+void MyViewPortWindow::drawInfo(const ImVec2& pos)
+{
+	ImGui::SetNextWindowPos(pos);
+	ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+	if (ImGui::Begin("状态(State)", 0, window_flags))
+	{
+		//gpu
+		ImGui::Text("GPU: %s", Statistic::GPU);
+		//memory
+		ImGui::Text("Memory: %.3f kb", Statistic::getMemoryUse() / 1024.0f);
+		//logic time
+		ImGui::Text("LogicTime: %.1f ms", Statistic::LogicTime);
+
+		//render time
+		mFrameTimeBuffer.push_back((float)Statistic::RenderTime);
+		if (mFrameTimeBuffer.size() > 40)
+		{
+			mFrameTimeBuffer.erase(mFrameTimeBuffer.begin());
+		}
+		ImGui::SetNextItemWidth(200);
+		ImGui::PlotLines("Frame Times", &mFrameTimeBuffer[0], (int)mFrameTimeBuffer.size());
+		ImGui::SameLine();
+		ImGui::Text("%.1f ms", Statistic::RenderTime);
+
+		//fps
+		ImGui::Text("FPS: %.1f(%.3f ms/Frame)", GUIFunction::getFrameRate(), GUIFunction::getFrameRateTime());
+
+		//draw
+		ImGui::Text("PassCount: %d", Statistic::PassCount);
+		ImGui::Text("DrawCount: %d", Statistic::DrawCall);
+
+		//mouse
+		ImGui::InputFloat2("MousePosition", glm::value_ptr(Statistic::mousePosition), "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat2("MouseOffset", glm::value_ptr(Statistic::mouseOffset), "%.3f", ImGuiInputTextFlags_ReadOnly);
+
+		ImGui::End();
 	}
 }

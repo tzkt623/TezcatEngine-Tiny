@@ -143,6 +143,33 @@ namespace tezcat::Tiny::Core
 		{
 			mIsDirty = true;
 			mLocalRotation += offset;
+
+			if (mLocalRotation.x > 360.0f)
+			{
+				mLocalRotation.x -= 360.0f;
+			}
+			else if (mLocalRotation.x < 360.0f)
+			{
+				mLocalRotation.x += 360.0f;
+			}
+
+			if (mLocalRotation.y > 360.0f)
+			{
+				mLocalRotation.y -= 360.0f;
+			}
+			else if (mLocalRotation.y < 360.0f)
+			{
+				mLocalRotation.y += 360.0f;
+			}
+
+			if (mLocalRotation.z > 360.0f)
+			{
+				mLocalRotation.z -= 360.0f;
+			}
+			else if (mLocalRotation.z < 360.0f)
+			{
+				mLocalRotation.z += 360.0f;
+			}
 		}
 
 	protected:

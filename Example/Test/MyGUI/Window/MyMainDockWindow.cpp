@@ -67,10 +67,44 @@ void MyMainDockWindow::onRender()
 
 		if (ImGui::BeginMenuBar())
 		{
-			if (ImGui::BeginMenu("Options"))
+			if (ImGui::BeginMenu("Scene"))
 			{
+				auto& scenes = SceneMgr::getInstance()->getAllScenes();
+				for (auto it : scenes)
+				{
+					if (ImGui::MenuItem(it.first.c_str()))
+					{
+						SceneMgr::getInstance()->pushScene(it.second);
+					}
+				}
+
 				ImGui::EndMenu();
 			}
+
+			if (ImGui::BeginMenu("Shader"))
+			{
+				if (ImGui::BeginMenu("Rebuild"))
+				{
+					if (ImGui::MenuItem("All"))
+					{
+						ShaderMgr::getInstance()->rebuildShaders();
+					}
+					ImGui::Separator();
+
+					auto& packages = ShaderMgr::getInstance()->getAllShaderPackages();
+					for (auto package : packages)
+					{
+						if (ImGui::MenuItem(package->getName().c_str()))
+						{
+							package->rebuild();
+						}
+					}
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 
@@ -79,12 +113,12 @@ void MyMainDockWindow::onRender()
 
 }
 
-void MyMainDockWindow::beginParent()
+void MyMainDockWindow::begin()
 {
 
 }
 
-void MyMainDockWindow::endParent()
+void MyMainDockWindow::end()
 {
 
 }

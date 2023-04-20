@@ -60,6 +60,11 @@ namespace tezcat::Tiny::GL
 		void setTexture2D(UniformID& uniform, Texture2D* data) override;
 		void setTextureCube(UniformID& uniform, TextureCube* data) override;
 
+	public:
+		void create() override;
+		void clear() override;
+
+
 	protected:
 		void onApply(const UniformID::USet& uniforms) override;
 

@@ -1,36 +1,21 @@
 #include "MyScene.h"
 #include "MyInputer.h"
-#include "MyGUI/MyGUI.h"
 #include "MyController.h"
-
-#define CreateWindow(X) (new X)->open()
 
 MyScene::MyScene(const std::string& name)
 	: Scene(name)
 {
-	InputSys::getInstance()->push(MyInputer::getInstance());
-}
 
-void MyScene::initGUI()
-{
-	CreateWindow(MyMainDockWindow);
-	CreateWindow(MyViewPortWindow);
-	CreateWindow(MyInfoWindow);
-	CreateWindow(MyObjectWindow);
-	CreateWindow(MyOverviewWindow);
-	CreateWindow(MyLogWindow);
 }
-
 
 
 void MyScene::onEnter()
 {
 	Scene::onEnter();
+	InputSys::getInstance()->push(MyInputer::getInstance());
 
 	float gateWidth = 1920.0f / 4;
 	float gateHigh = 1080.0f / 4;
-
-
 
 
 	// 	auto controller_go = new GameObject("Controller");
@@ -38,7 +23,6 @@ void MyScene::onEnter()
 	// 	controller_go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
 	// 	controller_go->addComponent<FlyController>();
 	//	MyInputer::getInstance()->setController(controller_go->addComponent<FlyController>());
-
 
 
 	//地板
@@ -182,7 +166,7 @@ void MyScene::onEnter()
 	//
 	//	Transparent
 	//
-	if (false)
+	if (true)
 	{
 		this->createTransparentObject();
 	}
@@ -206,7 +190,7 @@ void MyScene::onEnter()
 	//
 	//	Cubes 1
 	//
-	if (false)
+	if (true)
 	{
 		std::random_device rd;
 		std::mt19937 gen(rd());
@@ -215,23 +199,21 @@ void MyScene::onEnter()
 		for (int i = 0; i < 1000; i++)
 		{
 			auto go = new GameObject();
-			go->setLayerMaskIndex(1);
+			go->setLayerMaskIndex(0);
 			go->addComponent<Transform>();
-			go->getTransform()->setPosition(glm::vec3(dis(gen) / 10.0f, dis(gen) / 10.0f, dis(gen) / 10.0f));
+			go->getTransform()->setPosition(glm::vec3(dis(gen), dis(gen), dis(gen)));
+			go->getTransform()->setScale(glm::vec3(10.0f));
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = new Material("Standard/Std1");
 			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "metal_plate_diff");
 			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "metal_plate_spec");
 			material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 16.0f);
-			material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
+			//material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
 			mr->setMaterial(material);
-			mr->setMesh("Cube");
+			mr->setMesh("Sphere");
 		}
 	}
-
-
-	this->initGUI();
 }
 
 void MyScene::createGates(float gateWidth, float gateHigh)
@@ -376,6 +358,7 @@ void MyScene::createTransparentObject()
 
 void MyScene::createInfinitePlane()
 {
+	Log::info("createInfinitePlane");
 	auto go = new GameObject("InfinitePlane");
 	go->addComponent<Transform>()->setPosition(0.0f, 0.0f, 0.0f);
 	auto mr = go->addComponent<MeshRenderer>();
@@ -387,6 +370,7 @@ void MyScene::createInfinitePlane()
 
 void MyScene::createDirectionLight()
 {
+	Log::info("createDirectionLight");
 	auto direction_light_go = new GameObject("DirectionLight");
 	direction_light_go->addComponent<Transform>();
 	direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 600.0f));
@@ -406,10 +390,17 @@ void MyScene::createDirectionLight()
 	dir_light->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
 	dir_light->setAmbient(glm::vec3(0.1f));
 	dir_light->setSpecular(glm::vec3(0.5f));
+
+	float rotation = 0;
+	dir_light->startLogic([=]()
+	{
+		direction_light_go->getTransform()->rotate(glm::vec3(0.0f, 10.0f * Engine::getDeltaTime(), 0.0f));
+	});
 }
 
 void MyScene::createPBR()
 {
+	Log::info("createPBR");
 	auto go = new GameObject("PBRBall1");
 	go->addComponent<Transform>();
 	go->getTransform()->setPosition(glm::vec3(20.0f, 0.0f, -20.0f));
@@ -447,7 +438,7 @@ void MyScene::createPBR()
 	{
 		for (int x = 0; x <= 5; x++)
 		{
-			auto go = new GameObject("PBRBall2");
+			auto go = new GameObject(StringTool::stringFormat("PBRBall_%d_%d", x, y));
 			go->addComponent<Transform>();
 			go->getTransform()->setPosition(glm::vec3(x * 30.0f, y * 30.0f, -60.0f));
 			go->getTransform()->setScale(glm::vec3(10.0f));

@@ -29,4 +29,7 @@ namespace tezcat::Tiny::Core
 		glm::vec3 m_Min;
 		glm::vec3 m_Max;
 	};
+
+
+
 }

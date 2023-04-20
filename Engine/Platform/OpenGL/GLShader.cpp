@@ -1,5 +1,6 @@
 #include "GLShader.h"
 #include "Core/Renderer/Texture.h"
+#include "Core/Tool/Log.h"
 
 
 namespace tezcat::Tiny::GL
@@ -7,7 +8,6 @@ namespace tezcat::Tiny::GL
 	GLShader::GLShader()
 		: mTexureCountor(0)
 	{
-		mProgramID = glCreateProgram();
 	}
 
 	GLShader::~GLShader()
@@ -42,6 +42,7 @@ namespace tezcat::Tiny::GL
 			glGetProgramInfoLog(mProgramID, 512, nullptr, infoLog);
 		}
 
+		mTinyUniformList.resize(UniformID::allStringCount(), -1);
 		for (auto& uniform_id : uniforms)
 		{
 			//std::cout << uniform_id.getString() << std::endl;
@@ -51,7 +52,7 @@ namespace tezcat::Tiny::GL
 			}
 			else
 			{
-				std::invalid_argument(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", uniform_id.getStringData()));
+				Log::error(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", uniform_id.getStringData()));
 			}
 		}
 
@@ -316,5 +317,20 @@ namespace tezcat::Tiny::GL
 	void GLShader::resetState()
 	{
 		mTexureCountor = 0;
+	}
+
+	void GLShader::clear()
+	{
+
+	}
+
+	void GLShader::create()
+	{
+		if (mProgramID > 0)
+		{
+			glDeleteProgram(mProgramID);
+		}
+
+		mProgramID = glCreateProgram();
 	}
 }

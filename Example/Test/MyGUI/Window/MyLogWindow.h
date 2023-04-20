@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../MyGUIContext.h"
+#include "Core/Tool/Log.h"
 
 class MyLogWindow : public GUIWindow
 {
 public:
 	MyLogWindow();
 	virtual ~MyLogWindow();
-private:
 
 protected:
 	void onRender() override;
@@ -15,6 +15,8 @@ protected:
 
 	void clear();
 	void addLog(const char* fmt, ...) IM_FMTARGS(2);
+	void addLog(const std::string& info);
+
 private:
 	ImGuiTextBuffer mTextBuffer;
 	ImGuiTextFilter mFilter;

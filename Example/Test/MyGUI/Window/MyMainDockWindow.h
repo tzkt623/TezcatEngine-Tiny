@@ -13,8 +13,8 @@ protected:
 	void onRender() override;
 
 public:
-	void beginParent() override;
-	void endParent() override;
+	void begin() override;
+	void end() override;
 
 private:
 	ImGuiWindowFlags mWindowFlags;

@@ -13,6 +13,7 @@ namespace tezcat::Tiny::Core
 	{
 	public:
 		virtual ShaderPackage* create(const std::string& filePath) = 0;
+		virtual void rebuild(ShaderPackage* package) = 0;
 	};
 
 	class TINY_API ShaderManager : public Manager<ShaderCreator>
@@ -28,11 +29,16 @@ namespace tezcat::Tiny::Core
 		void addShaderPackage(ShaderPackage* shaderPackage);
 		ShaderPackage* findPackage(const std::string& name);
 		ShaderPackage* create(const std::string& filePath);
+		std::vector<Shader*>& getAllShaders() { return mAllShaderList; }
+		std::vector<ShaderPackage*>& getAllShaderPackages() { return mShaderPackageAry; }
 
 	public:
 		void loadIncludeFiles(const std::string& path);
-		std::string getIncludeContent(const std::string& name);
 
+		std::string getIncludeContent(const std::string& name);
+		void clearIncludeFiles();
+		void rebuildShaders();
+		void rebuild(ShaderPackage* package);
 
 	private:
 		std::unordered_map<std::string, ShaderPackage*> mShaderPackageDict;
@@ -41,7 +47,6 @@ namespace tezcat::Tiny::Core
 
 		std::unordered_map<std::string, std::string> mIncludeFileDict;
 	public:
-		void clearIncludeFiles();
 	};
 
 	using ShaderMgr = SG<ShaderManager>;

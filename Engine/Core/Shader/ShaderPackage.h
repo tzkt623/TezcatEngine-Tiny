@@ -15,12 +15,15 @@ namespace tezcat::Tiny::Core
 	public:
 		void addShader(Shader* shader);
 		void setConfig(std::unordered_map<std::string, Any>& data);
+		void sort();
 		void apply();
+		void rebuild();
 
 	public:
 		const std::vector<Shader*>& getShaders() { return mShaders; }
 		std::string& getName() { return mName; }
 		int getUID() const { return mUID; }
+		Shader* findShader(const std::string& name);
 
 	private:
 		int mUID;

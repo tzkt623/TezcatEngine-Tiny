@@ -17,6 +17,7 @@
 #include "Shader/ShaderParam.h"
 
 #include "Utility/Utility.h"
+#include "Event/EngineEvent.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -55,17 +56,19 @@ namespace tezcat::Tiny::Core
 
 	bool Engine::init(ResourceLoader* loader)
 	{
-		if (!this->preInit(loader))
+		EngineEvent::get()->init(EngineEventID::EE_IDCount);
+		mResourceLoader = loader;
+		if (!this->preInit())
 		{
 			return false;
 		}
 
-		if (!this->onInit(loader))
+		if (!this->onInit())
 		{
 			return false;
 		}
 
-		if (!this->postInit(loader))
+		if (!this->postInit())
 		{
 			return false;
 		}
@@ -73,36 +76,35 @@ namespace tezcat::Tiny::Core
 		return true;
 	}
 
-	bool Engine::preInit(ResourceLoader* loader)
+	bool Engine::preInit()
 	{
-		mResourceLoader = loader;
-		ShaderParam::initAllParam(std::bind(&ResourceLoader::initYourShaderParam, mResourceLoader));
 		mResourceLoader->prepareEngine(this);
-
 		ScreenWidth = mResourceLoader->getWindowWidth();
 		ScreenHeight = mResourceLoader->getWindowHeight();
 
+		ShaderParam::initAllParam(std::bind(&ResourceLoader::initYourShaderParam, mResourceLoader));
+
 		LayerMask::init();
+		FileTool::init(mResourceLoader->getResourceFolderName());
 		return true;
 	}
 
-	bool Engine::onInit(ResourceLoader* loader)
+	bool Engine::onInit()
 	{
 		mGraphics = this->createGraphics();
-		Graphics::attach(mGraphics);
 		mGraphics->init(this);
 
-		FileTool::init(mResourceLoader->getResourceFolderName());
 		mResourceLoader->prepareResource(this);
 		return true;
 	}
 
-	bool Engine::postInit(ResourceLoader* loader)
+	bool Engine::postInit()
 	{
 		mSceneManager->init();
 		mResourceLoader->prepareGame(this);
 		return true;
 	}
+
 	void Engine::beforeLoop()
 	{
 
@@ -137,12 +139,11 @@ namespace tezcat::Tiny::Core
 		mInputSystem->update();
 		mSceneManager->update();
 		mGraphics->render();
-		mGraphics->swapBuffer();
 	}
 
 	void Engine::postUpdate()
 	{
-
+		GameObject::clearDeletedGameObjects();
 	}
 
 	void Engine::stop()

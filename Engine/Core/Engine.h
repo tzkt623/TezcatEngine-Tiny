@@ -27,9 +27,9 @@ namespace tezcat::Tiny::Core
 		BaseGraphics* getGraphics() { return mGraphics; }
 
 	protected:
-		virtual bool preInit(ResourceLoader* loader);
-		virtual bool onInit(ResourceLoader* loader);
-		virtual bool postInit(ResourceLoader* loader);
+		virtual bool preInit();
+		virtual bool onInit();
+		virtual bool postInit();
 
 		virtual void stop();
 		virtual void beforeLoop();
@@ -50,22 +50,18 @@ namespace tezcat::Tiny::Core
 		TextureManager* mTextureManager;
 		PipelineManager* mPipelineManager;
 		VertexManager* mVertexManager;
-
-
 		InputSystem* mInputSystem;
 		ResourceLoader* mResourceLoader;
-
-	private:
 		BaseGraphics* mGraphics;
-
 
 	protected:
 		bool mIsRunning;
 
 	public:
-		inline static int getScreenWidth() { return ScreenWidth; }
-		inline static int getScreenHeight() { return ScreenHeight; }
-		inline static float getDeltaTime() { return sDeltaTime; }
+		inline static const int& getScreenWidth() { return ScreenWidth; }
+		inline static const int& getScreenHeight() { return ScreenHeight; }
+		inline static const float& getDeltaTime() { return sDeltaTime; }
+
 	protected:
 		static int ScreenWidth;
 		static int ScreenHeight;

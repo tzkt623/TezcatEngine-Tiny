@@ -1,10 +1,8 @@
 #include "MyOverviewWindow.h"
 
 
-
-
 MyOverviewWindow::MyOverviewWindow()
-	: GUIWindow("总览")
+	: GUIWindow("对象总览(Object)")
 	, mGameObject(nullptr)
 	, mOpen(true)
 {
@@ -174,7 +172,7 @@ void MyOverviewWindow::drawMeshRenderer(Component* com)
 			{
 				auto tex = (UniformTex2D*)uniform;
 				ImGui::Text(UniformID::getStringStatic(tex->ID).data());
-				ImGui::Image((ImTextureID)tex->value->getTextureID()
+				ImGui::Image(reinterpret_cast<ImTextureID>(tex->value->getTextureID())
 					, ImVec2(100, 100)
 					, ImVec2(0, 1)
 					, ImVec2(1, 0));

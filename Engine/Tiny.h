@@ -15,6 +15,7 @@
 #include "Core/Manager/TextureManager.h"
 #include "Core/Manager/FrameBufferManager.h"
 #include "Core/Manager/PipelineManager.h"
+#include "Core/Manager/ShaderManager.h"
 
 #include "Core/Scene/Scene.h"
 
@@ -35,6 +36,9 @@
 #include "Core/Input/InputSystem.h"
 
 #include "Core/Shader/ShaderParam.h"
+#include "Core/Shader/ShaderPackage.h"
+
+#include "Core/Tool/Log.h"
 
 #include "Utility/Utility.h"
 

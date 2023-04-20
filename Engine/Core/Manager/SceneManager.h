@@ -13,19 +13,27 @@ namespace tezcat::Tiny::Core
 		~SceneManager();
 
 		void init();
-		void update();
+		bool update();
 
 	public:
 		void prepareScene(Scene* scene);
 
 		void pushScene(const std::string& name);
+		void pushScene(Scene* scene);
+
 		void popScene();
 
 		Scene* getCurrentScene() { return mScenes.top(); }
+		std::unordered_map<std::string, Scene*>& getAllScenes() { return mSceneWithName; }
+
+		bool empty() { return mScenes.empty(); }
 
 	private:
 		std::stack<Scene*> mScenes;
-		std::unordered_map<std::string, Scene*> m_SceneWithName;
+		std::unordered_map<std::string, Scene*> mSceneWithName;
+
+
+	public:
 	};
 
 	using SceneMgr = SG<SceneManager>;

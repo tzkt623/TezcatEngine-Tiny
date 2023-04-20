@@ -33,6 +33,7 @@ namespace tezcat::Tiny::Core
 	public:
 		int getWindowHeight() const { return mWindowHeight; }
 		int getWindowWidth() const { return mWindowWidth; }
+		bool isEnabelVsync() const { return mEnableVsync; }
 
 		const std::string& getName() const
 		{
@@ -55,11 +56,14 @@ namespace tezcat::Tiny::Core
 		void createPlane();
 		void createGridSquare();
 		void createSphere2(uint32_t X_SEGMENTS, uint32_t Y_SEGMENTS);
+
 	protected:
 		int mWindowWidth;
 		int mWindowHeight;
 
 		std::u8string mGameName;
 		std::string mResourceFolderName;
+
+		bool mEnableVsync;
 	};
 }

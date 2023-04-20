@@ -53,12 +53,12 @@ namespace tezcat::Tiny::Core
 
 	void GUIParentWidget::update()
 	{
-		this->beginParent();
+		this->begin();
 
 		this->onUpdate();
 		this->onRender();
 
-		this->endParent();
+		this->end();
 	}
 
 
@@ -86,24 +86,25 @@ namespace tezcat::Tiny::Core
 
 	}
 
-	void GUIWindow::beginParent()
+	void GUIWindow::begin()
 	{
 		ImGui::Begin(this->getName(), 0);
 	}
 
-	void GUIWindow::endParent()
+	void GUIWindow::end()
 	{
 		ImGui::End();
 	}
 
-	void GUIWindow::open()
+	void GUIWindow::open(GUI* gui)
 	{
-		SG<GUI>::getInstance()->addWindow(this);
+		mHost = gui;
+		mHost->addWindow(this);
 	}
 
 	void GUIWindow::close()
 	{
-		SG<GUI>::getInstance()->removeWindow(this);
+		mHost->removeWindow(this);
 	}
 
 

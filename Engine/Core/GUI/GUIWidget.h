@@ -9,6 +9,8 @@
 
 namespace tezcat::Tiny::Core
 {
+	class GUI;
+
 	class TINY_API GUIFunction
 	{
 	public:
@@ -38,7 +40,7 @@ namespace tezcat::Tiny::Core
 
 		void setName(const std::string& val) { mName = val; }
 
-		virtual void open() {}
+		virtual void open(GUI* gui) {}
 		virtual void close() {}
 
 	protected:
@@ -56,8 +58,8 @@ namespace tezcat::Tiny::Core
 	public:
 		void update() final;
 	protected:
-		virtual void beginParent() = 0;
-		virtual void endParent() = 0;
+		virtual void begin() = 0;
+		virtual void end() = 0;
 		void onRender() override;
 	};
 
@@ -71,12 +73,15 @@ namespace tezcat::Tiny::Core
 		virtual ~GUIWindow();
 
 	public:
-		void beginParent() override;
-		void endParent() override;
+		void begin() override;
+		void end() override;
 
 	public:
-		void open() override;
+		void open(GUI* gui) override;
 		void close() override;
+
+	protected:
+		GUI* mHost;
 	};
 
 

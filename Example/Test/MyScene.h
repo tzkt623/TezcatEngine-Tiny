@@ -25,10 +25,6 @@ public:
 
 	void createPBR();
 
-
-protected:
-	void initGUI();
-
 public:
 };
 

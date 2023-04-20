@@ -53,6 +53,11 @@ namespace tezcat::Tiny::Core
 		this->apply();
 	}
 
+	void Shader::rebuild(const UniformID::USet& uniforms)
+	{
+		this->onApply(uniforms);
+	}
+
 	void Shader::begin()
 	{
 		this->setStateOptions();

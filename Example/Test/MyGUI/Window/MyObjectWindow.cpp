@@ -2,7 +2,7 @@
 
 
 MyObjectWindow::MyObjectWindow()
-	: GUIWindow(u8"物体信息(Object Info)")
+	: GUIWindow("场景总览(Scene)")
 	, mSelectedItem(-1)
 {
 	MyGUIContext::getInstance().setObjectWindow(this);
@@ -21,6 +21,11 @@ void MyObjectWindow::init()
 
 void MyObjectWindow::onUpdate()
 {
+	if (SceneMgr::getInstance()->empty())
+	{
+		return;
+	}
+
 	auto& list = SceneMgr::getInstance()->getCurrentScene()->getObjectList();
 	int index = -1;
 	for (auto tran : list)

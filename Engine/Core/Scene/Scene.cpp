@@ -8,6 +8,7 @@
 #include "../Component/Light.h"
 #include "../Component/Transform.h"
 #include "../Layer/RenderLayer.h"
+#include "../Tool/Log.h"
 
 namespace tezcat::Tiny::Core
 {
@@ -26,6 +27,8 @@ namespace tezcat::Tiny::Core
 
 	void Scene::onEnter()
 	{
+		Log::info(StringTool::stringFormat("Enter Scene: %s", this->getName().c_str()));
+
 		CameraMgr::getInstance()->setCameraData(mCameraData);
 		LightMgr::getInstance()->setData(mLightData);
 	}

@@ -46,6 +46,7 @@
         void main()
         {
             myFinalColor = texture(TINY_TexColor, myUV);
+            //myFinalColor = vec4(0.0, 1.0, 0.0, 1.0);
         }
     }
     #TINY_FS_END
