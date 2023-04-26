@@ -3,7 +3,7 @@
 #include "../Head/GLMHead.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Camera;
 	struct TINY_API CullHelper

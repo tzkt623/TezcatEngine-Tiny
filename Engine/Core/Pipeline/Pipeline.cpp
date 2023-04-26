@@ -8,7 +8,7 @@
 #include "../Manager/PipelineManager.h"
 #include "../Renderer/RenderObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	PipelineQueue* Pipeline::sBackground = new PipelineQueue(PipelineQueue::Background, 1000);
 	PipelineQueue* Pipeline::sGeometry = new PipelineQueue(PipelineQueue::Geometry, 2000);

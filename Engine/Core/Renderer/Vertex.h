@@ -1,57 +1,62 @@
 #pragma once
 
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
 #include "../Head/Context.h"
+#include "VertexConfig.h"
+#include "../Base/TinyObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class MeshData;
 	class VertexBuffer;
+	class IndexBuffer;
 
 	/// <summary>
 	/// 对应gl的VAO
+	/// 
 	/// </summary>
-	class TINY_API Vertex
+	class TINY_API Vertex : public TinyObject
 	{
+		TINY_RTTI_H(Vertex)
+
 	public:
 		Vertex();
 		virtual ~Vertex();
-
-	public:
-		std::string getName() const { return mName; }
 		void setName(const std::string& val) { mName = val; }
+		std::string getName() const { return mName; }
 		int getVertexCount() const { return mVertexCount; }
 		int getIndexCount() const { return mIndexCount; }
-		DrawMode getDrawMode() const { return mDrawMode; }
-		unsigned int getUID() const { return mUID; }
+		DrawModeWrapper& getDrawMode() { return mDrawModeWrapper; }
+
+		uint32_t getUID() const { return mUID; }
+		VertexLayout& getLayout() { return mLayout; }
+
+		virtual void setVertexBuffer(VertexBuffer* buffer);
+		virtual void setIndexBuffer(IndexBuffer* buffer);
+		void setVertexCount(size_t size) { mVertexCount = size; }
+		void setIndexCount(size_t size) { mIndexCount = size; }
 
 		void addChild(Vertex* vertex);
 
 	public:
 		virtual void init(MeshData* mesh);
+		virtual void init(const std::string& name, const size_t& vertexCount, const DrawMode& drawMode);
 		virtual void bind() = 0;
 		virtual void unbind() = 0;
 
 	protected:
+		bool mMultiBufferMode;
 		std::string mName;
-		unsigned int mUID;
+		uint32_t mUID = 0;
 
-		int mVertexCount;
-		int mIndexCount;
+		uint32_t mVertexCount = 0;
+		uint32_t mIndexCount = 0;
 
-		DrawMode mDrawMode;
-		VertexBuffer* mVertexBuffer;
-
-		std::vector<Vertex*>* mChildren;
+		VertexLayout mLayout;
+		DrawModeWrapper mDrawModeWrapper;
+		TinyVector<VertexBuffer*> mVertexBuffers;
+		IndexBuffer* mIndexBuffer = nullptr;
+		TinyVector<Vertex*>* mChildren = nullptr;
 	};
-
-	class TINY_API VertexGroupCreatorImp
-	{
-	public:
-		virtual ~VertexGroupCreatorImp() = default;
-		virtual Vertex* create(MeshData* meshData) = 0;
-	};
-
-	//using VertexGroupCreator = DelegateCreator<VertexGroupCreatorImp, Vertex>;
 }

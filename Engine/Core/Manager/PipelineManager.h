@@ -2,10 +2,9 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "Utility/Singleton.h"
+#include "../Tool/Singleton.h"
 
-using namespace tezcat::Tiny::Utility;
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class BaseGraphics;
 	class Shader;

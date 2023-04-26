@@ -4,7 +4,7 @@
 #include "../Renderer/BaseGraphics.h"
 #include "../Data/MeshData.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	VertexManager::VertexManager()
 	{
@@ -76,20 +76,37 @@ namespace tezcat::Tiny::Core
 		return nullptr;
 	}
 
-	VertexBuffer* VertexManager::createVertexBuffer(MeshData* meshData)
+	VertexBuffer* VertexManager::createVertexBuffer(const void* data, const size_t& length)
 	{
 		auto buffer = mCreator->createVertexBuffer();
-		buffer->init(meshData);
+		buffer->bind();
+		buffer->init(data, length);
+		return buffer;
+	}
+
+	VertexBuffer* VertexManager::createVertexBuffer(const size_t& length)
+	{
+		auto buffer = mCreator->createVertexBuffer();
+		buffer->bind();
+		buffer->init(length);
+		return buffer;
+	}
+
+	IndexBuffer* VertexManager::createIndexBuffer(const void* data, const size_t& length)
+	{
+		auto buffer = mCreator->createIndexBuffer();
+		buffer->bind();
+		buffer->init(data, length);
 		return buffer;
 	}
 
 	Vertex* VertexManager::createVertex(MeshData* meshData)
 	{
 		auto vertex = mCreator->createVertex();
-		vertex->init(meshData);
-
+		this->buildVertex(vertex, meshData);
 		this->buildChild(vertex, meshData);
 
+		vertex->addRef();
 		mVertexUMap.emplace(meshData->getName(), vertex);
 		return vertex;
 	}
@@ -101,11 +118,37 @@ namespace tezcat::Tiny::Core
 			for (auto cmesh : meshParent->getChildren())
 			{
 				auto cvertex = mCreator->createVertex();
-				cvertex->init(cmesh);
+				this->buildVertex(cvertex, cmesh);
 				vertexParent->addChild(cvertex);
 				this->buildChild(cvertex, cmesh);
 			}
 		}
+	}
+
+	void VertexManager::buildVertex(Vertex* vertex, MeshData* meshData)
+	{
+		vertex->bind();
+
+		vertex->init(meshData->getName(), meshData->vertices.size(), meshData->drawMode);
+		for (auto p : meshData->layoutPositions)
+		{
+			size_t length = 0;
+			auto data = meshData->getVertexData(p, length);
+			auto vbuffer = this->createVertexBuffer(data, length);
+			vbuffer->setLayoutData(p, VertexLayout::getLayoutType(p));
+			vertex->setVertexBuffer(vbuffer);
+		}
+
+		vertex->setVertexCount(meshData->vertices.size());
+
+		if (!meshData->indices.empty())
+		{
+			auto ibuffer = this->createIndexBuffer(meshData->indices.data(), meshData->indexSize());
+			vertex->setIndexBuffer(ibuffer);
+			vertex->setIndexCount(meshData->indices.size());
+		}
+
+		vertex->unbind();
 	}
 
 }

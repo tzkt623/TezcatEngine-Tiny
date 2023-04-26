@@ -4,13 +4,15 @@
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Manager/FrameBufferManager.h"
 
-using namespace tezcat::Tiny::Core;
+using namespace tezcat::Tiny;
 namespace tezcat::Tiny::GL
 {
 	class TINY_API GLFrameBufferDefault : public FrameBuffer
 	{
-	public:
 		GLFrameBufferDefault();
+		TINY_Factory(GLFrameBufferDefault)
+		TINY_RTTI_H(GLFrameBufferDefault)
+	public:
 		virtual ~GLFrameBufferDefault();
 
 
@@ -24,8 +26,10 @@ namespace tezcat::Tiny::GL
 
 	class TINY_API GLFrameBuffer : public FrameBuffer
 	{
-	public:
 		GLFrameBuffer();
+		TINY_Factory(GLFrameBuffer)
+		TINY_RTTI_H(GLFrameBuffer)
+	public:
 		~GLFrameBuffer();
 
 		void attach(TextureRenderBuffer2D* buffer) override;

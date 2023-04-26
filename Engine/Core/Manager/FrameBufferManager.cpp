@@ -3,7 +3,7 @@
 #include "../Renderer/Texture.h"
 #include "../Renderer/FrameBuffer.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	//-------------------------------------------------
 	//
@@ -60,6 +60,12 @@ namespace tezcat::Tiny::Core
 
 	FrameBuffer* FrameBufferManager::create(const std::string& name, const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos)
 	{
+		auto result = this->find(name);
+		if (result)
+		{
+			return result;
+		}
+
 		auto frame = mCreator->create(width, high, infos);
 		this->addFrameBuffer(name, frame);
 		return frame;
@@ -74,15 +80,7 @@ namespace tezcat::Tiny::Core
 
 	void FrameBufferManager::addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer)
 	{
-		auto flag = mBufferUMap.try_emplace(name, nullptr);
-		if (flag.second)
-		{
-			flag.first->second = frameBuffer;
-		}
-		else
-		{
-			delete frameBuffer;
-		}
+		mBufferUMap.try_emplace(name, frameBuffer);
 	}
 
 	FrameBuffer* FrameBufferManager::find(const std::string& name)
@@ -95,6 +93,5 @@ namespace tezcat::Tiny::Core
 
 		return nullptr;
 	}
-
 }
 

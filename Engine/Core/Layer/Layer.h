@@ -2,7 +2,7 @@
 
 #include "../Head/CppHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class GameObject;
 	class Camera;
@@ -18,6 +18,6 @@ namespace tezcat::Tiny::Core
 
 	private:
 		int mIndex;
-		std::list<ref<IRenderObject>> m_RenderObejctList;
+		std::list<TinyRef<IRenderObject>> m_RenderObejctList;
 	};
 }

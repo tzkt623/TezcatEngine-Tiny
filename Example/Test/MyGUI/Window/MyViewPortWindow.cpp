@@ -73,29 +73,6 @@ void MyViewPortWindow::calculate(const ImVec2& inTextureSize, const ImVec2& inWi
 void MyViewPortWindow::onRender()
 {
 	static bool bInfo;
-
-	if (mColorBuffer == nullptr)
-	{
-		mColorBuffer = (TextureBuffer2D*)TextureMgr::getInstance()->findTexture("RB_World1");
-	}
-
-	if (mColorBuffer)
-	{
-		ImVec2 texture_size = ImVec2((float)Engine::getScreenWidth(), (float)Engine::getScreenHeight());
-		ImVec2 display_size, offset, uv0, uv1;
-
-		this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
-
-		CameraMgr::getInstance()->getMainCamera()->setViewRect(0, 0, display_size.x, display_size.y);
-
-		ImGui::SetCursorPos(offset);
-		ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
-			, display_size
-			, uv0
-			, uv1);
-	}
-
-
 	if (ImGui::BeginMenuBar())
 	{
 		ImGui::MenuItem("Info", 0, &bInfo);
@@ -108,6 +85,48 @@ void MyViewPortWindow::onRender()
 
 		ImGui::EndMenuBar();
 	}
+
+// 	auto pos = ImGui::GetItemRectSize();
+// 	Log::info(StringTool::stringFormat("MenuBarSize[%.1f,%.1f]", pos.x, pos.y));
+
+	auto camera_data = CameraMgr::getInstance()->getCameraData();
+	if (!camera_data.lock())
+	{
+		return;
+	}
+
+	if (!camera_data->getMainCamera())
+	{
+		return;
+	}
+
+	if (ImGui::BeginChild("Viewport"))
+	{
+		if (mColorBuffer == nullptr)
+		{
+			mColorBuffer = (TextureBuffer2D*)TextureMgr::getInstance()->findTexture("RB_Viewport");
+		}
+
+		if (mColorBuffer)
+		{
+			ImVec2 texture_size = ImVec2((float)Engine::getScreenWidth(), (float)Engine::getScreenHeight());
+			ImVec2 display_size, offset, uv0, uv1;
+
+			this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+
+			camera_data->getMainCamera()->setViewRect(0, 0, display_size.x, display_size.y);
+
+			//Log::info(StringTool::stringFormat("Ratio[%.3f]", display_size.x / display_size.y));
+
+			ImGui::SetCursorPos(offset);
+			ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
+				, display_size
+				, uv0
+				, uv1);
+		}
+
+		ImGui::EndChild();
+	}
 }
 
 void MyViewPortWindow::drawInfo(const ImVec2& pos)
@@ -119,8 +138,7 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 	{
 		//gpu
 		ImGui::Text("GPU: %s", Statistic::GPU);
-		//memory
-		ImGui::Text("Memory: %.3f kb", Statistic::getMemoryUse() / 1024.0f);
+
 		//logic time
 		ImGui::Text("LogicTime: %.1f ms", Statistic::LogicTime);
 
@@ -141,6 +159,17 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 		//draw
 		ImGui::Text("PassCount: %d", Statistic::PassCount);
 		ImGui::Text("DrawCount: %d", Statistic::DrawCall);
+		ImGui::Separator();
+
+		ImGui::Text("Memory");
+		ImGui::Text("Used: %.3f kb", Statistic::getMemoryUse() / 1024.0f);
+		ImGui::Text("TotalID: %d", TinyRefObject::totalID());
+		ImGui::SameLine();
+		ImGui::Text("FreeID: %d", TinyRefObject::freeID());
+		ImGui::SameLine();
+		ImGui::Text("UsedID: %d", TinyRefObject::usedID());
+
+		ImGui::Separator();
 
 		//mouse
 		ImGui::InputFloat2("MousePosition", glm::value_ptr(Statistic::mousePosition), "%.3f", ImGuiInputTextFlags_ReadOnly);

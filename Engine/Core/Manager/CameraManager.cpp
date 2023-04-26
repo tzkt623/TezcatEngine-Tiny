@@ -3,12 +3,12 @@
 #include "../Component/MeshRenderer.h"
 #include "../Component/Camera.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
-	CameraData* CameraManager::sEmpty = new CameraData();
+	//CameraData* CameraManager::sEmpty = new CameraData();
 
 	CameraManager::CameraManager()
-		: mData(sEmpty)
+		: mData()
 	{
 		CameraMgr::attach(this);
 	}
@@ -43,8 +43,21 @@ namespace tezcat::Tiny::Core
 		mData = data;
 	}
 
+	const std::vector<Camera*>& CameraManager::getSortedCameraAry()
+	{
+		if (auto ptr = mData.lock())
+		{
+			return ptr->getAllCamera();
+		}
 
-	// CameraData
+		return mEmptyCamera;
+	}
+
+	//--------------------------------------------------------
+	//
+	//	CameraData
+	//
+	TINY_RTTI_CPP(CameraData)
 	Camera* CameraData::getMainCamera()
 	{
 		return mMain;

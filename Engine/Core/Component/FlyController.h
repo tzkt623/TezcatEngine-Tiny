@@ -4,16 +4,18 @@
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Transform;
 	class TINY_API FlyController : public ComponentT<FlyController>
 	{
-	public:
 		FlyController();
-		virtual ~FlyController();
+	public:
+		TINY_Factory(FlyController)
+		TINY_RTTI_H(FlyController)
 
 	public:
+		virtual ~FlyController();
 		void yawPitch(float yaw, float pitch, bool constrainPitch = true);
 		void translate(const glm::vec3& offset);
 		void roll(float roll);

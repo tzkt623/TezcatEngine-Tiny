@@ -4,11 +4,17 @@
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
 
+![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
+
 注意!本引擎使用C++20版本
 
 Notice!Tiny Use The C++20 Ver.
 
 ## **编辑器(Editor)**
+
+现在可以在菜单里面切换两个场景
+
+Now you can switch scenes in the menu
 
 ### 场景总览(Scene Overview)
 
@@ -32,14 +38,16 @@ Now Editor an rebuild shader in runtime.
 
 MainMenu->Shader->Rebuild, Choose your want or All
 
+## **内存管理(Memory Management)**
+
+做了一套简单的基于引用计数的内存管理,还在调试中......
+
+Did a simple reference counting based memory management, still debugging......
+
 ## **代码结构(Code)**
 
-因为我用unity比较多,就模仿了他的结构,现在的结构是这样
-
-I am a Unity user, so i image that and make Tiny looks like this
-
 ```cpp
-auto go = new GameObject("World1_Camera");
+auto go = GameObject::create("World1_Camera");
 auto camera = go->addComponent<Camera>(true);
 camera->setPerspective(60.0f, 0.1f, 2000.0f);
 camera->setCullLayer(0);
@@ -49,7 +57,7 @@ go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 go->getTransform()->setParent(controller_go->getTransform());
 
 //-------------------------------------
-go = new GameObject("Skybox1");
+go = GameObject::create("Skybox1");
 go->addComponent<Transform>();
 
 auto skybox = go->addComponent<Skybox>();
@@ -58,7 +66,7 @@ material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
 skybox->setMaterial(material);
 
 //---------------------------------------------------------
-auto world2 = new GameObject("World2_Gate");
+auto world2 = GameObject::create("World2_Gate");
 auto tran = world2->addComponent<Transform>();
 tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
 tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
@@ -78,7 +86,7 @@ mr1->setMesh("Square");
 
 ```cpp
 //gameobject will auto load into current scene
-auto go = new GameObject("World1_Camera");
+auto go = GameObject::create("World1_Camera");
 //attach a Camera component
 auto camera = go->addComponent<Camera>(true);
 camera->setPerspective(60.0f, 0.1f, 2000.0f);
@@ -94,7 +102,7 @@ go->getTransform()->setParent(controller_go->getTransform());
   Create a Skybox
 
 ```cpp
-auto go = new GameObject("Skybox1");
+auto go = GameObject::create("Skybox1");
 //set layer, a camera just render objects with thesame layer id
 go->setLayerMaskIndex(1);
 go->addComponent<Transform>();
@@ -114,7 +122,7 @@ skybox->setMaterial(material);
 
 ```cpp
 //default layer is 0
-auto world2 = new GameObject("World2_Gate");
+auto world2 = GameObject::create("World2_Gate");
 auto tran = world2->addComponent<Transform>();
 tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
 tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
@@ -242,8 +250,18 @@ Attention! The .exe file must be in the same directory as the resource folder
     void MyResourceLoader::prepareGame(Engine* engine)
     {
         ResourceLoader::prepareGame(engine);
-        SG<SceneManager>::getInstance()->prepareScene(new MyScene("MyScene"));
-        SG<SceneManager>::getInstance()->pushScene("MyScene");
+        auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
+
+        CreateWindow(gui_host, MyMainDockWindow);
+        CreateWindow(gui_host, MyViewPortWindow);
+        CreateWindow(gui_host, MyObjectWindow);
+        CreateWindow(gui_host, MyOverviewWindow);
+        CreateWindow(gui_host, MyLogWindow);
+
+        engine->getGraphics()->setShadowMap(1024, 1024);
+
+        SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
+        SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
     }
     ```
 
@@ -622,9 +640,7 @@ The[`int Version`] should be setted.The other params You can set as your wish.
 
             float diff = max(dot(normal, light_dir), 0.0);
 
-            //vec3 reflect_dir = reflect(-light_dir, normal);
             vec3 halfwayDir = normalize(light_dir + viewDir); 
-            //float spec = pow(max(dot(viewDir, reflect_dir), 0.0), TINY_MatStd.shininess);
             float spec = pow(max(dot(normal, halfwayDir), 0.0), TINY_MatStd.shininess);
 
             vec3 ambient = lit.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
@@ -636,9 +652,6 @@ The[`int Version`] should be setted.The other params You can set as your wish.
             vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
 
             return lighting;
-            //return ambient + diffuse + specular;
-            //return vec4(diffuse, 1.0f);
-            //return vec4(texture(TINY_MatStd.diffuse, myUV).rgb, 1.0f);
         }
 
         void main()
@@ -647,9 +660,6 @@ The[`int Version`] should be setted.The other params You can set as your wish.
             vec3 view_dir = normalize(TINY_ViewPosition - myWorldPosition);
 
             myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
-            //myFinalColor = mix(calcDirectionLight(TINY_LitDir, viewDir, normal), reflection(-viewDir), 0.2f);
-            //myFinalColor = reflection(-viewDir);
-            //myFinalColor = refraction();
         }
     }
     #TINY_FS_END

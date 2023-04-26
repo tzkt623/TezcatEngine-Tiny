@@ -2,7 +2,7 @@
 
 #include "../Head/CppHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class ILight;
 	class Pipeline;

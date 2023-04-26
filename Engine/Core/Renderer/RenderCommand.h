@@ -2,7 +2,7 @@
 
 #include "../Head/Context.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class MeshData;
 

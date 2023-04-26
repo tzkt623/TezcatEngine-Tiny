@@ -485,11 +485,11 @@ namespace tezcat::Tiny::GL
 			{
 			case GL_VERTEX_SHADER:
 				//std::cout << "GLShader [" + shader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log::error(StringTool::stringFormat("GLShader[%s]: [VERTEX] COMPILATION_FAILED > %s)", shader->getName(), infoLog));
+				Log::error(StringTool::stringFormat("GLShader[%s]: [VERTEX] COMPILATION_FAILED > %s)", shader->getName().c_str(), infoLog));
 				break;
 			case GL_FRAGMENT_SHADER:
 				//std::cout << "GLShader [" + shader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log::error(StringTool::stringFormat("GLShader[%s]: [FRAGMENT] COMPILATION_FAILED > %s)", shader->getName(), infoLog));
+				Log::error(StringTool::stringFormat("GLShader[%s]: [FRAGMENT] COMPILATION_FAILED > %s)", shader->getName().c_str(), infoLog));
 				break;
 			default:
 				break;

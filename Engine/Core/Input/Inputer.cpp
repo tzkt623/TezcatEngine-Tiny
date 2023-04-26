@@ -1,6 +1,6 @@
 #include "Inputer.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 
 	void EmptyInputer::processInput(InputSystem* system)

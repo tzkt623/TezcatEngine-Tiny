@@ -4,15 +4,18 @@
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class TINY_API Transform : public ComponentT<Transform>
 	{
 		friend class Scene;
-	public:
 		Transform();
 		Transform(Transform* parent);
-		~Transform();
+		TINY_RTTI_H(Transform)
+		TINY_Factory(Transform)
+
+	public:
+		virtual ~Transform();
 
 		//用来解决相机矩阵的问题
 		void setDelegateUpdate(const std::function<void(Transform*)>& function)
@@ -49,6 +52,7 @@ namespace tezcat::Tiny::Core
 		{
 			mIsDirty = true;
 			mLocalRotation = val;
+			this->clampRotation();
 		}
 
 		void setRotation(const float& x, const float& y, const float& z)
@@ -57,6 +61,7 @@ namespace tezcat::Tiny::Core
 			mLocalRotation.x = x;
 			mLocalRotation.y = y;
 			mLocalRotation.z = z;
+			this->clampRotation();
 		}
 
 		glm::vec3& getScale() { return mLocalScale; }
@@ -125,8 +130,11 @@ namespace tezcat::Tiny::Core
 
 		void addChild(Transform* val);
 		bool removeChild(Transform* val);
-		size_t getChildCount() { return mChildren.size(); }
-		std::vector<Transform*>& getChildren() { return mChildren; }
+
+		size_t getChildCount() { return mChildren->size(); }
+		std::vector<TinyWeakRef<Transform>>* getChildren() { return mChildren; }
+
+
 		void manualUpdateMatrix();
 		void markDirty() { mIsDirty = true; }
 
@@ -143,12 +151,16 @@ namespace tezcat::Tiny::Core
 		{
 			mIsDirty = true;
 			mLocalRotation += offset;
+			this->clampRotation();
+		}
 
+		void clampRotation()
+		{
 			if (mLocalRotation.x > 360.0f)
 			{
 				mLocalRotation.x -= 360.0f;
 			}
-			else if (mLocalRotation.x < 360.0f)
+			else if (mLocalRotation.x < -360.0f)
 			{
 				mLocalRotation.x += 360.0f;
 			}
@@ -157,7 +169,7 @@ namespace tezcat::Tiny::Core
 			{
 				mLocalRotation.y -= 360.0f;
 			}
-			else if (mLocalRotation.y < 360.0f)
+			else if (mLocalRotation.y < -360.0f)
 			{
 				mLocalRotation.y += 360.0f;
 			}
@@ -166,7 +178,7 @@ namespace tezcat::Tiny::Core
 			{
 				mLocalRotation.z -= 360.0f;
 			}
-			else if (mLocalRotation.z < 360.0f)
+			else if (mLocalRotation.z < -360.0f)
 			{
 				mLocalRotation.z += 360.0f;
 			}
@@ -182,10 +194,11 @@ namespace tezcat::Tiny::Core
 	public:
 		void forceUpdate();
 		void forceUpdateChildren();
+
 	private:
 		uint32_t mIndex;
 		Transform* mParent;
-		std::vector<Transform*> mChildren;
+		std::vector<TinyWeakRef<Transform>>* mChildren;
 
 	private:
 		bool mIsDirty;
@@ -193,7 +206,6 @@ namespace tezcat::Tiny::Core
 		glm::vec3 mLocalPosition;
 		glm::vec3 mLocalRotation;
 		glm::vec3 mLocalScale;
-
 		glm::mat4 mModelMatrix;
 
 		std::function<void(Transform*)> mDelegateUpdate;

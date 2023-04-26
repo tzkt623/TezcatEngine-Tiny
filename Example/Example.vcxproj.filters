@@ -27,7 +27,7 @@
     <ClCompile Include="Test\MyResourceLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyScene.cpp">
+    <ClCompile Include="Test\Scene\MyMainScene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Test\MyController.cpp">
@@ -60,6 +60,12 @@
     <ClCompile Include="Test\MyGUI\Widget\TransformWidget.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test\MyEvent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\Scene\MySecondScene.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test\MyGUI\MyGUI.h">
@@ -71,7 +77,7 @@
     <ClInclude Include="Test\MyResourceLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyScene.h">
+    <ClInclude Include="Test\Scene\MyMainScene.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyController.h">
@@ -102,6 +108,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyGUI\Widget\TransformWidget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyEvent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\Scene\MySecondScene.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

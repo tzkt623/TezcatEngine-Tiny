@@ -14,7 +14,6 @@
         str Queue = Background;
         str DepthTest = Less;
         bool ZWrite = false;
-        str DepthTest = Less;
         str CullFace = Back;
     }
     #TINY_CFG_END

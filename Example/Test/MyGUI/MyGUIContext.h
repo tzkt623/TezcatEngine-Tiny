@@ -7,9 +7,19 @@ class MyOverviewWindow;
 
 struct ValueConfig
 {
+	bool isColor;
 	float speed;
 	float min;
 	float max;
+
+// 	ValueConfig()
+// 		: isColor(false)
+// 		, speed(0)
+// 		, min(0)
+// 		, max(0)
+// 	{}
+
+
 };
 
 
@@ -22,11 +32,6 @@ public:
 		static MyGUIContext instance;
 		return instance;
 	}
-
-	void selectObject(GameObject* object);
-
-	void setOverviewWindow(MyOverviewWindow* window) { mOverviewWindow = window; }
-	void setObjectWindow(MyObjectWindow* window) { mObjectWindow = window; }
 	ValueConfig* getValueConfig(const UniformID& ID);
 
 private:
@@ -38,8 +43,6 @@ private:
 
 
 private:
-	MyObjectWindow* mObjectWindow;
-	MyOverviewWindow* mOverviewWindow;
 
 	std::vector<ValueConfig*> mValueConfigAry;
 

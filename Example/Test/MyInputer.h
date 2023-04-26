@@ -19,13 +19,16 @@ public:
 	void mouseCursorPosCallBack(double xpos, double ypos) override;
 	void mouseScrollPosCallBack(double xoffset, double yoffset) override;
 
-	void setController(FlyController* val) { mController = val; }
+	void setController(FlyController* val)
+	{
+		mController = TinyWeakRef<FlyController>(val);
+	}
 
 private:
 	bool mLockMouse;
 	float mLastX;
 	float mLastY;
 
-	FlyController* mController;
+	TinyWeakRef<FlyController> mController;
 };
 

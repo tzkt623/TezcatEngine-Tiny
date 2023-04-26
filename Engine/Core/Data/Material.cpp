@@ -1,5 +1,6 @@
 #include "Material.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
+
 
 #include "../Manager/ShaderManager.h"
 #include "../Shader/ShaderPackage.h"
@@ -8,8 +9,9 @@
 #include "../Shader/Shader.h"
 #include "../Component/Transform.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(Material)
 	Material::Material(const std::string& name)
 		: mName(name)
 	{

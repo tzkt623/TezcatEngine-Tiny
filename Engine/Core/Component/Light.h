@@ -4,7 +4,7 @@
 #include "../Head/CppHead.h"
 #include "../Shader/Shader.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	enum class TINY_API LightType
 	{
@@ -33,9 +33,13 @@ namespace tezcat::Tiny::Core
 
 	class TINY_API DirectionalLight : public ComponentT<DirectionalLight>, public ILight
 	{
-	public:
 		DirectionalLight();
 		DirectionalLight(const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
+	public:
+		TINY_Factory(DirectionalLight)
+		TINY_RTTI_H(DirectionalLight)
+
+	public:
 		virtual ~DirectionalLight();
 
 		LightType getLightType() final { return LightType::Directional; }
@@ -73,8 +77,10 @@ namespace tezcat::Tiny::Core
 
 	class TINY_API PointLight : public ComponentT<PointLight>, public ILight
 	{
-	public:
 		PointLight();
+	public:
+		TINY_Factory(PointLight)
+	public:
 		virtual ~PointLight();
 
 		LightType getLightType() final { return LightType::Point; }

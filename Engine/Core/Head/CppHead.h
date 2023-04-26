@@ -23,9 +23,45 @@
 #include <string_view>
 #include <tuple>
 #include <limits>
+#include "ConfigHead.h"
 
-template<typename T>
-using ref = std::shared_ptr<T>;
+namespace tezcat::Tiny
+{
+	inline namespace v1
+	{
+		template<typename T>
+		using TinyRef = std::shared_ptr<T>;
 
-template<typename T>
-using uref = std::unique_ptr<T>;
+		template<typename T>
+		using TinyURef = std::unique_ptr<T>;
+
+		template<typename T>
+		using TinyWRef = std::weak_ptr<T>;
+
+		template<typename T, typename... Args>
+		constexpr TinyRef<T> TinyShared(Args&& ... args)
+		{
+			return std::make_shared<T>(std::forward<Args>(args)...);
+		}
+
+		template<typename T, typename... Args>
+		constexpr TinyURef<T> TinyUnique(Args&& ... args)
+		{
+			return std::make_unique<T>(std::forward<Args>(args)...);
+		}
+
+		template<typename T1, typename T2>
+		constexpr TinyRef<T1> TinyStaticCast(const T2& pointer)
+		{
+			return std::static_pointer_cast<T1>(pointer);
+		}
+
+		template<typename T1, typename T2>
+		constexpr TinyRef<T1> TinyDynamicCast(const T2& pointer)
+		{
+			return std::dynamic_pointer_cast<T1>(pointer);
+		}
+
+#define TinyMove(x) std::move(x)
+	}
+}

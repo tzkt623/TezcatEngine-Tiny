@@ -4,10 +4,11 @@
 #include "../Head/ImGuiHead.h"
 #include "../Head/GLMHead.h"
 
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
 
-namespace tezcat::Tiny::Core
+
+namespace tezcat::Tiny
 {
 	class GUI;
 
@@ -35,7 +36,7 @@ namespace tezcat::Tiny::Core
 
 		void setName(const std::u8string& val)
 		{
-			mName = Utility::StringTool::fromU8(val);
+			mName = StringTool::fromU8(val);
 		}
 
 		void setName(const std::string& val) { mName = val; }

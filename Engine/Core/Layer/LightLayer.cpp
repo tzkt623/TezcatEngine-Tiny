@@ -2,7 +2,7 @@
 #include "../Component/GameObject.h"
 #include "../Component/Light.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	LightLayer::LightLayer()
 	{

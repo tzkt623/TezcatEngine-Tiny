@@ -2,10 +2,11 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
+
 
 struct GLFWwindow;
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class GUIWindow;
 	class TINY_API GUI

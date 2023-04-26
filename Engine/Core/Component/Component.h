@@ -2,32 +2,20 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "../Base/BaseObject.h"
+#include "../Base/TinyObject.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 #define LogicBind(func) std::bind(&func, this)
 
 	class GameObject;
 	class Transform;
 
-	// 	class ComponentIDGenerator
-	// 	{
-	// 		ComponentIDGenerator() = delete;
-	// 		~ComponentIDGenerator() = delete;
-	// 
-	// 		static uint32_t sID;
-	// 	public:
-	// 		static uint32_t giveID()
-	// 		{
-	// 			return sID++;
-	// 		}
-	// 	};
-
-	class TINY_API Component : public BaseObject
+	class TINY_API Component : public TinyObject
 	{
 		friend class GameObject;
+
 	public:
 		Component();
 		virtual ~Component();
@@ -41,14 +29,6 @@ namespace tezcat::Tiny::Core
 		/// 停止逻辑
 		/// </summary>
 		void stopLogic();
-
-// 		void update()
-// 		{
-// 			if (mEnable)
-// 			{
-// 				this->onUpdate();
-// 			}
-// 		}
 
 	protected:
 		//进入场景时执行
@@ -70,10 +50,7 @@ namespace tezcat::Tiny::Core
 		}
 
 		//析构函数执行
-		virtual void onDestroy()
-		{
-
-		}
+		virtual void onDestroy();
 
 		//virtual void onUpdate() {}
 
@@ -106,18 +83,16 @@ namespace tezcat::Tiny::Core
 
 		bool isDetached() const { return mGameObject == nullptr; }
 
-		virtual void close() override;
-
 	public:
-		virtual void onComponentAdded(Component* com) {}
-		virtual void onComponentRemoved(Component* com) {}
+		virtual void onComponentAdded(Component* component) {}
+		virtual void onComponentRemoved(Component* component) {}
 
 	public://RTTI
 		template<class Com>
 		bool is() { return this->is(std::type_index(typeid(Com))); }
 		virtual const std::type_index& getComponentType() = 0;
 
-		virtual uint32_t getComponentID() = 0;
+		virtual uint32_t getComponentTypeID() = 0;
 		virtual bool is(const uint32_t& id) = 0;
 
 	protected:
@@ -136,6 +111,11 @@ namespace tezcat::Tiny::Core
 		{
 			return sID++;
 		}
+
+		static uint32_t totalID()
+		{
+			return sID;
+		}
 	};
 
 	/// <summary>
@@ -152,12 +132,12 @@ namespace tezcat::Tiny::Core
 		const std::type_index& getComponentType() override { return sTypeIndex; }
 		bool is(const std::type_index& type) override { return sTypeIndex == type; }
 
-		uint32_t getComponentID() override { return sTypeID; }
+		uint32_t getComponentTypeID() override { return sTypeID; }
 		bool is(const uint32_t& id) override { return sTypeID == id; }
 
 	public:
 		static const std::type_index& getComponentTypeStatic() { return sTypeIndex; }
-		static const uint32_t getComponentIDStatic() { return sTypeID; }
+		static const uint32_t getComponentTypeIDStatic() { return sTypeID; }
 
 	private:
 		static std::type_index sTypeIndex;

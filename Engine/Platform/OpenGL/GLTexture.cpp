@@ -2,13 +2,14 @@
 #include "Core/Data/Image.h"
 #include "Core/Head/Context.h"
 
-using namespace tezcat::Tiny::Core;
+using namespace tezcat::Tiny;
 namespace tezcat::Tiny::GL
 {
 	//--------------------------------------------------------
 	//
 	//	Texture2D
 	//
+	TINY_RTTI_CPP(GLTexture2D)
 	GLTexture2D::GLTexture2D()
 	{
 		glGenTextures(1, &mTextureID);
@@ -24,7 +25,8 @@ namespace tezcat::Tiny::GL
 		mWrap = ContextMap::TextureWrapArray[(uint32_t)info.wrap];
 		mFilter = ContextMap::TextureFilterArray[(uint32_t)info.filter];
 		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)info.internalChannel];
-		mChannel = Texture::getTextureChannels(image);
+		mChannel = ContextMap::TextureChannelArray[(uint32_t)info.channel];
+		mDataType = ContextMap::DataTypeArray[(uint32_t)info.dataType];
 
 		glBindTexture(GL_TEXTURE_2D, mTextureID);
 
@@ -57,6 +59,7 @@ namespace tezcat::Tiny::GL
 	//
 	//	Cube
 	//
+	TINY_RTTI_CPP(GLTextureCube)
 	GLTextureCube::GLTextureCube()
 	{
 		glGenTextures(1, &mTextureID);
@@ -71,6 +74,7 @@ namespace tezcat::Tiny::GL
 	{
 		mFilter = ContextMap::TextureFilterArray[(uint32_t)info.filter];
 		mWrap = ContextMap::TextureWrapArray[(uint32_t)info.wrap];
+		mDataType = ContextMap::DataTypeArray[(uint32_t)info.dataType];
 
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureID);
 
@@ -101,6 +105,7 @@ namespace tezcat::Tiny::GL
 	//
 	//	Buffer2D
 	//
+	TINY_RTTI_CPP(GLTextureBuffer2D)
 	GLTextureBuffer2D::GLTextureBuffer2D()
 	{
 		glGenTextures(1, &mTextureID);
@@ -116,7 +121,10 @@ namespace tezcat::Tiny::GL
 
 	}
 
-	void GLTextureBuffer2D::create(const int& width, const int& high, const TextureChannel& internalChannel, const TextureChannel& channel, const DataType& dataType)
+	void GLTextureBuffer2D::create(const int& width, const int& high
+		, const TextureChannel& internalChannel
+		, const TextureChannel& channel
+		, const DataType& dataType)
 	{
 		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)internalChannel];
 		mChannel = ContextMap::TextureChannelArray[(uint32_t)channel];
@@ -137,12 +145,14 @@ namespace tezcat::Tiny::GL
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void GLTextureBuffer2D::create(const int& width, const int& high, const TextureBufferInfo& info)
+	void GLTextureBuffer2D::create(const int& width, const int& high
+		, const TextureBufferInfo& info)
 	{
 		mWrap = ContextMap::TextureWrapArray[(uint32_t)info.wrap];
 		mFilter = ContextMap::TextureFilterArray[(uint32_t)info.filter];
 		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)info.internalChannel];
 		mChannel = ContextMap::TextureChannelArray[(uint32_t)info.channel];
+		mDataType = ContextMap::DataTypeArray[(uint32_t)info.dataType];
 
 		glBindTexture(GL_TEXTURE_2D, mTextureID);
 		glTexImage2D(GL_TEXTURE_2D
@@ -172,6 +182,7 @@ namespace tezcat::Tiny::GL
 	//
 	//	RenderBuffer2D
 	//
+	TINY_RTTI_CPP(GLTextureRenderBuffer2D)
 	GLTextureRenderBuffer2D::GLTextureRenderBuffer2D()
 	{
 		glGenRenderbuffers(1, &mTextureID);
@@ -182,7 +193,8 @@ namespace tezcat::Tiny::GL
 		glDeleteRenderbuffers(1, &mTextureID);
 	}
 
-	void GLTextureRenderBuffer2D::create(const int& width, const int& high, const TextureChannel& internalChannel)
+	void GLTextureRenderBuffer2D::create(const int& width, const int& high
+		, const TextureChannel& internalChannel)
 	{
 		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)internalChannel];
 		glBindRenderbuffer(GL_RENDERBUFFER, mTextureID);
@@ -196,21 +208,21 @@ namespace tezcat::Tiny::GL
 	//
 	Texture2D* GLTextureCreator::create2D()
 	{
-		return new GLTexture2D();
+		return GLTexture2D::create();
 	}
 
 	TextureCube* GLTextureCreator::createCube()
 	{
-		return new GLTextureCube();
+		return GLTextureCube::create();
 	}
 
 	TextureBuffer2D* GLTextureCreator::createBuffer2D()
 	{
-		return new GLTextureBuffer2D();
+		return GLTextureBuffer2D::create();
 	}
 
 	TextureRenderBuffer2D* GLTextureCreator::createRenderBuffer2D()
 	{
-		return new GLTextureRenderBuffer2D();
+		return GLTextureRenderBuffer2D::create();
 	}
 }

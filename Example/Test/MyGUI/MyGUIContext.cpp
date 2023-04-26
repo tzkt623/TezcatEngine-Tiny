@@ -6,9 +6,7 @@ MyGUIContext::MyGUIContext()
 	: mValueConfigAry(UniformID::allStringCount(), nullptr)
 {
 
-	initValueConfig();
-
-
+	this->initValueConfig();
 }
 
 
@@ -18,12 +16,6 @@ MyGUIContext::~MyGUIContext()
 }
 
 
-
-void MyGUIContext::selectObject(GameObject* object)
-{
-	mOverviewWindow->onSelectObject(object);
-}
-
 ValueConfig* MyGUIContext::getValueConfig(const UniformID& ID)
 {
 	return mValueConfigAry[ID.getUID()];
@@ -31,17 +23,17 @@ ValueConfig* MyGUIContext::getValueConfig(const UniformID& ID)
 
 void MyGUIContext::initValueConfig()
 {
-	mValueConfigAry[ShaderParam::LightDirection::Ambient] = new ValueConfig{ 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::LightDirection::Diffuse] = new ValueConfig{ 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::LightDirection::Specular] = new ValueConfig{ 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::LightDirection::Ambient] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::LightDirection::Diffuse] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::LightDirection::Specular] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
 
 
-	mValueConfigAry[ShaderParam::StdMaterial::Shininess] = new ValueConfig{ 0.1f, 0.1f, 999.0f };
+	mValueConfigAry[ShaderParam::StdMaterial::Shininess] = new ValueConfig{ false, 0.1f, 0.1f, 999.0f };
 
-	mValueConfigAry[ShaderParam::MatPBR_Test::Albedo] = new ValueConfig{ 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::MatPBR_Test::Metallic] = new ValueConfig{ 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::MatPBR_Test::Roughness] = new ValueConfig{ 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::MatPBR_Test::AO] = new ValueConfig{ 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::MatPBR_Test::Albedo] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::MatPBR_Test::Metallic] = new ValueConfig{ false, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::MatPBR_Test::Roughness] = new ValueConfig{ false, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::MatPBR_Test::AO] = new ValueConfig{ false, 0.005f, 0.0f, 1.0f };
 }
 
 

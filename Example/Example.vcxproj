@@ -135,11 +135,12 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
       <NoEntryPoint>false</NoEntryPoint>
     </Link>
   </ItemDefinitionGroup>
@@ -168,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="Test\MyController.cpp" />
     <ClCompile Include="Test\main.cpp" />
+    <ClCompile Include="Test\MyEvent.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUI.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUIContext.cpp" />
     <ClCompile Include="Test\MyGUI\Widget\TransformWidget.cpp" />
@@ -180,10 +182,12 @@
     <ClCompile Include="Test\MyGUI\Window\MyViewPortWindow.cpp" />
     <ClCompile Include="Test\MyInputer.cpp" />
     <ClCompile Include="Test\MyResourceLoader.cpp" />
-    <ClCompile Include="Test\MyScene.cpp" />
+    <ClCompile Include="Test\Scene\MyMainScene.cpp" />
+    <ClCompile Include="Test\Scene\MySecondScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test\MyController.h" />
+    <ClInclude Include="Test\MyEvent.h" />
     <ClInclude Include="Test\MyGUI\MyGUI.h" />
     <ClInclude Include="Test\MyGUI\MyGUIContext.h" />
     <ClInclude Include="Test\MyGUI\Widget\TransformWidget.h" />
@@ -196,7 +200,8 @@
     <ClInclude Include="Test\MyGUI\Window\MyViewPortWindow.h" />
     <ClInclude Include="Test\MyInputer.h" />
     <ClInclude Include="Test\MyResourceLoader.h" />
-    <ClInclude Include="Test\MyScene.h" />
+    <ClInclude Include="Test\Scene\MyMainScene.h" />
+    <ClInclude Include="Test\Scene\MySecondScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

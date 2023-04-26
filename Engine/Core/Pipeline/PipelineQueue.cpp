@@ -4,7 +4,7 @@
 #include "../Component/Light.h"
 #include "../Manager/TextureManager.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	std::unordered_map<std::string, PipelineQueue::Queue> PipelineQueue::sQueueMap =
 	{

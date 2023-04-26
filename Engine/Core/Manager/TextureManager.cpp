@@ -1,10 +1,9 @@
 #include "TextureManager.h"
 #include "../Renderer/Texture.h"
-#include "../Utility/FileTool.h"
+#include "../Tool/Tool.h"
 #include "../Data/Image.h"
 
-using namespace tezcat::Tiny::Utility;
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	TextureManager::TextureManager()
 	{
@@ -24,12 +23,14 @@ namespace tezcat::Tiny::Core
 		std::unordered_map<std::string, std::array<std::string, 6>> skybox_path_cache;
 
 		std::string temp_name;
-		std::unordered_map<std::string, std::string> files;
+		FileInfoMap files;
 		FileTool::loadFiles(dir, files);
 
 		for (auto& pair : files)
 		{
-			if (std::regex_search(pair.first, result, pattern))
+			auto& info = pair.second;
+
+			if (std::regex_search(info.name, result, pattern))
 			{
 				std::cout << result[1] << result[2] << std::endl;
 
@@ -38,32 +39,32 @@ namespace tezcat::Tiny::Core
 				temp_name = result[2];
 				if (temp_name == "R")
 				{
-					skybox_path_cache[result[1]][0] = pair.second;
+					skybox_path_cache[result[1]][0] = std::move(info.path);
 					//					skybox_images[0] = &img;
 				}
 				else if (temp_name == "L")
 				{
-					skybox_path_cache[result[1]][1] = pair.second;
+					skybox_path_cache[result[1]][1] = std::move(info.path);
 					//					skybox_images[1] = &img;
 				}
 				else if (temp_name == "U")
 				{
-					skybox_path_cache[result[1]][2] = pair.second;
+					skybox_path_cache[result[1]][2] = std::move(info.path);
 					//					skybox_images[2] = &img;
 				}
 				else if (temp_name == "D")
 				{
-					skybox_path_cache[result[1]][3] = pair.second;
+					skybox_path_cache[result[1]][3] = std::move(info.path);
 					//					skybox_images[3] = &img;
 				}
 				else if (temp_name == "F")
 				{
-					skybox_path_cache[result[1]][4] = pair.second;
+					skybox_path_cache[result[1]][4] = std::move(info.path);
 					//					skybox_images[4] = &img;
 				}
 				else if (temp_name == "B")
 				{
-					skybox_path_cache[result[1]][5] = pair.second;
+					skybox_path_cache[result[1]][5] = std::move(info.path);
 					//					skybox_images[5] = &img;
 				}
 				else
@@ -76,8 +77,8 @@ namespace tezcat::Tiny::Core
 			else
 			{
 				Image img;
-				img.openFile(pair.second, true);
-				this->create2D(pair.first, img);
+				img.openFile(info, true);
+				this->create2D(info.name, img);
 			}
 		}
 
@@ -98,13 +99,11 @@ namespace tezcat::Tiny::Core
 	{
 		if (info.isManagered)
 		{
-			auto it = mTextureMap.try_emplace(info.name, nullptr);
+			auto tex = mCreator->createBuffer2D(width, height, info);
+			auto it = mTextureMap.try_emplace(info.name, tex);
 			if (it.second)
 			{
-				auto tex = mCreator->createBuffer2D(width, height, info);
-				tex->setSize(width, height);
 				tex->setManagered(true);
-				it.first->second = (Texture*)tex;
 			}
 
 			return (TextureRenderBuffer2D*)(it.first->second);
@@ -116,12 +115,11 @@ namespace tezcat::Tiny::Core
 
 	TextureCube* TextureManager::createCube(const std::string& name, const std::array<Image, 6>& images)
 	{
-		auto it = mTextureMap.try_emplace(name, nullptr);
+		auto tex = mCreator->createCube(images, TextureInfo(name));
+		auto it = mTextureMap.try_emplace(name, tex);
 		if (it.second)
 		{
-			auto tex = mCreator->createCube(images, TextureInfo(name));
 			tex->setManagered(true);
-			it.first->second = (Texture*)tex;
 		}
 
 		return (TextureCube*)(it.first->second);
@@ -140,13 +138,20 @@ namespace tezcat::Tiny::Core
 			break;
 		}
 
-		auto it = mTextureMap.try_emplace(name, nullptr);
+		TextureInfo info(name, channel);
+
+		if (img.isHDR())
+		{
+			info.internalChannel = TextureChannel::RGBF16;
+			info.dataType = DataType::Float32;
+		}
+
+		auto tex = mCreator->create2D(img, info);
+		auto it = mTextureMap.try_emplace(name, tex);
 		if (it.second)
 		{
-			auto tex = mCreator->create2D(img, TextureInfo(name, channel));
 			tex->setManagered(true);
 			tex->setSize(img.getWidth(), img.getHeight());
-			it.first->second = (Texture*)tex;
 		}
 
 		return (Texture2D*)(it.first->second);
@@ -195,7 +200,6 @@ namespace tezcat::Tiny::Core
 				, DataType::Float32
 				, false
 				, true));
-		tex->setSize(width, height);
 		return tex;
 	}
 

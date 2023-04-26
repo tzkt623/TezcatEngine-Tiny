@@ -3,7 +3,7 @@
 #include "CppHead.h"
 #include "ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	enum class TINY_API DataType : uint32_t
 	{
@@ -78,6 +78,8 @@ namespace tezcat::Tiny::Core
 		Depth32f_Stencil8,
 		//internal only
 		Stencil8,
+
+		RGBF16,
 
 		Count
 	};
@@ -162,14 +164,6 @@ namespace tezcat::Tiny::Core
 		Unlit,
 		Main,
 		Addition
-	};
-
-	enum TINY_API VertexPosition : uint32_t
-	{
-		Position = 0,
-		Normal,
-		Color,
-		UV
 	};
 
 	template<typename TinyType, typename PlatformType>

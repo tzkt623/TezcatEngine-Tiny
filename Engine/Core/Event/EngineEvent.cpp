@@ -1,6 +1,6 @@
 #include "EngineEvent.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	Event* EngineEvent::mEvent = new Event();
 }

@@ -1,11 +1,14 @@
 #include "Transform.h"
 #include "../Scene/Scene.h"
 #include "../Component/GameObject.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
-namespace tezcat::Tiny::Core
+
+namespace tezcat::Tiny
 {
-	static glm::mat4 WORLD_MATRIX(1.0f);
+	TINY_RTTI_CPP(Transform)
+
+		static glm::mat4 WORLD_MATRIX(1.0f);
 	static glm::vec3 XAxis(1.0f, 0.0f, 0.0f);
 	static glm::vec3 YAxis(0.0f, 1.0f, 0.0f);
 	static glm::vec3 ZAxis(0.0f, 0.0f, 1.0f);
@@ -25,6 +28,7 @@ namespace tezcat::Tiny::Core
 		, mParent(parent)
 		, mIndex(0)
 		, mDelegateUpdate(std::bind(&Transform::updateMatrix, this, std::placeholders::_1))
+		, mChildren(nullptr)
 	{
 		if (mParent != nullptr)
 		{
@@ -35,6 +39,7 @@ namespace tezcat::Tiny::Core
 	Transform::~Transform()
 	{
 		mParent = nullptr;
+		delete mChildren;
 	}
 
 	void Transform::onStart()
@@ -48,6 +53,7 @@ namespace tezcat::Tiny::Core
 	void Transform::onEnable()
 	{
 		mGameObject->mTransform = this;
+		mGameObject->swapTransform();
 	}
 
 	void Transform::onDisable()
@@ -88,22 +94,20 @@ namespace tezcat::Tiny::Core
 
 	void Transform::forceUpdateChildren()
 	{
-		if (!mChildren.empty())
+		if (mChildren)
 		{
-			auto it = mChildren.begin();
-			while (it != mChildren.end())
+			auto it = mChildren->begin();
+			while (it != mChildren->end())
 			{
-				auto go = (*it)->getGameObject();
-				if (go->needDelete())
+				auto child = (*it);
+				if (child.lock())
 				{
-					it = mChildren.erase(it);
-					go->close();
-					delete go;
+					child->forceUpdate();
+					it++;
 				}
 				else
 				{
-					(*it)->forceUpdate();
-					it++;
+					it = mChildren->erase(it);
 				}
 			}
 		}
@@ -111,22 +115,20 @@ namespace tezcat::Tiny::Core
 
 	void Transform::updateChildren()
 	{
-		if (!mChildren.empty())
+		if (mChildren)
 		{
-			auto it = mChildren.begin();
-			while (it != mChildren.end())
+			auto it = mChildren->begin();
+			while (it != mChildren->end())
 			{
-				auto go = (*it)->getGameObject();
-				if (go->needDelete())
+				auto child = (*it);
+				if (child.lock())
 				{
-					it = mChildren.erase(it);
-					go->close();
-					delete go;
+					child->update();
+					it++;
 				}
 				else
 				{
-					(*it)->update();
-					it++;
+					it = mChildren->erase(it);
 				}
 			}
 		}
@@ -136,10 +138,10 @@ namespace tezcat::Tiny::Core
 	{
 		mModelMatrix = glm::translate(WORLD_MATRIX, mLocalPosition);
 
-// 		auto q1 = glm::rotate(glm::quat(), mLocalRotation.x, this->getRight());
-// 		auto q2 = glm::rotate(glm::quat(), mLocalRotation.y, this->getUp());
-// 		auto q3 = glm::rotate(glm::quat(), mLocalRotation.z, this->getForward());
-// 		mModelMatrix = mModelMatrix * glm::mat4_cast(q1 * q2 * q3);
+		// 		auto q1 = glm::rotate(glm::quat(), mLocalRotation.x, this->getRight());
+		// 		auto q2 = glm::rotate(glm::quat(), mLocalRotation.y, this->getUp());
+		// 		auto q3 = glm::rotate(glm::quat(), mLocalRotation.z, this->getForward());
+		// 		mModelMatrix = mModelMatrix * glm::mat4_cast(q1 * q2 * q3);
 
 		mModelMatrix = mModelMatrix * glm::mat4_cast(glm::quat(glm::radians(mLocalRotation)));
 		mModelMatrix = glm::scale(mModelMatrix, mLocalScale);
@@ -157,26 +159,20 @@ namespace tezcat::Tiny::Core
 
 	void Transform::addChild(Transform* transform)
 	{
-		//		transform->mIndex = static_cast<uint32_t>(mChildren.size());
-		mChildren.push_back(transform);
+		if (mChildren == nullptr)
+		{
+			mChildren = new std::vector<TinyWeakRef<Transform>>();
+		}
+		mChildren->push_back(transform);
 	}
 
 	bool Transform::removeChild(Transform* transform)
 	{
-		mChildren.erase(std::find(mChildren.begin(), mChildren.end(), transform));
-
-		// 		auto index = transform->mIndex;
-		// 		if (mChildren[index] != transform)
-		// 		{
-		// 			return false;
-		// 		}
-		// 
-		// 		mChildren.erase(mChildren.begin() + index);
-		// 
-		// 		for (int i = index; i < mChildren.size(); i++)
-		// 		{
-		// 			mChildren[i]->mIndex = i;
-		// 		}
+		mChildren->erase(std::find_if(mChildren->begin(), mChildren->end(),
+			[transform](TinyWeakRef<Transform> inner)
+			{
+				return inner.get() == transform;
+			}));
 
 		return true;
 	}

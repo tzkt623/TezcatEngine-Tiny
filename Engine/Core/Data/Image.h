@@ -2,21 +2,25 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
+#include "../Tool/FileTool.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class TINY_API Image
 	{
 	public:
 		Image();
-		Image(Image&& other);
+		Image(Image&& other) noexcept;
 		~Image();
 
 		void openFile(const std::string& path, bool flip = false);
+		void openFile(const FileInfo& info, bool flip = false);
+
 		inline const int& getWidth() const { return mWidth; }
 		inline const int& getHeight() const { return mHeight; }
 		inline const int& getChannels() const { return mChannels; }
-		inline unsigned char* getData() const { return mData; }
+		inline void* getData() const { return mData; }
+		inline bool isHDR() const { return mIsHDR; }
 
 		Image& operator=(Image&& other) noexcept
 		{
@@ -32,6 +36,7 @@ namespace tezcat::Tiny::Core
 		int mWidth;
 		int mHeight;
 		int mChannels;
-		unsigned char* mData;
+		void* mData;
+		bool mIsHDR;
 	};
 }

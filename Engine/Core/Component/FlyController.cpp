@@ -1,8 +1,9 @@
 #include "FlyController.h"
 #include "Transform.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(FlyController)
 
 
 	/// <summary>

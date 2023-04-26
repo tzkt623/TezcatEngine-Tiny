@@ -1,9 +1,9 @@
 #pragma once
-#include "../Head/CppHead.h"
-#include "Utility/Utility.h"
+#include "../Head/TinyCpp.h"
+#include "../Tool/Tool.h"
 #include "../Head/ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Scene;
 	class TINY_API SceneManager
@@ -21,19 +21,19 @@ namespace tezcat::Tiny::Core
 		void pushScene(const std::string& name);
 		void pushScene(Scene* scene);
 
+		void switchScene(Scene* scene);
+
 		void popScene();
 
 		Scene* getCurrentScene() { return mScenes.top(); }
-		std::unordered_map<std::string, Scene*>& getAllScenes() { return mSceneWithName; }
+		TinyUMap<std::string, Scene*>& getAllScenes() { return mSceneWithName; }
 
 		bool empty() { return mScenes.empty(); }
 
 	private:
-		std::stack<Scene*> mScenes;
-		std::unordered_map<std::string, Scene*> mSceneWithName;
 
-
-	public:
+		TinyStack<Scene*> mScenes;
+		TinyUMap<std::string, Scene*> mSceneWithName;
 	};
 
 	using SceneMgr = SG<SceneManager>;

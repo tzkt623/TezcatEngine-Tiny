@@ -1,10 +1,11 @@
 #include "ShaderPackage.h"
 #include "Shader.h"
 
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
+
 #include "../Manager/ShaderManager.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	ShaderPackage::ShaderPackage()
 		: mUID(-1)

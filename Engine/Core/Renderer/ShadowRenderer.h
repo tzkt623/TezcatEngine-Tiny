@@ -3,8 +3,9 @@
 #include "RenderObject.h"
 #include "../Head/ConfigHead.h"
 #include "../Head/CppHead.h"
+#include "../Base/TinyObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class ILight;
 	class IRenderMesh;

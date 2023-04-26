@@ -43,9 +43,6 @@
     <ClCompile Include="ThirdParty\imgui\imgui.cpp">
       <Filter>Engine\Thirdparty\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp">
       <Filter>Engine\Thirdparty\imgui</Filter>
     </ClCompile>
@@ -64,7 +61,7 @@
     <ClCompile Include="Core\Statistic.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\StringTool.cpp">
+    <ClCompile Include="Core\Tool\StringTool.cpp">
       <Filter>Engine\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Core\Data\Image.cpp">
@@ -121,9 +118,6 @@
     <ClCompile Include="Core\Renderer\LayerMask.cpp">
       <Filter>Engine\Core\Scene\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Base\TinyObject.cpp">
-      <Filter>Engine\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Component\Component.cpp">
       <Filter>Engine\Core\Scene\GameObject</Filter>
     </ClCompile>
@@ -144,7 +138,7 @@
     <ClCompile Include="Core\Layer\RenderLayer.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
-    <ClCompile Include="Utility\ProfilerTimer.cpp" />
+    <ClCompile Include="Core\Tool\ProfilerTimer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
     <ClCompile Include="Core\Head\Context.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
@@ -159,12 +153,16 @@
     <ClCompile Include="Core\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
     <ClCompile Include="Core\Manager\FrameBufferManager.cpp" />
-    <ClCompile Include="Utility\FileTool.cpp" />
+    <ClCompile Include="Core\Tool\FileTool.cpp" />
     <ClCompile Include="Core\Renderer\ShadowRenderer.cpp" />
     <ClCompile Include="Core\Component\FlyController.cpp" />
     <ClCompile Include="Core\Tool\Log.cpp" />
-    <ClCompile Include="Utility\Event.cpp" />
+    <ClCompile Include="Core\Tool\Event.cpp" />
     <ClCompile Include="Core\Event\EngineEvent.cpp" />
+    <ClCompile Include="Core\Renderer\VertexConfig.cpp" />
+    <ClCompile Include="Core\Base\TinyGC.cpp" />
+    <ClCompile Include="Core\Base\TinyRefObject.cpp" />
+    <ClCompile Include="Core\Renderer\RenderAgent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1165,7 +1163,7 @@
     <ClInclude Include="ThirdParty\imgui\imgui_impl_opengl3_loader.h">
       <Filter>Engine\Thirdparty\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Utility.h">
+    <ClInclude Include="Core\Tool\Tool.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Core\Statistic.h">
@@ -1240,9 +1238,6 @@
     <ClInclude Include="Core\Renderer\LayerMask.h">
       <Filter>Engine\Core\Scene\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Base\TinyObject.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Component\Component.h">
       <Filter>Engine\Core\Scene\GameObject</Filter>
     </ClInclude>
@@ -1261,7 +1256,7 @@
     <ClInclude Include="Core\Shader\ShaderPackage.h" />
     <ClInclude Include="Core\Manager\PipelineManager.h" />
     <ClInclude Include="Core\Head\ConfigHead.h" />
-    <ClInclude Include="Utility\Bitmask.h" />
+    <ClInclude Include="Core\Tool\Bitmask.h" />
     <ClInclude Include="Platform\OpenGL\WindowsEngine.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
@@ -1269,39 +1264,43 @@
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Layer\Layer.h" />
     <ClInclude Include="Core\Layer\RenderLayer.h" />
-    <ClInclude Include="Utility\ProfilerTimer.h" />
+    <ClInclude Include="Core\Tool\ProfilerTimer.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
     <ClInclude Include="Core\Head\Context.h" />
     <ClInclude Include="Platform\OpenGL\GLShader.h" />
-    <ClInclude Include="Utility\IDString.h" />
+    <ClInclude Include="Core\Tool\IDString.h" />
     <ClInclude Include="Core\Shader\Uniform.h" />
-    <ClInclude Include="Utility\Any.h" />
+    <ClInclude Include="Core\Tool\Any.h" />
     <ClInclude Include="Core\Manager\TextureManager.h" />
-    <ClInclude Include="Utility\StringTool.h" />
-    <ClInclude Include="Utility\IDGenerator.h" />
-    <ClInclude Include="Utility\Event.h" />
-    <ClInclude Include="Utility\Singleton.h" />
-    <ClInclude Include="Utility\DelegateCreator.h" />
+    <ClInclude Include="Core\Tool\StringTool.h" />
+    <ClInclude Include="Core\Tool\IDGenerator.h" />
+    <ClInclude Include="Core\Tool\Event.h" />
+    <ClInclude Include="Core\Tool\Singleton.h" />
+    <ClInclude Include="Core\Tool\DelegateCreator.h" />
     <ClInclude Include="Core\Pipeline\Forward.h" />
     <ClInclude Include="Core\Pipeline\PipelineQueue.h" />
     <ClInclude Include="Core\Layer\LightLayer.h" />
     <ClInclude Include="Core\Tool\AABB.h" />
     <ClInclude Include="Core\Tool\FrustumCulling.h" />
     <ClInclude Include="Core\Renderer\RenderObjectTag.h" />
-    <ClInclude Include="Core\Base\TinySmartPointer.h" />
-    <ClInclude Include="Core\Base\BaseObject.h" />
+    <ClInclude Include="Core\Base\TinyObject.h" />
     <ClInclude Include="Core\Component\Skybox.h" />
     <ClInclude Include="Core\Renderer\FrameBuffer.h" />
     <ClInclude Include="Platform\OpenGL\GLFrameBuffer.h" />
     <ClInclude Include="Core\Manager\FrameBufferManager.h" />
     <ClInclude Include="Core\Manager\Manager.h" />
-    <ClInclude Include="Utility\FileTool.h" />
+    <ClInclude Include="Core\Tool\FileTool.h" />
     <ClInclude Include="Core\Renderer\RenderConfig.h" />
     <ClInclude Include="Core\Renderer\ShadowRenderer.h" />
     <ClInclude Include="Core\Manager\ObserverManager.h" />
     <ClInclude Include="Core\Component\FlyController.h" />
     <ClInclude Include="Core\Tool\Log.h" />
     <ClInclude Include="Core\Event\EngineEvent.h" />
+    <ClInclude Include="Core\Renderer\VertexConfig.h" />
+    <ClInclude Include="Core\Base\TinyRefObject.h" />
+    <ClInclude Include="Core\Base\TinyGC.h" />
+    <ClInclude Include="Core\Head\TinyCpp.h" />
+    <ClInclude Include="Core\Renderer\RenderAgent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

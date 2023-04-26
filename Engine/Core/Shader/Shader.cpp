@@ -1,10 +1,11 @@
 #include "Shader.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
+
 
 #include "../Manager/ShaderManager.h"
 #include "../Renderer/RenderPass.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	Shader::Shader()
 		: Shader("##ErrorShader", 0)

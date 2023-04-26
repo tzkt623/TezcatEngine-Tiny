@@ -1,3 +1,4 @@
 uniform samplerCube TINY_TexCube;
 uniform sampler2D TINY_TexDepth;
 uniform sampler2D TINY_TexColor;
+uniform sampler2D TINY_TexEnv;

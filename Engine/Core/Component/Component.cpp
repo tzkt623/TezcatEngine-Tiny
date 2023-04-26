@@ -3,7 +3,7 @@
 #include "../Component/GameObject.h"
 #include "Transform.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	uint32_t Component::sID = 0;
 
@@ -35,10 +35,9 @@ namespace tezcat::Tiny::Core
 		return mGameObject->mTransform;
 	}
 
-	void Component::close()
+	void Component::onDestroy()
 	{
-		mGameObject->removeComponent(this);
-		delete this;
+		//mGameObject->removeComponent(this);
 	}
 }
 

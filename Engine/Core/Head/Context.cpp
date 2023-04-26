@@ -1,6 +1,6 @@
 #include "Context.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	std::array<DataTypeWrapper, (std::size_t)DataType::Count> ContextMap::DataTypeArray =
 	{
@@ -58,6 +58,8 @@ namespace tezcat::Tiny::Core
 		TexChannelWrapper(TextureChannel::Depth_Stencil,		0),
 		TexChannelWrapper(TextureChannel::Depth24_Stencil8,		0),
 		TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	0),
+		TexChannelWrapper(TextureChannel::Stencil8,				0),
+		TexChannelWrapper(TextureChannel::RGBF16,				0),
 	};
 
 	std::array<ColorBufferWrapper, (std::size_t)ColorBuffer::Count> ContextMap::ColorBufferArray =

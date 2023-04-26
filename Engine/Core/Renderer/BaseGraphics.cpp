@@ -21,7 +21,7 @@
 
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
 	{
@@ -45,24 +45,29 @@ namespace tezcat::Tiny::Core
 	{
 		Statistic::DrawCall = 0;
 		Statistic::PassCount = 0;
+		//RenderCommander::preRender();
 	}
 
 	void BaseGraphics::onRender()
 	{
 		//#PipelineManager::render
-		auto& cameras = CameraMgr::getInstance()->getSortedCameraAry();
-		for (auto camera : cameras)
+		auto& data = CameraMgr::getInstance()->getCameraData();
+		if (data.lock())
 		{
-			if (camera->isEnable())
+			auto cameras = data->getAllCamera();
+			for (auto camera : cameras)
 			{
-				camera->render(this);
+				if (camera->isEnable())
+				{
+					camera->render(this);
+				}
 			}
 		}
 	}
 
 	void BaseGraphics::postRender()
 	{
-
+		//RenderCommander::postRender();
 	}
 
 	void BaseGraphics::setShadowMap(int width, int height)
@@ -75,7 +80,5 @@ namespace tezcat::Tiny::Core
 		MeshData* meshdata = new MeshData();
 		meshdata->vertices.emplace_back(begin);
 		meshdata->vertices.emplace_back(end);
-
 	}
-
 }

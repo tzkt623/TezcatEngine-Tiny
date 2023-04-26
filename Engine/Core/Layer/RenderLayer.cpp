@@ -11,7 +11,7 @@
 #include "../Manager/ShaderManager.h"
 #include "../Renderer/RenderPass.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	std::array<RenderLayer*, 32> RenderLayer::sLayerAry =
 	{
@@ -32,11 +32,6 @@ namespace tezcat::Tiny::Core
 		mRenderObjectList.clear();
 	}
 
-	void RenderLayer::addRenderObejct(IRenderObject* renderObject)
-	{
-		mRenderObjectList.emplace_back(renderObject);
-	}
-
 	void RenderLayer::culling(IRenderObserver* renderObserver, const RenderPassType& passType)
 	{
 		if (mRenderObjectList.empty())
@@ -48,15 +43,30 @@ namespace tezcat::Tiny::Core
 		auto end = mRenderObjectList.end();
 		while (it != end)
 		{
-			auto com = dynamic_cast<Component*>(*it);
-			if (com->isEnable())
+			auto agent = (*it);
+			if (agent.lock())
 			{
-				if (renderObserver->culling(com->getGameObject()))
+				auto com = agent->getComponent();
+				if (com->isEnable())
 				{
-					(*it)->sendToRenderPass(passType);
+					if (renderObserver->culling(com->getGameObject()))
+					{
+						agent->getRenderObject()->sendToRenderPass(passType);
+					}
 				}
+
+				it++;
 			}
-			it++;
+			else
+			{
+				it = mRenderObjectList.erase(it);
+			}
 		}
 	}
+
+	void RenderLayer::addRenderAgent(RenderAgent* renderAgent)
+	{
+		mRenderObjectList.emplace_back(renderAgent);
+	}
+
 }

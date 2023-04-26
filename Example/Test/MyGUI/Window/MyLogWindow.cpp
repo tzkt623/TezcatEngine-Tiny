@@ -105,7 +105,10 @@ void MyLogWindow::onRender()
 // 	{
 // 		ImGui::OpenPopup("Options");
 //  }
+	auto& logs = Log::allLog();
 
+	ImGui::LabelText("数量(Count)", std::to_string(logs.size()).c_str());
+	ImGui::SameLine();
 	ImGui::Checkbox("Auto-scroll", &mAutoScroll);
 
 	static bool mOnlyEngine, mOnlyInfo, mOnlyError, mOnlyWarning;
@@ -122,8 +125,8 @@ void MyLogWindow::onRender()
 	bool clear = ImGui::Button("Clear");
 	ImGui::SameLine();
 	bool copy = ImGui::Button("Copy");
-	ImGui::SameLine();
-	mFilter.Draw("Filter", -100.0f);
+	//ImGui::SameLine();
+	//mFilter.Draw("Filter", -100.0f);
 
 	ImGui::Separator();
 	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -146,7 +149,6 @@ void MyLogWindow::onRender()
 	static ImVec4 error(1.0f, 0.0f, 0.0f, 1.0f);
 	static ImVec4 warning(0.0f, 1.0f, 1.0f, 1.0f);
 
-	auto& logs = Log::allLog();
 	ImGuiListClipper clipper;
 	clipper.Begin(logs.size());
 	while (clipper.Step())

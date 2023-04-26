@@ -10,24 +10,28 @@
 #include "../Layer/RenderLayer.h"
 #include "../Tool/Log.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(Scene);
+	
 	Scene::Scene(const std::string& name)
 		: mName(name)
 		, mLightData(new LightData())
-		, mCameraData(new CameraData())
+		, mCameraData(nullptr)
 	{
-
 	}
 
 	Scene::~Scene()
 	{
-
 	}
 
 	void Scene::onEnter()
 	{
 		Log::info(StringTool::stringFormat("Enter Scene: %s", this->getName().c_str()));
+
+		mCameraData = CameraData::create();
+		mCameraData->addRef();
+
 
 		CameraMgr::getInstance()->setCameraData(mCameraData);
 		LightMgr::getInstance()->setData(mLightData);
@@ -35,7 +39,13 @@ namespace tezcat::Tiny::Core
 
 	void Scene::onExit()
 	{
+		mCameraData->subRef();
+		mTransformList.clear();
+		mObjectList.clear();
+		mLogicList.clear();
 
+		CameraMgr::getInstance()->setCameraData(nullptr);
+		Log::info(StringTool::stringFormat("Exit Scene: %s", this->getName().c_str()));
 	}
 
 	void Scene::onPause()
@@ -51,8 +61,8 @@ namespace tezcat::Tiny::Core
 
 	void Scene::addGameObject(GameObject* gameObject)
 	{
-		mNewObjectList.emplace_back(gameObject);
-		mObjectList.emplace_back(gameObject);
+		mNewObjectList.push_back(gameObject);
+		mObjectList.push_back(gameObject);
 	}
 
 	void Scene::addTransform(Transform* transform)
@@ -101,63 +111,27 @@ namespace tezcat::Tiny::Core
 			}
 		}
 
-// 		if (!mUpdateTransformList.empty())
-// 		{
-//			std::sort(mUpdateTransformList.begin(), mUpdateTransformList.end(),
-//				[](Transform* a, Transform* b)
-//				{
-//					return a->getIndex() < b->getIndex();
-//				});
-// 		}
-
 		//#TransformUpdate
 		auto it = mTransformList.begin();
 		auto end = mTransformList.end();
 		while (it != end)
 		{
-			auto go = (*it)->getGameObject();
-			if (go->needDelete())
+			auto child = (*it);
+			if (child.lock())
 			{
-				it = mTransformList.erase(it);
-				end = mTransformList.end();
-				go->exitScene();
-				go->close();
-				delete go;
+				child->update();
+				it++;
 			}
 			else
 			{
-				(*it)->update();
-				it++;
+				it = mTransformList.erase(it);
 			}
 		}
-
-		//#CameraCulling
-// 		auto it_camera = m_CameraData->m_CameraList.begin();
-// 		auto end_camera = m_CameraData->m_CameraList.end();
-// 		while (it_camera != end_camera)
-// 		{
-// 			auto c = (*it_camera);
-// 			if (c->isEnable())
-// 			{
-// 				const auto& cull_list = c->getCullLayerList();
-// 				for (auto& index : cull_list)
-// 				{
-// 					m_RenderLayerList[index]->testWithCamera(c, m_LightLayerList[index]);
-// 				}
-// 
-// 				it_camera++;
-// 			}
-// 			else
-// 			{
-// 				it_camera = m_CameraData->m_CameraList.erase(it_camera);
-// 				end_camera = m_CameraData->m_CameraList.end();
-// 			}
-// 		}
 	}
 
-	std::vector<GameObject*> Scene::findGameObjects(const std::string& name)
+	TinyVector<GameObject*> Scene::findGameObjects(const std::string& name)
 	{
-		std::vector<GameObject*> result;
+		TinyVector<GameObject*> result;
 		for (auto object : mObjectList)
 		{
 			if (object->getName() == name)
@@ -171,12 +145,13 @@ namespace tezcat::Tiny::Core
 
 	uint32_t Scene::addUpdateTransform(Transform* transform)
 	{
-		mUpdateTransformList.emplace_back(transform);
-		return mUpdateTransformList.size() - 1;
+		// 		mUpdateTransformList.emplace_back(transform);
+		// 		return mUpdateTransformList.size() - 1;
+		return 0;
 	}
 
 	void Scene::setUpdateTransform(const uint32_t& index, Transform* transform)
 	{
-		mUpdateTransformList[index] = transform;
+		//mUpdateTransformList[index] = transform;
 	}
 }

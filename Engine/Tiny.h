@@ -9,6 +9,7 @@
 #include "Core/Renderer/Texture.h"
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/RenderObject.h"
+#include "Core/Renderer/Vertex.h"
 
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/CameraManager.h"
@@ -38,9 +39,8 @@
 #include "Core/Shader/ShaderParam.h"
 #include "Core/Shader/ShaderPackage.h"
 
-#include "Core/Tool/Log.h"
+#include "Core/Tool/Tool.h"
 
-#include "Utility/Utility.h"
 
 #ifdef TINY_PLATFORM_WINDOWS
 #include "Platform/OpenGL/WindowsEngine.h"

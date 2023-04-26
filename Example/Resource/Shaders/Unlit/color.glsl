@@ -23,7 +23,7 @@
         #include "tiny_vs_base"
 
         layout (location = 0) in vec3 aPos;
-        layout (location = 2) in vec4 aColor;
+        layout (location = 3) in vec4 aColor;
 
         out vec4 myColor;
         out vec4 myWorldPosition;

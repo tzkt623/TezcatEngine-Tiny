@@ -1,6 +1,6 @@
 #include "LayerMask.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	std::vector<std::string> LayerMask::sMaskWithName(32);
 

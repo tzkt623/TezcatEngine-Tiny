@@ -1,11 +1,12 @@
 #pragma once
 #include "../Manager/Manager.h"
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/Context.h"
 
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
-namespace tezcat::Tiny::Core
+
+namespace tezcat::Tiny
 {
 	class Image;
 	class Texture;
@@ -51,7 +52,9 @@ namespace tezcat::Tiny::Core
 		Texture* findTexture(const std::string& name);
 
 	private:
-		std::unordered_map<std::string, Texture*> mTextureMap;
+		TinyUMap<std::string, Texture*> mTextureMap;
+
+		//std::unordered_map<std::string, Texture*> mTextureMap;
 	};
 
 	using TextureMgr = SG<TextureManager>;

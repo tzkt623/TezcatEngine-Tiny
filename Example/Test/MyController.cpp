@@ -1,6 +1,6 @@
 #include "MyController.h"
 #include "MyInputer.h"
-#include "MyScene.h"
+#include "Scene/MyMainScene.h"
 
 MyController::MyController()
 	: mFront(0.0f, 0.0f, -1.0f)
@@ -29,7 +29,7 @@ void MyController::onStart()
 
 void MyController::onEnable()
 {
-//	MyInputer::getInstance()->setController(this);
+	//	MyInputer::getInstance()->setController(this);
 	//	this->startLogic(std::bind(&MyController::warp, this));
 }
 
@@ -108,6 +108,7 @@ void MyController::yawPitch(float yaw, float pitch, bool constrainPitch)
 		{
 			mPitch = 89.0f;
 		}
+
 		if (mPitch < -89.0f)
 		{
 			mPitch = -89.0f;

@@ -3,9 +3,9 @@
 
 struct GLFWwindow;
 
-using namespace tezcat::Tiny::Core;
+using namespace tezcat::Tiny;
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class GUI;
 }

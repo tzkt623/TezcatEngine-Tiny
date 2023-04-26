@@ -16,6 +16,13 @@ MyInputer::~MyInputer()
 
 void MyInputer::processInput(InputSystem* system)
 {
+	auto ptr = mController.lock();
+	if (!ptr)
+	{
+		return;
+	}
+
+
 	float speed = 100 * Engine::getDeltaTime();
 	bool flag = false;
 	auto transform = mController->getTransform();

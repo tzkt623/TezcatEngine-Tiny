@@ -6,7 +6,7 @@
 #include "../Component/MeshRenderer.h"
 #include "../Renderer/BaseGraphics.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	PassVertexGroup::PassVertexGroup(Vertex* vg)
 		: mDelegateVertexGroup(vg)

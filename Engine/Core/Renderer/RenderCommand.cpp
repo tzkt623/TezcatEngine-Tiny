@@ -3,7 +3,7 @@
 
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	RenderCommand::RenderCommand()
 		: mDrawMode(ContextMap::DrawModeArray[(uint32_t)DrawMode::Triangles])

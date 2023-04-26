@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../Head/CppHead.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 #include "Uniform.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	//#内置Shader变量
 	struct TINY_API ShaderParam
@@ -39,6 +39,7 @@ namespace tezcat::Tiny::Core
 		static UniformID TexColor;
 		static UniformID TexCube;
 		static UniformID TexDepth;
+		static UniformID TexEnv;
 
 // 		static UniformID LightPosition;
 // 		static UniformID LightColor;

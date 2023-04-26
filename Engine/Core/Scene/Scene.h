@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
+#include "../Base/TinyObject.h"
 #include "../Head/ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class GameObject;
 	class Camera;
@@ -13,12 +14,17 @@ namespace tezcat::Tiny::Core
 	class Layer;
 	class RenderLayer;
 	class LightLayer;
-	class TINY_API Scene
+	class TINY_API Scene : public TinyObject
 	{
 		friend class GameObject;
 		friend class Transform;
-	public:
+
+		TINY_RTTI_H(Scene)
+
+	protected:
 		Scene(const std::string& name);
+
+	public:
 		virtual ~Scene();
 		const std::string& getName() const { return mName; }
 
@@ -42,9 +48,9 @@ namespace tezcat::Tiny::Core
 
 
 	public:
-		inline const std::list<GameObject*>& getObjectList() const { return mObjectList; }
-		inline const std::list<Transform*>& getTransformList() const { return mTransformList; }
-		std::vector<GameObject*> findGameObjects(const std::string& name);
+		TinyList<GameObject*>& getObjectList() { return mObjectList; }
+		std::list<TinyWeakRef<Transform>>& getTransformList() { return mTransformList; }
+		TinyVector<GameObject*> findGameObjects(const std::string& name);
 
 	private:
 		uint32_t addUpdateTransform(Transform* transform);
@@ -52,12 +58,13 @@ namespace tezcat::Tiny::Core
 
 	private:
 		std::string mName;
-		std::list<GameObject*> mObjectList;
 		std::list<GameObject*> mNewObjectList;
-		std::list<Transform*> mTransformList;
-		std::vector<Transform*> mUpdateTransformList;
-
 		std::unordered_map<void*, std::function<void()>> mLogicList;
+
+	public:
+
+		TinyList<GameObject*> mObjectList;
+		std::list<TinyWeakRef<Transform>> mTransformList;
 	private:
 		//灯光数据
 		LightData* mLightData;

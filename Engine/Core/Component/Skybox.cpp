@@ -12,31 +12,45 @@
 
 #include "../Manager/VertexManager.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(Skybox)
+
 	Skybox::Skybox()
-		: mVertexGroup(VertexMgr::getInstance()->getVertex("Skybox"))
+		: mVertex(VertexMgr::getInstance()->getVertex("Skybox"))
 		, mDrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
 		, mMaterial(nullptr)
+		, mRenderAgent(nullptr)
 	{
-
+		mVertex->addRef();
 	}
 
 	Skybox::~Skybox()
 	{
-		delete mMaterial;
-
-		mVertexGroup = nullptr;
-		mMaterial = nullptr;
+		mVertex->subRef();
+		mRenderAgent->subRef();
+		mMaterial->subRef();
 	}
 
 	void Skybox::onStart()
 	{
-		RenderLayer::addRenderObejct(this->getGameObject()->getLayerIndex(), this);
+		if (mRenderAgent == nullptr)
+		{
+			mRenderAgent = RenderAgent::create(this, this);
+			mRenderAgent->addRef();
+		}
+
+		RenderLayer::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
+	}
+
+	void Skybox::onDisable()
+	{
+
 	}
 
 	void Skybox::onEnable()
 	{
+
 	}
 
 	Material* Skybox::getMaterial() const
@@ -66,16 +80,28 @@ namespace tezcat::Tiny::Core
 
 	int Skybox::getVertexCount() const
 	{
-		return mVertexGroup->getVertexCount();
+		return mVertex->getVertexCount();
 	}
 
 	void Skybox::beginRender()
 	{
-		mVertexGroup->bind();
+		mVertex->bind();
 	}
 
 	void Skybox::endRender()
 	{
-		mVertexGroup->unbind();
+		mVertex->unbind();
 	}
+
+	void Skybox::setMaterial(Material* material)
+	{
+		if (mMaterial)
+		{
+			mMaterial->subRef();
+		}
+
+		mMaterial = material;
+		mMaterial->addRef();
+	}
+
 }

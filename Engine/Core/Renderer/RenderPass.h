@@ -3,7 +3,7 @@
 #include "../Head/ConfigHead.h"
 #include "../Head/Context.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Shader;
 	class PassVertexGroup;

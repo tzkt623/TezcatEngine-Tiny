@@ -2,11 +2,12 @@
 #include "../Data/Image.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	uint32_t Texture::sUIDGiver = 0;
 	std::deque<uint32_t> Texture::sFreeUIDs;
 
+	TINY_RTTI_CPP(Texture)
 	Texture::Texture()
 		: Texture(TextureChannel::None, TextureWrap::Repeat, TextureFilter::Linear, false)
 	{
@@ -58,6 +59,11 @@ namespace tezcat::Tiny::Core
 		return uid;
 	}
 
+	//------------------------------------------------------------
+	//
+	//
+	//
+	TINY_RTTI_CPP(Texture2D)
 	Texture2D::Texture2D()
 		: mWidth(0)
 		, mHeight(0)
@@ -65,9 +71,9 @@ namespace tezcat::Tiny::Core
 
 	}
 
+	TINY_RTTI_CPP(Texture3D)
+	TINY_RTTI_CPP(TextureCube)
+	TINY_RTTI_CPP(TextureRenderBuffer2D)
+	TINY_RTTI_CPP(TextureBuffer2D)
 
-	void TextureRenderBuffer2D::create(const Image& img, const TextureInfo& info)
-	{
-		throw std::logic_error("The method or operation is not implemented.");
-	}
 }

@@ -1,6 +1,7 @@
 #include "MeshRenderer.h"
 #include "Transform.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
+
 
 #include "../Data/Material.h"
 #include "../Component/GameObject.h"
@@ -15,38 +16,32 @@
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/VertexBuffer.h"
 #include "../Renderer/ShadowRenderer.h"
+#include "../Renderer/RenderAgent.h"
 
 #include "../Manager/PipelineManager.h"
 #include "../Manager/VertexManager.h"
 
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(MeshRenderer)
+
 	MeshRenderer::MeshRenderer()
-		: MeshRenderer((Vertex*)nullptr)
-	{
-
-	}
-
-	MeshRenderer::MeshRenderer(MeshData* meshData)
-		: MeshRenderer(VertexMgr::getInstance()->createVertex(meshData))
-	{
-
-	}
-
-	MeshRenderer::MeshRenderer(Vertex* vertex)
-		: mVertex(vertex)
-		, mDrawMode(ContextMap::DrawModeArray[(uint32_t)DrawMode::Triangles])
+		: mDrawMode(ContextMap::DrawModeArray[(uint32_t)DrawMode::Triangles])
 		, mMainMaterial(nullptr)
 		, mIsCastShadow(true)
+		, mRenderAgent(nullptr)
+		, mVertex(nullptr)
 	{
-
+		
 	}
 
 	MeshRenderer::~MeshRenderer()
 	{
-		mVertex = nullptr;
+		mRenderAgent->subRef();
+		mVertex->subRef();
+		mMainMaterial->subRef();
 	}
 
 	int MeshRenderer::getVertexCount() const
@@ -62,13 +57,13 @@ namespace tezcat::Tiny::Core
 	void MeshRenderer::setMesh(const std::string& meshName)
 	{
 		mVertex = VertexMgr::getInstance()->getVertex(meshName);
-		this->setDrawMode(mVertex->getDrawMode());
+		mVertex->addRef();
 	}
 
 	void MeshRenderer::setMesh(MeshData* meshData)
 	{
 		mVertex = VertexMgr::getInstance()->getVertex(meshData);
-		this->setDrawMode(mVertex->getDrawMode());
+		mVertex->addRef();
 	}
 
 	void MeshRenderer::onEnable()
@@ -78,12 +73,16 @@ namespace tezcat::Tiny::Core
 
 	void MeshRenderer::onDisable()
 	{
-
 	}
 
 	void MeshRenderer::onStart()
 	{
-		RenderLayer::addRenderObejct(this->getGameObject()->getLayerIndex(), this);
+		if (mRenderAgent == nullptr)
+		{
+			mRenderAgent = RenderAgent::create(this, this);
+			mRenderAgent->addRef();
+		}
+		RenderLayer::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
 	}
 
 	void MeshRenderer::sendToRenderPass(const RenderPassType& passType)
@@ -131,5 +130,16 @@ namespace tezcat::Tiny::Core
 	void MeshRenderer::endRender()
 	{
 		mVertex->unbind();
+	}
+
+	void MeshRenderer::setMaterial(Material* val)
+	{
+		if (mMainMaterial)
+		{
+			mMainMaterial->subRef();
+		}
+
+		mMainMaterial = val;
+		mMainMaterial->addRef();
 	}
 }

@@ -1,26 +1,31 @@
 #pragma once
 
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
 #include "../Renderer/RenderConfig.h"
+#include "../Renderer/RenderAgent.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class IRenderObserver;
-	class IRenderObject;
+	class RenderAgent;
+
+	//-------------------------------------------------------
+	//
+	//	RenderLayer
+	//
 	class TINY_API RenderLayer
 	{
 	public:
 		RenderLayer();
 		~RenderLayer();
 	public:
-		void addRenderObejct(IRenderObject* gameObject);
 		void culling(IRenderObserver* renderObserver, const RenderPassType& passType);
+		void addRenderAgent(RenderAgent* renderAgent);
 
 	private:
 		int mIndex;
-		std::list<IRenderObject*> mRenderObjectList;
-		std::list<IRenderObject*> mVisibleRenderObjectList;
+		std::list<TinyWeakRef<RenderAgent>> mRenderObjectList;
 
 	public:
 		static RenderLayer* getRenderLayer(uint32_t index)
@@ -28,13 +33,13 @@ namespace tezcat::Tiny::Core
 			return sLayerAry[index];
 		}
 
-		static void addRenderObejct(uint32_t index, IRenderObject* renderObject)
+		static void addRenderAgent(uint32_t index, RenderAgent* renderAgent)
 		{
-			sLayerAry[index]->addRenderObejct(renderObject);
+			sLayerAry[index]->addRenderAgent(renderAgent);
 		}
 
-	private:
 
+	private:
 		static std::array<RenderLayer*, 32> sLayerAry;
 	};
 }

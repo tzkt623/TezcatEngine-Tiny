@@ -16,10 +16,12 @@
 #include "Component/GameObject.h"
 #include "Shader/ShaderParam.h"
 
-#include "Utility/Utility.h"
+#include "Tool/Tool.h"
 #include "Event/EngineEvent.h"
 
-namespace tezcat::Tiny::Core
+#include "Base/TinyGC.h"
+
+namespace tezcat::Tiny
 {
 	int Engine::ScreenHeight = 0;
 	int Engine::ScreenWidth = 0;
@@ -144,6 +146,7 @@ namespace tezcat::Tiny::Core
 	void Engine::postUpdate()
 	{
 		GameObject::clearDeletedGameObjects();
+		TinyGC::getInstance().update();
 	}
 
 	void Engine::stop()

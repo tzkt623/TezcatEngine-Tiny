@@ -1,6 +1,6 @@
 #include "Log.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	LogImp* Log::mLogImp = new DefaultLogImp();
 	std::deque<LogData*> Log::mLogQueue;

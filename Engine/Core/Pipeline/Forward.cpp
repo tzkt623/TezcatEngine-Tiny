@@ -23,7 +23,7 @@
 #include "../Data/Material.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	Forward::Forward()
 	{

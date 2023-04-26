@@ -1,7 +1,12 @@
 #include "MyResourceLoader.h"
-#include "MyScene.h"
 #include "MyInputer.h"
 #include "MyGUI/MyGUI.h"
+#include "MyEvent.h"
+
+#include "Scene/MyMainScene.h"
+#include "Scene/MySecondScene.h"
+
+
 
 using namespace tezcat::Tiny::GL;
 #define CreateWindow(host, X) (new X)->open(host)
@@ -14,6 +19,8 @@ MyResourceLoader::MyResourceLoader()
 void MyResourceLoader::prepareEngine(Engine* engine)
 {
 	ResourceLoader::prepareEngine(engine);
+	MyEvent::get()->init(MyEventID::Count);
+
 	static_cast<WindowsEditor*>(engine)->setGLVersion(3, 3);
 
 	mResourceFolderName = "Resource";
@@ -42,7 +49,9 @@ void MyResourceLoader::prepareGame(Engine* engine)
 
 	engine->getGraphics()->setShadowMap(1024, 1024);
 
- 	SceneMgr::getInstance()->prepareScene(new MyScene("MyScene"));
+ 	SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
+ 	SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
+ 	//SceneMgr::getInstance()->pushScene("MyScene");
 }
 
 void MyResourceLoader::initYourShaderParam()

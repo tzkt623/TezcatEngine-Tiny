@@ -6,7 +6,7 @@
 
 #include "../Renderer/RenderObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Shader;
 	class BaseGraphics;
@@ -16,7 +16,6 @@ namespace tezcat::Tiny::Core
 	/// </summary>
 	class TINY_API Camera : public ComponentT<Camera>, public IRenderObserver
 	{
-	public:
 		//创建一个forward主相机
 		Camera();
 		//创建一个forward相机
@@ -26,6 +25,10 @@ namespace tezcat::Tiny::Core
 		//使用管线创建一个相机
 		Camera(Pipeline* pipeling, bool mainCamera);
 
+		TINY_Factory(Camera)
+		TINY_RTTI_H(Camera)
+
+	public:
 		virtual ~Camera();
 
 		RenderObjectType getRenderObjectType() override { return RenderObjectType::Camera; }

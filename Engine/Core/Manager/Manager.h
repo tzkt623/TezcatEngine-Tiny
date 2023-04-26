@@ -2,7 +2,7 @@
 
 #include "../Head/ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	template<class Creator>
 	class TINY_API Manager

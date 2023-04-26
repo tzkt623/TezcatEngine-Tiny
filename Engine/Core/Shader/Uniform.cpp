@@ -8,7 +8,7 @@
 #include "../Component/GameObject.h"
 #include "../Manager/TextureManager.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	void UniformI1::submit(Transform* transform, Shader* shader)
 	{

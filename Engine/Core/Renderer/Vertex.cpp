@@ -1,52 +1,63 @@
 #include "Vertex.h"
 #include "../Data/MeshData.h"
 #include "../Manager/VertexManager.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
+
 #include "VertexBuffer.h"
 #include "BaseGraphics.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(Vertex)
+
 	Vertex::Vertex()
-		: mUID(0)
-		, mIndexCount(0)
-		, mVertexBuffer(nullptr)
-		, mVertexCount(0)
-		, mName("##ErrorVAO")
-		, mChildren(nullptr)
+		: mName("##ErrorVAO")
 	{
 
 	}
 
 	Vertex::~Vertex()
 	{
-		if (mChildren != nullptr)
+		if (mIndexBuffer)
 		{
-			for (auto c : *mChildren)
-			{
-				delete c;
-			}
+			mIndexBuffer->subRef();
 		}
-
 		delete mChildren;
-		delete mVertexBuffer;
 	}
 
 	void Vertex::addChild(Vertex* vertex)
 	{
 		if (mChildren == nullptr)
 		{
-			mChildren = new std::vector<Vertex*>();
+			mChildren = new TinyVector<Vertex*>();
 		}
 
-		mChildren->push_back(vertex);
+		mChildren->emplace_back(vertex);
 	}
 
-	void Vertex::init(MeshData* mesh)
+	void Vertex::init(MeshData* meshData)
 	{
-		mDrawMode = mesh->drawMode;
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->drawMode];
+		mName = meshData->getName();
 	}
 
+	void Vertex::init(const std::string& name, const size_t& vertexCount, const DrawMode& drawMode)
+	{
+		mName = name;
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)drawMode];
+		mVertexCount = vertexCount;
+	}
+
+	void Vertex::setVertexBuffer(VertexBuffer* buffer)
+	{
+		mVertexBuffers.push_back(buffer);
+	}
+
+	void Vertex::setIndexBuffer(IndexBuffer* buffer)
+	{
+		mIndexBuffer = buffer;
+		mIndexBuffer->addRef();
+	}
 }
 

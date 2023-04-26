@@ -16,7 +16,7 @@
 #include "CameraManager.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	PipelineManager::PipelineManager()
 	{

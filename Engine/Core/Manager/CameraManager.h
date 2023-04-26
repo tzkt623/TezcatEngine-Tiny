@@ -1,15 +1,20 @@
 #pragma once
 
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
+#include "../Base/TinyObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Camera;
-	class TINY_API CameraData
+	class TINY_API CameraData : public TinyObject
 	{
 		friend class CameraManager;
+		CameraData() = default;
+		TINY_Factory(CameraData)
+		TINY_RTTI_H(CameraData)
+
 	public:
 		Camera* getMainCamera();
 		const std::vector<Camera*>& getAllCamera();
@@ -34,21 +39,26 @@ namespace tezcat::Tiny::Core
 	public:
 		CameraManager();
 		void setCameraData(CameraData* data);
+		TinyWeakRef<CameraData>& getCameraData()
+		{
+			return mData;
+		}
 
 	public:
 		Camera* getCamera(int index);
 		Camera* getCamera(const std::string& name);
 		Camera* getMainCamera() { return mData->getMainCamera(); }
-		const std::vector<Camera*>& getSortedCameraAry() { return mData->getAllCamera(); }
+		const std::vector<Camera*>& getSortedCameraAry();
 
 		void setMainCamera(Camera* camera);
 		void setMainCamera(const std::string& name);
 		void addCamera(Camera* camera);
 	private:
-		CameraData* mData;
-
+		//CameraData* mData;
+		TinyWeakRef<CameraData> mData;
+		std::vector<Camera*> mEmptyCamera;
 	private:
-		static CameraData* sEmpty;
+		//static CameraData* sEmpty;
 	};
 
 	using CameraMgr = SG<CameraManager>;

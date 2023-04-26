@@ -1,20 +1,24 @@
 #pragma once
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
 #include "../Shader/ShaderParam.h"
 #include "../Shader/Uniform.h"
+#include "../Base/TinyObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	struct Uniform;
 	class ShaderPackage;
 	class Shader;
 	class Transform;
-	class TINY_API Material
+	class TINY_API Material : public TinyObject
 	{
-	public:
 		Material(const std::string& name);
-		~Material();
+		TINY_Factory(Material)
+		TINY_RTTI_H(Material)
+
+	public:
+		virtual ~Material();
 
 	public:
 		int getUID() const;

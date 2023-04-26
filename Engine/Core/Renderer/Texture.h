@@ -2,12 +2,13 @@
 #include "../Head/CppHead.h"
 #include "../Head/Context.h"
 #include "../Head/ConfigHead.h"
+#include "../Base/TinyObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Image;
 
-	struct TINY_API TextureInfo
+	struct TINY_API TextureInfo 
 	{
 		std::string name;
 		TextureFilter filter;
@@ -43,7 +44,7 @@ namespace tezcat::Tiny::Core
 				, filter
 				, wrap
 				, internalChannel
-				, TextureChannel::None
+				, internalChannel
 				, DataType::UByte
 				, true)
 		{
@@ -142,8 +143,9 @@ namespace tezcat::Tiny::Core
 		}
 	};
 
-	class TINY_API Texture
+	class TINY_API Texture : public TinyObject
 	{
+		TINY_RTTI_H(Texture)
 	public:
 		Texture();
 		/// <summary>
@@ -201,6 +203,7 @@ namespace tezcat::Tiny::Core
 
 	class TINY_API Texture2D : public Texture
 	{
+		TINY_RTTI_H(Texture2D)
 	public:
 		Texture2D();
 		~Texture2D() = default;
@@ -222,12 +225,14 @@ namespace tezcat::Tiny::Core
 
 	class TINY_API Texture3D : public Texture
 	{
+		TINY_RTTI_H(Texture3D)
 	public:
 		TextureType getTextureType() const final { return TextureType::Texture3D; }
 	};
 
 	class TINY_API TextureCube : public Texture
 	{
+		TINY_RTTI_H(TextureCube)
 	public:
 		TextureType getTextureType() const final { return TextureType::TextureCube; }
 		virtual void create(const std::array<Image, 6>& images, const TextureInfo& info) = 0;
@@ -239,6 +244,7 @@ namespace tezcat::Tiny::Core
 	/// </summary>
 	class TINY_API TextureRenderBuffer2D : public Texture2D
 	{
+		TINY_RTTI_H(TextureRenderBuffer2D)
 	public:
 		TextureType getTextureType() const override { return TextureType::TextureRenderBuffer2D; }
 		virtual void create(const int& width
@@ -249,7 +255,7 @@ namespace tezcat::Tiny::Core
 		void setBufferType(const TextureBufferType& val) { mBufferType = val; }
 
 	private:
-		void create(const Image& img, const TextureInfo& info) final;
+		void create(const Image& img, const TextureInfo& info) final {};
 
 	protected:
 		TextureBufferType mBufferType;
@@ -261,6 +267,7 @@ namespace tezcat::Tiny::Core
 	/// </summary>
 	class TINY_API TextureBuffer2D : public TextureRenderBuffer2D
 	{
+		TINY_RTTI_H(TextureBuffer2D)
 	public:
 		TextureType getTextureType() const final { return TextureType::TextureBuffer2D; }
 		virtual void create(const int& width

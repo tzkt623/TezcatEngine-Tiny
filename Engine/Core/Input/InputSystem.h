@@ -2,12 +2,12 @@
 
 #include "../Head/CppHead.h"
 #include "Platform/OpenGL/GLHead.h"
-#include "Utility/Singleton.h"
+#include "../Tool/Tool.h"
+
 
 struct GLFWwindow;
 
-using namespace tezcat::Tiny::Utility;
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Inputer;
 	class TINY_API InputSystem

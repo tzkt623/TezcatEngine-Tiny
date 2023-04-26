@@ -1,11 +1,13 @@
 #include "GameObject.h"
 #include "../Scene/Scene.h"
 #include "../Manager/SceneManager.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(GameObject)
+
 	std::stack<int> GameObject::sUIDPool;
 	std::list<GameObject*> GameObject::sDeleteObjectList;
 
@@ -16,13 +18,13 @@ namespace tezcat::Tiny::Core
 	}
 
 	GameObject::GameObject(const std::string& name)
-		: mName(name)
-		, mIsLogic(false)
+		: mIsLogic(false)
 		, mScene(SceneMgr::getInstance()->getCurrentScene())
 		, mNeedDelete(false)
 		, mLayerMaskIndex(0)
 		, mUID(-1)
 		, mTransform(nullptr)
+		, mName(name)
 	{
 		if (sUIDPool.empty())
 		{
@@ -34,20 +36,25 @@ namespace tezcat::Tiny::Core
 			sUIDPool.pop();
 		}
 
-		//		this->addComponent<Transform>();
-
-		//处理第一个component
-		//创建GameObject并不会把对象加入场景树中
-		//需要创建Transform,并且parent==null才会加入场景中
-// 		auto tran = new Transform();
-// 		tran->setGameObject(this);
-// 		mComponentList.push_back(tran);
-
 		mScene->addGameObject(this);
 	}
 
 	GameObject::~GameObject()
 	{
+		if (mTransform->getParent() != nullptr)
+		{
+
+		}
+
+		auto children = this->getTransform()->getChildren();
+		if (children)
+		{
+			for (auto& child : *children)
+			{
+				child->getGameObject()->subRef();
+			}
+		}
+
 		mComponentList.clear();
 		sUIDPool.push(mUID);
 		mScene = nullptr;
@@ -61,35 +68,42 @@ namespace tezcat::Tiny::Core
 		}
 
 		auto children = this->getTransform()->getChildren();
-		for (auto child : children)
+		if (children)
 		{
-			child->getGameObject()->enterScene(mScene);
+			for (auto& child : *children)
+			{
+				child->getGameObject()->enterScene(mScene);
+			}
 		}
+
 	}
 
 	void GameObject::exitScene()
 	{
-		auto children = this->getTransform()->getChildren();
-		for (auto child : children)
-		{
-			child->getGameObject()->exitScene();
-		}
-
 		for (auto com : mComponentList)
 		{
 			com->onDisable();
+		}
+
+		auto children = this->getTransform()->getChildren();
+		if (children)
+		{
+			for (auto& child : *children)
+			{
+				child->getGameObject()->exitScene();
+			}
 		}
 
 		mScene = nullptr;
 	}
 
 
-	void GameObject::swapTransform(Transform* transform)
+	void GameObject::swapTransform()
 	{
-		if (!mComponentList.empty())
+		if (mComponentList.size() > 1)
 		{
 			auto temp = mComponentList[0];
-			mComponentList[0] = transform;
+			mComponentList[0] = mComponentList[mComponentList.size() - 1];
 			mComponentList[mComponentList.size() - 1] = temp;
 		}
 	}
@@ -109,7 +123,7 @@ namespace tezcat::Tiny::Core
 			mComponentList[i]->onComponentAdded(component);
 		}
 
-		mComponentList.emplace_back(component);
+		mComponentList.push_back(component);
 		component->onEnable();
 	}
 
@@ -122,24 +136,8 @@ namespace tezcat::Tiny::Core
 
 		for (auto go : sDeleteObjectList)
 		{
-			delete go;
+			//delete go;
 		}
 		sDeleteObjectList.clear();
-	}
-
-	void GameObject::close()
-	{
-		auto children = this->getTransform()->getChildren();
-		for (auto child : children)
-		{
-			child->getGameObject()->close();
-		}
-
-		for (auto com : mComponentList)
-		{
-			com->onDisable();
-		}
-
-		mScene = nullptr;
 	}
 }

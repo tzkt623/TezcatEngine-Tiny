@@ -10,8 +10,11 @@ namespace tezcat::Tiny::GL
 {
 	class TINY_API GLTexture2D : public Texture2D
 	{
-	public:
 		GLTexture2D();
+
+		TINY_Factory(GLTexture2D)
+		TINY_RTTI_H(GLTexture2D)
+	public:
 		virtual ~GLTexture2D();
 
 		void create(const Image& img, const TextureInfo& info) override;
@@ -19,9 +22,12 @@ namespace tezcat::Tiny::GL
 
 	class TINY_API GLTextureCube : public TextureCube
 	{
-	public:
 		GLTextureCube();
-		~GLTextureCube();
+
+		TINY_Factory(GLTextureCube)
+		TINY_RTTI_H(GLTextureCube)
+	public:
+		virtual ~GLTextureCube();
 
 		void create(const std::array<Image, 6>& images, const TextureInfo& info) override;
 
@@ -31,8 +37,10 @@ namespace tezcat::Tiny::GL
 
 	class TINY_API GLTextureRenderBuffer2D : public TextureRenderBuffer2D
 	{
-	public:
 		GLTextureRenderBuffer2D();
+		TINY_Factory(GLTextureRenderBuffer2D)
+		TINY_RTTI_H(GLTextureRenderBuffer2D)
+	public:
 		virtual ~GLTextureRenderBuffer2D();
 
 		void create(const int& width
@@ -42,8 +50,10 @@ namespace tezcat::Tiny::GL
 
 	class TINY_API GLTextureBuffer2D : public TextureBuffer2D
 	{
-	public:
 		GLTextureBuffer2D();
+		TINY_Factory(GLTextureBuffer2D)
+		TINY_RTTI_H(GLTextureBuffer2D)
+	public:
 		virtual ~GLTextureBuffer2D();
 
 		void create(const int& width

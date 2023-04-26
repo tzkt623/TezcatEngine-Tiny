@@ -7,9 +7,10 @@
 #include "../Renderer/BaseGraphics.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	//------------------------------------------------------------------------
+	TINY_RTTI_CPP(DirectionalLight)
 	DirectionalLight::DirectionalLight()
 		: mDirection(0.0f, 0.0f, 0.0f)
 		, mAmbient(0.1f)

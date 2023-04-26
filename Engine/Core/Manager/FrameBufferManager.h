@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Manager.h"
-#include "Utility/Singleton.h"
-#include "../Head/CppHead.h"
+#include "../Tool/Singleton.h"
+#include "../Head/TinyCpp.h"
 
-using namespace tezcat::Tiny::Utility;
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class TextureRenderBuffer2D;
 	struct TextureBufferInfo;
@@ -30,15 +29,15 @@ namespace tezcat::Tiny::Core
 
 		FrameBuffer* create(const std::string& name, const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos);
 		FrameBuffer* createShadowMap(const std::string& name, const int& width, const int& high);
-
 		FrameBuffer* find(const std::string& name);
 
 	private:
 		void addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer);
 
 	private:
-		std::unordered_map<std::string, FrameBuffer*> mBufferUMap;
+		//std::unordered_map<std::string, FrameBuffer*> mBufferUMap;
 
+		TinyUMap<std::string, FrameBuffer*> mBufferUMap;
 
 	};
 

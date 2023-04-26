@@ -1,6 +1,6 @@
 #include "ShaderParam.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	UniformID ShaderParam::Empty;
 	UniformID ShaderParam::MatrixP;
@@ -18,6 +18,7 @@ namespace tezcat::Tiny::Core
 	UniformID ShaderParam::TexColor;
 	UniformID ShaderParam::TexCube;
 	UniformID ShaderParam::TexDepth;
+	UniformID ShaderParam::TexEnv;
 
 // 	UniformID ShaderParam::LightPosition;
 // 	UniformID ShaderParam::LightColor;
@@ -81,6 +82,7 @@ namespace tezcat::Tiny::Core
 		ShaderParam::TexColor = "TINY_TexColor";
 		ShaderParam::TexCube = "TINY_TexCube";
 		ShaderParam::TexDepth = "TINY_TexDepth";
+		ShaderParam::TexEnv = "TINY_TexEnv";
 
 		//5
 // 		ShaderParam::LightPosition = "TINY_LightPosition";

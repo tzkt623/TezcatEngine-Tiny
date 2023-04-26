@@ -5,7 +5,7 @@
 #include "../Component/Transform.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	void CullHelper::createFrustumWithCamera(Camera* camera, Frustum& frustum)
 	{

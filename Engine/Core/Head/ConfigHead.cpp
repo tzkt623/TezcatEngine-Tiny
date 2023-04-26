@@ -1,6 +1,6 @@
 #include "ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	RenderAPI EngineConfig::sRenderAPI = RenderAPI::Error;
 }

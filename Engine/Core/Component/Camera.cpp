@@ -32,14 +32,16 @@
 #include "../Data/Material.h"
 
 
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(Camera)
+
 	Camera::Camera(Pipeline* pipeline, bool mainCamera)
 		: IRenderObserver()
-		, mUID(Utility::IDGenerator<Camera, unsigned int>::generate())
+		, mUID(IDGenerator<Camera, unsigned int>::generate())
 		, mIsMain(mainCamera)
 		, mViewMatrix(1.0f)
 		, mDepth(0)
@@ -239,4 +241,5 @@ namespace tezcat::Tiny::Core
 	{
 		return mViewMatrix;
 	}
+
 }

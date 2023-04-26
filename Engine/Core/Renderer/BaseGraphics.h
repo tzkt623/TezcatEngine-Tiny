@@ -4,10 +4,10 @@
 #include "../Head/GLMHead.h"
 
 #include "../Shader/Uniform.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 #include "RenderConfig.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Vertex;
 	class MeshRenderer;
@@ -30,7 +30,6 @@ namespace tezcat::Tiny::Core
 
 	public:
 		virtual void init(Engine* engine) = 0;
-		virtual void swapBuffer() = 0;
 
 		virtual void preRender();
 		virtual void onRender();
@@ -42,7 +41,7 @@ namespace tezcat::Tiny::Core
 	public:
 		virtual void draw(IRenderMesh* renderMesh) = 0;
 		virtual void draw(MeshRenderer* renderer) = 0;
-		virtual void draw(Vertex* vertex, const DrawModeWrapper& drawMode) = 0;
+		virtual void draw(Vertex* vertex) = 0;
 
 	public:
 		virtual void drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color = glm::vec3(0.0f, 1.0f, 0.0f));

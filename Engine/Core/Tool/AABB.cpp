@@ -1,6 +1,6 @@
 #include "AABB.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	AABB::AABB()
 		: m_Min(std::numeric_limits<float>::max())

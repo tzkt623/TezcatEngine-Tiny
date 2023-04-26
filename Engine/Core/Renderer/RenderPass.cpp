@@ -18,7 +18,7 @@
 #include "../Statistic.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	std::vector<RenderPass*> RenderPass::sPassAry;
 	std::unordered_map<std::string, RenderPass*> RenderPass::sPassDict;

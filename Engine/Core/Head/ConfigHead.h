@@ -15,7 +15,7 @@
 #error Windows Only
 #endif
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	enum class TINY_API RenderAPI
 	{

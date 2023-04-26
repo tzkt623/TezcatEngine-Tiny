@@ -2,13 +2,17 @@
 
 #include "../Renderer/RenderObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Vertex;
+	class RenderAgent;
 	class Skybox : public ComponentT<Skybox>, public IRenderMesh
 	{
-	public:
 		Skybox();
+		TINY_RTTI_H(Skybox)
+		TINY_Factory(Skybox)
+	public:
+		
 		virtual ~Skybox();
 
 	public:
@@ -20,18 +24,20 @@ namespace tezcat::Tiny::Core
 		void sendToRenderPass(const RenderPassType& passType) override;
 		void submit(Shader* shader) override;
 
-		void setMaterial(Material* material) { mMaterial = material; }
+		void setMaterial(Material* material);
 		void beginRender() override;
 		void endRender() override;
 
 	protected:
 		void onStart() override;
 		void onEnable() override;
+		void onDisable() override;
 
 	private:
 		DrawModeWrapper mDrawMode;
 		Material* mMaterial;
-		Vertex* mVertexGroup;
+		Vertex* mVertex;
+		RenderAgent* mRenderAgent;
 	};
 }
 

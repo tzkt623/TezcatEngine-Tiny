@@ -8,7 +8,7 @@
 #include "../Platform/OpenGL/WindowsEngine.h"
 
 using namespace tezcat::Tiny::GL;
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	GUI::GUI()
 	{

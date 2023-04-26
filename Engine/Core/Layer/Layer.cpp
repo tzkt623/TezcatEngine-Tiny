@@ -7,7 +7,7 @@
 
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	Layer::Layer()
 		: mIndex(-1)

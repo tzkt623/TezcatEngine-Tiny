@@ -2,9 +2,9 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class DirectionalLight;
 	class PointLight;

@@ -2,7 +2,7 @@
 
 #include "Utility/Utility.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	struct RenderObjectTagT { };
 

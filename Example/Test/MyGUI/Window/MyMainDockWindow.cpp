@@ -39,6 +39,7 @@ void MyMainDockWindow::onRender()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, 5.0f);
 
 	bool p_open = true;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -69,12 +70,19 @@ void MyMainDockWindow::onRender()
 		{
 			if (ImGui::BeginMenu("Scene"))
 			{
+				if (ImGui::MenuItem("Close Current Scene"))
+				{
+					SceneMgr::getInstance()->popScene();
+				}
+
+				ImGui::Separator();
+
 				auto& scenes = SceneMgr::getInstance()->getAllScenes();
 				for (auto it : scenes)
 				{
 					if (ImGui::MenuItem(it.first.c_str()))
 					{
-						SceneMgr::getInstance()->pushScene(it.second);
+						SceneMgr::getInstance()->switchScene(it.second);
 					}
 				}
 

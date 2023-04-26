@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class ObserverManager
 	{

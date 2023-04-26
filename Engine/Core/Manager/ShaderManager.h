@@ -1,10 +1,10 @@
 #pragma once
 #include "../Head/CppHead.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 #include "../Head/ConfigHead.h"
 #include "Manager.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class ShaderPackage;
 	class Shader;

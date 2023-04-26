@@ -1,11 +1,12 @@
 #include "MyObjectWindow.h"
+#include "../../MyEvent.h"
 
 
 MyObjectWindow::MyObjectWindow()
 	: GUIWindow("场景总览(Scene)")
 	, mSelectedItem(-1)
 {
-	MyGUIContext::getInstance().setObjectWindow(this);
+
 }
 
 MyObjectWindow::~MyObjectWindow()
@@ -28,14 +29,18 @@ void MyObjectWindow::onUpdate()
 
 	auto& list = SceneMgr::getInstance()->getCurrentScene()->getObjectList();
 	int index = -1;
-	for (auto tran : list)
+	for (auto game_object : list)
 	{
 		index++;
-		ImGui::Selectable(tran->getName().c_str(), mSelectedItem == index);
+		ImGui::Selectable(game_object->getName().c_str(), mSelectedItem == index);
 		if (ImGui::IsItemClicked())
 		{
 			mSelectedItem = index;
-			MyGUIContext::getInstance().selectObject(tran);
+			MyEvent::get()->dispatch(EventData
+				{
+					MyEventID::Window_ObjectSelected,
+					game_object
+				});
 		}
 	}
 }

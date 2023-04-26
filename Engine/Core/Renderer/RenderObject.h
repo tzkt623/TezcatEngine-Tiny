@@ -2,11 +2,10 @@
 #include "RenderConfig.h"
 
 #include "../Component/Component.h"
-#include "../Head/ConfigHead.h"
 #include "../Head/Context.h"
 #include "../Head/GLMHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	enum class TINY_API RenderObjectType
 	{
@@ -85,6 +84,11 @@ namespace tezcat::Tiny::Core
 
 	};
 
+
+	//------------------------------------------------------
+	//
+	//	IRenderMesh
+	//
 	class TINY_API IRenderMesh : public IRenderObject
 	{
 	public:
@@ -132,6 +136,10 @@ namespace tezcat::Tiny::Core
 		virtual void submitModelMatrix(Shader* shader) {}
 	};
 
+	//------------------------------------------------------
+	//
+	//	IRenderObserver
+	//
 	class TINY_API IRenderObserver : public IRenderObject
 	{
 	public:
@@ -143,7 +151,7 @@ namespace tezcat::Tiny::Core
 
 	public:
 		IRenderObserver();
-		virtual ~IRenderObserver() = default;
+		virtual ~IRenderObserver();
 
 
 		/*
@@ -183,7 +191,7 @@ namespace tezcat::Tiny::Core
 
 		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
 
-		FrameBuffer* getFrameBuffer() const { return mFrameBuffer; }
+		FrameBuffer* getFrameBuffer() { return mFrameBuffer; }
 		void setFrameBuffer(FrameBuffer* val);
 
 		void setViewRect(int x, int y, int width, int height);

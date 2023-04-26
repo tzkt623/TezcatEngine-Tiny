@@ -1,7 +1,7 @@
 #include "LightManager.h"
 #include "../Component/Light.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	//------------------------------------------------------------
 	LightData::LightData()

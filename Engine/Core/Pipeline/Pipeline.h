@@ -3,7 +3,7 @@
 #include "../Head/ConfigHead.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	enum class TINY_API PipelineType
 	{

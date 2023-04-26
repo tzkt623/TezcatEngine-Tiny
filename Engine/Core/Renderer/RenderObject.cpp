@@ -1,7 +1,7 @@
 #include "RenderObject.h"
 #include "FrameBuffer.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	IRenderObserver::IRenderObserver()
 		: mCullMask(0)
@@ -14,6 +14,7 @@ namespace tezcat::Tiny::Core
 		, mPMatDirty(true)
 	{
 		this->setCullLayer(0);
+		mFrameBuffer->addRef();
 	}
 
 
@@ -74,15 +75,30 @@ namespace tezcat::Tiny::Core
 		}
 	}
 
-	void IRenderObserver::setFrameBuffer(FrameBuffer* val)
+	void IRenderObserver::setFrameBuffer(FrameBuffer* buffer)
 	{
-		if (val == nullptr)
+		if (mFrameBuffer)
 		{
-			mFrameBuffer = FrameBuffer::getDefaultBuffer();
+			mFrameBuffer->subRef();
+		}
+
+		if (buffer)
+		{
+			mFrameBuffer = buffer;
 		}
 		else
 		{
-			mFrameBuffer = val;
+			mFrameBuffer = FrameBuffer::getDefaultBuffer();
+		}
+
+		mFrameBuffer->addRef();
+	}
+
+	IRenderObserver::~IRenderObserver()
+	{
+		if (mFrameBuffer)
+		{
+			mFrameBuffer->subRef();
 		}
 	}
 }

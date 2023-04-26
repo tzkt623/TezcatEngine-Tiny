@@ -4,7 +4,7 @@
 #include "Core/Shader/Uniform.h"
 #include "Core/Manager/ShaderManager.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Shader;
 }

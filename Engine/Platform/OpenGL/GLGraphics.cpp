@@ -23,7 +23,6 @@
 namespace tezcat::Tiny::GL
 {
 	GLGraphics::GLGraphics()
-		: mWindow(nullptr)
 	{
 		Graphics::attach(this);
 
@@ -35,121 +34,13 @@ namespace tezcat::Tiny::GL
 
 	GLGraphics::~GLGraphics()
 	{
-//		mWindow = nullptr;
+
 	}
 
 	void GLGraphics::init(Engine* engine)
 	{
-// 		auto we = (WindowsEngine*)engine;
-// 		mWindow = we->getGLFWWindow();
-// 		glfwMakeContextCurrent(mWindow);
-// 		glfwSwapInterval(1);
-// 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-// 		{
-// 			throw std::logic_error("Failed to initialize GLAD");
-// 		}
-
 		this->initContext();
-
-//		(new GUI())->init(engine);
 	}
-
-	void GLGraphics::setViewport(const ViewportInfo& info)
-	{
-		glViewport(info.OX, info.OY, info.Width, info.Height);
-	}
-
-	void GLGraphics::preRender()
-	{
-		BaseGraphics::preRender();
-	}
-
-	void GLGraphics::onRender()
-	{
-		glClear(GL_COLOR_BUFFER_BIT);
-		BaseGraphics::onRender();
-	}
-
-	void GLGraphics::postRender()
-	{
-		BaseGraphics::postRender();
-//		SG<GUI>::getInstance()->render();
-	}
-
-	void GLGraphics::swapBuffer()
-	{
-//		glfwSwapBuffers(mWindow);
-	}
-
-	void GLGraphics::clear(const ClearOption& option)
-	{
-		if (option == ClearOption::CO_None)
-		{
-			return;
-		}
-
-		GLbitfield mask = 0;
-		if ((option & ClearOption::CO_Color) == ClearOption::CO_Color)
-		{
-			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-			mask |= GL_COLOR_BUFFER_BIT;
-		}
-
-		if ((option & ClearOption::CO_Depth) == ClearOption::CO_Depth)
-		{
-			//如果深度缓冲不允许写入
-			//那么也无法clear
-			//所以这里必须要打开
-			glDepthMask(GL_TRUE);
-			glClearDepth(1.0);
-			mask |= GL_DEPTH_BUFFER_BIT;
-		}
-
-		if ((option & ClearOption::CO_Stencil) == ClearOption::CO_Stencil)
-		{
-			glStencilMask(0xFF);
-			mask |= GL_STENCIL_BUFFER_BIT;
-		}
-
-		glClear(mask);
-	}
-
-	void GLGraphics::draw(IRenderMesh* renderMesh)
-	{
-		if (renderMesh->getIndexCount() > 0)
-		{
-			glDrawElements(renderMesh->getDrawMode().platform, renderMesh->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-		}
-		else
-		{
-			glDrawArrays(renderMesh->getDrawMode().platform, 0, renderMesh->getVertexCount());
-		}
-	}
-
-	void GLGraphics::draw(MeshRenderer* renderer)
-	{
-		if (renderer->getIndexCount() > 0)
-		{
-			glDrawElements(renderer->getDrawMode().platform, renderer->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-		}
-		else
-		{
-			glDrawArrays(renderer->getDrawMode().platform, 0, renderer->getVertexCount());
-		}
-	}
-
-	void GLGraphics::draw(Vertex* vertex, const DrawModeWrapper& drawMode)
-	{
-		if (vertex->getIndexCount() > 0)
-		{
-			glDrawElements(drawMode.platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-		}
-		else
-		{
-			glDrawArrays(drawMode.platform, 0, vertex->getVertexCount());
-		}
-	}
-
 
 	void GLGraphics::initContext()
 	{
@@ -223,6 +114,7 @@ namespace tezcat::Tiny::GL
 			TexChannelWrapper(TextureChannel::Depth24_Stencil8,		GL_DEPTH24_STENCIL8),
 			TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	GL_DEPTH32F_STENCIL8),
 			TexChannelWrapper(TextureChannel::Stencil8,				GL_STENCIL_INDEX8),
+			TexChannelWrapper(TextureChannel::RGBF16,				GL_RGB16),
 		};
 
 		ContextMap::ColorBufferArray =
@@ -318,4 +210,109 @@ namespace tezcat::Tiny::GL
 			DepthTestWrapper(DepthTest::NotEqual,		GL_NOTEQUAL)
 		};
 	}
+
+	void GLGraphics::setViewport(const ViewportInfo& info)
+	{
+		glViewport(info.OX, info.OY, info.Width, info.Height);
+	}
+
+	void GLGraphics::preRender()
+	{
+		BaseGraphics::preRender();
+	}
+
+	void GLGraphics::onRender()
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		BaseGraphics::onRender();
+	}
+
+	void GLGraphics::postRender()
+	{
+		BaseGraphics::postRender();
+	}
+
+	void GLGraphics::clear(const ClearOption& option)
+	{
+		if (option == ClearOption::CO_None)
+		{
+			return;
+		}
+
+		GLbitfield mask = 0;
+		if ((option & ClearOption::CO_Color) == ClearOption::CO_Color)
+		{
+			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+			mask |= GL_COLOR_BUFFER_BIT;
+		}
+
+		if ((option & ClearOption::CO_Depth) == ClearOption::CO_Depth)
+		{
+			//如果深度缓冲不允许写入
+			//那么也无法clear
+			//所以这里必须要打开
+			glDepthMask(GL_TRUE);
+			glClearDepth(1.0);
+			mask |= GL_DEPTH_BUFFER_BIT;
+		}
+
+		if ((option & ClearOption::CO_Stencil) == ClearOption::CO_Stencil)
+		{
+			glStencilMask(0xFF);
+			mask |= GL_STENCIL_BUFFER_BIT;
+		}
+
+		glClear(mask);
+	}
+
+	void GLGraphics::draw(IRenderMesh* renderMesh)
+	{
+		//glDrawArrays(renderMesh->getDrawMode().platform, 0, renderMesh->getVertexCount());
+
+
+		if (renderMesh->getIndexCount() > 0)
+		{
+			glDrawElements(renderMesh->getDrawMode().platform, renderMesh->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+		}
+		else
+		{
+			glDrawArrays(renderMesh->getDrawMode().platform, 0, renderMesh->getVertexCount());
+		}
+	}
+
+	void GLGraphics::draw(MeshRenderer* renderer)
+	{
+		if (renderer->getIndexCount() > 0)
+		{
+			glDrawElements(renderer->getDrawMode().platform, renderer->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+		}
+		else
+		{
+			glDrawArrays(renderer->getDrawMode().platform, 0, renderer->getVertexCount());
+		}
+	}
+
+	void GLGraphics::draw(Vertex* vertex)
+	{
+		if (vertex->getIndexCount() > 0)
+		{
+			glDrawElements(vertex->getDrawMode().platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+		}
+		else
+		{
+			glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount());
+		}
+	}
+
+	void GLGraphics::drawLine(Vertex* vertex, const uint32_t& needCount)
+	{
+		vertex->bind();
+		glDrawArrays(GL_LINE, 0, needCount);
+	}
+
+	void GLGraphics::drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color /*= glm::vec3(0.0f, 1.0f, 0.0f)*/)
+	{
+
+	}
+
 }

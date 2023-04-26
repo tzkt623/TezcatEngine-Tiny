@@ -10,7 +10,7 @@
 #include "../Pipeline/Pipeline.h"
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Texture;
 	class TexttureCube;

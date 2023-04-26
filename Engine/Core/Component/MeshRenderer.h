@@ -1,31 +1,28 @@
 #pragma once
 
-#include "../Renderer/RenderObject.h"
 #include "../Head/Context.h"
 #include "../Head/ConfigHead.h"
-
-namespace tezcat::Tiny::Core
+#include "../Renderer/RenderObject.h"
+namespace tezcat::Tiny
 {
 	class Vertex;
 	class Shader;
 	class Material;
 	class MeshData;
+	class RenderAgent;
 	class TINY_API MeshRenderer : public ComponentT<MeshRenderer>, public IRenderMesh
 	{
-	public:
 		MeshRenderer();
-		MeshRenderer(MeshData* meshData);
-		MeshRenderer(Vertex* vg);
+		TINY_Factory(MeshRenderer)
+		TINY_RTTI_H(MeshRenderer)
+	public:
 		virtual ~MeshRenderer();
 
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::MeshRenderer; }
 		Vertex* getVertex() const { return mVertex; }
 
 		Material* getMaterial() const override { return mMainMaterial; }
-		void setMaterial(Material* val)
-		{
-			mMainMaterial = val;
-		}
+		void setMaterial(Material* val);
 		void setMesh(const std::string& meshName);
 		void setMesh(MeshData* meshData);
 
@@ -53,5 +50,6 @@ namespace tezcat::Tiny::Core
 		DrawModeWrapper mDrawMode;
 		Vertex* mVertex;
 		Material* mMainMaterial;
+		RenderAgent* mRenderAgent;
 	};
 }

@@ -1,16 +1,18 @@
 #pragma once
 
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
+#include "../Base/TinyObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	struct TextureBufferInfo;
 	class TextureRenderBuffer2D;
 	class TextureBuffer2D;
 
-	class TINY_API FrameBuffer
+	class TINY_API FrameBuffer : public TinyObject
 	{
+		TINY_RTTI_H(FrameBuffer)
 	public:
 		FrameBuffer();
 		virtual ~FrameBuffer();
@@ -25,7 +27,7 @@ namespace tezcat::Tiny::Core
 
 	protected:
 		uint32_t mBufferID;
-		std::vector<TextureRenderBuffer2D*> mBuffers;
+		TinyVector<TextureRenderBuffer2D*> mBuffers;
 
 	public:
 		static void bind(FrameBuffer* buffer);
@@ -38,7 +40,7 @@ namespace tezcat::Tiny::Core
 		}
 
 	private:
-		static std::stack<FrameBuffer*> sFrameBufferStack;
+		static TinyStack<FrameBuffer*> sFrameBufferStack;
 		static FrameBuffer* sDefaultBuffer;
 	};
 }

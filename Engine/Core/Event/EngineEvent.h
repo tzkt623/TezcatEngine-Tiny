@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Utility/Event.h"
+#include "../Tool/Tool.h"
 
-using namespace tezcat::Tiny::Utility;
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class EngineEvent
 	{

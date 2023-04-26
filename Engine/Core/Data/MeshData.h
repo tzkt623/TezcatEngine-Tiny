@@ -3,9 +3,9 @@
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
-#include "../Head/Context.h"
+#include "../Renderer/VertexConfig.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	/// <summary>
 	/// mesh数据
@@ -40,7 +40,7 @@ namespace tezcat::Tiny::Core
 
 		size_t uvSize()
 		{
-			return this->uv.size() * sizeof(glm::vec2);
+			return this->uvs.size() * sizeof(glm::vec2);
 		}
 
 		size_t indexSize()
@@ -49,6 +49,11 @@ namespace tezcat::Tiny::Core
 		}
 
 		int getBufferSize();
+
+		const void* getVertexData(const VertexPosition& position, size_t& outDataLength);
+		const void* getIndexData(size_t& outDataLength);
+
+		void apply(DrawMode drawMode = DrawMode::Triangles);
 
 	public:
 		bool hasChildren() { return mChildrenData != nullptr; }
@@ -63,10 +68,12 @@ namespace tezcat::Tiny::Core
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec4> colors;
-		std::vector<glm::vec2> uv;
+		std::vector<glm::vec2> uvs;
 
 		std::vector<unsigned int> indices;
 		DrawMode drawMode;
+
+		std::vector<VertexPosition> layoutPositions;
 
 
 	private:

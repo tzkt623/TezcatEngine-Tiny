@@ -1,9 +1,9 @@
 #include "ShaderManager.h"
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
-#include "Utility/FileTool.h"
+#include "../Tool/FileTool.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	ShaderManager::ShaderManager()
 	{
@@ -53,7 +53,7 @@ namespace tezcat::Tiny::Core
 			return it->second;
 		}
 
-		return nullptr;
+		return mShaderPackageDict["Unlit/Color"];
 	}
 
 	void ShaderManager::loadIncludeFiles(const std::string& path)
@@ -66,7 +66,7 @@ namespace tezcat::Tiny::Core
 		std::regex regex_comment(R"(/\*[\s\S]*\*/|//.*)");
 
 
-		std::unordered_map<std::string, std::string> out_files;
+		FileInfoMap out_files;
 		FileTool::findAllFiles(path, out_files);
 
 		struct DataInfo
@@ -78,14 +78,15 @@ namespace tezcat::Tiny::Core
 			DataInfo(const std::string& info) : data(info) { }
 		};
 
-		std::unordered_map<std::string, DataInfo> temp_datas;
+		std::unordered_map<std::string_view, DataInfo> temp_datas;
 		//预加载
 		for (auto& pair : out_files)
 		{
-			std::string data = FileTool::loadText(pair.second);
+			auto& info = pair.second;
+			std::string data = FileTool::loadText(info.path);
 			data = std::regex_replace(data, regex_comment, "");
 			temp_datas.emplace(pair.first, DataInfo(data));
-			mIncludeFileDict.emplace(pair.first, data);
+			mIncludeFileDict.emplace(info.name, data);
 		}
 
 		//------------------------------------------------------------
@@ -134,7 +135,7 @@ namespace tezcat::Tiny::Core
 				}
 				else
 				{
-					mIncludeFileDict[it->first] = it->second.data;
+					mIncludeFileDict[it->first.data()] = std::move(it->second.data);
 					it = temp_datas.erase(it);
 				}
 			}

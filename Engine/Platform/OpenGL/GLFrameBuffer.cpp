@@ -4,6 +4,7 @@
 
 namespace tezcat::Tiny::GL
 {
+	TINY_RTTI_CPP(GLFrameBuffer)
 	GLFrameBuffer::GLFrameBuffer()
 		: mColorCount(0)
 	{
@@ -155,12 +156,12 @@ namespace tezcat::Tiny::GL
 	//
 	FrameBuffer* GLFrameBufferCreator::createFrameBuffer()
 	{
-		return new GLFrameBuffer();
+		return GLFrameBuffer::create();
 	}
 
 	GLFrameBufferCreator::GLFrameBufferCreator()
 	{
-		FrameBuffer::setDefaultBuffer(new GLFrameBufferDefault());
+		FrameBuffer::setDefaultBuffer(GLFrameBufferDefault::create());
 	}
 
 
@@ -168,7 +169,7 @@ namespace tezcat::Tiny::GL
 	//
 	//
 	//
-
+	TINY_RTTI_CPP(GLFrameBufferDefault)
 	GLFrameBufferDefault::GLFrameBufferDefault()
 	{
 		mBufferID = 0;

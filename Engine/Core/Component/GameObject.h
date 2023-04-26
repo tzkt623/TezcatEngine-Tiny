@@ -1,23 +1,27 @@
 #pragma once
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
 #include "../Component/Transform.h"
-#include "../Base/BaseObject.h"
+#include "../Base/TinyObject.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Scene;
-	class TINY_API GameObject : BaseObject
+	class TINY_API GameObject : public TinyObject
 	{
 		friend class Component;
 		friend class Transform;
-	public:
+
 		GameObject();
 		GameObject(const std::string& name);
+
+		TINY_Factory(GameObject)
+		TINY_RTTI_H(GameObject)
+	public:
+
 		virtual ~GameObject();
 
 	public:
-		virtual void close() override;
 
 		std::string getName() const { return mName; }
 		void setName(const std::string& val) { mName = val; }
@@ -38,8 +42,7 @@ namespace tezcat::Tiny::Core
 
 		Transform* getTransform()
 		{
-			return mTransform;
-//			return static_cast<Transform*>(mComponentList[0]);
+			return static_cast<Transform*>(mComponentList[0]);
 		}
 
 		template<class Com>
@@ -84,7 +87,7 @@ namespace tezcat::Tiny::Core
 		template<typename Com, typename... Args>
 		Com* addComponent(Args&&... args)
 		{
-			auto component = new Com(std::forward<Args>(args)...);
+			auto component = Com::create(std::forward<Args>(args)...);
 			this->addComponent(component);
 			return component;
 		}
@@ -108,7 +111,7 @@ namespace tezcat::Tiny::Core
 
 		void detachAllComponent() { mComponentList.clear(); }
 
-		std::vector<Component*>& getCompoents() { return mComponentList; }
+		TinyVector<Component*>& getCompoents() { return mComponentList; }
 
 	private:
 		void removeComponent(Component* com)
@@ -116,16 +119,18 @@ namespace tezcat::Tiny::Core
 			auto it = mComponentList.begin();
 			while (it != mComponentList.end())
 			{
-				if ((*it) == com)
+				if (*it == com)
 				{
 					it = mComponentList.erase(it);
 				}
-
-				(*it)->onComponentRemoved(com);
+				else
+				{
+					(*it)->onComponentRemoved(com);
+				}
 			}
 		}
 
-		void swapTransform(Transform* transform);
+		void swapTransform();
 
 	public:
 		template<typename T>
@@ -174,7 +179,7 @@ namespace tezcat::Tiny::Core
 	private:
 		Scene* mScene;
 		Transform* mTransform;
-		std::vector<Component*> mComponentList;
+		TinyVector<Component*> mComponentList;
 
 	private:
 		static std::stack<int> sUIDPool;

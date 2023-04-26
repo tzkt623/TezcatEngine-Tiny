@@ -1,9 +1,9 @@
 #include "InputSystem.h"
 #include "Inputer.h"
 
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	InputSystem::InputSystem()
 		: mWindow(nullptr)

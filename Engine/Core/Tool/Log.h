@@ -3,7 +3,7 @@
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	typedef unsigned char LogType;
 

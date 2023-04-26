@@ -2,9 +2,9 @@
 
 #include "../Head/GLMHead.h"
 #include "../Head/Context.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	class Texture;
 	class Texture2D;

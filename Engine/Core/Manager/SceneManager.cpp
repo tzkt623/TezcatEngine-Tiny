@@ -1,9 +1,9 @@
 #include "SceneManager.h"
 #include "../Scene/Scene.h"
-#include "Utility/Utility.h"
+#include "../Tool/Tool.h"
 #include "../Statistic.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	SceneManager::SceneManager()
 	{
@@ -53,14 +53,23 @@ namespace tezcat::Tiny::Core
 
 	void SceneManager::popScene()
 	{
+		if (mScenes.empty())
+		{
+			return;
+		}
+
 		mScenes.top()->onExit();
 		mScenes.pop();
-		mScenes.top()->onResume();
+
+		if (!mScenes.empty())
+		{
+			mScenes.top()->onResume();
+		}
 	}
 
 	void SceneManager::prepareScene(Scene* scene)
 	{
-		mSceneWithName.emplace(scene->getName(), scene);
+		mSceneWithName.try_emplace(scene->getName(), scene);
 	}
 
 	bool SceneManager::update()
@@ -74,4 +83,17 @@ namespace tezcat::Tiny::Core
 		mScenes.top()->update();
 		return true;
 	}
+
+	void SceneManager::switchScene(Scene* scene)
+	{
+		if (!mScenes.empty())
+		{
+			mScenes.top()->onExit();
+			mScenes.pop();
+		}
+
+		mScenes.push(scene);
+		scene->onEnter();
+	}
+
 }

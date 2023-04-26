@@ -1,9 +1,12 @@
 #include "FrameBuffer.h"
+#include "../Renderer/Texture.h"
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	FrameBuffer* FrameBuffer::sDefaultBuffer;
-	std::stack<FrameBuffer*> FrameBuffer::sFrameBufferStack;
+	TinyStack<FrameBuffer*> FrameBuffer::sFrameBufferStack;
+
+	TINY_RTTI_CPP(FrameBuffer)
 
 	FrameBuffer::FrameBuffer()
 		: mBufferID(-1)
@@ -14,7 +17,7 @@ namespace tezcat::Tiny::Core
 
 	FrameBuffer::~FrameBuffer()
 	{
-		mBuffers.clear();
+
 	}
 
 	TextureRenderBuffer2D* FrameBuffer::getBuffer(const int& index)
@@ -24,8 +27,8 @@ namespace tezcat::Tiny::Core
 
 	void FrameBuffer::bind(FrameBuffer* buffer)
 	{
-		sFrameBufferStack.push(buffer);
 		buffer->bind();
+		sFrameBufferStack.push(buffer);
 	}
 
 	void FrameBuffer::unbind(FrameBuffer* buffer)

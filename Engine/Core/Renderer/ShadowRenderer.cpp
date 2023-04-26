@@ -11,10 +11,10 @@
 
 
 
-namespace tezcat::Tiny::Core
+namespace tezcat::Tiny
 {
 	RenderPass* ShadowRenderer::mPass = nullptr;
-	FrameBuffer* ShadowRenderer::mFrameBuffer = nullptr;
+	FrameBuffer* ShadowRenderer::mFrameBuffer;
 	ViewportInfo ShadowRenderer::mViewInfo;
 
 	void ShadowRenderer::init(int x, int y, int width, int height)

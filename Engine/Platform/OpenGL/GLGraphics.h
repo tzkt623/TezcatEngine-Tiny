@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-using namespace tezcat::Tiny::Core;
+using namespace tezcat::Tiny;
 namespace tezcat::Tiny::GL
 {
 	class TINY_API GLGraphics : public BaseGraphics
@@ -16,7 +16,6 @@ namespace tezcat::Tiny::GL
 
 	public:
 		void init(Engine* engine) override;
-		void swapBuffer() override;
 
 	public:
 		void preRender() override;
@@ -27,12 +26,12 @@ namespace tezcat::Tiny::GL
 		void clear(const ClearOption& option) override;
 		void draw(IRenderMesh* renderMesh) override;
 		void draw(MeshRenderer* renderer) override;
-		void draw(Vertex* vertex, const DrawModeWrapper& drawMode) override;
+		void draw(Vertex* vertex) override;
+		void drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color = glm::vec3(0.0f, 1.0f, 0.0f)) override;
+
+		void drawLine(Vertex* vertex, const uint32_t& needCount);
 
 	private:
 		void initContext();
-
-	private:
-		GLFWwindow* mWindow;
 	};
 }
