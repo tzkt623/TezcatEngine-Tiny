@@ -6,7 +6,15 @@
 
 namespace tezcat::Tiny
 {
-	TinyGC TinyGC::sInstance;
+	std::deque<uint32_t> TinyGC::mFreeGCInfos;
+	std::vector<TinyRefObject*> TinyGC::mMemoryPool;
+	std::vector<TinyGCInfo*> TinyGC::mGCInfos =
+	{
+		new TinyGCInfo(0, -623, 0, nullptr)
+	};
+
+	TinyGCInfo* TinyGC::DefaultGCInfo = TinyGC::mGCInfos[0];
+
 
 	void TinyGC::update()
 	{
@@ -29,33 +37,32 @@ namespace tezcat::Tiny
 		mMemoryPool.push_back(obj);
 	}
 
-	TinyGCInfo* TinyGC::getNextGCInfo()
+	TinyGCInfo* TinyGC::getNextGCInfo(TinyRefObject* object)
 	{
 		if (mFreeGCInfos.empty())
 		{
-			return &mGCInfos.emplace_back(mGCInfos.size());
+			auto info = new TinyGCInfo((TinyGCInfoID)mGCInfos.size(), 1, 0, object);
+			mGCInfos.push_back(info);
+			return info;
 		}
 		else
 		{
-			auto index = mFreeGCInfos.top();
-			mFreeGCInfos.pop();
-			return &mGCInfos[index];
+			auto index = mFreeGCInfos.front();
+			mFreeGCInfos.pop_front();
+			auto info = mGCInfos[index];
+			info->pointer = object;
+			info->strongRef = 1;
+			info->weakRef = 0;
+			return info;
 		}
 	}
 
-	void TinyGC::collect(const TinyGCInfo* info)
+	void TinyGC::recycle(TinyGCInfo* info)
 	{
-		if (info->strongRef < 1 && info->weakRef < 1)
-		{
-			mFreeGCInfos.push(info->index);
-		}
+		info->pointer = nullptr;
+		info->strongRef = -1;
+		info->weakRef = -1;
+		mFreeGCInfos.push_back(info->index);
 	}
-
-	TinyGC::TinyGC()
-		: mGCInfos()
-	{
-		mGCInfos.reserve(65535);
-	}
-
 }
 

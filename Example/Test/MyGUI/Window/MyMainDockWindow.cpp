@@ -72,7 +72,7 @@ void MyMainDockWindow::onRender()
 			{
 				if (ImGui::MenuItem("Close Current Scene"))
 				{
-					SceneMgr::getInstance()->popScene();
+					EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_PopScene });
 				}
 
 				ImGui::Separator();
@@ -82,7 +82,8 @@ void MyMainDockWindow::onRender()
 				{
 					if (ImGui::MenuItem(it.first.c_str()))
 					{
-						SceneMgr::getInstance()->switchScene(it.second);
+						EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_PopScene });
+						EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_PushScene, it.second });
 					}
 				}
 

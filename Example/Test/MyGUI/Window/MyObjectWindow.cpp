@@ -4,7 +4,7 @@
 
 MyObjectWindow::MyObjectWindow()
 	: GUIWindow("场景总览(Scene)")
-	, mSelectedItem(-1)
+	, mSelectedGameObject(nullptr)
 {
 
 }
@@ -24,23 +24,101 @@ void MyObjectWindow::onUpdate()
 {
 	if (SceneMgr::getInstance()->empty())
 	{
+		mSelectedGameObject = nullptr;
 		return;
 	}
 
-	auto& list = SceneMgr::getInstance()->getCurrentScene()->getObjectList();
-	int index = -1;
-	for (auto game_object : list)
+	static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+
+	std::function<void(std::vector<TinyWeakRef<Transform>>&)> buildTree =
+		[&buildTree, this](std::vector<TinyWeakRef<Transform>>& children)
 	{
-		index++;
-		ImGui::Selectable(game_object->getName().c_str(), mSelectedItem == index);
-		if (ImGui::IsItemClicked())
+		for (auto transform : children)
 		{
-			mSelectedItem = index;
+			auto game_object = transform->getGameObject();
+
+			ImGuiTreeNodeFlags flags = base_flags;
+			if (mSelectedGameObject == game_object)
+			{
+				flags |= ImGuiTreeNodeFlags_Selected;
+			}
+
+			auto children = transform->getChildren();
+			auto has_children = children && !children->empty();
+			if (has_children)
+			{
+				flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+			}
+			else
+			{
+				flags |= ImGuiTreeNodeFlags_Leaf;
+			}
+
+			auto open = ImGui::TreeNodeEx(game_object->getName().c_str(), flags);
+			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+			{
+				mSelectedGameObject = game_object;
+				MyEvent::get()->dispatch(EventData
+					{
+						MyEventID::Window_ObjectSelected,
+						game_object
+					});
+			}
+
+			if (open)
+			{
+				if (has_children)
+				{
+					buildTree(*children);
+				}
+				ImGui::TreePop();
+			}
+		}
+	};
+
+
+	auto& list = SceneMgr::getInstance()->getCurrentScene()->getTransformList();
+	for (auto transform : list)
+	{
+		auto game_object = transform->getGameObject();
+
+		ImGuiTreeNodeFlags flags = base_flags;
+		if (mSelectedGameObject == game_object)
+		{
+			flags |= ImGuiTreeNodeFlags_Selected;
+		}
+
+		auto children = transform->getChildren();
+		auto has_children = children && !children->empty();
+		if (has_children)
+		{
+			flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+		}
+		else
+		{
+			flags |= ImGuiTreeNodeFlags_Leaf;
+		}
+
+		auto open = ImGui::TreeNodeEx(game_object->getName().c_str(), flags);
+		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+		{
+			mSelectedGameObject = game_object;
 			MyEvent::get()->dispatch(EventData
 				{
 					MyEventID::Window_ObjectSelected,
 					game_object
 				});
 		}
+
+		if (open)
+		{
+			if (has_children)
+			{
+				buildTree(*children);
+			}
+			ImGui::TreePop();
+		}
 	}
+
+
 }

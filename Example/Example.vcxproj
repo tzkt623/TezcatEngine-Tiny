@@ -173,6 +173,7 @@
     <ClCompile Include="Test\MyGUI\MyGUI.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUIContext.cpp" />
     <ClCompile Include="Test\MyGUI\Widget\TransformWidget.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyGCInfoWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyInfoWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyLogWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyMainCameraWindow.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="Test\MyGUI\MyGUI.h" />
     <ClInclude Include="Test\MyGUI\MyGUIContext.h" />
     <ClInclude Include="Test\MyGUI\Widget\TransformWidget.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyGCInfoWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyInfoWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyLogWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyMainCameraWindow.h" />

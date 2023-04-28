@@ -2,8 +2,8 @@
 
 #include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
-#include "../Renderer/RenderConfig.h"
-#include "../Renderer/RenderAgent.h"
+#include "RenderConfig.h"
+#include "RenderAgent.h"
 
 namespace tezcat::Tiny
 {
@@ -38,6 +38,7 @@ namespace tezcat::Tiny
 			sLayerAry[index]->addRenderAgent(renderAgent);
 		}
 
+		static void init();
 
 	private:
 		static std::array<RenderLayer*, 32> sLayerAry;

@@ -46,7 +46,6 @@ namespace tezcat::Tiny
 		virtual void unbind() = 0;
 
 	protected:
-		bool mMultiBufferMode;
 		std::string mName;
 		uint32_t mUID = 0;
 

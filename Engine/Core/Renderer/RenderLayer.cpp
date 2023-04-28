@@ -1,30 +1,33 @@
 #include "RenderLayer.h"
-#include "LightLayer.h"
 
-#include "../Renderer/RenderObject.h"
+#include "BaseGraphics.h"
+#include "RenderObject.h"
+#include "RenderPass.h"
+
 #include "../Component/Component.h"
 #include "../Component/Camera.h"
-#include "../Manager/LightManager.h"
-#include "../Pipeline/Pipeline.h"
 #include "../Component/Light.h"
-#include "../Renderer/BaseGraphics.h"
+
+#include "../Manager/LightManager.h"
 #include "../Manager/ShaderManager.h"
-#include "../Renderer/RenderPass.h"
+
+#include "../Pipeline/Pipeline.h"
+
+#include "../Event/EngineEvent.h"
+
 
 namespace tezcat::Tiny
 {
-	std::array<RenderLayer*, 32> RenderLayer::sLayerAry =
-	{
-		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),
-		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),
-		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),
-		new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer(),new RenderLayer()
-	};
+	std::array<RenderLayer*, 32> RenderLayer::sLayerAry;
 
 	RenderLayer::RenderLayer()
 		: mIndex(-1)
 	{
-
+		EngineEvent::get()->addListener(EngineEventID::EE_PopScene, this
+			, [this](const EventData& data)
+			{
+				mRenderObjectList.clear();
+			});
 	}
 
 	RenderLayer::~RenderLayer()
@@ -67,6 +70,14 @@ namespace tezcat::Tiny
 	void RenderLayer::addRenderAgent(RenderAgent* renderAgent)
 	{
 		mRenderObjectList.emplace_back(renderAgent);
+	}
+
+	void RenderLayer::init()
+	{
+		for (auto i = 0; i < sLayerAry.size(); i++)
+		{
+			sLayerAry[i] = new RenderLayer();
+		}
 	}
 
 }

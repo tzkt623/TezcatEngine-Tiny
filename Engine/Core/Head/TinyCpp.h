@@ -251,7 +251,10 @@ namespace tezcat::Tiny
 		{
 			for (auto& s : mData)
 			{
-				s->subRef();
+				if (s)
+				{
+					s->subRef();
+				}
 			}
 
 			mData.clear();

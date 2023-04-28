@@ -497,7 +497,7 @@ namespace tezcat::Tiny::GL
 		}
 
 		mShaderIDs.push_back(shader_id);
-		shader->attachShader(shader_id);
+		shader->linkShader(shader_id);
 	}
 
 	//
@@ -544,6 +544,7 @@ namespace tezcat::Tiny::GL
 			auto shader = builder.parseShaders(package, data, shader_content);
 			shader->create();
 			builder.reparseShader(shader, shader_content, uniform_ary);
+
 			shader->rebuild(uniform_ary);
 			Log::engine(StringTool::stringFormat("Rebuild Shader %s", shader->getName().c_str()));
 		}

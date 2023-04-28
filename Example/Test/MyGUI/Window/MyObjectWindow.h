@@ -13,7 +13,7 @@ protected:
 	void onUpdate() override;
 
 private:
-	int mSelectedItem;
+	GameObject* mSelectedGameObject;
 	GUIDragFloat3* mPosition;
 };
 

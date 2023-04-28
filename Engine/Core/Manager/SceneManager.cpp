@@ -2,17 +2,30 @@
 #include "../Scene/Scene.h"
 #include "../Tool/Tool.h"
 #include "../Statistic.h"
+#include "../Event/EngineEvent.h"
 
 namespace tezcat::Tiny
 {
 	SceneManager::SceneManager()
 	{
 		SG<SceneManager>::attach(this);
+
+		EngineEvent::get()->addListener(EngineEventID::EE_PopScene, this
+			, [this](const EventData& data)
+			{
+				this->popScene();
+			});
+
+		EngineEvent::get()->addListener(EngineEventID::EE_PushScene, this
+			, [this](const EventData& data)
+			{
+				this->pushScene((Scene*)data.userData);
+			});
 	}
 
 	SceneManager::~SceneManager()
 	{
-
+		EngineEvent::get()->removeListener(this);
 	}
 
 	void SceneManager::init()

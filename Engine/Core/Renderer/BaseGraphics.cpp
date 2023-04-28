@@ -1,13 +1,14 @@
 #include "BaseGraphics.h"
 #include "RenderObject.h"
 #include "ShadowRenderer.h"
+#include "RenderHelper.h"
 
 #include "../Manager/CameraManager.h"
 #include "../Manager/LightManager.h"
 #include "../Manager/PipelineManager.h"
 #include "../Manager/FrameBufferManager.h"
 
-#include "../Layer/RenderLayer.h"
+#include "../Renderer/RenderLayer.h"
 #include "../Pipeline/Pipeline.h"
 
 #include "../Component/Camera.h"
@@ -25,7 +26,7 @@ namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
 	{
-
+		RenderLayer::init();
 	}
 
 	BaseGraphics::~BaseGraphics()
@@ -45,7 +46,7 @@ namespace tezcat::Tiny
 	{
 		Statistic::DrawCall = 0;
 		Statistic::PassCount = 0;
-		//RenderCommander::preRender();
+		RenderHelper::renderPreData();
 	}
 
 	void BaseGraphics::onRender()

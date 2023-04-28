@@ -6,7 +6,6 @@
 #include "../Data/Material.h"
 #include "../Component/GameObject.h"
 #include "../Pipeline/Pipeline.h"
-#include "../Layer/RenderLayer.h"
 
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
@@ -17,6 +16,7 @@
 #include "../Renderer/VertexBuffer.h"
 #include "../Renderer/ShadowRenderer.h"
 #include "../Renderer/RenderAgent.h"
+#include "../Renderer/RenderLayer.h"
 
 #include "../Manager/PipelineManager.h"
 #include "../Manager/VertexManager.h"
@@ -31,10 +31,10 @@ namespace tezcat::Tiny
 		: mDrawMode(ContextMap::DrawModeArray[(uint32_t)DrawMode::Triangles])
 		, mMainMaterial(nullptr)
 		, mIsCastShadow(true)
-		, mRenderAgent(nullptr)
+		, mRenderAgent(RenderAgent::create(this, this))
 		, mVertex(nullptr)
 	{
-		
+		mRenderAgent->addRef();
 	}
 
 	MeshRenderer::~MeshRenderer()
@@ -73,15 +73,11 @@ namespace tezcat::Tiny
 
 	void MeshRenderer::onDisable()
 	{
+
 	}
 
 	void MeshRenderer::onStart()
 	{
-		if (mRenderAgent == nullptr)
-		{
-			mRenderAgent = RenderAgent::create(this, this);
-			mRenderAgent->addRef();
-		}
 		RenderLayer::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
 	}
 

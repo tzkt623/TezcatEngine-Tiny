@@ -183,8 +183,7 @@ namespace tezcat::Tiny::GL
 
 	//-------------------------------------------------
 	//
-	//
-	//
+	//	GLVertexCreator
 	//
 	GLVertexCreator::GLVertexCreator()
 	{

@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Base\TinyGC.cpp" />
+    <ClCompile Include="Core\Base\TinyGCInfo.cpp" />
     <ClCompile Include="Core\Base\TinyRefObject.cpp" />
     <ClCompile Include="Core\Component\Camera.cpp" />
     <ClCompile Include="Core\Component\FlyController.cpp" />
@@ -175,6 +176,7 @@
     <ClCompile Include="Core\Pipeline\Forward.cpp" />
     <ClCompile Include="Core\Pipeline\PipelineQueue.cpp" />
     <ClCompile Include="Core\Renderer\RenderAgent.cpp" />
+    <ClCompile Include="Core\Renderer\RenderHelper.cpp" />
     <ClCompile Include="Core\Renderer\ShadowRenderer.cpp" />
     <ClCompile Include="Core\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
@@ -221,7 +223,7 @@
     <ClCompile Include="Core\Manager\PipelineManager.cpp" />
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
-    <ClCompile Include="Core\Layer\RenderLayer.cpp" />
+    <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
     <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
     <ClCompile Include="Core\Component\Skybox.cpp" />
@@ -239,6 +241,7 @@
     <ClCompile Include="Platform\OpenGL\GLVertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Base\TinyGCInfo.h" />
     <ClInclude Include="Core\Head\TinyCpp.h" />
     <ClInclude Include="Core\Base\TinyGC.h" />
     <ClInclude Include="Core\Base\TinyRefObject.h" />
@@ -257,6 +260,7 @@
     <ClInclude Include="Core\Manager\TextureManager.h" />
     <ClInclude Include="Core\Pipeline\Forward.h" />
     <ClInclude Include="Core\Pipeline\PipelineQueue.h" />
+    <ClInclude Include="Core\Renderer\RenderHelper.h" />
     <ClInclude Include="Core\Renderer\ShadowRenderer.h" />
     <ClInclude Include="Core\Renderer\FrameBuffer.h" />
     <ClInclude Include="Core\Manager\FrameBufferManager.h" />
@@ -310,7 +314,7 @@
     <ClInclude Include="Core\Manager\PipelineManager.h" />
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
-    <ClInclude Include="Core\Layer\RenderLayer.h" />
+    <ClInclude Include="Core\Renderer\RenderLayer.h" />
     <ClInclude Include="Platform\OpenGL\GLShader.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
     <ClInclude Include="Core\Component\Skybox.h" />

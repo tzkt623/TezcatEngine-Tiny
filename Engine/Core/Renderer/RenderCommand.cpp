@@ -5,9 +5,9 @@
 
 namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(RenderCommand)
+
 	RenderCommand::RenderCommand()
-		: mDrawMode(ContextMap::DrawModeArray[(uint32_t)DrawMode::Triangles])
-		, mMeshData(nullptr)
 	{
 
 	}
@@ -16,10 +16,4 @@ namespace tezcat::Tiny
 	{
 
 	}
-
-	void RenderCommand::setDrawMode(DrawMode val)
-	{
-		mDrawMode = ContextMap::DrawModeArray[(uint32_t)val];
-	}
-
 }

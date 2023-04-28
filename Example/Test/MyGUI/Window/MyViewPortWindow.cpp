@@ -163,11 +163,11 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 
 		ImGui::Text("Memory");
 		ImGui::Text("Used: %.3f kb", Statistic::getMemoryUse() / 1024.0f);
-		ImGui::Text("TotalID: %d", TinyRefObject::totalID());
+		ImGui::Text("TotalID: %d", TinyGC::totalID());
 		ImGui::SameLine();
-		ImGui::Text("FreeID: %d", TinyRefObject::freeID());
+		ImGui::Text("FreeID: %d", TinyGC::freeID());
 		ImGui::SameLine();
-		ImGui::Text("UsedID: %d", TinyRefObject::usedID());
+		ImGui::Text("UsedID: %d", TinyGC::usedID());
 
 		ImGui::Separator();
 

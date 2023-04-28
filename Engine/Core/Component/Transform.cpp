@@ -1,5 +1,6 @@
 #include "Transform.h"
 #include "../Scene/Scene.h"
+#include "../Manager/SceneManager.h"
 #include "../Component/GameObject.h"
 #include "../Tool/Tool.h"
 
@@ -8,7 +9,7 @@ namespace tezcat::Tiny
 {
 	TINY_RTTI_CPP(Transform)
 
-		static glm::mat4 WORLD_MATRIX(1.0f);
+	static glm::mat4 WORLD_MATRIX(1.0f);
 	static glm::vec3 XAxis(1.0f, 0.0f, 0.0f);
 	static glm::vec3 YAxis(0.0f, 1.0f, 0.0f);
 	static glm::vec3 ZAxis(0.0f, 0.0f, 1.0f);
@@ -30,10 +31,7 @@ namespace tezcat::Tiny
 		, mDelegateUpdate(std::bind(&Transform::updateMatrix, this, std::placeholders::_1))
 		, mChildren(nullptr)
 	{
-		if (mParent != nullptr)
-		{
-			mParent->addChild(this);
-		}
+
 	}
 
 	Transform::~Transform()
@@ -44,22 +42,90 @@ namespace tezcat::Tiny
 
 	void Transform::onStart()
 	{
-		if (mParent == nullptr)
-		{
-			mGameObject->getScene()->addTransform(this);
-		}
+
 	}
 
 	void Transform::onEnable()
 	{
-		mGameObject->mTransform = this;
 		mGameObject->swapTransform();
+		SceneMgr::getInstance()->getCurrentScene()->addNewTransform(this);
 	}
 
 	void Transform::onDisable()
 	{
 
 	}
+
+
+	void Transform::setParent(Transform* parent)
+	{
+		if (parent == mParent)
+		{
+			return;
+		}
+
+		bool inited = mGameObject->getScene();
+
+		//如果父节点不为空
+		if (mParent != nullptr)
+		{
+			//从父节点中删除自己
+			mParent->removeChild(this);
+		}
+
+		if (parent == nullptr)
+		{
+			mParent = parent;
+			mIndex = 0;
+
+			if (inited)
+			{
+				SceneMgr::getInstance()->getCurrentScene()->addTransform(this);
+			}
+			else
+			{
+				SceneMgr::getInstance()->getCurrentScene()->addNewTransform(this);
+			}
+		}
+		else
+		{
+			mParent = parent;
+			mIndex = mParent->mIndex + 1;
+			mParent->addChild(this);
+		}
+	}
+	void Transform::clampRotation()
+	{
+		if (mLocalRotation.x > 360.0f)
+		{
+			mLocalRotation.x -= 360.0f;
+		}
+		else if (mLocalRotation.x < -360.0f)
+		{
+			mLocalRotation.x += 360.0f;
+		}
+
+		if (mLocalRotation.y > 360.0f)
+		{
+			mLocalRotation.y -= 360.0f;
+		}
+		else if (mLocalRotation.y < -360.0f)
+		{
+			mLocalRotation.y += 360.0f;
+		}
+
+		if (mLocalRotation.z > 360.0f)
+		{
+			mLocalRotation.z -= 360.0f;
+		}
+		else if (mLocalRotation.z < -360.0f)
+		{
+			mLocalRotation.z += 360.0f;
+		}
+	}
+
+
+
 
 	/// <summary>
 	/// 更新流程
@@ -163,7 +229,9 @@ namespace tezcat::Tiny
 		{
 			mChildren = new std::vector<TinyWeakRef<Transform>>();
 		}
-		mChildren->push_back(transform);
+
+
+		mChildren->emplace_back(transform);
 	}
 
 	bool Transform::removeChild(Transform* transform)
@@ -221,32 +289,28 @@ namespace tezcat::Tiny
 	{
 		localVector = glm::inverse(mModelMatrix) * glm::vec4(worldVector, 0.0f);
 	}
-
-	void Transform::setParent(Transform* parent)
+	//-------------------------------------------------
+	//
+	//	TransformList
+	//
+	TransformList::TransformList()
 	{
-		if (parent == mParent)
-		{
-			return;
-		}
 
-		//如果父节点不为空
-		if (mParent != nullptr)
-		{
-			//从父节点中删除自己
-			mParent->removeChild(this);
-		}
-
-		mParent = parent;
-		//如果传入的父节点为空,说明需要添加到Scene中
-		if (mParent == nullptr)
-		{
-			mIndex = 0;
-			mGameObject->getScene()->addTransform(this);
-		}
-		else
-		{
-			mIndex = mParent->mIndex + 1;
-			mParent->addChild(this);
-		}
 	}
+
+	TransformList::~TransformList()
+	{
+
+	}
+
+	void TransformList::pushFront(Transform* transform)
+	{
+
+	}
+
+	void TransformList::pushBack(Transform* transform)
+	{
+
+	}
+
 }

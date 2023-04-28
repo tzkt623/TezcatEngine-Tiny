@@ -8,7 +8,7 @@
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/Vertex.h"
 #include "../Renderer/BaseGraphics.h"
-#include "../Layer/RenderLayer.h"
+#include "../Renderer/RenderLayer.h"
 
 #include "../Manager/VertexManager.h"
 
@@ -20,9 +20,10 @@ namespace tezcat::Tiny
 		: mVertex(VertexMgr::getInstance()->getVertex("Skybox"))
 		, mDrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
 		, mMaterial(nullptr)
-		, mRenderAgent(nullptr)
+		, mRenderAgent(mRenderAgent = RenderAgent::create(this, this))
 	{
 		mVertex->addRef();
+		mRenderAgent->addRef();
 	}
 
 	Skybox::~Skybox()
@@ -34,12 +35,6 @@ namespace tezcat::Tiny
 
 	void Skybox::onStart()
 	{
-		if (mRenderAgent == nullptr)
-		{
-			mRenderAgent = RenderAgent::create(this, this);
-			mRenderAgent->addRef();
-		}
-
 		RenderLayer::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
 	}
 

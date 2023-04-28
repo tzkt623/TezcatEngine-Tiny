@@ -8,7 +8,7 @@ namespace tezcat::Tiny
 {
 	class Image;
 
-	struct TINY_API TextureInfo 
+	struct TINY_API TextureInfo
 	{
 		std::string name;
 		TextureFilter filter;
@@ -148,10 +148,7 @@ namespace tezcat::Tiny
 		TINY_RTTI_H(Texture)
 	public:
 		Texture();
-		/// <summary>
-		/// 默认情况下
-		/// Texture都是由生成他的东西负责生命周期
-		/// </summary>
+
 		Texture(const TextureChannel& internalChannel
 			, const TextureWrap& wrap
 			, const TextureFilter& filter
@@ -247,9 +244,7 @@ namespace tezcat::Tiny
 		TINY_RTTI_H(TextureRenderBuffer2D)
 	public:
 		TextureType getTextureType() const override { return TextureType::TextureRenderBuffer2D; }
-		virtual void create(const int& width
-							, const int& high
-							, const TextureChannel& interanlChannel) = 0;
+		virtual void create(const int& width, const int& high, const TextureChannel& interanlChannel) = 0;
 
 		const TextureBufferType& getBufferType() const { return mBufferType; }
 		void setBufferType(const TextureBufferType& val) { mBufferType = val; }

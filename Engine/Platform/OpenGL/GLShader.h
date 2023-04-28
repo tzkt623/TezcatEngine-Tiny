@@ -12,7 +12,7 @@ namespace tezcat::Tiny::GL
 		GLShader();
 		~GLShader();
 
-		void attachShader(uint32_t id);
+		void linkShader(uint32_t id);
 
 	public:
 		void bind() override;

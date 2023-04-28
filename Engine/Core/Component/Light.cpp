@@ -74,8 +74,8 @@ namespace tezcat::Tiny
 	{
 		auto transform = this->getTransform();
 		mViewMatrix = glm::lookAt(
-			transform->getPosition(),
-			transform->getPosition() + transform->getForward(),
+			transform->getWorldPosition(),
+			transform->getWorldPosition() + transform->getForward(),
 			transform->getUp());
 		return mViewMatrix;
 	}

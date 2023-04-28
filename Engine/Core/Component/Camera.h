@@ -46,12 +46,11 @@ namespace tezcat::Tiny
 		void beginRender() override;
 		void endRender() override;
 
-
 		Pipeline* getPipeline() const { return mPipeline; }
 		void setPipeline(Pipeline* val) { mPipeline = val; }
 
 	public:
-		glm::mat4& getViewMatrix() override;
+		glm::mat4& getViewMatrix() { return mViewMatrix; }
 
 	public:
 		bool isMain() const { return mIsMain; }
@@ -74,12 +73,6 @@ namespace tezcat::Tiny
 		glm::vec3& getFront() { return mFront; }
 		glm::vec3& getUp() { return mUp; }
 		glm::vec3& getRight() { return mRight; }
-		void yawPitch(float yaw, float pitch, bool constrainPitch = true);
-		void roll(float roll);
-
-	private:
-		void updateVector();
-		void updateTransform(Transform* transform);
 		
 	private:
 		int mDepth;
@@ -87,16 +80,10 @@ namespace tezcat::Tiny
 		uint32_t mUID;
 
 	private:
-
-		//glm::mat4x4 mViewMatrix;
-	private:
 		glm::vec3 mFront;
 		glm::vec3 mUp;
 		glm::vec3 mRight;
 		glm::vec3 mWorldUp;
-		float mYaw;
-		float mPitch;
-		float mRoll;
 		glm::mat4 mViewMatrix;
 
 		//clear options

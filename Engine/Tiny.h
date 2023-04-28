@@ -40,6 +40,7 @@
 #include "Core/Shader/ShaderPackage.h"
 
 #include "Core/Tool/Tool.h"
+#include "Core/Event/EngineEvent.h"
 
 
 #ifdef TINY_PLATFORM_WINDOWS

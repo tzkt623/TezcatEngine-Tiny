@@ -88,7 +88,6 @@ namespace tezcat::Tiny::GL
 
 	void WindowsEngine::postUpdate()
 	{
-		GameObject::clearDeletedGameObjects();
 		mIsRunning = !glfwWindowShouldClose(mWindow);
 	}
 

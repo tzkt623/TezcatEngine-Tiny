@@ -33,6 +33,7 @@ namespace tezcat::Tiny
 		virtual void onExit();
 		virtual void onPause();
 		virtual void onResume();
+
 	public:
 		void update();
 		void addCamera(Camera* camera);
@@ -41,6 +42,7 @@ namespace tezcat::Tiny
 		void addLogicFunction(void* gameObject, const std::function<void()>& function);
 		void removeLogicFunction(void* gameObject);
 		void addTransform(Transform* transform);
+		void addNewTransform(Transform* transform);
 
 	private:
 		void addGameObject(GameObject* gameObject);
@@ -48,9 +50,9 @@ namespace tezcat::Tiny
 
 
 	public:
-		TinyList<GameObject*>& getObjectList() { return mObjectList; }
+		std::list<TinyWeakRef<GameObject>>& getObjectList() { return mObjectList; }
 		std::list<TinyWeakRef<Transform>>& getTransformList() { return mTransformList; }
-		TinyVector<GameObject*> findGameObjects(const std::string& name);
+		std::vector<TinyWeakRef<GameObject>> findGameObjects(const std::string& name);
 
 	private:
 		uint32_t addUpdateTransform(Transform* transform);
@@ -59,17 +61,18 @@ namespace tezcat::Tiny
 	private:
 		std::string mName;
 		std::list<GameObject*> mNewObjectList;
+		std::list<Transform*> mNewTransformList;
 		std::unordered_map<void*, std::function<void()>> mLogicList;
 
 	public:
-
-		TinyList<GameObject*> mObjectList;
+		std::list<TinyWeakRef<GameObject>> mObjectList;
 		std::list<TinyWeakRef<Transform>> mTransformList;
 	private:
 		//灯光数据
 		LightData* mLightData;
 		//相机数据
 		CameraData* mCameraData;
+	public:
 	};
 }
 

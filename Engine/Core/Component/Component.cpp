@@ -1,5 +1,6 @@
 #include "Component.h"
 #include "../Scene/Scene.h"
+#include "../Manager/SceneManager.h"
 #include "../Component/GameObject.h"
 #include "Transform.h"
 
@@ -22,17 +23,17 @@ namespace tezcat::Tiny
 
 	void Component::startLogic(const std::function<void()>& logicFunction)
 	{
-		mGameObject->getScene()->addLogicFunction(this, logicFunction);
+		SceneMgr::getInstance()->getCurrentScene()->addLogicFunction(this, logicFunction);
 	}
 
 	void Component::stopLogic()
 	{
-		mGameObject->getScene()->removeLogicFunction(this);
+		SceneMgr::getInstance()->getCurrentScene()->removeLogicFunction(this);
 	}
 
 	Transform* Component::getTransform()
 	{
-		return mGameObject->mTransform;
+		return mGameObject->getTransform();
 	}
 
 	void Component::onDestroy()

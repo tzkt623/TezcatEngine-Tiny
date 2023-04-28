@@ -5,12 +5,13 @@
 #include "../Renderer/BaseGraphics.h"
 #include "../Renderer/Texture.h"
 #include "../Renderer/ShadowRenderer.h"
+#include "../Renderer/RenderLayer.h"
+#include "../Renderer/FrameBuffer.h"
 
 #include "../Manager/CameraManager.h"
 #include "../Manager/PipelineManager.h"
 #include "../Manager/LightManager.h"
 #include "../Manager/FrameBufferManager.h"
-#include "../Renderer/FrameBuffer.h"
 
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
@@ -19,7 +20,6 @@
 #include "../Component/Camera.h"
 #include "../Component/Light.h"
 
-#include "../Layer/RenderLayer.h"
 #include "../Data/Material.h"
 
 

@@ -8,10 +8,7 @@ namespace tezcat::Tiny
 {
 	TINY_RTTI_CPP(GameObject)
 
-	std::stack<int> GameObject::sUIDPool;
-	std::list<GameObject*> GameObject::sDeleteObjectList;
-
-	GameObject::GameObject()
+		GameObject::GameObject()
 		: GameObject("GameObject")
 	{
 
@@ -19,33 +16,16 @@ namespace tezcat::Tiny
 
 	GameObject::GameObject(const std::string& name)
 		: mIsLogic(false)
-		, mScene(SceneMgr::getInstance()->getCurrentScene())
-		, mNeedDelete(false)
+		, mScene(nullptr)
 		, mLayerMaskIndex(0)
 		, mUID(-1)
-		, mTransform(nullptr)
 		, mName(name)
 	{
-		if (sUIDPool.empty())
-		{
-			mUID = IDGenerator<GameObject, int>::generate();
-		}
-		else
-		{
-			mUID = sUIDPool.top();
-			sUIDPool.pop();
-		}
-
-		mScene->addGameObject(this);
+		mUID = GameObjectPool::addGameObject(this);
 	}
 
 	GameObject::~GameObject()
 	{
-		if (mTransform->getParent() != nullptr)
-		{
-
-		}
-
 		auto children = this->getTransform()->getChildren();
 		if (children)
 		{
@@ -56,12 +36,14 @@ namespace tezcat::Tiny
 		}
 
 		mComponentList.clear();
-		sUIDPool.push(mUID);
 		mScene = nullptr;
+
+		GameObjectPool::removeGameObject(this);
 	}
 
 	void GameObject::enterScene(Scene* scene)
 	{
+		mScene = scene;
 		for (auto com : mComponentList)
 		{
 			com->onStart();
@@ -72,10 +54,9 @@ namespace tezcat::Tiny
 		{
 			for (auto& child : *children)
 			{
-				child->getGameObject()->enterScene(mScene);
+				child->getGameObject()->enterScene(scene);
 			}
 		}
-
 	}
 
 	void GameObject::exitScene()
@@ -108,12 +89,6 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void GameObject::destory(GameObject* go)
-	{
-		go->mNeedDelete = true;
-		sDeleteObjectList.emplace_back(go);
-	}
-
 	void GameObject::addComponent(Component* component)
 	{
 		component->setGameObject(this);
@@ -127,17 +102,11 @@ namespace tezcat::Tiny
 		component->onEnable();
 	}
 
-	void GameObject::clearDeletedGameObjects()
-	{
-		if (sDeleteObjectList.empty())
-		{
-			return;
-		}
+	//-------------------------------------------------
+	//
+	//
+	//
+	TinyVector<GameObject*> GameObjectPool::sPool;
+	std::deque<int> GameObjectPool::sFreeObjects;
 
-		for (auto go : sDeleteObjectList)
-		{
-			//delete go;
-		}
-		sDeleteObjectList.clear();
-	}
 }

@@ -7,6 +7,7 @@
 #include "Window/MyMainCameraWindow.h"
 #include "Window/MyObjectWindow.h"
 #include "Window/MyMainDockWindow.h"
+#include "Window/MyGCInfoWindow.h"
 
 
 

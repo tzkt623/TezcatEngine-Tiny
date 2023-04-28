@@ -7,6 +7,7 @@ TINY_RTTI_CPP(MyMainScene)
 
 MyMainScene::MyMainScene(const std::string& name)
 	: Scene(name)
+	, mController(nullptr)
 {
 
 }
@@ -20,12 +21,11 @@ void MyMainScene::onEnter()
 	float gateWidth = 1920.0f / 4;
 	float gateHigh = 1080.0f / 4;
 
-
-	// 	auto controller_go = GameObject::create("Controller");
-	// 	controller_go->addComponent<Transform>();
-	// 	controller_go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-	// 	controller_go->addComponent<FlyController>();
-	//	MyInputer::getInstance()->setController(controller_go->addComponent<FlyController>());
+	mController = GameObject::create("Controller");
+	mController->addComponent<Transform>();
+	mController->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+	mController->addComponent<FlyController>();
+	MyInputer::getInstance()->setController(mController->addComponent<FlyController>());
 
 	this->createEnvMap();
 
@@ -44,12 +44,11 @@ void MyMainScene::onEnter()
 		camera->setPipeline(PipelineMgr::getInstance()->get("Forward"));
 		camera->setCullLayer(0);
 
-		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
-
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		go->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-		//go->getTransform()->setParent(controller_go->getTransform());
+		go->getTransform()->setParent(mController->getTransform());
+		//MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 
 		auto frame = FrameBufferMgr::getInstance()->create(
 					"FB_Viewport",
@@ -144,7 +143,7 @@ void MyMainScene::onEnter()
 	//
 	//	Cubes 0
 	//
-	if (true)
+	if (false)
 	{
 		this->createCubes0();
 	}
@@ -196,14 +195,19 @@ void MyMainScene::createGates(float gateWidth, float gateHigh)
 
 void MyMainScene::createPaintings()
 {
-	//-------------------------------------------------
-	auto wife2 = GameObject::create();
-	wife2->addComponent<Transform>();
-	wife2->getTransform()->setPosition(glm::vec3(-960.0f, 0.0f, 0.0f));
-	wife2->getTransform()->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-	wife2->getTransform()->setScale(glm::vec3(1920.0f / 2, 1080.0f / 2, 1.0f));
+	auto go = GameObject::create("Paintings");
+	auto transform = go->addComponent<Transform>();
+	transform->setPosition(glm::vec3(20.0f, 0.0f, -20.0f));
 
-	auto mr2 = wife2->addComponent<MeshRenderer>();
+	//-------------------------------------------------
+	auto wife = GameObject::create("Wife");
+	wife->addComponent<Transform>();
+	wife->getTransform()->setPosition(glm::vec3(-960.0f, 0.0f, 0.0f));
+	wife->getTransform()->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+	wife->getTransform()->setScale(glm::vec3(1920.0f / 2, 1080.0f / 2, 1.0f));
+	wife->getTransform()->setParent(transform);
+
+	auto mr2 = wife->addComponent<MeshRenderer>();
 	auto wife_material2 = Material::create("Unlit/Texture");
 	wife_material2->addUniform<UniformTex2D>(ShaderParam::TexColor, "wife");
 	mr2->setMaterial(wife_material2);
@@ -211,11 +215,12 @@ void MyMainScene::createPaintings()
 
 
 	//--------------------------------------
-	auto elden_ring1 = GameObject::create();
+	auto elden_ring1 = GameObject::create("ED1");
 	elden_ring1->addComponent<Transform>();
 	elden_ring1->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, -960.0f));
 	elden_ring1->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 	elden_ring1->getTransform()->setScale(glm::vec3(1920.0f / 2, 1080.0f / 2, 1.0f));
+	elden_ring1->getTransform()->setParent(transform);
 
 	auto mre1 = elden_ring1->addComponent<MeshRenderer>();
 	auto elden_ring1_material = Material::create("Unlit/Texture");
@@ -224,11 +229,12 @@ void MyMainScene::createPaintings()
 	mre1->setMesh("Square");
 
 
-	auto elden_ring2 = GameObject::create();
+	auto elden_ring2 = GameObject::create("ED2");
 	elden_ring2->addComponent<Transform>();
 	elden_ring2->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 960.0f));
 	elden_ring2->getTransform()->setRotation(glm::vec3(0.0f, -180.0f, 0.0f));
 	elden_ring2->getTransform()->setScale(glm::vec3(1920.0f / 2, 1080.0f / 2, 1.0f));
+	elden_ring2->getTransform()->setParent(transform);
 
 	auto mre2 = elden_ring2->addComponent<MeshRenderer>();
 	auto elden_ring2_material = Material::create("Unlit/Texture");
@@ -269,6 +275,7 @@ void MyMainScene::createCubes0()
 		go->getTransform()->setPosition(glm::vec3(dis(gen), dis(gen), dis(gen)));
 		go->getTransform()->setScale(glm::vec3(10.0f));
 		go->getTransform()->setRotation(glm::vec3(dis_ro(gen), dis_ro(gen), dis_ro(gen)));
+		//go->getTransform()->setParent(mController->getTransform());
 
 		auto mr = go->addComponent<MeshRenderer>();
 		auto material = Material::create("Standard/Std1");
@@ -289,12 +296,17 @@ void MyMainScene::createTransparentObject()
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(-300, 300);
 
+	auto go = GameObject::create("Transparent");
+	auto transform = go->addComponent<Transform>();
+	transform->setPosition(glm::vec3(0.0f, 0.0f, -20.0f));
+
 	for (int i = 0; i < 20; i++)
 	{
-		auto go = GameObject::create();
+		auto go = GameObject::create(StringTool::stringFormat("T%d", i));
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(dis(gen), dis(gen), dis(gen)));
 		go->getTransform()->setScale(glm::vec3(30.0f, 30.0f, 1.0f));
+		go->getTransform()->setParent(transform);
 
 		auto mr = go->addComponent<MeshRenderer>();
 		auto material = Material::create("Unlit/Transparent");
@@ -349,21 +361,9 @@ void MyMainScene::createDirectionLight()
 void MyMainScene::createPBR()
 {
 	Log::info("createPBR");
-	auto go = GameObject::create("PBRBall1");
-	go->addComponent<Transform>();
-	go->getTransform()->setPosition(glm::vec3(20.0f, 0.0f, -20.0f));
-	go->getTransform()->setScale(glm::vec3(10.0f));
-	go->getTransform()->setRotation(glm::vec3(90.0f, 0.0f, 0.0f));
-
-	auto mr = go->addComponent<MeshRenderer>();
-	auto material = Material::create("Standard/PBRStd1");
-	material->addUniform<UniformTex2D>(ShaderParam::MatPBR_Std1::Albedo2D, "metal_plate_diff");
-	material->addUniform<UniformTex2D>(ShaderParam::MatPBR_Std1::Metallic2D, "metal_plate_metal");
-	material->addUniform<UniformTex2D>(ShaderParam::MatPBR_Std1::Roughness2D, "metal_plate_rough");
-	material->addUniform<UniformTex2D>(ShaderParam::MatPBR_Std1::AO2D, "metal_plate_ao");
-	mr->setMaterial(material);
-	mr->setMesh("Sphere");
-
+	auto go = GameObject::create("PBR");
+	auto transform = go->addComponent<Transform>();
+	transform->setPosition(glm::vec3(0.0f, 0.0f, -20.0f));
 
 	for (int y = 0; y <= 5; y++)
 	{
@@ -374,6 +374,7 @@ void MyMainScene::createPBR()
 			go->getTransform()->setPosition(glm::vec3(x * 30.0f, y * 30.0f, -60.0f));
 			go->getTransform()->setScale(glm::vec3(10.0f));
 			go->getTransform()->setRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			go->getTransform()->setParent(transform);
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = Material::create("Standard/PBRTest1");
@@ -389,9 +390,9 @@ void MyMainScene::createPBR()
 
 void MyMainScene::createEnvMap()
 {
-// 	FrameBufferMgr::getInstance()->create("FB_Env",
-// 		512, 512,
-// 		{
-// 			TextureBufferInfo("TB_Env", tex)
-// 		});
+	// 	FrameBufferMgr::getInstance()->create("FB_Env",
+	// 		512, 512,
+	// 		{
+	// 			TextureBufferInfo("TB_Env", tex)
+	// 		});
 }

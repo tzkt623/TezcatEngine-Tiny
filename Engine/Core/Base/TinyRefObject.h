@@ -1,52 +1,9 @@
 #pragma once
 #include "../Head/CppHead.h"
+#include "TinyGC.h"
 
 namespace tezcat::Tiny
 {
-	class TinyRefObject;
-	struct TinyGCInfo
-	{
-		uint32_t index = 0;
-		int strongRef = 0;
-		int weakRef = 0;
-		TinyRefObject* pointer = nullptr;
-
-		TinyGCInfo() {}
-		TinyGCInfo(int strongRef, int weakRef, TinyRefObject* pointer)
-			: strongRef(strongRef)
-			, weakRef(weakRef)
-			, pointer(pointer)
-		{
-
-		}
-
-		TinyGCInfo(uint32_t index)
-			: index(index)
-		{
-
-		}
-
-		~TinyGCInfo()
-		{
-			this->pointer = nullptr;
-		}
-
-		TinyGCInfo(TinyGCInfo&& other) noexcept
-		{
-			this->pointer = other.pointer;
-			this->strongRef = other.strongRef;
-			this->weakRef = other.weakRef;
-
-			other.strongRef = -1;
-			other.weakRef = -1;
-			other.pointer = nullptr;
-		}
-
-		void collect();
-
-		static TinyGCInfo* Default;
-	};
-
 	class TINY_API TinyRefObject
 	{
 		friend class TinyBaseWeakRef;
@@ -58,28 +15,17 @@ namespace tezcat::Tiny
 
 		int getRefCount() { return mGCInfo->strongRef; }
 
-		void addRef()
-		{
-			++mGCInfo->strongRef;
-		}
-
+		void addRef() { ++mGCInfo->strongRef; }
 		void subRef();
 
 		virtual const std::string& getClassName() const { return Empty; }
+		const TinyGCInfoID& getTinyID() const { return mGCInfo->index; }
 
 	private:
 		TinyGCInfo* mGCInfo;
-		uint32_t mUID;
 
 	private:
 		static const std::string Empty;
-		static uint32_t sIDGiver;
-		static std::deque<uint32_t> sFreeUIDPool;
-
-	public:
-		static uint32_t totalID() { return sIDGiver; }
-		static uint32_t freeID() { return sFreeUIDPool.size(); }
-		static uint32_t usedID() { return sIDGiver - sFreeUIDPool.size(); }
 	};
 
 	//-------------------------------------
@@ -92,23 +38,31 @@ namespace tezcat::Tiny
 	{
 	public:
 		constexpr TinyBaseWeakRef() noexcept
-			: mGCInfo(TinyGCInfo::Default)
+			: mGCInfo(TinyGC::DefaultGCInfo)
 		{
-
+			++mGCInfo->weakRef;
 		}
 
 		constexpr TinyBaseWeakRef(std::nullptr_t) noexcept
-			: mGCInfo(TinyGCInfo::Default) {}
+			: mGCInfo(TinyGC::DefaultGCInfo) {}
 
 		TinyBaseWeakRef(TinyRefObject* obj)
-			: mGCInfo(obj ? obj->mGCInfo : TinyGCInfo::Default)
+			: mGCInfo(obj ? obj->mGCInfo : TinyGC::DefaultGCInfo)
 		{
-			++(mGCInfo->weakRef);
+			++mGCInfo->weakRef;
 		}
 
 		virtual ~TinyBaseWeakRef();
 
 		TinyRefObject* getTinyRefObject() { return mGCInfo->pointer; }
+
+
+		void reset(TinyRefObject* other)
+		{
+			this->release();
+			mGCInfo = other->mGCInfo;
+			++(mGCInfo->weakRef);
+		}
 
 	protected:
 		void release();
@@ -126,14 +80,19 @@ namespace tezcat::Tiny
 			, T>;
 
 		template<typename To>
-		using to_type = std::enable_if_t<
+		using ToType = std::enable_if_t<
 			std::is_base_of_v<TinyRefObject, To>
 			&& std::is_class_v<To>
 			, To>;
 
 	public:
-		constexpr TinyWeakRef() noexcept = default;
-		constexpr TinyWeakRef(std::nullptr_t) noexcept {}
+		constexpr TinyWeakRef()
+			: TinyBaseWeakRef()
+		{}
+		constexpr TinyWeakRef(std::nullptr_t) noexcept
+			: TinyBaseWeakRef()
+		{}
+
 
 		TinyWeakRef(Type* obj)
 			: TinyBaseWeakRef(obj)
@@ -167,13 +126,13 @@ namespace tezcat::Tiny
 		}
 
 		template<class To>
-		TinyWeakRef<to_type<To>> staticCast()
+		TinyWeakRef<ToType<To>> staticCast()
 		{
 			return std::move(new TinyWeakRef(static_cast<Type*>(mGCInfo->pointer)));
 		}
 
 		template<class To>
-		TinyWeakRef<to_type<To>> dynamicCast()
+		TinyWeakRef<ToType<To>> dynamicCast()
 		{
 			return std::move(new TinyWeakRef(dynamic_cast<Type*>(mGCInfo->pointer)));
 		}
@@ -193,17 +152,9 @@ namespace tezcat::Tiny
 	private:
 		void setOther(const TinyWeakRef& other)
 		{
-			if (mGCInfo == TinyGCInfo::Default)
-			{
-				mGCInfo = other.mGCInfo;
-				++(mGCInfo->weakRef);
-			}
-			else
-			{
-				this->release();
-				mGCInfo = other.mGCInfo;
-				++(mGCInfo->weakRef);
-			}
+			this->release();
+			mGCInfo = other.mGCInfo;
+			++(mGCInfo->weakRef);
 		}
 	};
 

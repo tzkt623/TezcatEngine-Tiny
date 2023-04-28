@@ -13,6 +13,7 @@ private:
 
 protected:
 	void onRender() override;
+	int resetName(ImGuiInputTextCallbackData* data);
 	void onUpdate() override;
 
 
@@ -34,6 +35,7 @@ private:
 
 private:
 	bool mOpen;
+	std::string mNameBuffer;
 	TinyWeakRef<GameObject> mGameObject;
 	std::vector<std::function<void(Component*)>> mDrawFunctions;
 };

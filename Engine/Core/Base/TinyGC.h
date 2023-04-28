@@ -1,31 +1,36 @@
 #pragma once
 
 #include "../Head/CppHead.h"
+#include "TinyGCInfo.h"
 
 namespace tezcat::Tiny
 {
 	class TinyRefObject;
-	struct TinyGCInfo;
 	class TINY_API TinyGC
 	{
-		static TinyGC sInstance;
+		TinyGC() = delete;
+		~TinyGC() = delete;
 	public:
-		static TinyGC& getInstance() { return sInstance; }
+		static void init();
+		static void manage(TinyRefObject* obj);
+		static void update();
 
-		void manage(TinyRefObject* obj);
-		void update();
+		static TinyGCInfo* getNextGCInfo(TinyRefObject* object);
+		static void recycle(TinyGCInfo* info);
 
-		TinyGCInfo* getNextGCInfo();
+		static uint32_t totalID() { return mGCInfos.size(); }
+		static uint32_t freeID() { return mFreeGCInfos.size(); }
+		static uint32_t usedID() { return mGCInfos.size() - mFreeGCInfos.size(); }
 
-		void collect(const TinyGCInfo* info);
+		static const std::vector<TinyGCInfo*>& getGCInfos() { return mGCInfos; }
+
 	private:
-		TinyGC();
+		static std::vector<TinyRefObject*> mMemoryPool;
+		static std::vector<TinyGCInfo*> mGCInfos;
+		static std::deque<uint32_t> mFreeGCInfos;
 
-	private:
-		std::vector<TinyRefObject*> mMemoryPool;
-
-		std::vector<TinyGCInfo> mGCInfos;
-		std::stack<uint32_t> mFreeGCInfos;
+	public:
+		static TinyGCInfo* DefaultGCInfo;
 	};
 
 	namespace v3

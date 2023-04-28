@@ -8,6 +8,7 @@ MyOverviewWindow::MyOverviewWindow()
 	, mGameObject(nullptr)
 	, mOpen(true)
 	, mDrawFunctions()
+	, mNameBuffer(256, '\0')
 {
 	MyEvent::get()->addListener(MyEventID::Window_ObjectSelected, this, [this](const EventData& data)
 		{
@@ -19,9 +20,9 @@ MyOverviewWindow::MyOverviewWindow()
 			if (ImGui::CollapsingHeader("坐标(Transform)"))
 			{
 				auto transform = static_cast<Transform*>(com);
-				ImGui::DragFloat3("Position", glm::value_ptr(transform->getPosition()));
-				ImGui::DragFloat3("Rotation", glm::value_ptr(transform->getRotation()));
-				ImGui::DragFloat3("Scale", glm::value_ptr(transform->getScale()));
+				ImGui::DragFloat3("Position", glm::value_ptr(transform->getPosition()), 0.03f);
+				ImGui::DragFloat3("Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
+				ImGui::DragFloat3("Scale", glm::value_ptr(transform->getScale()), 0.03f);
 				transform->markDirty();
 			}
 		});
@@ -170,15 +171,29 @@ void MyOverviewWindow::onRender()
 		return;
 	}
 
+	//mNameBuffer.assign(mGameObject->getName().c_str());
+
 	ImGui::Text("名称(Name):");
 	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), mGameObject->getName().c_str());
+	//ImGui::InputText("123", mNameBuffer.data(), mNameBuffer.capacity(), 0, &MyOverviewWindow::resetName);
 
 	auto& components = mGameObject->getCompoents();
 	for (auto com : components)
 	{
 		mDrawFunctions[com->getComponentTypeID()](com);
 	}
+}
+
+int MyOverviewWindow::resetName(ImGuiInputTextCallbackData* data)
+{
+	if (data->EventChar)
+	{
+		mGameObject->setName(data->Buf);
+		return 0;
+	}
+
+	return 1;
 }
 
 void MyOverviewWindow::onUpdate()

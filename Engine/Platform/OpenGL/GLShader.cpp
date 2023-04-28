@@ -15,9 +15,10 @@ namespace tezcat::Tiny::GL
 		glDeleteProgram(mProgramID);
 	}
 
-	void GLShader::attachShader(uint32_t id)
+	void GLShader::linkShader(uint32_t id)
 	{
 		glAttachShader(mProgramID, id);
+		glDeleteShader(id);
 	}
 
 	void GLShader::bind()

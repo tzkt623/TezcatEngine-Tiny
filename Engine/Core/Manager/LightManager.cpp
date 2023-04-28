@@ -4,31 +4,21 @@
 namespace tezcat::Tiny
 {
 	//------------------------------------------------------------
+	TINY_RTTI_CPP(LightData)
+
 	LightData::LightData()
-		: directionalLight(nullptr)
 	{
 
 	}
 
 	LightData::~LightData()
 	{
-		delete directionalLight;
-		directionalLight = nullptr;
 
-		for (auto l : pointLights)
-		{
-			delete l;
-		}
-
-		for (auto l : spotLights)
-		{
-			delete l;
-		}
 	}
 
 	//------------------------------------------------------------
 	LightManager::LightManager()
-		: mData(nullptr)
+		: mData()
 	{
 		LightMgr::attach(this);
 	}

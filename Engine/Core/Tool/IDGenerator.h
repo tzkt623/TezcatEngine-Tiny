@@ -13,16 +13,44 @@ namespace tezcat::Tiny
 	template<class T, typename R>
 	class TINY_API IDGenerator
 	{
-	public:
 		IDGenerator() = delete;
 		~IDGenerator() = delete;
-
+	public:
 		static R generate()
 		{
-
+			if (sFreePool.empty())
+			{
+				return mID++;
+			}
+			else
+			{
+				auto r = sFreePool.front();
+				sFreePool.pop_front();
+				return r;
+			}
 		}
+
+		static void recycle(R&& value)
+		{
+			sFreePool.emplace_back(std::forward<R>(value));
+		}
+
+		static void recycle(R& value)
+		{
+			sFreePool.emplace_back(value);
+		}
+
+		static std::deque<R> sFreePool;
+		static R mID;
 	};
 
+	template<class T, typename R>
+	std::deque<R> IDGenerator<T, R>::sFreePool;
+
+	template<class T, typename R>
+	R IDGenerator<T, R>::mID;
+
+	/*
 	template<class T>
 	class TINY_API IDGenerator<T, uint32_t>
 	{
@@ -61,4 +89,5 @@ namespace tezcat::Tiny
 
 	template<class T>
 	int IDGenerator<T, int>::mID = 0;
+	*/
 }

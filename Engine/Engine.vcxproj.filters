@@ -135,7 +135,7 @@
     <ClCompile Include="Platform\OpenGL\GLVertexBuffer.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Core\Layer\Layer.cpp" />
-    <ClCompile Include="Core\Layer\RenderLayer.cpp" />
+    <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
     <ClCompile Include="Core\Tool\ProfilerTimer.cpp" />
@@ -163,6 +163,8 @@
     <ClCompile Include="Core\Base\TinyGC.cpp" />
     <ClCompile Include="Core\Base\TinyRefObject.cpp" />
     <ClCompile Include="Core\Renderer\RenderAgent.cpp" />
+    <ClCompile Include="Core\Renderer\RenderHelper.cpp" />
+    <ClCompile Include="Core\Base\TinyGCInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1263,7 +1265,7 @@
     <ClInclude Include="Platform\OpenGL\GLVertexBuffer.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Layer\Layer.h" />
-    <ClInclude Include="Core\Layer\RenderLayer.h" />
+    <ClInclude Include="Core\Renderer\RenderLayer.h" />
     <ClInclude Include="Core\Tool\ProfilerTimer.h" />
     <ClInclude Include="Platform\OpenGL\GLTexture.h" />
     <ClInclude Include="Core\Head\Context.h" />
@@ -1301,6 +1303,8 @@
     <ClInclude Include="Core\Base\TinyGC.h" />
     <ClInclude Include="Core\Head\TinyCpp.h" />
     <ClInclude Include="Core\Renderer\RenderAgent.h" />
+    <ClInclude Include="Core\Renderer\RenderHelper.h" />
+    <ClInclude Include="Core\Base\TinyGCInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

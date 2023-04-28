@@ -46,6 +46,7 @@ void MyResourceLoader::prepareGame(Engine* engine)
 	CreateWindow(gui_host, MyObjectWindow);
 	CreateWindow(gui_host, MyOverviewWindow);
 	CreateWindow(gui_host, MyLogWindow);
+	CreateWindow(gui_host, MyGCInfoWindow);
 
 	engine->getGraphics()->setShadowMap(1024, 1024);
 

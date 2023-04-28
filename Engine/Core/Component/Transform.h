@@ -12,7 +12,7 @@ namespace tezcat::Tiny
 		Transform();
 		Transform(Transform* parent);
 		TINY_RTTI_H(Transform)
-		TINY_Factory(Transform)
+			TINY_Factory(Transform)
 
 	public:
 		virtual ~Transform();
@@ -31,6 +31,7 @@ namespace tezcat::Tiny
 
 		const uint32_t& getIndex() const { return mIndex; }
 		void updateChildren();
+
 	public:
 		glm::vec3& getPosition() { return mLocalPosition; }
 		void setPosition(const glm::vec3& val)
@@ -47,11 +48,23 @@ namespace tezcat::Tiny
 			mLocalPosition.z = z;
 		}
 
-		glm::vec3& getRotation() { return mLocalRotation; }
+		glm::vec3& getRotation()
+		{
+			return mLocalRotation;
+		}
+
 		void setRotation(const glm::vec3& val)
 		{
 			mIsDirty = true;
 			mLocalRotation = val;
+			this->clampRotation();
+		}
+
+		void setRotation(const float& x, const float& y)
+		{
+			mIsDirty = true;
+			mLocalRotation.x = x;
+			mLocalRotation.y = y;
 			this->clampRotation();
 		}
 
@@ -65,6 +78,7 @@ namespace tezcat::Tiny
 		}
 
 		glm::vec3& getScale() { return mLocalScale; }
+
 		void setScale(const glm::vec3& val)
 		{
 			mIsDirty = true;
@@ -72,36 +86,24 @@ namespace tezcat::Tiny
 		}
 
 	public:
+		glm::mat4& getModelMatrix() { return mModelMatrix; }
+
+		glm::mat4 getWorldToLocalMatrix();
+
 		void setWorldPosition(const glm::vec3& worldPosition)
 		{
 			mLocalPosition = worldPosition;
 			this->inverseTransformPoint(mLocalPosition);
 		}
 
-		glm::vec3 getWorldPosition()
-		{
-			return mModelMatrix[3];
-		}
+		glm::vec3 getWorldPosition() { return mModelMatrix[3]; }
 
-		glm::vec3 getRight() const
-		{
-			return mModelMatrix[0];
-		}
+		glm::vec3 getRight() const { return mModelMatrix[0]; }
 
-		glm::vec3 getUp() const
-		{
-			return mModelMatrix[1];
-		}
+		glm::vec3 getUp() const { return mModelMatrix[1]; }
 
-		glm::vec3 getBackward() const
-		{
-			return mModelMatrix[2];
-		}
-
-		glm::vec3 getForward() const
-		{
-			return -mModelMatrix[2];
-		}
+		glm::vec3 getBackward() const { return mModelMatrix[2]; }
+		glm::vec3 getForward() const { return -mModelMatrix[2]; }
 
 		glm::vec3 getGlobalScale() const
 		{
@@ -109,11 +111,6 @@ namespace tezcat::Tiny
 		}
 
 	public:
-		inline glm::mat4& getModelMatrix() { return mModelMatrix; }
-		glm::mat4 getWorldToLocalMatrix();
-
-
-
 		void transformPoint(glm::vec3& localPosition);
 		void transformPoint(const glm::vec3& localPosition, glm::vec3& worldPosition);
 		void transformVector(glm::vec3& localVector);
@@ -134,7 +131,6 @@ namespace tezcat::Tiny
 		size_t getChildCount() { return mChildren->size(); }
 		std::vector<TinyWeakRef<Transform>>* getChildren() { return mChildren; }
 
-
 		void manualUpdateMatrix();
 		void markDirty() { mIsDirty = true; }
 
@@ -154,35 +150,7 @@ namespace tezcat::Tiny
 			this->clampRotation();
 		}
 
-		void clampRotation()
-		{
-			if (mLocalRotation.x > 360.0f)
-			{
-				mLocalRotation.x -= 360.0f;
-			}
-			else if (mLocalRotation.x < -360.0f)
-			{
-				mLocalRotation.x += 360.0f;
-			}
-
-			if (mLocalRotation.y > 360.0f)
-			{
-				mLocalRotation.y -= 360.0f;
-			}
-			else if (mLocalRotation.y < -360.0f)
-			{
-				mLocalRotation.y += 360.0f;
-			}
-
-			if (mLocalRotation.z > 360.0f)
-			{
-				mLocalRotation.z -= 360.0f;
-			}
-			else if (mLocalRotation.z < -360.0f)
-			{
-				mLocalRotation.z += 360.0f;
-			}
-		}
+		void clampRotation();
 
 	protected:
 		void onStart() override;
@@ -202,12 +170,35 @@ namespace tezcat::Tiny
 
 	private:
 		bool mIsDirty;
-		uint32_t mMask;
 		glm::vec3 mLocalPosition;
 		glm::vec3 mLocalRotation;
 		glm::vec3 mLocalScale;
 		glm::mat4 mModelMatrix;
 
 		std::function<void(Transform*)> mDelegateUpdate;
+
+	private:
+		Transform* mPreTransform;
+		Transform* mNextTransform;
+	};
+
+
+	//-------------------------------------------------
+	//
+	//	TransformList
+	//
+	class TransformList
+	{
+	public:
+		TransformList();
+		~TransformList();
+
+	public:
+		void pushFront(Transform* transform);
+		void pushBack(Transform* transform);
+
+	private:
+		Transform* mFront;
+		Transform* mBack;
 	};
 }

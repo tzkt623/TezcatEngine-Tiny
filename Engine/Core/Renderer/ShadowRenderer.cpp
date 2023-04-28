@@ -41,6 +41,7 @@ namespace tezcat::Tiny
 					, false
 					, true)
 			});
+		mFrameBuffer->addRef();
 	}
 
 	void ShadowRenderer::beginRender()

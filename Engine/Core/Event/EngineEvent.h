@@ -19,6 +19,8 @@ namespace tezcat::Tiny
 	enum EngineEventID : EventID
 	{
 		EE_LoadScene = 0,
+		EE_PopScene,
+		EE_PushScene,
 		EE_IDCount
 	};
 }

@@ -7,6 +7,13 @@
 namespace tezcat::Tiny
 {
 	class Scene;
+	/// <summary>
+	/// GameObject的生命周期
+	/// 属于储存他的那个对象
+	///
+	/// 子object的生命周期,归父object管
+	/// rootobject的生命周期归scene管
+	/// </summary>
 	class TINY_API GameObject : public TinyObject
 	{
 		friend class Component;
@@ -16,7 +23,7 @@ namespace tezcat::Tiny
 		GameObject(const std::string& name);
 
 		TINY_Factory(GameObject)
-		TINY_RTTI_H(GameObject)
+			TINY_RTTI_H(GameObject)
 	public:
 
 		virtual ~GameObject();
@@ -33,9 +40,6 @@ namespace tezcat::Tiny
 		uint32_t getLayerMask() { return 1 << mLayerMaskIndex; }
 		uint32_t getLayerIndex() { return mLayerMaskIndex; }
 		void setLayerMaskIndex(uint32_t maskIndex) { mLayerMaskIndex = maskIndex; }
-
-	public:
-		bool needDelete() const { return mNeedDelete; }
 
 	public:
 		int getUID() const { return mUID; }
@@ -163,27 +167,54 @@ namespace tezcat::Tiny
 			return go->addComponent<T>();
 		}
 
-		static void destory(GameObject* go);
-		static void clearDeletedGameObjects();
-
-
-
 	private:
 		std::string mName;
 		int mUID;
 		uint32_t mLayerMaskIndex;
 
 		bool mIsLogic;
-		bool mNeedDelete;
 
 	private:
 		Scene* mScene;
-		Transform* mTransform;
 		TinyVector<Component*> mComponentList;
+	};
+
+
+	class GameObjectPool
+	{
+		GameObjectPool() = delete;
+		~GameObjectPool() = delete;
+	public:
+
+		static int addGameObject(GameObject* gameObject)
+		{
+			int uid;
+			if (sFreeObjects.empty())
+			{
+				uid = sPool.size();
+				sPool.push_back(gameObject);
+			}
+			else
+			{
+				uid = sFreeObjects.front();
+				sFreeObjects.pop_front();
+				sPool[uid] = gameObject;
+				gameObject->addRef();
+			}
+
+			return uid;
+		}
+
+		static void removeGameObject(GameObject* gameObject)
+		{
+			auto uid = gameObject->getUID();
+			sPool[uid] = nullptr;
+			sFreeObjects.push_back(uid);
+		}
 
 	private:
-		static std::stack<int> sUIDPool;
-		static std::list<GameObject*> sDeleteObjectList;
+		static TinyVector<GameObject*> sPool;
+		static std::deque<int> sFreeObjects;
 	};
 }
 

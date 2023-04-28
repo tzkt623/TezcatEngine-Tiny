@@ -3,6 +3,7 @@
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
 #include "../Tool/Tool.h"
+#include "../Base/TinyObject.h"
 
 namespace tezcat::Tiny
 {
@@ -11,11 +12,15 @@ namespace tezcat::Tiny
 	class SpotLight;
 
 
-	class TINY_API LightData
+	class TINY_API LightData : public TinyObject
 	{
-	public:
 		LightData();
 		~LightData();
+
+		TINY_Factory(LightData)
+			TINY_RTTI_H(LightData)
+	public:
+
 
 	public:
 		DirectionalLight* directionalLight;
@@ -36,14 +41,23 @@ namespace tezcat::Tiny
 			mData = data;
 		}
 
-		DirectionalLight* getDirectionalLight() const { return mData->directionalLight; }
+		DirectionalLight* getDirectionalLight()
+		{
+			if (auto ptr = mData.lock())
+			{
+				return mData->directionalLight;
+			}
+
+			return nullptr;
+		}
+
 		void setDirectionalLight(DirectionalLight* val) { mData->directionalLight = val; }
 
 		void addPointLight(PointLight* light);
 		std::vector<PointLight*>& getPointLights() { return mData->pointLights; }
 
 	private:
-		LightData* mData;
+		TinyWeakRef<LightData> mData;
 	};
 
 	using LightMgr = SG<LightManager>;

@@ -30,5 +30,8 @@ public:
 
 public:
 	void createEnvMap();
+
+private:
+	GameObject* mController;
 };
 

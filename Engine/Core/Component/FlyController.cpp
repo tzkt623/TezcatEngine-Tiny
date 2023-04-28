@@ -32,8 +32,7 @@ namespace tezcat::Tiny
 
 	void FlyController::onStart()
 	{
-		//this->getTransform()->setDelegateUpdate(std::bind(&FlyController::updateVector, this, std::placeholders::_1));
-		//this->getTransform()->setRotation(mPitch, mYaw, mRoll);
+
 	}
 
 	void FlyController::onEnable()
@@ -70,7 +69,7 @@ namespace tezcat::Tiny
 			}
 		}
 
-		this->getTransform()->setRotation(mPitch, mYaw, mRoll);
+		this->getTransform()->setRotation(mPitch, mYaw);
 	}
 
 	void FlyController::roll(float roll)
