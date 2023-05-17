@@ -4,11 +4,20 @@
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
 
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
-
 注意!本引擎使用C++20版本
 
 Notice!Tiny Use The C++20 Ver.
+
+To Do
+
+- [ ] PBR IBL
+- [ ] Camera Culling
+- [ ] Multi-Thread Rendering
+- [ ] Multi-Light Support
+- [x] Octree
+- [x] RenderCommad Based Rendering
+- [x] Basic GL Shader Parser
+- [x] Basic ShadowMap
 
 ## **编辑器(Editor)**
 
@@ -26,13 +35,13 @@ Now Scene Overview can show all object in current scene, and you can select one 
 
 目前对象总览可以看到对象上绑定的组件的信息,还可以与其互动
 
-Now Object Overview can show components bind in object when you selected
+Now Object Overview can show components bind in object when you selected, and you can change them values
 
 ### 热编译着色器(Runtime Rebuild Shader)
 
 可以在运行时重新编译着色器
 
-Now Editor an rebuild shader in runtime.
+Now Editor can rebuild shader in runtime.
 
 主菜单->Shader->Rebuild之下选你想重新编译的,或者选all全部编译
 
@@ -42,7 +51,7 @@ MainMenu->Shader->Rebuild, Choose your want or All
 
 做了一套简单的基于引用计数的内存管理,还在调试中......
 
-Did a simple reference counting based memory management, still debugging......
+A simple reference counting based memory management, just still debugging......
 
 ## **代码结构(Code)**
 
@@ -54,14 +63,13 @@ camera->setCullLayer(0);
 
 go->addComponent<Transform>();
 go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-go->getTransform()->setParent(controller_go->getTransform());
 
 //-------------------------------------
 go = GameObject::create("Skybox1");
 go->addComponent<Transform>();
 
 auto skybox = go->addComponent<Skybox>();
-auto material = new Material("Unlit/Skybox");
+auto material = Material::create("Unlit/Skybox");
 material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
 skybox->setMaterial(material);
 
@@ -73,7 +81,7 @@ tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
 tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
 
 auto mr1 = world2->addComponent<MeshRenderer>();
-auto world2_material = new Material("Unlit/Texture");
+auto world2_material = Material::create("Unlit/Texture");
 world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
 mr1->setMaterial(world2_material);
 mr1->setMesh("Square");
@@ -110,7 +118,7 @@ go->addComponent<Transform>();
 //attach a Skybox component
 auto skybox = go->addComponent<Skybox>();
 //load Material with ShaderName(Buildin Shader)
-auto material = new Material("Unlit/Skybox");
+auto material = Material::create("Unlit/Skybox");
 //add a UniformValue to auto update value in shader
 //note that [skybox_2] is a [SkyboxName] auto loaded in [TextureManager], not the imagefile(.jpg.png....) name
 material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
@@ -129,7 +137,7 @@ tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
 tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
 
 auto mr1 = world2->addComponent<MeshRenderer>();
-auto world2_material = new Material("Unlit/Texture");
+auto world2_material = Material::create("Unlit/Texture");
 //note that [RB_World2] is a [FrameBuffer] created in [TextureManager] by yourself
 world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
 mr1->setMaterial(world2_material);
@@ -141,14 +149,14 @@ mr1->setMesh("Square");
 
 ```cpp
 auto fb = FrameBufferMgr::getInstance()->create(
-    //Name for find
+    //Name for find, set null string means will not cache it
     "FB_World1",
     //width, high
     Engine::getScreenWidth(), Engine::getScreenHeight(),
     {
         //Create a ColorBuffer Setting
         TextureBufferInfo(
-            //a Name for find(manager flag is true like this)
+            //a Name for find, set null string means will not cache it
             "RB_World1"
             //Buffer Type(FrameBuffer Component)
             , TextureBufferType::ColorComponent
@@ -157,12 +165,10 @@ auto fb = FrameBufferMgr::getInstance()->create(
             //Format
             , TextureChannel::RGBA
             //Data Type
-            , DataType::UByte
-            //a flag for cache this texutreBuffer in [TextureManager] to find
-            , true),
+            , DataType::UByte),
         //Create a write-only Buffer Setting for DepthAndStencil
         TextureBufferInfo(
-            //a Name for find(manager flag is false so noneffective)
+            //a Name for find, set null string means will not cache it
             "DS_World1"
             //Buffer Type(FrameBuffer Component)
             , TextureBufferType::DepthStencilComponent
@@ -219,10 +225,15 @@ Attention! The .exe file must be in the same directory as the resource folder
     void MyResourceLoader::prepareEngine(Engine* engine)
     {
         ResourceLoader::prepareEngine(engine);
+        MyEvent::get()->init(MyEventID::Count);
+
+        static_cast<WindowsEditor*>(engine)->setGLVersion(3, 3);
+
         mResourceFolderName = "Resource";
         mGameName = u8"YesIndeed,玩上老头环了!!!!!";
         mWindowWidth = 1920;
         mWindowHeight = 1080;
+        mEnableVsync = true;
     }
     ```
 
@@ -250,24 +261,25 @@ Attention! The .exe file must be in the same directory as the resource folder
     void MyResourceLoader::prepareGame(Engine* engine)
     {
         ResourceLoader::prepareGame(engine);
-        auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
+        ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
 
+        auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
         CreateWindow(gui_host, MyMainDockWindow);
         CreateWindow(gui_host, MyViewPortWindow);
         CreateWindow(gui_host, MyObjectWindow);
         CreateWindow(gui_host, MyOverviewWindow);
         CreateWindow(gui_host, MyLogWindow);
-
-        engine->getGraphics()->setShadowMap(1024, 1024);
+        CreateWindow(gui_host, MyGCInfoWindow);
 
         SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
         SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
+        SceneMgr::getInstance()->prepareScene(Tutorial01::create("Tutorial01"));
     }
     ```
 
 ## **材质结构 Material**
 
-目前Shader构建器可以自动解析出所有非数组的Uniform变量.
+目前Shader构建器可以自动解析出所有Uniform变量.
 
 ShaderBuilder can auto scan all GLSL Uniform value except array type.
 
@@ -285,12 +297,14 @@ Tiny Current Buildin Uniform Values
 |   MatrixN    |    mat3     |      NormalMat      |
 |  MatrixSBV   |    mat4     |    SkyboxViewMat    |
 |  MatrixLit   |    mat4     |   LightSpacePVMat   |
+| MatrixEnv[6] |    mat4     |       EnvMats       |
 | ViewPosition |    vec3     |    ViewPosition     |
 | ViewNearFar  |    vec2     | View`s Near And Far |
 | VertexColor  |    vec4     |   Vertex`s Color    |
 |   TexColor   |  Texture2D  |   Color`s Texture   |
 |   TexCube    | TextureCube |   Cube`s Texture    |
 |   TexDepth   |  Texture2D  |   Depth`s Texture   |
+|    TexEnv    | TextureCube |    Env`s Texture    |
 
 结构型变量 struct variable
 |         TinyName          | CommonType |       Useage        |
@@ -326,7 +340,7 @@ Current Buildin Material Values
 notice! add uniform value to your material for the gameobject.
 
 ```cpp
-auto plane_material = new Material("Standard/Std1");
+auto plane_material = Material::create("Standard/Std1");
 //texture is auto loaded by manager,so just put it`s name in function
 plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
 plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
@@ -347,18 +361,10 @@ ShaderBuilder now combine header files to automatically generate a shader file
 ```cpp
 void ResourceLoader::prepareResource(Engine* engine)
 {
-    ShaderMgr::getInstance()->loadIncludeFiles(FileTool::getRootResDir() + "/Shaders/Include");
-
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Standard/std1.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Standard/std2.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/color.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/color_depth.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/texture.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/texture_depth.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/skybox.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/transparent.glsl");
-    ShaderMgr::getInstance()->create(FileTool::getRootResDir() + "/Shaders/Unlit/shadow_map.glsl");
-
+    ShaderMgr::getInstance()->loadIncludeFiles(FileTool::getRootRelativeResDir() + "/Shaders/Include");
+    ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
+    ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
+    ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
     ShaderMgr::getInstance()->clearIncludeFiles();
 
     this->createSomeMode();

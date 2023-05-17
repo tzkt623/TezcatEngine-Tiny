@@ -1,5 +1,5 @@
 #include "GLGraphics.h"
-#include "GLVertexBuffer.h"
+#include "GLBuffer.h"
 
 #include "GLHead.h"
 #include "GLShaderBuilder.h"
@@ -9,13 +9,13 @@
 #include "WindowsEngine.h"
 
 #include "Core/Head/CppHead.h"
-#include "Core/Head/Context.h"
+#include "Core/Head/RenderConfig.h"
 
 #include "Core/Component/MeshRenderer.h"
 #include "Core/Component/Camera.h"
 
 #include "Core/Engine.h"
-#include "Core/Statistic.h"
+#include "Core/Profiler.h"
 #include "Core/GUI/GUI.h"
 #include "Core/Shader/ShaderPackage.h"
 #include "Core/Renderer/RenderObject.h"
@@ -28,7 +28,7 @@ namespace tezcat::Tiny::GL
 
 		FrameBufferMgr::getInstance()->initCreator(new GLFrameBufferCreator());
 		TextureMgr::getInstance()->initCreator(new GLTextureCreator());
-		VertexMgr::getInstance()->initCreator(new GLVertexCreator());
+		BufferMgr::getInstance()->initCreator(new GLBufferCreator());
 		ShaderMgr::getInstance()->initCreator(new GLShaderCreator());
 	}
 
@@ -40,11 +40,12 @@ namespace tezcat::Tiny::GL
 	void GLGraphics::init(Engine* engine)
 	{
 		this->initContext();
+		BaseGraphics::init(engine);
 	}
 
 	void GLGraphics::initContext()
 	{
-		Statistic::GPU = glGetString(GL_RENDERER);
+		Profiler::GPU = glGetString(GL_RENDERER);
 
 		ContextMap::DataTypeArray =
 		{
@@ -74,14 +75,13 @@ namespace tezcat::Tiny::GL
 
 		ContextMap::TextureTypeArray =
 		{
-			TexTypeWrapper(TextureType::Texture1D,					GL_TEXTURE_1D),
-			TexTypeWrapper(TextureType::Texture2D,					GL_TEXTURE_2D),
-			TexTypeWrapper(TextureType::Texture2D,					GL_TEXTURE_3D),
-			TexTypeWrapper(TextureType::TextureCube,				GL_TEXTURE_CUBE_MAP),
-			TexTypeWrapper(TextureType::Texture1DA,					GL_TEXTURE_1D_ARRAY),
-			TexTypeWrapper(TextureType::Texture2DA,					GL_TEXTURE_2D_ARRAY),
-			TexTypeWrapper(TextureType::TextureBuffer2D,			GL_TEXTURE_2D),
-			TexTypeWrapper(TextureType::TextureRenderBuffer2D,		GL_RENDERBUFFER),
+			TexTypeWrapper(TextureType::Texture1D,			GL_TEXTURE_1D),
+			TexTypeWrapper(TextureType::Texture2D,			GL_TEXTURE_2D),
+			TexTypeWrapper(TextureType::Texture2D,			GL_TEXTURE_3D),
+			TexTypeWrapper(TextureType::TextureCube,		GL_TEXTURE_CUBE_MAP),
+			TexTypeWrapper(TextureType::Texture1DA,			GL_TEXTURE_1D_ARRAY),
+			TexTypeWrapper(TextureType::Texture2DA,			GL_TEXTURE_2D_ARRAY),
+			TexTypeWrapper(TextureType::TextureRender2D,	GL_RENDERBUFFER),
 		};
 
 		ContextMap::TextureFilterArray =
@@ -265,35 +265,9 @@ namespace tezcat::Tiny::GL
 		glClear(mask);
 	}
 
-	void GLGraphics::draw(IRenderMesh* renderMesh)
-	{
-		//glDrawArrays(renderMesh->getDrawMode().platform, 0, renderMesh->getVertexCount());
-
-
-		if (renderMesh->getIndexCount() > 0)
-		{
-			glDrawElements(renderMesh->getDrawMode().platform, renderMesh->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-		}
-		else
-		{
-			glDrawArrays(renderMesh->getDrawMode().platform, 0, renderMesh->getVertexCount());
-		}
-	}
-
-	void GLGraphics::draw(MeshRenderer* renderer)
-	{
-		if (renderer->getIndexCount() > 0)
-		{
-			glDrawElements(renderer->getDrawMode().platform, renderer->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-		}
-		else
-		{
-			glDrawArrays(renderer->getDrawMode().platform, 0, renderer->getVertexCount());
-		}
-	}
-
 	void GLGraphics::draw(Vertex* vertex)
 	{
+		vertex->bind();
 		if (vertex->getIndexCount() > 0)
 		{
 			glDrawElements(vertex->getDrawMode().platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr);

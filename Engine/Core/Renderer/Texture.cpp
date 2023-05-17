@@ -7,7 +7,7 @@ namespace tezcat::Tiny
 	uint32_t Texture::sUIDGiver = 0;
 	std::deque<uint32_t> Texture::sFreeUIDs;
 
-	TINY_RTTI_CPP(Texture)
+	TINY_RTTI_CPP(Texture);
 	Texture::Texture()
 		: Texture(TextureChannel::None, TextureWrap::Repeat, TextureFilter::Linear, false)
 	{
@@ -63,7 +63,7 @@ namespace tezcat::Tiny
 	//
 	//
 	//
-	TINY_RTTI_CPP(Texture2D)
+	TINY_RTTI_CPP(Texture2D);
 	Texture2D::Texture2D()
 		: mWidth(0)
 		, mHeight(0)
@@ -71,9 +71,8 @@ namespace tezcat::Tiny
 
 	}
 
-	TINY_RTTI_CPP(Texture3D)
-	TINY_RTTI_CPP(TextureCube)
-	TINY_RTTI_CPP(TextureRenderBuffer2D)
-	TINY_RTTI_CPP(TextureBuffer2D)
+	TINY_RTTI_CPP(Texture3D);
+	TINY_RTTI_CPP(TextureCube);
+	TINY_RTTI_CPP(TextureRender2D);
 
 }

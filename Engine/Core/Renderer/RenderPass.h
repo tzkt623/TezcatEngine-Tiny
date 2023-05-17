@@ -1,7 +1,8 @@
 #pragma once
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
-#include "../Head/Context.h"
+#include "../Head/RenderConfig.h"
+#include "../Base/TinyObject.h"
 
 namespace tezcat::Tiny
 {
@@ -14,58 +15,95 @@ namespace tezcat::Tiny
 	class IRenderObject;
 	class IRenderMesh;
 	class IRenderObserver;
+	class RenderCommand;
+	class FrameBuffer;
 
 	/*
-	* @Author: HCL
-	* @Info: 2023|4|11
+	* RenderPass
 	*
+	* @brief 用于存放进入当前Pass的所有RenderCommand,执行时遍历所有command进行渲染
 	*/
-	class TINY_API RenderPass
+	class TINY_API RenderPass : public TinyObject
 	{
-	public:
 		RenderPass(Shader* shader);
-		~RenderPass();
+		RenderPass();
+
+		TINY_Factory(RenderPass);
+		TINY_RTTI_H(RenderPass);
+
+	public:
+		virtual ~RenderPass();
 
 	public:
 		int getOrderID() const;
 		int getProgramID() const;
 		const std::string& getName() const;
-		Shader* getShader();
-
+		Shader* getShader() { return mShader; }
+		void setShader(Shader* shader) { mShader = shader; }
 
 	public:
-		void addRenderMesh(IRenderMesh* renderObject);
-		void sortRenderObjects(const std::function<bool(IRenderMesh* a, IRenderMesh* b)>& function);
-		/*
-		* @Author: HCL
-		* @Info: 2023|4|13
-		* 正常渲染
-		*/
+		void addCommand(RenderCommand* cmd);
+		void sortRenderObjects(const std::function<bool(RenderCommand* a, RenderCommand* b)>& function);
 		void render(BaseGraphics* graphics);
-
-
-		/*
-		* @Author: HCL
-		* @Info: 2023|4|13
-		* 只渲染mesh
-		*/
-		void renderMeshOnly(BaseGraphics* graphics);
-
 		bool checkState();
 
 
 	private:
+		bool mDirty;
 		Shader* mShader;
-		std::vector<IRenderMesh*> mRenderMeshList;
+		std::vector<RenderCommand*> mCommandList;
+	};
 
+
+	class RenderQueue
+	{
 	public:
-		static RenderPass* create(Shader* shader);
-		static RenderPass* get(Shader* shader);
-		static RenderPass* get(const std::string& name);
+		RenderQueue(IRenderObserver* observer);
+		~RenderQueue();
+
+		virtual void render(BaseGraphics* graphics) = 0;
+		virtual void addRenderCommand(RenderCommand* cmd) = 0;
+
+		IRenderObserver* getRenderObserver() { return mObserver; }
+
+	protected:
+		IRenderObserver* mObserver;
+		std::vector<RenderPass*> mPrepareAry;
+	};
+
+	class ExtraQueue : public RenderQueue
+	{
+	public:
+		using RenderQueue::RenderQueue;
+		virtual ~ExtraQueue();
+
+		void render(BaseGraphics* graphics) override;
+		void addRenderCommand(RenderCommand* cmd) override;
+
 
 	private:
-		static std::vector<RenderPass*> sPassAry;
-		static std::unordered_map<std::string, RenderPass*> sPassDict;
+		std::vector<RenderPass*> mPasses;
+	};
+
+
+	class BaseQueue : public RenderQueue
+	{
+	public:
+		using RenderQueue::RenderQueue;
+		virtual ~BaseQueue();
+
+		void render(BaseGraphics* graphics) override;
+		void addRenderCommand(RenderCommand* cmd) override;
+
+	private:
+		void render(BaseGraphics* graphics, std::vector<RenderPass*>& passes);
+
+	private:
+		std::vector<RenderPass*> mBackground;
+		std::vector<RenderPass*> mOpaque;
+		std::vector<RenderPass*> mAlpha;
+		std::vector<RenderPass*> mTransparent;
+		std::vector<RenderPass*> mOpaqueLast;
+		std::vector<RenderPass*> mOverlay;
 	};
 }
-

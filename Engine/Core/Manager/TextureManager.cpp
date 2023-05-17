@@ -95,34 +95,48 @@ namespace tezcat::Tiny
 		}
 	}
 
-	TextureRenderBuffer2D* TextureManager::createBuffer2D(const int& width, const int& height, const TextureBufferInfo& info)
+	Texture2D* TextureManager::create2D(const int& width, const int& height, const TextureInfo& info)
 	{
-		if (info.isManagered)
+		if (!info.name.empty())
 		{
-			auto tex = mCreator->createBuffer2D(width, height, info);
-			auto it = mTextureMap.try_emplace(info.name, tex);
-			if (it.second)
+			auto it = mTextureMap.tryEmplace(info.name, [&]()
 			{
+				auto tex = mCreator->create2D(width, height, info);
 				tex->setManagered(true);
-			}
-
-			return (TextureRenderBuffer2D*)(it.first->second);
+				return tex;
+			});
+			return (Texture2D*)(it.first->second);
 		}
 
 
-		return mCreator->createBuffer2D(width, height, info);
+		return mCreator->create2D(width, height, info);
 	}
 
 	TextureCube* TextureManager::createCube(const std::string& name, const std::array<Image, 6>& images)
 	{
-		auto tex = mCreator->createCube(images, TextureInfo(name));
-		auto it = mTextureMap.try_emplace(name, tex);
-		if (it.second)
+		auto it = mTextureMap.tryEmplace(name, [&]()
 		{
+			auto tex = mCreator->createCube(images, TextureInfo(name));
 			tex->setManagered(true);
+			return tex;
+		});
+		return (TextureCube*)(it.first->second);
+	}
+
+	TextureCube* TextureManager::createCube(const int& width, const int& height, const TextureInfo& info)
+	{
+		if (!info.name.empty())
+		{
+			auto it = mTextureMap.tryEmplace(info.name, [&]()
+			{
+				auto tex = mCreator->createCube(width, height, info);
+				tex->setManagered(true);
+				return tex;
+			});
+			return (TextureCube*)(it.first->second);
 		}
 
-		return (TextureCube*)(it.first->second);
+		return mCreator->createCube(width, height, info);
 	}
 
 	Texture2D* TextureManager::create2D(const std::string& name, const Image& img)
@@ -146,15 +160,32 @@ namespace tezcat::Tiny
 			info.dataType = DataType::Float32;
 		}
 
-		auto tex = mCreator->create2D(img, info);
-		auto it = mTextureMap.try_emplace(name, tex);
-		if (it.second)
+		auto it = mTextureMap.tryEmplace(info.name, [&]()
 		{
+			auto tex = mCreator->create2D(img, info);
 			tex->setManagered(true);
 			tex->setSize(img.getWidth(), img.getHeight());
-		}
+			return tex;
+		});
 
 		return (Texture2D*)(it.first->second);
+	}
+
+	TextureRender2D* TextureManager::createRender2D(const int& width, const int& height, const TextureInfo& info)
+	{
+		if (!info.name.empty())
+		{
+			auto it = mTextureMap.tryEmplace(info.name, [&]()
+			{
+				auto tex = mCreator->createRender2D(width, height, info);
+				tex->setManagered(true);
+				return tex;
+			});
+
+			return (TextureRender2D*)(it.first->second);
+		}
+
+		return mCreator->createRender2D(width, height, info);
 	}
 
 	Texture* TextureManager::findTexture(const std::string& name)
@@ -168,7 +199,6 @@ namespace tezcat::Tiny
 		return nullptr;
 	}
 
-
 	//------------------------------------------------------------
 	//
 	//	Creator
@@ -177,6 +207,7 @@ namespace tezcat::Tiny
 	{
 		auto tex = this->create2D();
 		tex->create(img, info);
+		tex->setAttachPosition(info.attachPosition);
 		return tex;
 	}
 
@@ -184,41 +215,31 @@ namespace tezcat::Tiny
 	{
 		auto tex = this->createCube();
 		tex->create(images, info);
+		tex->setAttachPosition(info.attachPosition);
 		return tex;
 	}
 
-	TextureBuffer2D* TextureCreator::createShowmap(const int& width, const int& height)
+	TextureCube* TextureCreator::createCube(const int& width, const int& height, const TextureInfo& info)
 	{
-		auto tex = this->createBuffer2D();
-		tex->create(width, height,
-			TextureBufferInfo("ShadowMap"
-				, TextureBufferType::DepthComponent
-				, TextureFilter::Nearest
-				, TextureWrap::Repeat
-				, TextureChannel::Depth
-				, TextureChannel::Depth
-				, DataType::Float32
-				, false
-				, true));
+		auto tex = this->createCube();
+		tex->create(width, height, info);
+		tex->setAttachPosition(info.attachPosition);
 		return tex;
 	}
 
-	TextureRenderBuffer2D* TextureCreator::createBuffer2D(const int& width, const int& height, const TextureBufferInfo& info)
+	Texture2D* TextureCreator::create2D(const int& width, const int& height, const TextureInfo& info)
 	{
-		if (info.isCache)
-		{
-			auto tex = this->createRenderBuffer2D();
-			tex->create(width, height, info.internalChannel);
-			tex->setBufferType(info.bufferType);
-			return tex;
-		}
-		else
-		{
-			auto tex = this->createBuffer2D();
-			tex->create(width, height, info.internalChannel, info.channel, info.dataType);
-			tex->setBufferType(info.bufferType);
-			return tex;
-		}
+		auto tex = this->create2D();
+		tex->create(width, height, info.internalChannel, info.channel, info.dataType);
+		tex->setAttachPosition(info.attachPosition);
+		return tex;
 	}
 
+	TextureRender2D* TextureCreator::createRender2D(const int& width, const int& height, const TextureInfo& info)
+	{
+		auto tex = this->createRender2D();
+		tex->create(width, height, info.internalChannel);
+		tex->setAttachPosition(info.attachPosition);
+		return tex;
+	}
 }

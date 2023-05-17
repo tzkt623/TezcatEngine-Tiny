@@ -22,8 +22,8 @@ namespace tezcat::Tiny
 		GameObject();
 		GameObject(const std::string& name);
 
-		TINY_Factory(GameObject)
-			TINY_RTTI_H(GameObject)
+		TINY_Factory(GameObject);
+		TINY_RTTI_H(GameObject);
 	public:
 
 		virtual ~GameObject();
@@ -186,31 +186,8 @@ namespace tezcat::Tiny
 		~GameObjectPool() = delete;
 	public:
 
-		static int addGameObject(GameObject* gameObject)
-		{
-			int uid;
-			if (sFreeObjects.empty())
-			{
-				uid = sPool.size();
-				sPool.push_back(gameObject);
-			}
-			else
-			{
-				uid = sFreeObjects.front();
-				sFreeObjects.pop_front();
-				sPool[uid] = gameObject;
-				gameObject->addRef();
-			}
-
-			return uid;
-		}
-
-		static void removeGameObject(GameObject* gameObject)
-		{
-			auto uid = gameObject->getUID();
-			sPool[uid] = nullptr;
-			sFreeObjects.push_back(uid);
-		}
+		static int addGameObject(GameObject* gameObject);
+		static void removeGameObject(GameObject* gameObject);
 
 	private:
 		static TinyVector<GameObject*> sPool;

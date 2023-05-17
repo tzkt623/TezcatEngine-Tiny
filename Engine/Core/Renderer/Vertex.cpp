@@ -1,6 +1,6 @@
 #include "Vertex.h"
 #include "../Data/MeshData.h"
-#include "../Manager/VertexManager.h"
+#include "../Manager/BufferManager.h"
 #include "../Tool/Tool.h"
 
 #include "VertexBuffer.h"
@@ -9,8 +9,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Vertex)
-
+	TINY_RTTI_CPP(Vertex);
 	Vertex::Vertex()
 		: mName("##ErrorVAO")
 	{
@@ -26,16 +25,6 @@ namespace tezcat::Tiny
 		delete mChildren;
 	}
 
-	void Vertex::addChild(Vertex* vertex)
-	{
-		if (mChildren == nullptr)
-		{
-			mChildren = new TinyVector<Vertex*>();
-		}
-
-		mChildren->emplace_back(vertex);
-	}
-
 	void Vertex::init(MeshData* meshData)
 	{
 		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->drawMode];
@@ -46,7 +35,17 @@ namespace tezcat::Tiny
 	{
 		mName = name;
 		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)drawMode];
-		mVertexCount = vertexCount;
+		mVertexCount = (uint32_t)vertexCount;
+	}
+
+	void Vertex::addChild(Vertex* vertex)
+	{
+		if (mChildren == nullptr)
+		{
+			mChildren = new TinyVector<Vertex*>();
+		}
+
+		mChildren->emplace_back(vertex);
 	}
 
 	void Vertex::setVertexBuffer(VertexBuffer* buffer)

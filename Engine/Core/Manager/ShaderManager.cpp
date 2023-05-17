@@ -56,6 +56,17 @@ namespace tezcat::Tiny
 		return mShaderPackageDict["Unlit/Color"];
 	}
 
+	void ShaderManager::loadShaderFiles(const std::string& path)
+	{
+		FileInfoMap out_files;
+		FileTool::findAllFiles(path, out_files);
+
+		for (auto& pair : out_files)
+		{
+			this->create(pair.second.path);
+		}
+	}
+
 	void ShaderManager::loadIncludeFiles(const std::string& path)
 	{
 		//------------------------------------------------------------

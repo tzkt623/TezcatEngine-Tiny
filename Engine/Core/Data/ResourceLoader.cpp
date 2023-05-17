@@ -1,7 +1,7 @@
 #include "ResourceLoader.h"
 #include "../Renderer/BaseGraphics.h"
 #include "../Manager/ShaderManager.h"
-#include "../Manager/VertexManager.h"
+#include "../Manager/BufferManager.h"
 #include "../Data/MeshData.h"
 
 
@@ -23,21 +23,9 @@ namespace tezcat::Tiny
 	void ResourceLoader::prepareResource(Engine* engine)
 	{
 		ShaderMgr::getInstance()->loadIncludeFiles(FileTool::getRootRelativeResDir() + "/Shaders/Include");
-
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/std1.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/std2.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/pbr_std1.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Standard/pbr_test1.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/color.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/color_depth.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/texture.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/texture_depth.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/skybox.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/skybox_hdr.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/transparent.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Unlit/shadow_map.glsl");
-		ShaderMgr::getInstance()->create(FileTool::getRootRelativeResDir() + "/Shaders/Utility/infinite_grid.glsl");
-
+		ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
+		ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
+		ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
 		ShaderMgr::getInstance()->clearIncludeFiles();
 
 		this->createSomeMode();
@@ -156,7 +144,7 @@ namespace tezcat::Tiny
 
 		mesh_data.apply();
 
-		VertexMgr::getInstance()->createVertex(&mesh_data);
+		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createSphere()
@@ -220,7 +208,8 @@ namespace tezcat::Tiny
 
 		//indices.clear();
 		mesh_data->apply(DrawMode::Triangles_Strip);
-		VertexMgr::getInstance()->createVertex(mesh_data.get());
+
+		BufferMgr::getInstance()->createVertexAndCached(mesh_data.get());
 	}
 
 	void ResourceLoader::createSphere(int prec)
@@ -269,7 +258,7 @@ namespace tezcat::Tiny
 
 
 		mesh_data->apply();
-		VertexMgr::getInstance()->createVertex(mesh_data.get());
+		BufferMgr::getInstance()->createVertexAndCached(mesh_data.get());
 	}
 
 	void ResourceLoader::createSquare()
@@ -305,7 +294,7 @@ namespace tezcat::Tiny
 
 		mesh_data.apply();
 
-		VertexMgr::getInstance()->createVertex(&mesh_data);
+		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createGridSquare()
@@ -325,7 +314,7 @@ namespace tezcat::Tiny
 		mesh_data.indices.emplace_back(3);
 
 		mesh_data.apply();
-		VertexMgr::getInstance()->createVertex(&mesh_data);
+		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createPlane()
@@ -361,7 +350,7 @@ namespace tezcat::Tiny
 		mesh_data.normals.emplace_back(0.0f, 1.0f, 0.0f);
 
 		mesh_data.apply();
-		VertexMgr::getInstance()->createVertex(&mesh_data);
+		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createSkybox()
@@ -411,6 +400,6 @@ namespace tezcat::Tiny
 		mesh_data.vertices.emplace_back(1.0f, -1.0f, 1.0f);
 
 		mesh_data.apply();
-		VertexMgr::getInstance()->createVertex(&mesh_data);
+		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 }

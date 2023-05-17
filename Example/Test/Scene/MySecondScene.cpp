@@ -2,7 +2,7 @@
 #include "../MyInputer.h"
 #include "../MyController.h"
 
-TINY_RTTI_CPP(MySeconedScene)
+TINY_RTTI_CPP(MySeconedScene);
 
 MySeconedScene::MySeconedScene(const std::string& name)
 	: Scene(name)
@@ -19,55 +19,35 @@ void MySeconedScene::onEnter()
 	Scene::onEnter();
 	InputSys::getInstance()->push(MyInputer::getInstance());
 
-
 	if (true)
 	{
 		auto go = GameObject::create("World2_Camera");
 		auto camera = go->addComponent<Camera>(true);
 		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
-		camera->setPipeline(PipelineMgr::getInstance()->get("Forward"));
 		camera->setCullLayer(0);
-		camera->setDepth(1);
+		camera->setOrder(0);
 
 		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-		//go->getTransform()->setParent(controller_go->getTransform());
-
-// 		auto fb = FrameBufferMgr::getInstance()->create(
-// 			"FB_World2",
-// 			Engine::getScreenWidth(), Engine::getScreenHeight(),
-// 			{
-// 				TextureBufferInfo("RB_World2"
-// 					, TextureBufferType::ColorComponent
-// 					, TextureChannel::RGBA
-// 					, TextureChannel::RGBA
-// 					, DataType::UByte
-// 					, true),
-// 				TextureBufferInfo("DS_World2"
-// 					, TextureBufferType::DepthStencilComponent
-// 					, TextureChannel::Depth24_Stencil8)
-// 			});
 
 		auto frame = FrameBufferMgr::getInstance()->create(
-					"FB_Viewport",
-					Engine::getScreenWidth(), Engine::getScreenHeight(),
-					{
-						TextureBufferInfo("RB_Viewport"
-							, TextureBufferType::ColorComponent
-							, TextureChannel::RGBA
-							, TextureChannel::RGBA
-							, DataType::UByte
-							, true),
-						TextureBufferInfo("DS_Viewport"
-							, TextureBufferType::DepthComponent
-							, TextureChannel::Depth
-							, TextureChannel::Depth
-							, DataType::UByte
-							, true)
-					});
+			"FB_Viewport",
+			Engine::getScreenWidth(), Engine::getScreenHeight(),
+			{
+				TextureInfo("RB_Viewport"
+						  , TextureAttachPosition::ColorComponent
+						  , TextureChannel::RGBA
+						  , TextureChannel::RGBA
+						  , DataType::UByte),
+				TextureInfo("DS_Viewport"
+						  , TextureAttachPosition::DepthComponent
+						  , TextureChannel::Depth
+						  , TextureChannel::Depth
+						  , DataType::UByte)
+			});
 
 		camera->setFrameBuffer(frame);
 

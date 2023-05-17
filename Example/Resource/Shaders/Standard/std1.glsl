@@ -15,6 +15,7 @@
         str DepthTest = Less;
         bool ZWrite = true;
         str CullFace = Back;
+        str LightMode = Forward;
     }
     #TINY_CFG_END
 
@@ -105,7 +106,6 @@
         {
             vec3 normal = normalize(myNormal);
             vec3 view_dir = normalize(TINY_ViewPosition - myWorldPosition);
-
             myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
         }
     }

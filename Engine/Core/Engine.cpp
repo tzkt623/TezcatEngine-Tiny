@@ -3,11 +3,9 @@
 #include "Manager/ShaderManager.h"
 #include "Manager/SceneManager.h"
 #include "Manager/CameraManager.h"
-#include "Manager/VertexManager.h"
-#include "Manager/PipelineManager.h"
+#include "Manager/BufferManager.h"
 #include "Manager/FrameBufferManager.h"
 #include "Manager/TextureManager.h"
-#include "Manager/PipelineManager.h"
 
 #include "Data/ResourceLoader.h"
 #include "Input/InputSystem.h"
@@ -29,13 +27,10 @@ namespace tezcat::Tiny
 
 	Engine::Engine()
 		: mResourceLoader(nullptr)
-		, mLightManager(nullptr)
 		, mShaderManager(nullptr)
 		, mSceneManager(nullptr)
-		, mCameraManager(nullptr)
 		, mFrameBufferManager(nullptr)
 		, mTextureManager(nullptr)
-		, mPipelineManager(nullptr)
 		, mVertexManager(nullptr)
 		, mInputSystem(nullptr)
 		, mGraphics(nullptr)
@@ -50,9 +45,7 @@ namespace tezcat::Tiny
 		delete mGraphics;
 		delete mSceneManager;
 		delete mShaderManager;
-		delete mCameraManager;
 		delete mResourceLoader;
-		delete mLightManager;
 	}
 
 	bool Engine::init(ResourceLoader* loader)
@@ -60,14 +53,11 @@ namespace tezcat::Tiny
 		EngineEvent::get()->init(EngineEventID::EE_IDCount);
 		mResourceLoader = loader;
 
-		mLightManager = new LightManager();
 		mShaderManager = new ShaderManager();
 		mSceneManager = new SceneManager();
-		mCameraManager = new CameraManager();
 		mFrameBufferManager = new FrameBufferManager();
 		mTextureManager = new TextureManager();
-		mPipelineManager = new PipelineManager();
-		mVertexManager = new VertexManager();
+		mVertexManager = new BufferManager();
 		mInputSystem = new InputSystem();
 
 		if (!this->preInit())
@@ -149,7 +139,7 @@ namespace tezcat::Tiny
 	void Engine::onUpdate()
 	{
 		mInputSystem->update();
-		mSceneManager->update();
+		mSceneManager->update(mGraphics);
 		mGraphics->render();
 	}
 

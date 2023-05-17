@@ -34,27 +34,39 @@ namespace tezcat::Tiny
 
 			void removeSelf()
 			{
-				if (this->nextData)
-				{
-					this->nextData->preData = this->preData;
-				}
-
 				if (this->preData)
 				{
-					this->preData->nextData = TinyMove(this->nextData);
+					//删除的不是第一个
+					// 
+					//如果后一个有值
+					//先设置后一个的前一个
+					if (this->nextData)
+					{
+						this->nextData->preData = this->preData;
+					}
+					this->preData->nextData = std::move(this->nextData);
 				}
 				else
 				{
-					//如果前面没有值,说明它是第一个
-					//把下一个装到头上来
-					list->mRoot = TinyMove(this->nextData);
+					//删除的是第一个
+					if (this->nextData)
+					{
+						this->nextData->preData = nullptr;
+						//如果前面没有值,说明它是第一个
+						//把下一个装到头上来
+						list->mRoot = std::move(this->nextData);
+					}
+					else
+					{
+						list->mRoot.reset();
+					}
 				}
 			}
 
 			std::function<void(const EventData&)> callback;
 			ListenerList* list = nullptr;
 			Listener* preData = nullptr;
-			TinyRef<Listener> nextData;
+			std::shared_ptr<Listener> nextData;
 		};
 
 		class ListenerList
@@ -69,8 +81,8 @@ namespace tezcat::Tiny
 			{
 				while (mRoot)
 				{
-					auto next = TinyMove(mRoot->nextData);
-					mRoot = TinyMove(next);
+					auto next = std::move(mRoot->nextData);
+					mRoot = std::move(next);
 				}
 			}
 
@@ -81,23 +93,23 @@ namespace tezcat::Tiny
 			}
 
 		public:
-			void push(TinyRef<Listener>& listener)
+			void push(std::shared_ptr<Listener>& listener)
 			{
 				listener->list = this;
 
 				if (mRoot)
 				{
 					mRoot->preData = listener.get();
-					listener->nextData = TinyMove(mRoot);
-					mRoot = TinyMove(listener);
+					listener->nextData = std::move(mRoot);
+					mRoot = std::move(listener);
 				}
 				else
 				{
-					mRoot = TinyMove(listener);
+					mRoot = std::move(listener);
 				}
 			}
 
-			TinyRef<Listener> mRoot;
+			std::shared_ptr<Listener> mRoot;
 		};
 
 	public:
@@ -113,7 +125,7 @@ namespace tezcat::Tiny
 		void dispatch(const EventData& eventData);
 
 	private:
-		std::vector<TinyURef<ListenerList>> mListenerList;
-		std::unordered_map<void*, TinyURef<std::vector<TinyRef<Listener>>>> mListenerWithOwnerUMap;
+		std::vector<std::unique_ptr<ListenerList>> mListenerList;
+		std::unordered_map<void*, std::unique_ptr<std::vector<std::shared_ptr<Listener>>>> mListenerWithOwnerUMap;
 	};
 }

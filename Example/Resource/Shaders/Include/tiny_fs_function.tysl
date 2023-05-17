@@ -7,10 +7,10 @@ float linearizeDepth(float depth, float near, float far)
 }
 
 //阴影计算
-float calcShadow(vec4 lightPosition, vec3 normal, vec3 lightDir, sampler2D depthTex2D)
+float calcShadow(vec4 lightSpacePosition, vec3 normal, vec3 lightDir, sampler2D depthTex2D)
 {
     // 执行透视除法
-    vec3 projCoords = lightPosition.xyz / lightPosition.w;
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
     // 变换到[0,1]的范围
     projCoords = projCoords * 0.5 + 0.5;
 

@@ -8,20 +8,3 @@
 #include "Window/MyObjectWindow.h"
 #include "Window/MyMainDockWindow.h"
 #include "Window/MyGCInfoWindow.h"
-
-
-
-class MyPBRWindow : public GUIWindow
-{
-public:
-	MyPBRWindow();
-	~MyPBRWindow();
-
-	void init() override;
-
-protected:
-	void onUpdate() override;
-	void onRender() override;
-};
-
-

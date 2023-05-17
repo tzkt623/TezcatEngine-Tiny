@@ -23,8 +23,9 @@ namespace tezcat::Tiny
 			return;
 		}
 
-		for (auto s : mMemoryPool)
+		for (size_t i = 0; i < mMemoryPool.size(); i++)
 		{
+			auto s = mMemoryPool[i];
 			Log::engine(StringTool::stringFormat("Memory: {%s} RefSub: %d", s->getClassName().c_str(), s->getRefCount()));
 			s->subRef();
 		}

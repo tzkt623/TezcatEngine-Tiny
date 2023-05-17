@@ -1,6 +1,6 @@
 #include "GUI.h"
 #include "../Engine.h"
-#include "../Statistic.h"
+#include "../Profiler.h"
 #include "../Head//ImGuiHead.h"
 #include "Platform/OpenGL/GLHead.h"
 #include "GUIWidget.h"

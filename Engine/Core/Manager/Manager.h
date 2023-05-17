@@ -8,15 +8,13 @@ namespace tezcat::Tiny
 	class TINY_API Manager
 	{
 	public:
-		Manager()
-			: mCreator(nullptr)
+		Manager() : mCreator(nullptr)
 		{
 		}
 
 		virtual ~Manager()
 		{
 			delete mCreator;
-			mCreator = nullptr;
 		}
 
 		void initCreator(Creator* creator)

@@ -3,7 +3,7 @@
 #include "../MyController.h"
 
 
-TINY_RTTI_CPP(MyMainScene)
+TINY_RTTI_CPP(MyMainScene);
 
 MyMainScene::MyMainScene(const std::string& name)
 	: Scene(name)
@@ -27,21 +27,12 @@ void MyMainScene::onEnter()
 	mController->addComponent<FlyController>();
 	MyInputer::getInstance()->setController(mController->addComponent<FlyController>());
 
-	this->createEnvMap();
-
-	//地板
-	if (true)
-	{
-		this->createInfinitePlane();
-	}
-
 	if (true)
 	{
 		auto go = GameObject::create("World1_Camera");
 		auto camera = go->addComponent<Camera>(true);
 		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
-		camera->setPipeline(PipelineMgr::getInstance()->get("Forward"));
 		camera->setCullLayer(0);
 
 		go->addComponent<Transform>();
@@ -51,45 +42,45 @@ void MyMainScene::onEnter()
 		//MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 
 		auto frame = FrameBufferMgr::getInstance()->create(
-					"FB_Viewport",
-					Engine::getScreenWidth(), Engine::getScreenHeight(),
-					{
-						TextureBufferInfo("RB_Viewport"
-							, TextureBufferType::ColorComponent
-							, TextureChannel::RGBA
-							, TextureChannel::RGBA
-							, DataType::UByte
-							, true),
-						TextureBufferInfo("DS_Viewport"
-							, TextureBufferType::DepthComponent
-							, TextureChannel::Depth
-							, TextureChannel::Depth
-							, DataType::UByte
-							, true)
-					});
-		camera->setFrameBuffer(frame);
+			"FB_Viewport",
+			Engine::getScreenWidth(), Engine::getScreenHeight(),
+			{
+				TextureInfo("RB_Viewport"
+						  , TextureAttachPosition::ColorComponent
+						  , TextureChannel::RGBA
+						  , TextureChannel::RGBA
+						  , DataType::UByte),
 
-		go = GameObject::create("Skybox");
+				TextureInfo("DS_Viewport"
+						  , TextureAttachPosition::DepthComponent
+						  , TextureChannel::Depth
+						  , TextureChannel::Depth
+						  , DataType::UByte)
+			});
+		camera->setFrameBuffer(frame);
+	}
+
+	if (true)
+	{
+		auto go = GameObject::create("Skybox");
 		go->setLayerMaskIndex(0);
 		go->addComponent<Transform>();
 
 		auto skybox = go->addComponent<Skybox>();
 		auto material = Material::create("Unlit/Skybox");
 		material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
+		material->addUniform<UniformI1>(ShaderParam::IsHDR, false);
 		skybox->setMaterial(material);
 	}
 
-	if (false)
-	{
-		this->createGates(gateWidth, gateHigh);
-	}
-
-	//方向光
-	//方向光的位置理论上不应该影响阴影投射
-	if (true)
-	{
-		this->createDirectionLight();
-	}
+//	this->createInfinitePlane();
+	this->createDirectionLight();
+	this->createPaintings();
+	this->createPlane();
+	this->createTransparentObject();
+	this->createPBR();
+	this->createCubes0();
+	//this->createGates(gateWidth, gateHigh);
 
 	//灯光深度图
 	if (true)
@@ -109,58 +100,7 @@ void MyMainScene::onEnter()
 		mr->setMesh("Square");
 	}
 
-	///图片
-	if (true)
-	{
-		this->createPaintings();
-	}
-
-	//----------------------------------------
-	//
-	//	Plane
-	//
-	if (true)
-	{
-		this->createPlane();
-	}
-
-	//----------------------------------------
-	//
-	//	Transparent
-	//
-	if (true)
-	{
-		this->createTransparentObject();
-	}
-
-	//PBR
-	if (true)
-	{
-		this->createPBR();
-	}
-
-	//----------------------------------------
-	//
-	//	Cubes 0
-	//
-	if (false)
-	{
-		this->createCubes0();
-	}
-
-	if (true)
-	{
-		auto go = GameObject::create("HDRBox");
-		//go->setLayerMaskIndex(0);
-		go->addComponent<Transform>();
-		go->getTransform()->setScale(glm::vec3(10.0f));
-
-		auto mr = go->addComponent<MeshRenderer>();
-		auto material = Material::create("Unlit/SkyboxHDR");
-		material->addUniform<UniformTex2D>(ShaderParam::TexEnv, "blue_photo_studio_2k");
-		mr->setMaterial(material);
-		mr->setMesh("Cube");
-	}
+	EnvLighting::getInstance()->setDirty("blue_photo_studio_2k");
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
@@ -331,30 +271,32 @@ void MyMainScene::createInfinitePlane()
 void MyMainScene::createDirectionLight()
 {
 	Log::info("createDirectionLight");
-	auto direction_light_go = GameObject::create("DirectionLight");
-	direction_light_go->addComponent<Transform>();
-	direction_light_go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 600.0f));
-	direction_light_go->getTransform()->setScale(glm::vec3(100.0f));
-	direction_light_go->getTransform()->setRotation(-60.0f, 0.0f, 0.0f);
+	auto go = GameObject::create("DirectionLight");
+	go->addComponent<Transform>();
+	go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 600.0f));
+	go->getTransform()->setScale(glm::vec3(100.0f));
+	go->getTransform()->setRotation(-60.0f, 0.0f, 0.0f);
 
-	auto mr = direction_light_go->addComponent<MeshRenderer>();
+	auto mr = go->addComponent<MeshRenderer>();
 	auto light_material = Material::create("Unlit/Color");
 	mr->setCastShadow(false);
 	mr->setMaterial(light_material);
 	mr->setMesh("Sphere");
 
-	auto dir_light = direction_light_go->addComponent<DirectionalLight>();
-	dir_light->setOrtho(0.1f, 2000.0f);
-	dir_light->setViewRect(0, 0, 1024, 1024);
-
+	auto dir_light = go->addComponent<DirectionalLight>();
 	dir_light->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
 	dir_light->setAmbient(glm::vec3(0.1f));
 	dir_light->setSpecular(glm::vec3(0.5f));
 
-	//float rotation = 0;
+	auto shadow_caster = go->addComponent<ShadowCaster>();
+	shadow_caster->setOrtho(0.1f, 2000.0f);
+	shadow_caster->setViewRect(0, 0, 1024, 1024);
+	shadow_caster->setCullLayer(0);
+	shadow_caster->setShadowMap(4096, 4096, "Shadow");
+
 	dir_light->startLogic([=]()
 	{
-		direction_light_go->getTransform()->rotate(glm::vec3(0.0f, 10.0f * Engine::getDeltaTime(), 0.0f));
+		go->getTransform()->rotate(glm::vec3(0.0f, 10.0f * Engine::getDeltaTime(), 0.0f));
 	});
 }
 
@@ -386,13 +328,4 @@ void MyMainScene::createPBR()
 			mr->setMesh("Sphere");
 		}
 	}
-}
-
-void MyMainScene::createEnvMap()
-{
-	// 	FrameBufferMgr::getInstance()->create("FB_Env",
-	// 		512, 512,
-	// 		{
-	// 			TextureBufferInfo("TB_Env", tex)
-	// 		});
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Engine.h"
-#include "Core/Statistic.h"
+#include "Core/Profiler.h"
 
 #include "Core/GUI/GUIWidget.h"
 
@@ -10,13 +10,16 @@
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/RenderObject.h"
 #include "Core/Renderer/Vertex.h"
+#include "Core/Renderer/RenderCommand.h"
+#include "Core/Renderer/RenderPass.h"
+#include "Core/Renderer/EnvironmentLighting.h"
 
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/CameraManager.h"
 #include "Core/Manager/TextureManager.h"
 #include "Core/Manager/FrameBufferManager.h"
-#include "Core/Manager/PipelineManager.h"
 #include "Core/Manager/ShaderManager.h"
+#include "Core/Manager/BufferManager.h"
 
 #include "Core/Scene/Scene.h"
 
@@ -27,6 +30,7 @@
 #include "Core/Component/MeshRenderer.h"
 #include "Core/Component/Light.h"
 #include "Core/Component/Skybox.h"
+#include "Core/Component/ShadowCaster.h"
 
 #include "Core/Data/Image.h"
 #include "Core/Data/MeshData.h"
@@ -38,6 +42,7 @@
 
 #include "Core/Shader/ShaderParam.h"
 #include "Core/Shader/ShaderPackage.h"
+#include "Core/Shader/Shader.h"
 
 #include "Core/Tool/Tool.h"
 #include "Core/Event/EngineEvent.h"

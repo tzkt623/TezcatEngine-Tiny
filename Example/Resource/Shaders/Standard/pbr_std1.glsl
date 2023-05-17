@@ -11,6 +11,7 @@
         str Name = PBRStd1;
         int Version = 330;
         int OrderID = 50;
+        str LightMode = Forward;
         str Queue = Opaque;
         str DepthTest = Less;
         bool ZWrite = true;

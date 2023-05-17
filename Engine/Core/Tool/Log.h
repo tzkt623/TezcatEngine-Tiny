@@ -70,4 +70,17 @@ namespace tezcat::Tiny
 	private:
 
 	};
+
+
+#ifndef TINY_Release
+#define Log_Engine(x) Log::engine(x);
+#define Log_Info(x) Log::info(x);
+#define Log_Warning(x) Log::warning(x);
+#define Log_Error(x) Log::error(x);
+#else
+#define Log_Engine(x)
+#define Log_Info(x)
+#define Log_Warning(x)
+#define Log_Error(x)
+#endif
 }

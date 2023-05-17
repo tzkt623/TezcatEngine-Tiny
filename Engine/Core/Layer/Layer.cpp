@@ -22,7 +22,7 @@ namespace tezcat::Tiny
 
 	void Layer::addRenderObejct(IRenderObject* renderObject)
 	{
-		m_RenderObejctList.emplace_back(renderObject);
+		mRenderObejctList.emplace_back(renderObject);
 	}
 
 	void Layer::cullGameObject(Camera* camera)

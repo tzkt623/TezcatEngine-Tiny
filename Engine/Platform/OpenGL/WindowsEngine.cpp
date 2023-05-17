@@ -118,8 +118,7 @@ namespace tezcat::Tiny::GL
 
 	//-----------------------------------------------------------------
 	//
-	//
-	//
+	//	WindowsEditor
 	//
 	bool WindowsEditor::preInit()
 	{
@@ -137,7 +136,7 @@ namespace tezcat::Tiny::GL
 		if (mWindow == nullptr)
 		{
 			//std::cout << "Failed to create GLFW window" << std::endl;
-			Log::error("Failed to create GLFW window");
+			Log_Error("Failed to create GLFW window");
 			glfwTerminate();
 			return false;
 		}
@@ -146,14 +145,14 @@ namespace tezcat::Tiny::GL
 		glfwSwapInterval(mResourceLoader->isEnabelVsync() ? 1 : 0);
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
-			Log::error("Failed to initialize GLAD");
-			throw std::logic_error("Failed to initialize GLAD");
+			Log_Error("Failed to initialize GLAD");
+			TinyThrow_Logic("Failed to initialize GLAD");
 		}
 
 		GLint max;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		Log::engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
+		Log_Engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
 
 		auto get_default_color_buffer = [&](GLint id)
 		{
@@ -161,43 +160,43 @@ namespace tezcat::Tiny::GL
 			{
 			case GL_NONE:
 				//std::cout << "Default ColorBuffer: GL_NONE" << std::endl;
-				Log::engine("Default ColorBuffer: GL_NONE");
+				Log_Engine("Default ColorBuffer: GL_NONE");
 				break;
 			case GL_FRONT_LEFT:
 				//std::cout << "Default ColorBuffer: GL_FRONT_LEFT" << std::endl;
-				Log::engine("Default ColorBuffer: GL_FRONT_LEFT");
+				Log_Engine("Default ColorBuffer: GL_FRONT_LEFT");
 				break;
 			case GL_FRONT_RIGHT:
 				//std::cout << "Default ColorBuffer: GL_FRONT_RIGHT" << std::endl;
-				Log::engine("Default ColorBuffer: GL_FRONT_RIGHT");
+				Log_Engine("Default ColorBuffer: GL_FRONT_RIGHT");
 				break;
 			case GL_BACK_LEFT:
 				//std::cout << "Default ColorBuffer: GL_BACK_LEFT" << std::endl;
-				Log::engine("Default ColorBuffer: GL_BACK_LEFT");
+				Log_Engine("Default ColorBuffer: GL_BACK_LEFT");
 				break;
 			case GL_BACK_RIGHT:
 				//std::cout << "Default ColorBuffer: GL_BACK_RIGHT" << std::endl;
-				Log::engine("Default ColorBuffer: GL_BACK_RIGHT");
+				Log_Engine("Default ColorBuffer: GL_BACK_RIGHT");
 				break;
 			case GL_FRONT:
 				//std::cout << "Default ColorBuffer: GL_FRONT" << std::endl;
-				Log::engine("Default ColorBuffer: GL_FRONT");
+				Log_Engine("Default ColorBuffer: GL_FRONT");
 				break;
 			case GL_BACK:
 				//std::cout << "Default ColorBuffer: GL_BACK" << std::endl;
-				Log::engine("Default ColorBuffer: GL_BACK");
+				Log_Engine("Default ColorBuffer: GL_BACK");
 				break;
 			case GL_LEFT:
 				//std::cout << "Default ColorBuffer: GL_LEFT" << std::endl;
-				Log::engine("Default ColorBuffer: GL_LEFT");
+				Log_Engine("Default ColorBuffer: GL_LEFT");
 				break;
 			case GL_RIGHT:
 				//std::cout << "Default ColorBuffer: GL_RIGHT" << std::endl;
-				Log::engine("Default ColorBuffer: GL_RIGHT");
+				Log_Engine("Default ColorBuffer: GL_RIGHT");
 				break;
 			case GL_FRONT_AND_BACK:
 				//std::cout << "Default ColorBuffer: GL_FRONT_AND_BACK" << std::endl;
-				Log::engine("Default ColorBuffer: GL_FRONT_AND_BACK");
+				Log_Engine("Default ColorBuffer: GL_FRONT_AND_BACK");
 				break;
 			default:
 				break;
@@ -206,7 +205,7 @@ namespace tezcat::Tiny::GL
 
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		Log::engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
+		Log_Engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
 
 		glGetIntegerv(GL_DRAW_BUFFER, &max);
 		get_default_color_buffer(max);
@@ -250,7 +249,7 @@ namespace tezcat::Tiny::GL
 	void WindowsEditor::onUpdate()
 	{
 		mInputSystem->update();
-		mSceneManager->update();
+		mSceneManager->update(mGraphics);
 		mGraphics->render();
 		mGUI->render();
 		glfwSwapBuffers(mWindow);

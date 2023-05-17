@@ -2,7 +2,7 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "../Head/Context.h"
+#include "../Head/RenderConfig.h"
 
 namespace tezcat::Tiny
 {

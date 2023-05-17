@@ -2,7 +2,7 @@
 
 #include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
-#include "../Head/Context.h"
+#include "../Head/RenderConfig.h"
 #include "VertexConfig.h"
 #include "../Base/TinyObject.h"
 
@@ -18,8 +18,8 @@ namespace tezcat::Tiny
 	/// </summary>
 	class TINY_API Vertex : public TinyObject
 	{
-		TINY_RTTI_H(Vertex)
-
+		TINY_RTTI_H(Vertex);
+			
 	public:
 		Vertex();
 		virtual ~Vertex();
@@ -34,8 +34,8 @@ namespace tezcat::Tiny
 
 		virtual void setVertexBuffer(VertexBuffer* buffer);
 		virtual void setIndexBuffer(IndexBuffer* buffer);
-		void setVertexCount(size_t size) { mVertexCount = size; }
-		void setIndexCount(size_t size) { mIndexCount = size; }
+		void setVertexCount(size_t size) { mVertexCount = (uint32_t)size; }
+		void setIndexCount(size_t size) { mIndexCount = (uint32_t)size; }
 
 		void addChild(Vertex* vertex);
 

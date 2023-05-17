@@ -18,6 +18,5 @@ enum MyEventID : EventID
 	Window_ObjectSelected = 0,
 
 
-
 	Count
 };

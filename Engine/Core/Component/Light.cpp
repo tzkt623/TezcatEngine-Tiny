@@ -10,13 +10,12 @@
 namespace tezcat::Tiny
 {
 	//------------------------------------------------------------------------
-	TINY_RTTI_CPP(DirectionalLight)
+	TINY_RTTI_CPP(DirectionalLight);
 	DirectionalLight::DirectionalLight()
 		: mDirection(0.0f, 0.0f, 0.0f)
 		, mAmbient(0.1f)
 		, mDiffuse(1.0f)
 		, mSpecular(0.2f)
-		, mViewMatrix(1.0f)
 	{
 
 	}
@@ -26,7 +25,6 @@ namespace tezcat::Tiny
 		, mAmbient(ambient)
 		, mDiffuse(diffuse)
 		, mSpecular(specular)
-		, mViewMatrix(1.0f)
 	{
 
 	}
@@ -40,8 +38,6 @@ namespace tezcat::Tiny
 	{
 		auto transform = this->getTransform();
 		mDirection = glm::normalize(transform->getForward());
-		//std::cout << mDirection[0] << "," << mDirection[1] << "," << mDirection[2] << std::endl;
-
 		shader->setFloat3(ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
 		shader->setFloat3(ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
 		shader->setFloat3(ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));
@@ -63,24 +59,8 @@ namespace tezcat::Tiny
 
 	}
 
-	void DirectionalLight::submitViewMatrix(Shader* shader)
-	{
-		this->updateObserverMatrix();
-		auto lpv = mProjectionMatrix * this->getViewMatrix();
-		shader->setMat4(ShaderParam::MatrixLit, lpv);
-	}
-
-	glm::mat4& DirectionalLight::getViewMatrix()
-	{
-		auto transform = this->getTransform();
-		mViewMatrix = glm::lookAt(
-			transform->getWorldPosition(),
-			transform->getWorldPosition() + transform->getForward(),
-			transform->getUp());
-		return mViewMatrix;
-	}
-
 	//------------------------------------------------------------------------
+	TINY_RTTI_CPP(PointLight);
 	PointLight::PointLight()
 		: mAmbient(0.2f)
 		, mDiffuse(0.5f)
@@ -115,6 +95,7 @@ namespace tezcat::Tiny
 	}
 
 	//------------------------------------------------------------------------
+	TINY_RTTI_CPP(SpotLight);
 	SpotLight::SpotLight()
 	{
 

@@ -9,40 +9,40 @@ namespace tezcat::Tiny
 	//
 	//	Creator
 	//
-	FrameBuffer* FrameBufferCreator::create(const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos)
+	FrameBuffer* FrameBufferCreator::create(const int& width, const int& height
+		, const std::initializer_list<TextureInfo>& infos)
 	{
 		FrameBuffer* buffer = this->createFrameBuffer();
-		buffer->build([&](FrameBuffer* self)
+		buffer->beginBuild();
+		for (auto& info : infos)
 		{
-			for (auto& info : infos)
+			Texture* tex = nullptr;
+			switch (info.type)
 			{
-				auto tex = TextureMgr::getInstance()->createBuffer2D(width, high, info);
-				self->attach(tex);
+			case TextureType::Texture2D:
+				tex = TextureMgr::getInstance()->create2D(width, height, info);
+				break;
+			case TextureType::TextureCube:
+				tex = TextureMgr::getInstance()->createCube(width, height, info);
+				break;
+			case TextureType::TextureRender2D:
+				tex = TextureMgr::getInstance()->createRender2D(width, height, info);
+				break;
+			default:
+				break;
 			}
-		});
+
+			buffer->attach(tex);
+		}
+		buffer->endBuild();
 
 		return buffer;
 	}
 
-	FrameBuffer* FrameBufferCreator::createShadowMap(const int& width, const int& high)
+	FrameBuffer* FrameBufferCreator::create()
 	{
-		FrameBuffer* buffer = this->createFrameBuffer();
-
-		buffer->build([&](FrameBuffer* self)
-		{
-			auto tex = TextureMgr::getInstance()->createBuffer2D(width, high
-				, TextureBufferInfo("ShadowMap"
-					, TextureBufferType::DepthComponent
-					, TextureChannel::Depth
-					, TextureChannel::Depth
-					, DataType::Float32
-					, true));
-			self->attach(tex);
-		});
-
-		return buffer;
+		return this->createFrameBuffer();
 	}
-
 
 	//-------------------------------------------------
 	//
@@ -58,24 +58,29 @@ namespace tezcat::Tiny
 
 	}
 
-	FrameBuffer* FrameBufferManager::create(const std::string& name, const int& width, const int& high, const std::initializer_list<TextureBufferInfo>& infos)
+	FrameBuffer* FrameBufferManager::create(const std::string& name
+		, const int& width, const int& height
+		, const std::initializer_list<TextureInfo>& infos)
 	{
-		auto result = this->find(name);
-		if (result)
+		auto result = mBufferUMap.tryEmplace(name, [&]()
 		{
-			return result;
-		}
-
-		auto frame = mCreator->create(width, high, infos);
-		this->addFrameBuffer(name, frame);
-		return frame;
+			return mCreator->create(width, height, infos);
+		});
+		return result.first->second;
 	}
 
-	FrameBuffer* FrameBufferManager::createShadowMap(const std::string& name, const int& width, const int& high)
+	FrameBuffer* FrameBufferManager::create(const std::string& name)
 	{
-		auto frame = mCreator->createShadowMap(width, high);
-		this->addFrameBuffer(name, frame);
-		return frame;
+		auto result = mBufferUMap.tryEmplace(name, [&]()
+		{
+			return mCreator->create();
+		});
+		return result.first->second;
+	}
+
+	FrameBuffer* FrameBufferManager::create()
+	{
+		return mCreator->create();
 	}
 
 	void FrameBufferManager::addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer)

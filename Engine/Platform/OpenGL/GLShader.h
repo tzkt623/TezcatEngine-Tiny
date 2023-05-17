@@ -18,7 +18,8 @@ namespace tezcat::Tiny::GL
 		void bind() override;
 		void unbind() override;
 		void setStateOptions() override;
-		void resetState() override;
+		void resetGlobalState() override;
+		void resetLocalState() override;
 
 	public:
 		void setProjectionMatrix(const glm::mat4x4& matrix) override;
@@ -57,20 +58,24 @@ namespace tezcat::Tiny::GL
 		void setMat3(UniformID& uniform, float* data) override;
 		void setMat3(UniformID& uniform, const glm::mat3& mat3) override;
 		void setMat4(UniformID& uniform, const float* data) override;
+		void setMat4(UniformID& uniform, glm::mat4 data[], int count) override;
+
+		void setGlobalTexture2D(UniformID& uniform, Texture2D* data) override;
 		void setTexture2D(UniformID& uniform, Texture2D* data) override;
+
+		void setGlobalTextureCube(UniformID& uniform, TextureCube* data) override;
 		void setTextureCube(UniformID& uniform, TextureCube* data) override;
 
 	public:
-		void create() override;
+		void createID() override;
 		void clear() override;
 
-
-	protected:
-		void onApply(const UniformID::USet& uniforms) override;
+		void buildWithUniforms(const UniformID::USet& uniforms) override;
 
 	private:
 		std::unordered_map<std::string, uint32_t> mTextureID;
 		std::unordered_map<std::string, uint32_t> mUniformID;
-		int mTexureCountor;
+		uint8_t mLocalTexure;
+		uint8_t mGlobalTexture;
 	};
 }

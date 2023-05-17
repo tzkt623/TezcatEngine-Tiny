@@ -12,7 +12,7 @@
         int Version = 330;
         int OrderID = 50;
         str Queue = Background;
-        str DepthTest = Less;
+        str DepthTest = LessEqual;
         bool ZWrite = false;
         str CullFace = Back;
     }
@@ -38,11 +38,18 @@
         #include "tiny_fs_texture"
         
         in vec3 myUV;
+        uniform bool TINY_IsHDR;
         out vec4 myFinalColor;
 
         void main()
         {
-            myFinalColor = texture(TINY_TexCube, myUV);
+            vec3 color = texture(TINY_TexCube, myUV).rgb;
+            if(TINY_IsHDR)
+            {
+                color = color / (color + vec3(1.0));
+                color = pow(color, vec3(1.0/2.2)); 
+            }
+            myFinalColor = vec4(color, 1.0);
         }
     }
     #TINY_FS_END

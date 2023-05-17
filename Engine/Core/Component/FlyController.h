@@ -11,8 +11,8 @@ namespace tezcat::Tiny
 	{
 		FlyController();
 	public:
-		TINY_Factory(FlyController)
-		TINY_RTTI_H(FlyController)
+		TINY_Factory(FlyController);
+		TINY_RTTI_H(FlyController);
 
 	public:
 		virtual ~FlyController();

@@ -50,8 +50,8 @@ namespace tezcat::Tiny
 
 		int getBufferSize();
 
-		const void* getVertexData(const VertexPosition& position, size_t& outDataLength);
-		const void* getIndexData(size_t& outDataLength);
+		std::tuple<size_t, const void*> getVertexData(const VertexPosition& position);
+		std::tuple<size_t, const void*> getIndexData();
 
 		void apply(DrawMode drawMode = DrawMode::Triangles);
 

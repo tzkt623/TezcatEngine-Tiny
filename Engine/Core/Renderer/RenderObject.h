@@ -1,31 +1,32 @@
 #pragma once
-#include "RenderConfig.h"
-
 #include "../Component/Component.h"
-#include "../Head/Context.h"
+#include "../Head/RenderConfig.h"
 #include "../Head/GLMHead.h"
+
+#include "Vertex.h"
+#include "RenderAgent.h"
+#include "../Data/Material.h"
+
 
 namespace tezcat::Tiny
 {
 	enum class TINY_API RenderObjectType
 	{
+		Observer,
 		MeshRenderer,
-		Texture,
-		RenderTexture,
-		Skybox,
-		Light,
-		Camera,
-		ShadowMap
+		Light
 	};
 
 	class Shader;
-	class Material;
-	class Pipeline;
 	class FrameBuffer;
+	class RenderQueue;
 
-	/// <summary>
-	/// 可渲染的目标
-	/// </summary>
+
+	/*
+	* IRenderObject
+	*
+	* @brief 可渲染对象
+	*/
 	class TINY_API IRenderObject
 	{
 	public:
@@ -48,19 +49,13 @@ namespace tezcat::Tiny
 		 */
 		virtual RenderObjectType getRenderObjectType() = 0;
 
-		/// <summary>
-		/// 把自己发送到对应的管线中
-		/// </summary>
-		virtual void sendToRenderPass(const RenderPassType& passType) {}
 
 		/*
-		* Info:		HCL|2023|4|8
-		* Access:		virtual public
-		* Returns:		void
-		* Qualifier:
-		* Comment: 开始渲染
+		* @Author: HCL
+		* @Info: 2023|5|15
+		*
 		*/
-		virtual void beginRender() {}
+		virtual void sendToQueue(const RenderPhase& phase, RenderQueue* queue) {}
 
 		/*
 		* Info:		HCL|2023|4|8
@@ -71,54 +66,39 @@ namespace tezcat::Tiny
 		* Comment: 向shader提交数据
 		*/
 		virtual void submit(Shader* shader) = 0;
-
-		/*
-		* Info:		HCL|2023|4|8
-		* Access:		virtual public
-		* Returns:		void
-		* Qualifier:
-		* Comment: 结束渲染
-		*/
-		virtual void endRender() {}
-
-
 	};
 
-
-	//------------------------------------------------------
-	//
-	//	IRenderMesh
-	//
+	/*
+	* IRenderMesh
+	*
+	* @brief 可渲染mesh
+	*/
 	class TINY_API IRenderMesh : public IRenderObject
 	{
 	public:
-		IRenderMesh() = default;
-		virtual ~IRenderMesh() = default;
+		IRenderMesh();
+		virtual ~IRenderMesh();
 
 
-		RenderObjectType getRenderObjectType() override { return RenderObjectType::MeshRenderer; }
-
+		RenderObjectType getRenderObjectType() final { return RenderObjectType::MeshRenderer; }
 
 		/*
 		* @Author:	HCL
 		* @Info:	2023|4|8
 		* 材质
 		*/
-		virtual Material* getMaterial() const { return nullptr; }
-
-		/*
-		* @Author:	HCL
-		* @Info:	2023|4|9
-		* 绘制方式 索引or顶点
-		*/
-		virtual DrawModeWrapper& getDrawMode() = 0;
+		Material* getMaterial() const { return mMaterial; }
+		void setMaterial(Material* material);
 
 		/*
 		* @Author:	HCL
 		* @Info:	2023|4|9
 		* 顶点数量
 		*/
-		virtual int getVertexCount() const { return 0; }
+		int getVertexCount() const
+		{
+			return mVertex->getVertexCount();
+		}
 
 
 		/*
@@ -126,41 +106,63 @@ namespace tezcat::Tiny
 		* @Info:	2023|4|9
 		* 索引数量
 		*/
-		virtual int getIndexCount() const { return 0; }
+		int getIndexCount() const
+		{
+			return mVertex->getIndexCount();
+		}
 
-		/*
-		* @Author: HCL
-		* @Info: 2023|4|12
-		* 提交模型矩阵数据
-		*/
-		virtual void submitModelMatrix(Shader* shader) {}
+		void setMesh(const std::string& meshName);
+		void setMesh(MeshData* meshData);
+
+		void submit(Shader* shader) override;
+
+		void setShadowReciever(bool value)
+		{
+			mIsShadowReciever = true;
+		}
+
+		bool isShadowReciever() const { return mIsShadowReciever; }
+
+	protected:
+		bool mIsShadowReciever;
+		RenderAgent* mRenderAgent;
+		Material* mMaterial;
+		Vertex* mVertex;
 	};
 
-	//------------------------------------------------------
-	//
-	//	IRenderObserver
-	//
+
+	/*
+	* IRenderObserver
+	*
+	* @brief 渲染观察者
+	* @brief 观察者可以用它的视角来观察整个场景,并提供观察视角的数据
+	* @brief 观察者可以指定它看到的图元被渲染到哪个帧缓存上
+	* @brief 所以渲染目标必须在最外层被绑定,也就是整个目标在渲染时不能切换到其他目标上
+	*        于是要对Queue内部的Pass和CMD等进行排序
+	*
+	* @brief 所以基于Observer的渲染结构如下
+	*        foreach observers
+	*          observer check layer to culling agent
+	*            agent make CMD to current observer`s Pass
+	*        foreach passes
+	*          pass render
+	*/
 	class TINY_API IRenderObserver : public IRenderObject
 	{
 	public:
-		enum class Type
+		enum class ViewType
 		{
 			Ortho,
 			Perspective
 		};
 
 	public:
-		IRenderObserver();
+		IRenderObserver(RenderQueue* queue);
 		virtual ~IRenderObserver();
 
+		RenderObjectType getRenderObjectType() final { return RenderObjectType::Observer; }
 
-		/*
-		* @Author: HCL
-		* @Info: 2023|4|12
-		* 提交观察矩阵数据
-		*/
 		virtual void submitViewMatrix(Shader* shader) {}
-
 
 		virtual bool culling(GameObject* gameObject) { return true; }
 
@@ -192,33 +194,56 @@ namespace tezcat::Tiny
 		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
 
 		FrameBuffer* getFrameBuffer() { return mFrameBuffer; }
-		void setFrameBuffer(FrameBuffer* val);
+		void setFrameBuffer(FrameBuffer* buffer);
 
 		void setViewRect(int x, int y, int width, int height);
 		ViewportInfo& getViewportInfo() { return mViewInfo; }
 		glm::mat4& getProjectionMatrix() { return mProjectionMatrix; }
+		glm::mat4& getViewMatrix() { return mViewMatrix; }
 
 		void setOrtho(float near, float far);
 		void setPerspective(float fov, float near, float far);
 
-		virtual glm::mat4& getViewMatrix() = 0;
+		const RenderPhase& getPipelinePhase() const { return mRenderPhase; }
+		void setPipelineType(RenderPhase type) { mRenderPhase = type; }
+
+		void setClearOption(ClearOption option) { mClearOption = option; }
+		const ClearOption& getClearOption() const { return mClearOption; }
+
 		void updateObserverMatrix();
+
+		int getOrder() const { return mOrder; }
+		void setOrder(int val) { mOrder = val; }
+
+		float getFOV() { return mFOV; }
+		float getAspect() { return (float)mViewInfo.Width / (float)mViewInfo.Height; }
+		float getNear() { return mNearFace; }
+		float getFar() { return mFarFace; }
+
+		RenderQueue* getRenderQueue() { return mRenderQueue; }
+		template<class QueueType>
+		QueueType* getRenderQueue() { return static_cast<QueueType*>(mRenderQueue); }
 
 	protected:
 		FrameBuffer* mFrameBuffer;
 		ViewportInfo mViewInfo;
 
 	protected:
-		Type mType;
+		int mOrder;
+		RenderPhase mRenderPhase;
+		ViewType mViewType;
 		float mNearFace;
 		float mFarFace;
 		float mFOV;
 
 		glm::mat4 mProjectionMatrix;
+		glm::mat4 mViewMatrix;
 		bool mPMatDirty;
 
-	private:
+	protected:
 		uint32_t mCullMask;
 		std::vector<uint32_t> mCullLayerList;
+		ClearOption mClearOption;
+		RenderQueue* mRenderQueue;
 	};
 }

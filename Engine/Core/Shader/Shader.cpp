@@ -18,17 +18,16 @@ namespace tezcat::Tiny
 		, mName(name)
 		, mUID(IDGenerator<Shader, uint32_t>::generate())
 		, mOrderID(orderID)
-		, mViewMatrixID(0)
-		, mModelMatrixID(0)
-		, mProjectionMatrixID(0)
-		, mNormalMatrixID(0)
-		, mViewPositionID(0)
+// 		, mViewMatrixID(0)
+// 		, mModelMatrixID(0)
+// 		, mProjectionMatrixID(0)
+// 		, mNormalMatrixID(0)
+// 		, mViewPositionID(0)
 		, mEnableBlend(false)
 		, mDepthTest(DepthTest::Less, 0)
 		, mEnableZWrite(true)
-		, mEnableLighting(true)
 		, mVersion(-1)
-		, mRenderQueue(PipelineQueue::Geometry)
+		, mRenderQueue(Queue::Opaque)
 		, mBlendSource(Blend::One, 0)
 		, mBlendTarget(Blend::One, 0)
 		, mCullFace(CullFace::Back, 0)
@@ -39,24 +38,13 @@ namespace tezcat::Tiny
 
 	Shader::~Shader()
 	{
-
+		IDGenerator<Shader, uint32_t>::recycle(mUID);
 	}
 
 	void Shader::apply()
 	{
 		ShaderMgr::getInstance()->addShader(this);
 		RenderPass::create(this);
-	}
-
-	void Shader::apply(const UniformID::USet& uniforms)
-	{
-		this->onApply(uniforms);
-		this->apply();
-	}
-
-	void Shader::rebuild(const UniformID::USet& uniforms)
-	{
-		this->onApply(uniforms);
 	}
 
 	void Shader::begin()

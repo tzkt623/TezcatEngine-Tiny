@@ -11,8 +11,6 @@
 #include "../Manager/LightManager.h"
 #include "../Manager/ShaderManager.h"
 
-#include "../Pipeline/Pipeline.h"
-
 #include "../Event/EngineEvent.h"
 
 
@@ -23,7 +21,8 @@ namespace tezcat::Tiny
 	RenderLayer::RenderLayer()
 		: mIndex(-1)
 	{
-		EngineEvent::get()->addListener(EngineEventID::EE_PopScene, this
+		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene
+			, this
 			, [this](const EventData& data)
 			{
 				mRenderObjectList.clear();
@@ -35,13 +34,14 @@ namespace tezcat::Tiny
 		mRenderObjectList.clear();
 	}
 
-	void RenderLayer::culling(IRenderObserver* renderObserver, const RenderPassType& passType)
+	void RenderLayer::culling(IRenderObserver* renderObserver, RenderQueue* queue)
 	{
 		if (mRenderObjectList.empty())
 		{
 			return;
 		}
 
+		auto phase = renderObserver->getPipelinePhase();
 		auto it = mRenderObjectList.begin();
 		auto end = mRenderObjectList.end();
 		while (it != end)
@@ -54,7 +54,7 @@ namespace tezcat::Tiny
 				{
 					if (renderObserver->culling(com->getGameObject()))
 					{
-						agent->getRenderObject()->sendToRenderPass(passType);
+						agent->sendToQueue(phase, queue);
 					}
 				}
 
@@ -69,7 +69,7 @@ namespace tezcat::Tiny
 
 	void RenderLayer::addRenderAgent(RenderAgent* renderAgent)
 	{
-		mRenderObjectList.emplace_back(renderAgent);
+		mRenderObjectList.push_back(renderAgent);
 	}
 
 	void RenderLayer::init()
@@ -79,5 +79,4 @@ namespace tezcat::Tiny
 			sLayerAry[i] = new RenderLayer();
 		}
 	}
-
 }

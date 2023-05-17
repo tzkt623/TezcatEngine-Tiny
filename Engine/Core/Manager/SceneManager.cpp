@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 #include "../Scene/Scene.h"
 #include "../Tool/Tool.h"
-#include "../Statistic.h"
+#include "../Profiler.h"
 #include "../Event/EngineEvent.h"
 
 namespace tezcat::Tiny
@@ -10,13 +10,15 @@ namespace tezcat::Tiny
 	{
 		SG<SceneManager>::attach(this);
 
-		EngineEvent::get()->addListener(EngineEventID::EE_PopScene, this
+		EngineEvent::get()->addListener(EngineEventID::EE_PopScene
+			, this
 			, [this](const EventData& data)
 			{
 				this->popScene();
 			});
 
-		EngineEvent::get()->addListener(EngineEventID::EE_PushScene, this
+		EngineEvent::get()->addListener(EngineEventID::EE_PushScene
+			, this
 			, [this](const EventData& data)
 			{
 				this->pushScene((Scene*)data.userData);
@@ -44,6 +46,7 @@ namespace tezcat::Tiny
 		if (it != mSceneWithName.end())
 		{
 			mScenes.push(it->second);
+			EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
 			it->second->onEnter();
 		}
 	}
@@ -61,6 +64,7 @@ namespace tezcat::Tiny
 		}
 
 		mScenes.push(scene);
+		EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
 		scene->onEnter();
 	}
 
@@ -73,6 +77,7 @@ namespace tezcat::Tiny
 
 		mScenes.top()->onExit();
 		mScenes.pop();
+		EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPopScene });
 
 		if (!mScenes.empty())
 		{
@@ -85,15 +90,15 @@ namespace tezcat::Tiny
 		mSceneWithName.try_emplace(scene->getName(), scene);
 	}
 
-	bool SceneManager::update()
+	bool SceneManager::update(BaseGraphics* graphics)
 	{
-		TINY_PROFILER_TIMER_OUT(Statistic::LogicTime);
+		TINY_PROFILER_TIMER_OUT(Profiler::LogicTime);
 		if (mScenes.empty())
 		{
 			return false;
 		}
 
-		mScenes.top()->update();
+		mScenes.top()->update(graphics);
 		return true;
 	}
 
@@ -103,9 +108,11 @@ namespace tezcat::Tiny
 		{
 			mScenes.top()->onExit();
 			mScenes.pop();
+			EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPopScene });
 		}
 
 		mScenes.push(scene);
+		EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
 		scene->onEnter();
 	}
 

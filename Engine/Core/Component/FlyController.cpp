@@ -3,7 +3,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(FlyController)
+	TINY_RTTI_CPP(FlyController);
 
 
 	/// <summary>

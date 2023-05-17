@@ -106,34 +106,25 @@ namespace tezcat::Tiny
 		mChildrenData->push_back(meshData);
 	}
 
-	const void* MeshData::getVertexData(const VertexPosition& position, size_t& outDataLength)
+	std::tuple<size_t, const void*> MeshData::getVertexData(const VertexPosition& position)
 	{
 		switch (position)
 		{
 		case VertexPosition::VP_Position:
-			outDataLength = this->vertexSize();
-			return this->vertices.data();
+			return { this->vertexSize(), this->vertices.data() };
 		case VertexPosition::VP_Normal:
-			outDataLength = this->normalSize();
-			return this->normals.data();
+			return { this->normalSize(), this->normals.data() };
 		case VertexPosition::VP_Color:
-			outDataLength = this->colorSize();
-			return this->colors.data();
+			return  { this->colorSize(), this->colors.data() };
 		case VertexPosition::VP_UV:
-			outDataLength = this->uvSize();
-			return this->uvs.data();
-		default:
-			break;
+			return  { this->uvSize(), this->uvs.data() };
+		default: return { 0, nullptr };
 		}
-
-		outDataLength = 0;
-		return nullptr;
 	}
 
-	const void* MeshData::getIndexData(size_t& outDataLength)
+	std::tuple<size_t, const void*> MeshData::getIndexData()
 	{
-		outDataLength = this->indexSize();
-		return this->indices.data();
+		return { this->indexSize(), this->indices.data() };
 	}
 
 	void MeshData::apply(DrawMode drawMode)

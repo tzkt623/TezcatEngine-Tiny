@@ -10,6 +10,7 @@ namespace tezcat::Tiny
 	class DirectionalLight;
 	class PointLight;
 	class SpotLight;
+	class ILight;
 
 
 	class TINY_API LightData : public TinyObject
@@ -17,12 +18,14 @@ namespace tezcat::Tiny
 		LightData();
 		~LightData();
 
-		TINY_Factory(LightData)
-			TINY_RTTI_H(LightData)
+		TINY_Factory(LightData);
+		TINY_RTTI_H(LightData);
 	public:
 
 
 	public:
+		std::vector<ILight*> mImportantLights;
+
 		DirectionalLight* directionalLight;
 		std::vector<PointLight*> pointLights;
 		std::vector<SpotLight*> spotLights;
@@ -55,6 +58,11 @@ namespace tezcat::Tiny
 
 		void addPointLight(PointLight* light);
 		std::vector<PointLight*>& getPointLights() { return mData->pointLights; }
+
+		TinyWeakRef<LightData>& getLightData()
+		{
+			return mData;
+		}
 
 	private:
 		TinyWeakRef<LightData> mData;

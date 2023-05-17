@@ -6,6 +6,7 @@
 
 namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(Component);
 	uint32_t Component::sID = 0;
 
 	Component::Component()

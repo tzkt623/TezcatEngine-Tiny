@@ -3,10 +3,13 @@
 #include "../Component/MeshRenderer.h"
 #include "../Component/Camera.h"
 
+#include "../Renderer/RenderLayer.h"
+#include "../Renderer/BaseGraphics.h"
+
+#include "../Event/EngineEvent.h"
+
 namespace tezcat::Tiny
 {
-	//CameraData* CameraManager::sEmpty = new CameraData();
-
 	CameraManager::CameraManager()
 		: mData()
 	{
@@ -53,11 +56,37 @@ namespace tezcat::Tiny
 		return mEmptyCamera;
 	}
 
+	void CameraManager::calculate(BaseGraphics* graphics)
+	{
+		if (!mData.lock())
+		{
+			return;
+		}
+
+		auto cameras = mData->getAllCamera();
+		for (auto camera : cameras)
+		{
+			if (camera->isEnable())
+			{
+				RenderQueue* queue = camera->getRenderQueue();
+				graphics->addBaseRenderPassQueue((BaseQueue*)queue);
+
+				//先剔除
+				auto& cull_list = camera->getCullLayerList();
+				for (auto& index : cull_list)
+				{
+					//剔除到对应的渲染通道
+					RenderLayer::getRenderLayer(index)->culling(camera, queue);
+				}
+			}
+		}
+	}
+
 	//--------------------------------------------------------
 	//
 	//	CameraData
 	//
-	TINY_RTTI_CPP(CameraData)
+	TINY_RTTI_CPP(CameraData);
 	Camera* CameraData::getMainCamera()
 	{
 		return mMain;
@@ -65,15 +94,7 @@ namespace tezcat::Tiny
 
 	const std::vector<Camera*>& CameraData::getAllCamera()
 	{
-		if (mDirty)
-		{
-			mDirty = false;
-			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera* a, Camera* b)->auto
-			{
-				return a->getDeep() < b->getDeep();
-			});
-		}
-
+		this->sort();
 		return mCameraList;
 	}
 
@@ -84,10 +105,7 @@ namespace tezcat::Tiny
 
 	void CameraData::addCamera(Camera* camera)
 	{
-		if (camera->isMain())
-		{
-			mMain = camera;
-		}
+		this->setMain(camera);
 
 		if (mCameraList.empty())
 		{
@@ -97,20 +115,9 @@ namespace tezcat::Tiny
 		{
 			mDirty = true;
 			mCameraList.push_back(camera);
-// 			auto it = mCameraList.begin();
-// 			auto end = mCameraList.end();
-// 			while (it != end)
-// 			{
-// 				if ((*it)->getDeep() >= camera->getDeep())
-// 				{
-// 					mCameraList.insert(it, camera);
-// 					break;
-// 				}
-// 				it++;
-// 			}
 		}
 
-		mCameraWithName.emplace(camera->getGameObject()->getName(), camera);
+		mCameraWithName.try_emplace(camera->getGameObject()->getName(), camera);
 	}
 
 	Camera* CameraData::getCamera(const std::string& name)
@@ -134,21 +141,24 @@ namespace tezcat::Tiny
 		if (mDirty)
 		{
 			mDirty = false;
-			std::sort(mCameraList.begin(), mCameraList.end(), [](Camera* a, Camera* b)->auto
+			std::ranges::sort(mCameraList, [](Camera* a, Camera* b)->auto
 			{
-				return a->getDeep() < b->getDeep();
+				return a->getOrder() < b->getOrder();
 			});
 		}
 	}
 
 	void CameraData::setMain(Camera* camera)
 	{
-		if (mMain != nullptr)
+		mDirty = true;
+
+		if (mMain != nullptr && mMain != camera)
 		{
 			mMain->clearMain();
 		}
 
 		mMain = camera;
+		EngineEvent::get()->dispatch({ EngineEventID::EE_SetMainCamera, mMain });
 	}
 
 	void CameraData::setMain(const std::string& name)

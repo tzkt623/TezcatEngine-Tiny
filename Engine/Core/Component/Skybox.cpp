@@ -4,37 +4,32 @@
 #include "../Data/Material.h"
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
-#include "../Manager/PipelineManager.h"
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/Vertex.h"
 #include "../Renderer/BaseGraphics.h"
 #include "../Renderer/RenderLayer.h"
+#include "../Renderer/RenderCommand.h"
 
-#include "../Manager/VertexManager.h"
+#include "../Manager/BufferManager.h"
+#include "../Event/EngineEvent.h"
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Skybox)
+	TINY_RTTI_CPP(Skybox);
 
 	Skybox::Skybox()
-		: mVertex(VertexMgr::getInstance()->getVertex("Skybox"))
-		, mDrawMode(ContextMap::DrawModeArray[(int)DrawMode::Triangles])
-		, mMaterial(nullptr)
-		, mRenderAgent(mRenderAgent = RenderAgent::create(this, this))
 	{
-		mVertex->addRef();
-		mRenderAgent->addRef();
+		mRenderAgent->setComponent(this);
 	}
 
 	Skybox::~Skybox()
 	{
-		mVertex->subRef();
-		mRenderAgent->subRef();
-		mMaterial->subRef();
+
 	}
 
 	void Skybox::onStart()
 	{
+		EngineEvent::get()->dispatch(EventData{EngineEventID::EE_ActiveSkybox, this});
 		RenderLayer::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
 	}
 
@@ -45,58 +40,21 @@ namespace tezcat::Tiny
 
 	void Skybox::onEnable()
 	{
-
+		this->setMesh("Skybox");
 	}
 
-	Material* Skybox::getMaterial() const
+	void Skybox::sendToQueue(const RenderPhase& phase, RenderQueue* queue)
 	{
-		return mMaterial;
-	}
-
-	void Skybox::sendToRenderPass(const RenderPassType& passType)
-	{
-		if (passType != RenderPassType::Default)
+		switch (phase)
 		{
-			return;
-		}
-		auto shader = mMaterial->getShaderPackage()->getShaders()[0];
-		RenderPass::get(shader)->addRenderMesh(this);
-	}
-
-	void Skybox::submit(Shader* shader)
-	{
-		mMaterial->submit(this->getTransform(), shader);
-	}
-
-	DrawModeWrapper& Skybox::getDrawMode()
-	{
-		return mDrawMode;
-	}
-
-	int Skybox::getVertexCount() const
-	{
-		return mVertex->getVertexCount();
-	}
-
-	void Skybox::beginRender()
-	{
-		mVertex->bind();
-	}
-
-	void Skybox::endRender()
-	{
-		mVertex->unbind();
-	}
-
-	void Skybox::setMaterial(Material* material)
-	{
-		if (mMaterial)
+		case RenderPhase::Forward:
+		case RenderPhase::Deferred:
 		{
-			mMaterial->subRef();
+			queue->addRenderCommand(new RenderCMD_Skybox(mVertex, this->getTransform(), mMaterial));
+			break;
 		}
-
-		mMaterial = material;
-		mMaterial->addRef();
+		default:
+			break;
+		}
 	}
-
 }

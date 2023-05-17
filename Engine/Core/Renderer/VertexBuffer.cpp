@@ -7,7 +7,7 @@ namespace tezcat::Tiny
 	//
 	//
 	//
-	TINY_RTTI_CPP(VertexBuffer)
+	TINY_RTTI_CPP(VertexBuffer);
 	VertexBuffer::VertexBuffer()
 	{
 
@@ -29,7 +29,7 @@ namespace tezcat::Tiny
 	//
 	//
 	//
-	TINY_RTTI_CPP(IndexBuffer)
+	TINY_RTTI_CPP(IndexBuffer);
 	IndexBuffer::IndexBuffer()
 	{
 

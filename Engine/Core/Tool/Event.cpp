@@ -17,7 +17,7 @@ namespace tezcat::Tiny
 		auto result2 = mListenerWithOwnerUMap.find(master);
 		if (result2 == mListenerWithOwnerUMap.end())
 		{
-			auto vector = TinyUnique<std::vector<TinyRef<Listener>>>();
+			auto vector = TinyUnique<std::vector<std::shared_ptr<Listener>>>();
 			vector->emplace_back(listener);
 			mListenerWithOwnerUMap.emplace(master, TinyMove(vector));
 		}

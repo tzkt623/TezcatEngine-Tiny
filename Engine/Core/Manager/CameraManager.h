@@ -8,12 +8,14 @@
 namespace tezcat::Tiny
 {
 	class Camera;
+	class BaseGraphics;
+
 	class TINY_API CameraData : public TinyObject
 	{
 		friend class CameraManager;
 		CameraData() = default;
-		TINY_Factory(CameraData)
-		TINY_RTTI_H(CameraData)
+		TINY_Factory(CameraData);
+		TINY_RTTI_H(CameraData);
 
 	public:
 		Camera* getMainCamera();
@@ -27,6 +29,7 @@ namespace tezcat::Tiny
 		void setMain(Camera* camera);
 		void setMain(const std::string& name);
 		void addCamera(Camera* camera);
+
 	private:
 		bool mDirty;
 		Camera* mMain;
@@ -53,12 +56,13 @@ namespace tezcat::Tiny
 		void setMainCamera(Camera* camera);
 		void setMainCamera(const std::string& name);
 		void addCamera(Camera* camera);
+
+		void calculate(BaseGraphics* graphics);
+
 	private:
-		//CameraData* mData;
 		TinyWeakRef<CameraData> mData;
 		std::vector<Camera*> mEmptyCamera;
-	private:
-		//static CameraData* sEmpty;
+
 	};
 
 	using CameraMgr = SG<CameraManager>;

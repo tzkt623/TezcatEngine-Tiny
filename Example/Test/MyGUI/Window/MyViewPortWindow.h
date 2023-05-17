@@ -17,8 +17,8 @@ protected:
 	void drawInfo(const ImVec2& pos);
 
 private:
-	TextureBuffer2D* mColorBuffer;
-	TextureBuffer2D* mDepthBuffer;
+	Texture2D* mColorBuffer;
+	Texture2D* mDepthBuffer;
 
 	std::vector<float> mFrameTimeBuffer;
 };

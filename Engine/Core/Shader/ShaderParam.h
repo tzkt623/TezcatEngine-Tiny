@@ -30,10 +30,12 @@ namespace tezcat::Tiny
 		static UniformID MatrixN;
 		static UniformID MatrixSBV;
 		static UniformID MatrixLit;
+		static UniformID MatrixEnv;
 
 		static UniformID ViewPosition;
 		static UniformID ViewNearFar;
 		static UniformID ScreenLength;
+		static UniformID IsHDR;
 
 		static UniformID VertexColor;
 		static UniformID TexColor;

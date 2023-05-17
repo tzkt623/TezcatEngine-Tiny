@@ -6,28 +6,38 @@
 
 namespace tezcat::Tiny
 {
-	struct TextureBufferInfo;
-	class TextureRenderBuffer2D;
-	class TextureBuffer2D;
+	struct TextureInfo;
+	class Texture;
+	class Texture2D;
+	class TextureRender2D;
+	class TextureCube;
 
 	class TINY_API FrameBuffer : public TinyObject
 	{
-		TINY_RTTI_H(FrameBuffer)
+		TINY_RTTI_H(FrameBuffer);
 	public:
 		FrameBuffer();
 		virtual ~FrameBuffer();
-		virtual void attach(TextureRenderBuffer2D* buffer) = 0;
-		virtual void build(const std::function<void(FrameBuffer*)>& function) = 0;
 
-		TextureRenderBuffer2D* getBuffer(const int& index);
+		virtual void beginBuild() = 0;
+		virtual void endBuild() = 0;
+		virtual void attach(Texture* buffer) = 0;
+
+	public:
+		virtual void attach2D(Texture2D* tex) = 0;
+		virtual void attachRender(TextureRender2D* tex) = 0;
+		virtual void attachCube(TextureCube* tex) = 0;
+		virtual void attachCube(TextureCube* tex, int colorIndex, int faceIndex) = 0;
+
+		Texture* getBuffer(const int& index);
 
 	protected:
 		virtual void bind() = 0;
-		//virtual void unbind() = 0;
+		virtual void unbind() = 0;
 
 	protected:
 		uint32_t mBufferID;
-		TinyVector<TextureRenderBuffer2D*> mBuffers;
+		TinyVector<Texture*> mBuffers;
 
 	public:
 		static void bind(FrameBuffer* buffer);
@@ -44,3 +54,4 @@ namespace tezcat::Tiny
 		static FrameBuffer* sDefaultBuffer;
 	};
 }
+

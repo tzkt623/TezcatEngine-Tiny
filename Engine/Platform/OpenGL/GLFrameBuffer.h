@@ -10,41 +10,52 @@ namespace tezcat::Tiny::GL
 	class TINY_API GLFrameBufferDefault : public FrameBuffer
 	{
 		GLFrameBufferDefault();
-		TINY_Factory(GLFrameBufferDefault)
-		TINY_RTTI_H(GLFrameBufferDefault)
+		TINY_Factory(GLFrameBufferDefault);
+		TINY_RTTI_H(GLFrameBufferDefault);
 	public:
 		virtual ~GLFrameBufferDefault();
 
+		void beginBuild() override {}
+		void endBuild() override {}
+		void attach(Texture* tex) final {}
 
-		void attach(TextureRenderBuffer2D* buffer) final;
-		void build(const std::function<void(FrameBuffer*) >& function) final;
+	public:
+		void attach2D(Texture2D* tex) final {}
+		void attachRender(TextureRender2D* tex) final {}
+		void attachCube(TextureCube* tex) final {}
+		void attachCube(TextureCube* tex, int colorIndex, int faceIndex) {};
 
 	protected:
 		void bind() final;
-		//void unbind() final;
+		void unbind() final;
 	};
 
 	class TINY_API GLFrameBuffer : public FrameBuffer
 	{
 		GLFrameBuffer();
-		TINY_Factory(GLFrameBuffer)
-		TINY_RTTI_H(GLFrameBuffer)
+		TINY_Factory(GLFrameBuffer);
+		TINY_RTTI_H(GLFrameBuffer);
 	public:
 		~GLFrameBuffer();
 
-		void attach(TextureRenderBuffer2D* buffer) override;
-		void build(const std::function<void(FrameBuffer*) >& function) override;
+		void beginBuild() override;
+		void endBuild() override;
+		void attach(Texture* tex) override;
+
+	public:
+		void attach2D(Texture2D* tex) override;
+		void attachRender(TextureRender2D* tex) override;
+		void attachCube(TextureCube* tex) override;
+		void attachCube(TextureCube* tex, int colorIndex, int faceIndex) override;
 
 	protected:
 		void bind() override;
-		//void unbind() override;
+		void unbind() override;
+
 
 	private:
-		void createTextureBuffer(TextureBuffer2D* tex);
-		void createRenderBuffer(TextureRenderBuffer2D* tex);
-
-	private:
-		uint32_t mColorCount;
+		uint32_t mColorCount : 8;
+		bool mBuild;
 	};
 
 	//-------------------------------------------------

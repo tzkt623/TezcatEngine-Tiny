@@ -15,7 +15,9 @@ namespace tezcat::Tiny
 
 	class Shader;
 	class FrameBuffer;
-	class TINY_API ILight : public IRenderObserver
+	class BaseGraphics;
+
+	class TINY_API ILight : public IRenderObject
 	{
 	public:
 		virtual ~ILight() = default;
@@ -24,31 +26,22 @@ namespace tezcat::Tiny
 		virtual void render(BaseGraphics* graphics) {}
 	};
 
-// 	class TINY_API Light : public ComponentT<Light>, public ILight
-// 	{
-// 	public:
-// 		Light() = default;
-// 		virtual ~Light() = default;
-// 	};
-
 	class TINY_API DirectionalLight : public ComponentT<DirectionalLight>, public ILight
 	{
 		DirectionalLight();
 		DirectionalLight(const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
 	public:
-		TINY_Factory(DirectionalLight)
-		TINY_RTTI_H(DirectionalLight)
+		TINY_Factory(DirectionalLight);
+		TINY_RTTI_H(DirectionalLight);
 
 	public:
 		virtual ~DirectionalLight();
 
 		LightType getLightType() final { return LightType::Directional; }
-		glm::mat4& getViewMatrix() override;
 
 	public:
 		void render(BaseGraphics* graphics) override;
 		void submit(Shader* shader) override;
-		void submitViewMatrix(Shader* shader) override;
 
 		glm::vec3& getDirection() { return mDirection; }
 		void setDirection(const glm::vec3& val) { mDirection = val; }
@@ -71,15 +64,15 @@ namespace tezcat::Tiny
 		glm::vec3 mAmbient;
 		glm::vec3 mDiffuse;
 		glm::vec3 mSpecular;
-		glm::mat4 mViewMatrix;
 	};
 
 
 	class TINY_API PointLight : public ComponentT<PointLight>, public ILight
 	{
 		PointLight();
-	public:
-		TINY_Factory(PointLight)
+		TINY_Factory(PointLight);
+		TINY_RTTI_H(PointLight);
+
 	public:
 		virtual ~PointLight();
 
@@ -135,8 +128,10 @@ namespace tezcat::Tiny
 
 	class TINY_API SpotLight : public ComponentT<SpotLight>, public ILight
 	{
-	public:
 		SpotLight();
+		TINY_Factory(SpotLight);
+		TINY_RTTI_H(SpotLight);
+	public:
 		virtual ~SpotLight();
 
 		LightType getLightType() final { return LightType::Spot; }

@@ -184,7 +184,9 @@
     <ClCompile Include="Test\MyInputer.cpp" />
     <ClCompile Include="Test\MyResourceLoader.cpp" />
     <ClCompile Include="Test\Scene\MyMainScene.cpp" />
+    <ClCompile Include="Test\MyObserver.cpp" />
     <ClCompile Include="Test\Scene\MySecondScene.cpp" />
+    <ClCompile Include="Test\Scene\Tutorial01.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test\MyController.h" />
@@ -203,7 +205,9 @@
     <ClInclude Include="Test\MyInputer.h" />
     <ClInclude Include="Test\MyResourceLoader.h" />
     <ClInclude Include="Test\Scene\MyMainScene.h" />
+    <ClInclude Include="Test\MyObserver.h" />
     <ClInclude Include="Test\Scene\MySecondScene.h" />
+    <ClInclude Include="Test\Scene\Tutorial01.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

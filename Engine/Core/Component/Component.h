@@ -15,6 +15,7 @@ namespace tezcat::Tiny
 	class TINY_API Component : public TinyObject
 	{
 		friend class GameObject;
+		TINY_RTTI_H(Component);
 
 	public:
 		Component();

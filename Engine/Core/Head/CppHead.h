@@ -23,45 +23,48 @@
 #include <string_view>
 #include <tuple>
 #include <limits>
+#include <ranges>
+
 #include "ConfigHead.h"
 
 namespace tezcat::Tiny
 {
 	inline namespace v1
 	{
-		template<typename T>
-		using TinyRef = std::shared_ptr<T>;
-
-		template<typename T>
-		using TinyURef = std::unique_ptr<T>;
-
-		template<typename T>
-		using TinyWRef = std::weak_ptr<T>;
-
 		template<typename T, typename... Args>
-		constexpr TinyRef<T> TinyShared(Args&& ... args)
+		constexpr std::shared_ptr<T> TinyShared(Args&& ... args)
 		{
 			return std::make_shared<T>(std::forward<Args>(args)...);
 		}
 
 		template<typename T, typename... Args>
-		constexpr TinyURef<T> TinyUnique(Args&& ... args)
+		constexpr std::unique_ptr<T> TinyUnique(Args&& ... args)
 		{
 			return std::make_unique<T>(std::forward<Args>(args)...);
 		}
 
 		template<typename T1, typename T2>
-		constexpr TinyRef<T1> TinyStaticCast(const T2& pointer)
+		constexpr std::shared_ptr<T1> TinyStaticCast(const T2& pointer)
 		{
 			return std::static_pointer_cast<T1>(pointer);
 		}
 
 		template<typename T1, typename T2>
-		constexpr TinyRef<T1> TinyDynamicCast(const T2& pointer)
+		constexpr std::shared_ptr<T1> TinyDynamicCast(const T2& pointer)
 		{
 			return std::dynamic_pointer_cast<T1>(pointer);
 		}
 
 #define TinyMove(x) std::move(x)
+
+#ifndef TINY_Release
+#define TinyThrow(x) throw x
+#define TinyThrow_Logic(x) throw std::logic_error(x)
+#define TinyAssert(x) static_assert(x)
+#else
+#define TinyThrow(x)
+#define TinyThrow_Logic(x)
+#define TinyAssert(x)
+#endif
 	}
 }

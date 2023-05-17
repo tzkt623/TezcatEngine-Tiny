@@ -3,7 +3,6 @@
 
 namespace tezcat::Tiny
 {
-
 	//-----------------------------------------------------------------
 	//
 	//	TinyRefObject
@@ -54,6 +53,11 @@ namespace tezcat::Tiny
 	{
 		if (--mGCInfo->weakRef < 1)
 		{
+			if (mGCInfo->strongRef == -623)
+			{
+				return;
+			}
+
 			if (mGCInfo->strongRef < 1)
 			{
 				TinyGC::recycle(mGCInfo);

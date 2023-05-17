@@ -6,9 +6,9 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(GameObject)
+	TINY_RTTI_CPP(GameObject);
 
-		GameObject::GameObject()
+	GameObject::GameObject()
 		: GameObject("GameObject")
 	{
 
@@ -108,5 +108,31 @@ namespace tezcat::Tiny
 	//
 	TinyVector<GameObject*> GameObjectPool::sPool;
 	std::deque<int> GameObjectPool::sFreeObjects;
+
+	int GameObjectPool::addGameObject(GameObject* gameObject)
+	{
+		int uid;
+		if (sFreeObjects.empty())
+		{
+			uid = sPool.size();
+			sPool.push_back(gameObject);
+		}
+		else
+		{
+			uid = sFreeObjects.front();
+			sFreeObjects.pop_front();
+			sPool[uid] = gameObject;
+			gameObject->addRef();
+		}
+
+		return uid;
+	}
+
+	void GameObjectPool::removeGameObject(GameObject* gameObject)
+	{
+		auto uid = gameObject->getUID();
+		sPool[uid] = nullptr;
+		sFreeObjects.push_back(uid);
+	}
 
 }

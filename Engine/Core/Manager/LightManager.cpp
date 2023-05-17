@@ -4,7 +4,7 @@
 namespace tezcat::Tiny
 {
 	//------------------------------------------------------------
-	TINY_RTTI_CPP(LightData)
+	TINY_RTTI_CPP(LightData);
 
 	LightData::LightData()
 	{
@@ -32,5 +32,4 @@ namespace tezcat::Tiny
 	{
 		mData->pointLights.push_back(light);
 	}
-
 }

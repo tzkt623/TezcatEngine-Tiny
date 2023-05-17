@@ -56,10 +56,10 @@ namespace tezcat::Tiny
 			auto com = dynamic_cast<Component*>(*it);
 			if (com->isEnable())
 			{
-				if ((*it)->culling(com->getGameObject()))
-				{
+// 				if ((*it)->culling(com->getGameObject()))
+// 				{
 //					pipeline->addPassLightingTestRenderObject(*it, renderObject);
-				}
+//				}
 				it++;
 			}
 			else

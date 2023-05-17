@@ -28,6 +28,62 @@ namespace tezcat::Tiny
 		static const std::string Empty;
 	};
 
+	//-----------------------------------------------------
+	//
+	//	共享引用
+	//
+	class TinyBaseSharedRef
+	{
+	public:
+		constexpr TinyBaseSharedRef() noexcept = default;
+		constexpr TinyBaseSharedRef(std::nullptr_t) noexcept {}
+
+	public:
+		virtual TinyRefObject* getTinyRefObject() = 0;
+
+	};
+
+	template<class T>
+	class TinySharedRef : public TinyBaseSharedRef
+	{
+		using Type = std::enable_if_t<
+			std::is_base_of_v<TinyRefObject, T>
+			&& std::is_class_v<T>
+			, T>;
+
+		template<typename To>
+		using ToType = std::enable_if_t<
+			std::is_base_of_v<TinyRefObject, To>
+			&& std::is_class_v<To>
+			, To>;
+	public:
+		constexpr TinySharedRef() noexcept
+			: TinyBaseSharedRef()
+		{
+
+		}
+
+		constexpr TinySharedRef(std::nullptr_t) noexcept
+			: TinyBaseSharedRef()
+		{
+
+		}
+
+	public:
+		TinySharedRef& operator=(const TinySharedRef& other)
+		{
+			return *this;
+		}
+
+		Type* operator->()
+		{
+			return mObject;
+		}
+
+	private:
+		Type* mObject;
+	};
+
 	//-------------------------------------
 	//
 	// 弱引用
@@ -55,7 +111,6 @@ namespace tezcat::Tiny
 		virtual ~TinyBaseWeakRef();
 
 		TinyRefObject* getTinyRefObject() { return mGCInfo->pointer; }
-
 
 		void reset(TinyRefObject* other)
 		{
@@ -108,7 +163,7 @@ namespace tezcat::Tiny
 		TinyWeakRef(TinyWeakRef&& other)
 		{
 			mGCInfo = other.mGCInfo;
-			other.mGCInfo = nullptr;
+			other.mGCInfo = TinyGC::DefaultGCInfo;
 		}
 
 		virtual ~TinyWeakRef() {}
@@ -169,17 +224,15 @@ public:\
 		auto obj = new className(std::forward<Args>(args)...);\
 		obj->manageThis();\
 		return obj;\
-	}\
-private:
+	}
 
 #define TINY_RTTI_H(className)\
-private:\
-	static const std::string __rttiClassName;\
 public:\
 	constexpr static const std::string& getClassNameStatic() { return __rttiClassName; }\
-	const std::string& getClassName() const override { return __rttiClassName; }
-
+	const std::string& getClassName() const override { return __rttiClassName; }\
+private:\
+	static const std::string __rttiClassName
 
 #define TINY_RTTI_CPP(className)\
-const std::string className::__rttiClassName = #className;
+const std::string className::__rttiClassName = #className
 }

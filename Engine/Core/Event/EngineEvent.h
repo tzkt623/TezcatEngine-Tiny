@@ -21,6 +21,13 @@ namespace tezcat::Tiny
 		EE_LoadScene = 0,
 		EE_PopScene,
 		EE_PushScene,
+		EE_OnPopScene,
+		EE_OnPushScene,
+
+		EE_SetMainCamera,
+		EE_ActiveSkybox,
+
+
 		EE_IDCount
 	};
 }

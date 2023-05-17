@@ -12,65 +12,49 @@ namespace tezcat::Tiny::GL
 	{
 		GLTexture2D();
 
-		TINY_Factory(GLTexture2D)
-		TINY_RTTI_H(GLTexture2D)
+		TINY_Factory(GLTexture2D);
+		TINY_RTTI_H(GLTexture2D);
 	public:
 		virtual ~GLTexture2D();
 
 		void create(const Image& img, const TextureInfo& info) override;
+		void create(const int& width
+				   , const int& height
+				   , const TextureChannel& internalChannel
+				   , const TextureChannel& channel
+				   , const DataType& dataType) override;
+
+		void create(const int& width, const int& height, const TextureInfo& info) override;
 	};
 
 	class TINY_API GLTextureCube : public TextureCube
 	{
 		GLTextureCube();
 
-		TINY_Factory(GLTextureCube)
-		TINY_RTTI_H(GLTextureCube)
+		TINY_Factory(GLTextureCube);
+		TINY_RTTI_H(GLTextureCube);
 	public:
 		virtual ~GLTextureCube();
 
 		void create(const std::array<Image, 6>& images, const TextureInfo& info) override;
+		void create(const int& width, const int& hegiht, const TextureInfo& info) override;
 
 	private:
 
 	};
 
-	class TINY_API GLTextureRenderBuffer2D : public TextureRenderBuffer2D
+	class TINY_API GLTextureRender2D : public TextureRender2D
 	{
-		GLTextureRenderBuffer2D();
-		TINY_Factory(GLTextureRenderBuffer2D)
-		TINY_RTTI_H(GLTextureRenderBuffer2D)
+		GLTextureRender2D();
+		TINY_Factory(GLTextureRender2D);
+		TINY_RTTI_H(GLTextureRender2D);
 	public:
-		virtual ~GLTextureRenderBuffer2D();
+		virtual ~GLTextureRender2D();
 
 		void create(const int& width
-			, const int& high
+			, const int& height
 			, const TextureChannel& internalChannel) override;
 	};
-
-	class TINY_API GLTextureBuffer2D : public TextureBuffer2D
-	{
-		GLTextureBuffer2D();
-		TINY_Factory(GLTextureBuffer2D)
-		TINY_RTTI_H(GLTextureBuffer2D)
-	public:
-		virtual ~GLTextureBuffer2D();
-
-		void create(const int& width
-			, const int& high
-			, const TextureChannel& internalChannel) override;
-
-		void create(const int& width
-			, const int& high
-			, const TextureChannel& internalChannel
-			, const TextureChannel& channel
-			, const DataType& dataType) override;
-
-		void create(const int& width, const int& high
-			, const TextureBufferInfo& info) override;
-	};
-
-
 
 
 	//-----------------------------------
@@ -87,7 +71,6 @@ namespace tezcat::Tiny::GL
 	protected:
 		Texture2D* create2D() override;
 		TextureCube* createCube() override;
-		TextureRenderBuffer2D* createRenderBuffer2D() override;
-		TextureBuffer2D* createBuffer2D() override;
+		TextureRender2D* createRender2D() override;
 	};
 }

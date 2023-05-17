@@ -6,7 +6,7 @@ namespace tezcat::Tiny
 	FrameBuffer* FrameBuffer::sDefaultBuffer;
 	TinyStack<FrameBuffer*> FrameBuffer::sFrameBufferStack;
 
-	TINY_RTTI_CPP(FrameBuffer)
+	TINY_RTTI_CPP(FrameBuffer);
 
 	FrameBuffer::FrameBuffer()
 		: mBufferID(-1)
@@ -20,7 +20,7 @@ namespace tezcat::Tiny
 
 	}
 
-	TextureRenderBuffer2D* FrameBuffer::getBuffer(const int& index)
+	Texture* FrameBuffer::getBuffer(const int& index)
 	{
 		return mBuffers[index];
 	}

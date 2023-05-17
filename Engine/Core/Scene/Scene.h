@@ -14,12 +14,13 @@ namespace tezcat::Tiny
 	class Layer;
 	class RenderLayer;
 	class LightLayer;
+	class BaseGraphics;
 	class TINY_API Scene : public TinyObject
 	{
 		friend class GameObject;
 		friend class Transform;
 
-		TINY_RTTI_H(Scene)
+		TINY_RTTI_H(Scene);
 
 	protected:
 		Scene(const std::string& name);
@@ -35,7 +36,7 @@ namespace tezcat::Tiny
 		virtual void onResume();
 
 	public:
-		void update();
+		void update(BaseGraphics* graphics);
 		void addCamera(Camera* camera);
 
 	public:
@@ -72,7 +73,6 @@ namespace tezcat::Tiny
 		LightData* mLightData;
 		//相机数据
 		CameraData* mCameraData;
-	public:
 	};
 }
 

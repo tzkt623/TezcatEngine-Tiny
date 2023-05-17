@@ -11,8 +11,8 @@ namespace tezcat::Tiny
 		friend class Scene;
 		Transform();
 		Transform(Transform* parent);
-		TINY_RTTI_H(Transform)
-			TINY_Factory(Transform)
+		TINY_RTTI_H(Transform);
+		TINY_Factory(Transform);
 
 	public:
 		virtual ~Transform();
@@ -200,5 +200,11 @@ namespace tezcat::Tiny
 	private:
 		Transform* mFront;
 		Transform* mBack;
+	};
+
+
+	class TINY_API Collider
+	{
+
 	};
 }

@@ -34,12 +34,12 @@ namespace tezcat::Tiny
 
 	public:
 		void loadIncludeFiles(const std::string& path);
+		void loadShaderFiles(const std::string& path);
 
 		std::string getIncludeContent(const std::string& name);
 		void clearIncludeFiles();
 		void rebuildShaders();
 		void rebuild(ShaderPackage* package);
-
 	private:
 		std::unordered_map<std::string, ShaderPackage*> mShaderPackageDict;
 		std::vector<ShaderPackage*> mShaderPackageAry;

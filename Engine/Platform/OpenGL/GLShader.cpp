@@ -6,7 +6,8 @@
 namespace tezcat::Tiny::GL
 {
 	GLShader::GLShader()
-		: mTexureCountor(0)
+		: mLocalTexure(0)
+		, mGlobalTexture(0)
 	{
 	}
 
@@ -31,7 +32,7 @@ namespace tezcat::Tiny::GL
 		glUseProgram(0);
 	}
 
-	void GLShader::onApply(const UniformID::USet& uniforms)
+	void GLShader::buildWithUniforms(const UniformID::USet& uniforms)
 	{
 		glLinkProgram(mProgramID);
 
@@ -46,14 +47,13 @@ namespace tezcat::Tiny::GL
 		mTinyUniformList.resize(UniformID::allStringCount(), -1);
 		for (auto& uniform_id : uniforms)
 		{
-			//std::cout << uniform_id.getString() << std::endl;
 			if (uniform_id.getUID() < mTinyUniformList.size())
 			{
 				mTinyUniformList[uniform_id.getUID()] = glGetUniformLocation(mProgramID, uniform_id.getStringData());
 			}
 			else
 			{
-				Log::error(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", uniform_id.getStringData()));
+				Log_Error(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", uniform_id.getStringData()));
 			}
 		}
 
@@ -118,6 +118,16 @@ namespace tezcat::Tiny::GL
 		{
 			glUniform3fv(mTinyUniformList[ShaderParam::ViewPosition], 1, glm::value_ptr(position));
 		}
+	}
+
+	void GLShader::resetLocalState()
+	{
+		mLocalTexure = 0;
+	}
+
+	void GLShader::resetGlobalState()
+	{
+		mGlobalTexture = 0;
 	}
 
 	void GLShader::setFloat1(const char* name, float* data)
@@ -298,26 +308,54 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix4fv(mTinyUniformList[uniform], 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
+	void GLShader::setMat4(UniformID& uniform, glm::mat4 data[], int count)
+	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+
+		glUniformMatrix4fv(mTinyUniformList[uniform], count, GL_FALSE, glm::value_ptr(data[0]));
+	}
+
+	void GLShader::setGlobalTexture2D(UniformID& uniform, Texture2D* data)
+	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+
+		glUniform1i(mTinyUniformList[uniform], mGlobalTexture);
+		glActiveTexture(GL_TEXTURE0 + mGlobalTexture);
+		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
+		++mGlobalTexture;
+	}
+
 	void GLShader::setTexture2D(UniformID& uniform, Texture2D* data)
 	{
 		if (mTinyUniformList[uniform] < 0)
 		{
 			return;
 		}
-		glUniform1i(mTinyUniformList[uniform], mTexureCountor);
-		glActiveTexture(GL_TEXTURE0 + mTexureCountor++);
+
+		glUniform1i(mTinyUniformList[uniform], mGlobalTexture + mLocalTexure);
+		glActiveTexture(GL_TEXTURE0 + mGlobalTexture + mLocalTexure);
 		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
+		++mLocalTexure;
 	}
 
 	void GLShader::setTextureCube(UniformID& uniform, TextureCube* data)
 	{
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE0 + mGlobalTexture + mLocalTexure);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
+		++mLocalTexure;
 	}
 
-	void GLShader::resetState()
+	void GLShader::setGlobalTextureCube(UniformID& uniform, TextureCube* data)
 	{
-		mTexureCountor = 0;
+		glActiveTexture(GL_TEXTURE0 + mGlobalTexture);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
+		++mGlobalTexture;
 	}
 
 	void GLShader::clear()
@@ -325,7 +363,7 @@ namespace tezcat::Tiny::GL
 
 	}
 
-	void GLShader::create()
+	void GLShader::createID()
 	{
 		if (mProgramID > 0)
 		{
@@ -334,4 +372,5 @@ namespace tezcat::Tiny::GL
 
 		mProgramID = glCreateProgram();
 	}
+
 }

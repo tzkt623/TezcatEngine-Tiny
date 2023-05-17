@@ -18,9 +18,9 @@ namespace tezcat::Tiny
 		static TinyGCInfo* getNextGCInfo(TinyRefObject* object);
 		static void recycle(TinyGCInfo* info);
 
-		static uint32_t totalID() { return mGCInfos.size(); }
-		static uint32_t freeID() { return mFreeGCInfos.size(); }
-		static uint32_t usedID() { return mGCInfos.size() - mFreeGCInfos.size(); }
+		static uint32_t totalID() { return(uint32_t)mGCInfos.size(); }
+		static uint32_t freeID() { return (uint32_t)mFreeGCInfos.size(); }
+		static uint32_t usedID() { return (uint32_t)(mGCInfos.size() - mFreeGCInfos.size()); }
 
 		static const std::vector<TinyGCInfo*>& getGCInfos() { return mGCInfos; }
 

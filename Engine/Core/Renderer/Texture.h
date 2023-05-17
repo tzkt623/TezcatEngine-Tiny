@@ -1,6 +1,6 @@
 #pragma once
 #include "../Head/CppHead.h"
-#include "../Head/Context.h"
+#include "../Head/RenderConfig.h"
 #include "../Head/ConfigHead.h"
 #include "../Base/TinyObject.h"
 
@@ -11,133 +11,132 @@ namespace tezcat::Tiny
 	struct TINY_API TextureInfo
 	{
 		std::string name;
+		TextureType type;
+		TextureAttachPosition attachPosition;
 		TextureFilter filter;
 		TextureWrap wrap;
 		TextureChannel internalChannel;
 		TextureChannel channel;
 		DataType dataType;
-		bool isManagered;
 
-		/// <summary>
-		/// Skybox Used
-		/// </summary>
+		/*
+		* @author HCL
+		* @info 2023|5|17
+		* @brief name填空字符串表示不将此tex保存在manager中
+		*/
+		TextureInfo(const std::string& name
+				  , const TextureType& type
+				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& filter				  , const TextureWrap& wrap				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
+			: name(name)
+			, type(type)
+			, attachPosition(attachPosition)			, filter(filter)			, wrap(wrap)			, internalChannel(internalChannel)			, channel(channel)			, dataType(dataType)
+		{
+
+		}
+		/*
+		* @author HCL
+		* @info 2023|5|17
+		* @brief name填空字符串表示不将此tex保存在manager中
+		* @brief 创建Skybox
+		*/
 		TextureInfo(const std::string& name)
 			: TextureInfo(name
-				, TextureFilter::Linear
-				, TextureWrap::Repeat
-				, TextureChannel::None
-				, TextureChannel::None
-				, DataType::UByte
-				, true)
+						, TextureType::TextureCube
+						, TextureAttachPosition::ColorComponent
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, TextureChannel::None
+						, TextureChannel::None
+						, DataType::UByte)
 		{
 
 		}
 
-		/// <summary>
-		/// Texture2D
-		/// </summary>
+		/*
+		* @author HCL
+		* @info 2023|5|17
+		* @brief name填空字符串表示不将此tex保存在manager中
+		*/
 		TextureInfo(const std::string& name
-			, const TextureChannel& internalChannel
-			, const TextureWrap& wrap = TextureWrap::Repeat
-			, const TextureFilter& filter = TextureFilter::Linear)
+				  , const TextureChannel& internalChannel
+				  , const TextureWrap& wrap = TextureWrap::Repeat
+				  , const TextureFilter& filter = TextureFilter::Linear)
 			: TextureInfo(name
-				, filter
-				, wrap
-				, internalChannel
-				, internalChannel
-				, DataType::UByte
-				, true)
+						, TextureType::Texture2D
+						, TextureAttachPosition::ColorComponent
+						, filter
+						, wrap
+						, internalChannel
+						, internalChannel
+						, DataType::UByte)
 		{
 
 		}
 
+		/*
+		* @author HCL
+		* @info 2023|5|17
+		* @brief name填空字符串表示不将此tex保存在manager中
+		* @brief 创建RenderBuffer
+		*/
 		TextureInfo(const std::string& name
-			, const TextureFilter& filter
-			, const TextureWrap& wrap
-			, const TextureChannel& internalChannel
-			, const TextureChannel& channel
-			, const DataType& dataType
-			, bool isManagered = true)
-			: name(name)
-			, filter(filter)
-			, wrap(wrap)
-			, internalChannel(internalChannel)
-			, channel(channel)
-			, dataType(dataType)
-			, isManagered(isManagered)
-		{
-
-		}
-	};
-
-	enum class TINY_API TextureBufferType : uint32_t
-	{
-		ColorComponent = 0,
-		DepthComponent,
-		StencilCompoent,
-		DepthStencilComponent,
-	};
-
-	struct TINY_API TextureBufferInfo : TextureInfo
-	{
-		TextureBufferType bufferType;
-		bool isCache;
-
-		/// <summary>
-		/// RenderBuffer Used
-		/// </summary>
-		TextureBufferInfo(const std::string& name
-			, const TextureBufferType& bufferType
-			, const TextureChannel& internalChannel)
-			: TextureBufferInfo(name
-				, bufferType
-				, TextureFilter::Linear
-				, TextureWrap::Repeat
-				, internalChannel
-				, internalChannel
-				, DataType::UByte
-				, true
-				, false)
+				  , const TextureType& type
+				  , const TextureAttachPosition& attachPosition
+				  , const TextureChannel& internalChannel)
+			: TextureInfo(name
+						, type
+						, attachPosition
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, internalChannel
+						, internalChannel
+						, DataType::UByte)
 		{
 
 		}
 
-		/// <summary>
-		/// ColorBuffer
-		/// </summary>
-		TextureBufferInfo(const std::string& name
-			, const TextureBufferType& bufferType
-			, const TextureChannel& internalChannel
-			, const TextureChannel& channel
-			, const DataType& dataType
-			, bool isManagered)
-			: TextureBufferInfo(name
-				, bufferType
-				, TextureFilter::Linear
-				, TextureWrap::Repeat
-				, internalChannel
-				, channel
-				, dataType
-				, false
-				, isManagered)
-
+		/*
+		* @author HCL
+		* @info 2023|5|17
+		* @brief name填空字符串表示不将此tex保存在manager中
+		* @brief 创建ColorBuffer
+		*/
+		TextureInfo(const std::string& name
+				  , const TextureAttachPosition& attachPosition
+				  , const TextureChannel& internalChannel
+				  , const TextureChannel& channel
+				  , const DataType& dataType)
+			: TextureInfo(name
+						, TextureType::Texture2D
+						, attachPosition
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, internalChannel
+						, channel
+						, dataType)
 		{
 
 		}
 
-		TextureBufferInfo(const std::string& name
-			, const TextureBufferType& bufferType
-			, const TextureFilter& filter
-			, const TextureWrap& warp
-			, const TextureChannel& internalChannel
-			, const TextureChannel& channel
-			, const DataType& dataType
-			, bool isCache
-			, bool isManagered)
-			: TextureInfo(name, filter, warp, internalChannel, channel, dataType, isManagered)
-			, bufferType(bufferType)
-			, isCache(isCache)
-
+		/*
+		* @author HCL
+		* @info 2023|5|17
+		* @brief name填空字符串表示不将此tex保存在manager中
+		*/
+		TextureInfo(const std::string& name
+				  , const TextureType type
+				  , const TextureAttachPosition& attachPosition
+				  , const TextureChannel& internalChannel
+				  , const TextureChannel& channel
+				  , const DataType& dataType)
+			: TextureInfo(name
+						, TextureType::Texture2D
+						, attachPosition
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, internalChannel
+						, channel
+						, dataType)
 		{
 
 		}
@@ -145,14 +144,14 @@ namespace tezcat::Tiny
 
 	class TINY_API Texture : public TinyObject
 	{
-		TINY_RTTI_H(Texture)
+		TINY_RTTI_H(Texture);
 	public:
 		Texture();
 
 		Texture(const TextureChannel& internalChannel
-			, const TextureWrap& wrap
-			, const TextureFilter& filter
-			, const bool& isManagered = false);
+			  , const TextureWrap& wrap
+			  , const TextureFilter& filter
+			  , const bool& isManagered = false);
 		virtual ~Texture();
 
 		virtual TextureType getTextureType() const = 0;
@@ -179,6 +178,9 @@ namespace tezcat::Tiny
 		bool isManagered() { return mIsManagered; }
 		void setManagered(bool value) { mIsManagered = value; }
 
+		const TextureAttachPosition& getAttachPosition() const { return mAttachPosition; }
+		void setAttachPosition(const TextureAttachPosition& val) { mAttachPosition = val; }
+
 	public:
 		static TexChannelWrapper getTextureChannels(const Image& image);
 
@@ -190,6 +192,7 @@ namespace tezcat::Tiny
 		TexChannelWrapper mInternalChannel;
 		TexChannelWrapper mChannel;
 		DataTypeWrapper mDataType;
+		TextureAttachPosition mAttachPosition;
 		bool mIsManagered;
 
 	private:
@@ -200,20 +203,27 @@ namespace tezcat::Tiny
 
 	class TINY_API Texture2D : public Texture
 	{
-		TINY_RTTI_H(Texture2D)
+		TINY_RTTI_H(Texture2D);
 	public:
 		Texture2D();
-		~Texture2D() = default;
+		virtual ~Texture2D() = default;
+
 		TextureType getTextureType() const override { return TextureType::Texture2D; }
-		virtual void create(const Image& img, const TextureInfo& info) = 0;
+		virtual void create(const Image& img, const TextureInfo& info) {};
+		virtual void create(const int& width, const int& height
+						   , const TextureChannel& internalChannel
+						   , const TextureChannel& channel
+						   , const DataType& dataType) {};
+		virtual void create(const int& width, const int& height, const TextureInfo& info) {};
+
 		void setSize(const int& width, const int& height)
 		{
 			mWidth = width;
 			mHeight = height;
 		}
 
-		uint32_t getWidth() { return mWidth; }
-		uint32_t getHeight() { return mHeight; }
+		uint32_t getWidth() const { return mWidth; }
+		uint32_t getHeight() const { return mHeight; }
 
 	protected:
 		uint32_t mWidth;
@@ -222,57 +232,40 @@ namespace tezcat::Tiny
 
 	class TINY_API Texture3D : public Texture
 	{
-		TINY_RTTI_H(Texture3D)
+		TINY_RTTI_H(Texture3D);
 	public:
+		virtual ~Texture3D() = default;
+
 		TextureType getTextureType() const final { return TextureType::Texture3D; }
 	};
 
 	class TINY_API TextureCube : public Texture
 	{
-		TINY_RTTI_H(TextureCube)
+		TINY_RTTI_H(TextureCube);
 	public:
+		virtual ~TextureCube() = default;
+
 		TextureType getTextureType() const final { return TextureType::TextureCube; }
 		virtual void create(const std::array<Image, 6>& images, const TextureInfo& info) = 0;
+		virtual void create(const int& width, const int& hegiht, const TextureInfo& info) = 0;
+
 	};
 
 	/// <summary>
 	/// WriteOnlyBuffer
 	/// Used By FrameBuffer
 	/// </summary>
-	class TINY_API TextureRenderBuffer2D : public Texture2D
+	class TINY_API TextureRender2D : public Texture2D
 	{
-		TINY_RTTI_H(TextureRenderBuffer2D)
+		TINY_RTTI_H(TextureRender2D);
 	public:
-		TextureType getTextureType() const override { return TextureType::TextureRenderBuffer2D; }
-		virtual void create(const int& width, const int& high, const TextureChannel& interanlChannel) = 0;
+		virtual ~TextureRender2D() = default;
 
-		const TextureBufferType& getBufferType() const { return mBufferType; }
-		void setBufferType(const TextureBufferType& val) { mBufferType = val; }
+		TextureType getTextureType() const override { return TextureType::TextureRender2D; }
+		virtual void create(const int& width, const int& height, const TextureChannel& interanlChannel) = 0;
+
 
 	private:
 		void create(const Image& img, const TextureInfo& info) final {};
-
-	protected:
-		TextureBufferType mBufferType;
-
 	};
-
-	/// <summary>
-	/// Used By FrameBuffer
-	/// </summary>
-	class TINY_API TextureBuffer2D : public TextureRenderBuffer2D
-	{
-		TINY_RTTI_H(TextureBuffer2D)
-	public:
-		TextureType getTextureType() const final { return TextureType::TextureBuffer2D; }
-		virtual void create(const int& width
-							, const int& high
-							, const TextureChannel& internalChannel
-							, const TextureChannel& channel
-							, const DataType& dataType) = 0;
-
-		virtual void create(const int& width, const int& high, const TextureBufferInfo& info) = 0;
-	};
-
-
 }

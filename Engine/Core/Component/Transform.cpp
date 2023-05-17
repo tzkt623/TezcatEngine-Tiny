@@ -7,7 +7,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Transform)
+	TINY_RTTI_CPP(Transform);
 
 	static glm::mat4 WORLD_MATRIX(1.0f);
 	static glm::vec3 XAxis(1.0f, 0.0f, 0.0f);

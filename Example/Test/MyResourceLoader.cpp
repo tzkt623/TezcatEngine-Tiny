@@ -5,11 +5,12 @@
 
 #include "Scene/MyMainScene.h"
 #include "Scene/MySecondScene.h"
-
+#include "Scene/Tutorial01.h"
 
 
 using namespace tezcat::Tiny::GL;
-#define CreateWindow(host, X) (new X)->open(host)
+#define CreateWindow(host, X) (new X())->open(host)
+
 MyResourceLoader::MyResourceLoader()
 	: ResourceLoader(RenderAPI::OpenGL)
 {
@@ -39,8 +40,9 @@ void MyResourceLoader::prepareResource(Engine* engine)
 void MyResourceLoader::prepareGame(Engine* engine)
 {
 	ResourceLoader::prepareGame(engine);
-	auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
+	ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
 
+	auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
 	CreateWindow(gui_host, MyMainDockWindow);
 	CreateWindow(gui_host, MyViewPortWindow);
 	CreateWindow(gui_host, MyObjectWindow);
@@ -48,11 +50,9 @@ void MyResourceLoader::prepareGame(Engine* engine)
 	CreateWindow(gui_host, MyLogWindow);
 	CreateWindow(gui_host, MyGCInfoWindow);
 
-	engine->getGraphics()->setShadowMap(1024, 1024);
-
  	SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
  	SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
- 	//SceneMgr::getInstance()->pushScene("MyScene");
+ 	SceneMgr::getInstance()->prepareScene(Tutorial01::create("Tutorial01"));
 }
 
 void MyResourceLoader::initYourShaderParam()

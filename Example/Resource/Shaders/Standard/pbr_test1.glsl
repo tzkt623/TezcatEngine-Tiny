@@ -11,6 +11,7 @@
         str Name = PBRTest1;
         int Version = 330;
         int OrderID = 50;
+        str LightMode = Forward;
         str Queue = Opaque;
         str DepthTest = Less;
         bool ZWrite = true;
@@ -80,29 +81,38 @@
 
             //计算一个灯的光照
             vec3 Lo = vec3(0.0);
-            vec3 L = normalize(-TINY_LitDir.direction);
-            vec3 H = normalize(V + L); 
-            float cosTheta = max(dot(N, L), 0.0);
-            vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
+            {
+                vec3 L = normalize(-TINY_LitDir.direction);
+                vec3 H = normalize(V + L); 
+                float cosTheta = max(dot(N, L), 0.0);
+                vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
 
-            float NDF = DistributionGGX(N, H, roughness);
-            float G = GeometrySmith(N, V, L, remapADirect(roughness));
-            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+                float NDF = DistributionGGX(N, H, roughness);
+                float G = GeometrySmith(N, V, L, remapADirect(roughness));
+                vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-            vec3 kS = F;
-            vec3 kD = vec3(1.0) - kS;
-            kD *= 1.0 - metallic;
+                vec3 kS = F;
+                vec3 kD = vec3(1.0) - kS;
+                kD *= 1.0 - metallic;
 
-            vec3 nominator = NDF * G * F;
-            float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
-            vec3 specular = nominator / denominator;
+                vec3 nominator = NDF * G * F;
+                float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
+                vec3 specular = nominator / denominator;
 
-            // add to outgoing radiance Lo
-            float NdotL = max(dot(N, L), 0.0);                
-            Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+                // add to outgoing radiance Lo
+                float NdotL = max(dot(N, L), 0.0);                
+                Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+            }
 
             //计算漫反射颜色
-            vec3 ambient = vec3(0.03) * albedo * ao;
+            //vec3 ambient = vec3(0.03) * albedo * ao;
+
+            vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+            vec3 kD = 1.0 - kS;
+            kD *= 1.0 - metallic;	  
+            vec3 irradiance = texture(TINY_TexEnv, N).rgb;
+            vec3 diffuse = irradiance * albedo;
+            vec3 ambient = (kD * diffuse) * ao;
             vec3 color = ambient + Lo;
 
             color = color / (color + vec3(1.0));

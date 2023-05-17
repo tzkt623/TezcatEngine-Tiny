@@ -6,6 +6,7 @@
 namespace tezcat::Tiny
 {
 	class Scene;
+	class BaseGraphics;
 	class TINY_API SceneManager
 	{
 	public:
@@ -13,7 +14,7 @@ namespace tezcat::Tiny
 		~SceneManager();
 
 		void init();
-		bool update();
+		bool update(BaseGraphics* graphics);
 
 	public:
 		void prepareScene(Scene* scene);

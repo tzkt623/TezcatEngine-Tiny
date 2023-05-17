@@ -5,9 +5,7 @@
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
-#include "../Head/Context.h"
-#include "../Pipeline/PipelineQueue.h"
-#include "../Pipeline/Pipeline.h"
+#include "../Head/RenderConfig.h"
 
 
 namespace tezcat::Tiny
@@ -15,48 +13,46 @@ namespace tezcat::Tiny
 	class Texture;
 	class TexttureCube;
 	class PipelineQueue;
+
+	/*
+	* Shader
+	* @brief 含有一个唯一UID,使用这个ID去创建对应的RenderPass,
+	*/
 	class TINY_API Shader
 	{
-		//---------------------------------------------
-		//
-		//
 	public:
 		Shader();
 		Shader(const std::string& name, int orderID);
 		~Shader();
 
-		virtual void create() {}
+		virtual void createID() {}
 		virtual void clear() {}
 		void apply();
 
-		inline const std::string& getName() const { return mName; }
-		inline PipelineQueue::Queue getRenderQueue() const { return mRenderQueue; }
-		inline void setRenderQueue(PipelineQueue::Queue val) { mRenderQueue = val; }
-		inline void setName(const std::string& name) { mName = name; }
-		inline int getProgramID() const { return mProgramID; }
-		inline int getOrderID() const { return mOrderID; }
-		inline void setOrderID(int orderID) { mOrderID = orderID; }
-		inline int getUID() const { return mUID; }
-		inline int getVersion() const { return mVersion; }
-		inline void setVersion(int val) { mVersion = val; }
-		inline void setLightMode(LightMode lightMode) { mLightMode = lightMode; }
-		inline LightMode getLightMode() { return mLightMode; }
+		const std::string& getName() const { return mName; }
+		Queue getRenderQueue() const { return mRenderQueue; }
+		void setRenderQueue(Queue val) { mRenderQueue = val; }
+		void setName(const std::string& name) { mName = name; }
+		int getProgramID() const { return mProgramID; }
+		int getOrderID() const { return mOrderID; }
+		void setOrderID(int orderID) { mOrderID = orderID; }
+		int getUID() const { return mUID; }
+		int getVersion() const { return mVersion; }
+		void setVersion(int val) { mVersion = val; }
+		void setLightMode(LightMode lightMode) { mLightMode = lightMode; }
+		LightMode getLightMode() { return mLightMode; }
+		bool isShadowReceiver() { return mIsShadowReceiver; }
 
 	public:
-		void apply(const UniformID::USet& uniforms);
-
-	protected:
-		virtual void onApply(const UniformID::USet& uniforms) {}
+		virtual void buildWithUniforms(const UniformID::USet& uniforms) = 0;
 
 	public:
 		void begin();
 		void end();
 		virtual void bind() = 0;
 		virtual void unbind() = 0;
-		virtual void resetState() = 0;
-
-	public:
-		inline bool isEnableLighting() const { return mEnableLighting; }
+		virtual void resetGlobalState() = 0;
+		virtual void resetLocalState() = 0;
 
 	public:
 		/// <summary>
@@ -64,7 +60,6 @@ namespace tezcat::Tiny
 		/// </summary>
 		virtual void setStateOptions() = 0;
 		void setZWrite(bool val) { mEnableZWrite = val; }
-		void setLighting(bool val) { mEnableLighting = val; }
 
 		void setCullFace(const CullFace& value)
 		{
@@ -120,7 +115,6 @@ namespace tezcat::Tiny
 
 		virtual void setMat3(const char* name, float* data) = 0;
 		virtual void setMat4(const char* name, const float* data) = 0;
-		virtual void setMat4(UniformID& uniform, const glm::mat4& mat4) = 0;
 
 	public://快速传参
 		virtual void setFloat1(UniformID& uniform, float* data) = 0;
@@ -138,27 +132,26 @@ namespace tezcat::Tiny
 		virtual void setMat3(UniformID& uniform, float* data) = 0;
 		virtual void setMat3(UniformID& uniform, const glm::mat3& mat3) = 0;
 		virtual void setMat4(UniformID& uniform, const float* data) = 0;
+		virtual void setMat4(UniformID& uniform, const glm::mat4& mat4) = 0;
+		virtual void setMat4(UniformID& uniform, glm::mat4 data[], int count) = 0;
 
+		virtual void setGlobalTexture2D(UniformID& uniform, Texture2D* data) = 0;
 		virtual void setTexture2D(UniformID& uniform, Texture2D* data) = 0;
+
+		virtual void setGlobalTextureCube(UniformID& uniform, TextureCube* data) = 0;
 		virtual void setTextureCube(UniformID& uniform, TextureCube* data) = 0;
 
-	public:
-		void cacheFilePath(const std::string& path)
-		{
-			mFilePath = path;
-		}
-		void rebuild(const UniformID::USet& uniforms);
-	private:
+	protected:
 		std::string mName;
 		int mUID;
 		int mOrderID;
 		int mVersion;
-
-		PipelineQueue::Queue mRenderQueue;
+		int mProgramID;
+		Queue mRenderQueue;
 
 	protected:
-		int mProgramID;
-		bool mEnableLighting;
+
+		bool mIsShadowReceiver;
 
 		//LightMode
 		LightMode mLightMode;
@@ -176,16 +169,8 @@ namespace tezcat::Tiny
 		DepthTestWrapper mDepthTest;
 
 	protected:
-		int mProjectionMatrixID;
-		int mViewMatrixID;
-		int mModelMatrixID;
-		int mNormalMatrixID;
-		int mViewPositionID;
-
-	protected:
 		std::unordered_map<std::string, uint32_t> mTextureID;
 		std::unordered_map<std::string, uint32_t> mUniformID;
 		std::vector<int> mTinyUniformList;
-		std::string mFilePath;
 	};
 }

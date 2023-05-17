@@ -74,8 +74,8 @@ void MyInputer::processInput(InputSystem* system)
 	float current_x;
 	float current_y;
 	system->getMousePosition(current_x, current_y);
-	Statistic::mousePosition.x = current_x;
-	Statistic::mousePosition.y = current_y;
+	Profiler::mousePosition.x = current_x;
+	Profiler::mousePosition.y = current_y;
 
 	if (system->getMouseButtonDown(GLFW_MOUSE_BUTTON_2))
 	{
@@ -90,8 +90,8 @@ void MyInputer::processInput(InputSystem* system)
 			float offset_x = current_x - mLastX;
 			float offset_y = mLastY - current_y;
 
-			Statistic::mouseOffset.x = offset_x;
-			Statistic::mouseOffset.y = offset_y;
+			Profiler::mouseOffset.x = offset_x;
+			Profiler::mouseOffset.y = offset_y;
 
 			mLastX = current_x;
 			mLastY = current_y;

@@ -29,7 +29,7 @@ namespace tezcat::Tiny
 
 	void Scene::onEnter()
 	{
-		Log::info(StringTool::stringFormat("Enter Scene: %s", this->getName().c_str()));
+		Log_Info(StringTool::stringFormat("Enter Scene: %s", this->getName().c_str()));
 
 		mCameraData = CameraData::create();
 		mCameraData->addRef();
@@ -62,7 +62,7 @@ namespace tezcat::Tiny
 		CameraMgr::getInstance()->setCameraData(nullptr);
 		LightMgr::getInstance()->setData(nullptr);
 
-		Log::info(StringTool::stringFormat("Exit Scene: %s", this->getName().c_str()));
+		Log_Info(StringTool::stringFormat("Exit Scene: %s", this->getName().c_str()));
 	}
 
 	void Scene::onPause()
@@ -112,7 +112,7 @@ namespace tezcat::Tiny
 		mNewObjectList.emplace_back(gameObject);
 	}
 
-	void Scene::update()
+	void Scene::update(BaseGraphics* graphics)
 	{
 		//#InitNewObjects
 		if (!mNewTransformList.empty())

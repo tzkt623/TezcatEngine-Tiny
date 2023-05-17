@@ -18,6 +18,6 @@ namespace tezcat::Tiny
 
 	private:
 		int mIndex;
-		std::list<TinyRef<IRenderObject>> m_RenderObejctList;
+		std::list<IRenderObject*> mRenderObejctList;
 	};
 }

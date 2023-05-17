@@ -504,6 +504,26 @@ namespace tezcat::Tiny
 			return pair;
 		}
 
+
+		/*
+		* @author HCL
+		* @info 2023|5|17
+		* @brief 试着加入一个元素,如果元素已经存在,则不会出发后面的创建方法
+		*/
+		pair<iterator, bool> tryEmplace(const key_type& key, const std::function<Value()>& function)
+		{
+			auto pair = mData.try_emplace(key, nullptr);
+			if (pair.second)
+			{
+				pair.first->second = function();
+				pair.first->second->addRef();
+			}
+
+			return pair;
+
+			//return mData.try_emplace(key, std::forward<Values>(values)...);
+		}
+
 		template<class Values>
 		pair<iterator, bool> try_emplace(const key_type& key, Values&& values)
 		{

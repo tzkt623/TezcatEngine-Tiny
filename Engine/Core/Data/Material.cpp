@@ -1,17 +1,14 @@
 #include "Material.h"
 #include "../Tool/Tool.h"
-
+#include "../Head/RenderConfig.h"
 
 #include "../Manager/ShaderManager.h"
 #include "../Shader/ShaderPackage.h"
-#include "../Head/Context.h"
-#include "../Renderer/BaseGraphics.h"
 #include "../Shader/Shader.h"
-#include "../Component/Transform.h"
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Material)
+	TINY_RTTI_CPP(Material);
 	Material::Material(const std::string& name)
 		: mName(name)
 	{
@@ -33,15 +30,12 @@ namespace tezcat::Tiny
 		return mShaderPackage->getUID();
 	}
 
-	void Material::submit(Transform* transform, Shader* shader)
+	void Material::submit(Shader* shader)
 	{
-		//主动传送自身的所有可能变量
-		//然而理论上,应该让shader来挑选自己需要的数据
-		//可以避免大量冗余操作
-		shader->resetState();
+		shader->resetLocalState();
 		for (auto uniform : mUniforms)
 		{
-			uniform->submit(transform, shader);
+			uniform->submit(shader);
 		}
 	}
 }

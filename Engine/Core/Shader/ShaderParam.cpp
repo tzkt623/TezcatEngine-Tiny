@@ -9,10 +9,12 @@ namespace tezcat::Tiny
 	UniformID ShaderParam::MatrixN;
 	UniformID ShaderParam::MatrixSBV;
 	UniformID ShaderParam::MatrixLit;
+	UniformID ShaderParam::MatrixEnv;
 
 	UniformID ShaderParam::ScreenLength;
 	UniformID ShaderParam::ViewPosition;
 	UniformID ShaderParam::ViewNearFar;
+	UniformID ShaderParam::IsHDR;
 
 	UniformID ShaderParam::VertexColor;
 	UniformID ShaderParam::TexColor;
@@ -71,10 +73,12 @@ namespace tezcat::Tiny
 		ShaderParam::MatrixN = "TINY_MatrixN";
 		ShaderParam::MatrixSBV = "TINY_MatrixSBV";
 		ShaderParam::MatrixLit = "TINY_MatrixLit";
+		ShaderParam::MatrixEnv = "TINY_MatrixEnv[6]";
 
 		ShaderParam::ScreenLength = "TINY_ScreenLength";
 		ShaderParam::ViewPosition = "TINY_ViewPosition";
 		ShaderParam::ViewNearFar = "TINY_ViewNearFar";
+		ShaderParam::IsHDR = "TINY_IsHDR";
 
 
 		//3

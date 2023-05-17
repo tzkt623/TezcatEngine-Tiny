@@ -86,43 +86,44 @@ void MyViewPortWindow::onRender()
 		ImGui::EndMenuBar();
 	}
 
-// 	auto pos = ImGui::GetItemRectSize();
-// 	Log::info(StringTool::stringFormat("MenuBarSize[%.1f,%.1f]", pos.x, pos.y));
-
-	auto camera_data = CameraMgr::getInstance()->getCameraData();
-	if (!camera_data.lock())
-	{
-		return;
-	}
-
-	if (!camera_data->getMainCamera())
-	{
-		return;
-	}
-
 	if (ImGui::BeginChild("Viewport"))
 	{
 		if (mColorBuffer == nullptr)
 		{
-			mColorBuffer = (TextureBuffer2D*)TextureMgr::getInstance()->findTexture("RB_Viewport");
+			mColorBuffer = (Texture2D*)TextureMgr::getInstance()->findTexture("RB_Viewport");
 		}
 
 		if (mColorBuffer)
 		{
-			ImVec2 texture_size = ImVec2((float)Engine::getScreenWidth(), (float)Engine::getScreenHeight());
-			ImVec2 display_size, offset, uv0, uv1;
+			auto camera_data = CameraMgr::getInstance()->getCameraData();
+			if (camera_data.lock() && camera_data->getMainCamera())
+			{
+				ImVec2 texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
+				ImVec2 display_size, offset, uv0, uv1;
 
-			this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+				this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
 
-			camera_data->getMainCamera()->setViewRect(0, 0, display_size.x, display_size.y);
+				camera_data->getMainCamera()->setViewRect(0, 0, display_size.x, display_size.y);
 
-			//Log::info(StringTool::stringFormat("Ratio[%.3f]", display_size.x / display_size.y));
+				ImGui::SetCursorPos(offset);
+				ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
+							, display_size
+							, uv0
+							, uv1);
+			}
+			else
+			{
+				ImVec2 texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
+				ImVec2 display_size, offset, uv0, uv1;
 
-			ImGui::SetCursorPos(offset);
-			ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
-				, display_size
-				, uv0
-				, uv1);
+				this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+
+				ImGui::SetCursorPos(offset);
+				ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
+							, display_size
+							, ImVec2(0, 1)
+							, ImVec2(1, 0));
+			}
 		}
 
 		ImGui::EndChild();
@@ -137,13 +138,13 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 	if (ImGui::Begin("状态(State)", 0, window_flags))
 	{
 		//gpu
-		ImGui::Text("GPU: %s", Statistic::GPU);
+		ImGui::Text("GPU: %s", Profiler::GPU);
 
 		//logic time
-		ImGui::Text("LogicTime: %.1f ms", Statistic::LogicTime);
+		ImGui::Text("LogicTime: %.1f ms", Profiler::LogicTime);
 
 		//render time
-		mFrameTimeBuffer.push_back((float)Statistic::RenderTime);
+		mFrameTimeBuffer.push_back((float)Profiler::RenderTime);
 		if (mFrameTimeBuffer.size() > 40)
 		{
 			mFrameTimeBuffer.erase(mFrameTimeBuffer.begin());
@@ -151,18 +152,18 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 		ImGui::SetNextItemWidth(200);
 		ImGui::PlotLines("Frame Times", &mFrameTimeBuffer[0], (int)mFrameTimeBuffer.size());
 		ImGui::SameLine();
-		ImGui::Text("%.1f ms", Statistic::RenderTime);
+		ImGui::Text("%.1f ms", Profiler::RenderTime);
 
 		//fps
 		ImGui::Text("FPS: %.1f(%.3f ms/Frame)", GUIFunction::getFrameRate(), GUIFunction::getFrameRateTime());
 
 		//draw
-		ImGui::Text("PassCount: %d", Statistic::PassCount);
-		ImGui::Text("DrawCount: %d", Statistic::DrawCall);
+		ImGui::Text("PassCount: %d", Profiler::PassCount);
+		ImGui::Text("DrawCount: %d", Profiler::DrawCall);
 		ImGui::Separator();
 
 		ImGui::Text("Memory");
-		ImGui::Text("Used: %.3f kb", Statistic::getMemoryUse() / 1024.0f);
+		ImGui::Text("Used: %.3f kb", Profiler::getMemoryUse() / 1024.0f);
 		ImGui::Text("TotalID: %d", TinyGC::totalID());
 		ImGui::SameLine();
 		ImGui::Text("FreeID: %d", TinyGC::freeID());
@@ -172,8 +173,8 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 		ImGui::Separator();
 
 		//mouse
-		ImGui::InputFloat2("MousePosition", glm::value_ptr(Statistic::mousePosition), "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat2("MouseOffset", glm::value_ptr(Statistic::mouseOffset), "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat2("MousePosition", glm::value_ptr(Profiler::mousePosition), "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat2("MouseOffset", glm::value_ptr(Profiler::mouseOffset), "%.3f", ImGuiInputTextFlags_ReadOnly);
 
 		ImGui::End();
 	}

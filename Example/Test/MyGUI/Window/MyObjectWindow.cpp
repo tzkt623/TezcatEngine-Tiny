@@ -33,7 +33,7 @@ void MyObjectWindow::onUpdate()
 	std::function<void(std::vector<TinyWeakRef<Transform>>&)> buildTree =
 		[&buildTree, this](std::vector<TinyWeakRef<Transform>>& children)
 	{
-		for (auto transform : children)
+		for (auto& transform : children)
 		{
 			auto game_object = transform->getGameObject();
 
@@ -78,7 +78,7 @@ void MyObjectWindow::onUpdate()
 
 
 	auto& list = SceneMgr::getInstance()->getCurrentScene()->getTransformList();
-	for (auto transform : list)
+	for (auto& transform : list)
 	{
 		auto game_object = transform->getGameObject();
 
