@@ -72,12 +72,12 @@
             float roughness = TINY_MatPBR_Test.roughness;
             float ao = TINY_MatPBR_Test.ao, myUV;
 
-            vec3 F0 = vec3(0.04); 
-            F0 = mix(F0, albedo, metallic);
-
             vec3 N = normalize(myNormal);
             vec3 V = normalize(TINY_ViewPosition - myWorldPosition);
+            vec3 R = reflect(-V, N); 
 
+            vec3 F0 = vec3(0.04); 
+            F0 = mix(F0, albedo, metallic);
 
             //计算一个灯的光照
             vec3 Lo = vec3(0.0);
@@ -87,8 +87,8 @@
                 float cosTheta = max(dot(N, L), 0.0);
                 vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
 
-                float NDF = DistributionGGX(N, H, roughness);
-                float G = GeometrySmith(N, V, L, remapADirect(roughness));
+                float NDF = distributionGGX(N, H, roughness);
+                float G = geometrySmith(N, V, L, roughness);
                 vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
                 vec3 kS = F;
@@ -104,21 +104,32 @@
                 Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
             }
 
-            //计算漫反射颜色
-            //vec3 ambient = vec3(0.03) * albedo * ao;
-
-            vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+            vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    
+            vec3 kS = F;
             vec3 kD = 1.0 - kS;
-            kD *= 1.0 - metallic;	  
-            vec3 irradiance = texture(TINY_TexEnv, N).rgb;
+            kD *= 1.0 - metallic;
+
+            vec3 irradiance = texture(TINY_TexIrradiance, N).rgb;
             vec3 diffuse = irradiance * albedo;
-            vec3 ambient = (kD * diffuse) * ao;
+
+            const float MAX_REFLECTION_LOD = 4.0;
+            vec3 prefilteredColor = textureLod(TINY_TexPrefilter, R, roughness * MAX_REFLECTION_LOD).rgb;    
+            vec2 brdf = texture(TINY_TexBRDFLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+            vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+
+            vec3 ambient = (kD * diffuse + specular) * ao;
+            //vec3 ambient = (kD * diffuse) * ao;
+
             vec3 color = ambient + Lo;
 
             color = color / (color + vec3(1.0));
             color = pow(color, vec3(1.0 / 2.2)); 
 
             myFinalColor = vec4(color, 1.0);
+            //myFinalColor = vec4(prefilteredColor, 1.0);
+            //myFinalColor = vec4(R, 1.0);
+            //myFinalColor = vec4(brdf.x, brdf.y, 0.0, 1.0);     
         }
     }
     #TINY_FS_END

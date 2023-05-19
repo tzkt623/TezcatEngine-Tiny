@@ -13,8 +13,11 @@ namespace tezcat::Tiny
 		std::string name;
 		TextureType type;
 		TextureAttachPosition attachPosition;
-		TextureFilter filter;
-		TextureWrap wrap;
+		TextureFilter minFilter;
+		TextureFilter magFilter;
+		TextureWrap wrapS;
+		TextureWrap wrapT;
+		TextureWrap wrapR;
 		TextureChannel internalChannel;
 		TextureChannel channel;
 		DataType dataType;
@@ -26,13 +29,41 @@ namespace tezcat::Tiny
 		*/
 		TextureInfo(const std::string& name
 				  , const TextureType& type
-				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& filter				  , const TextureWrap& wrap				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
+				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& minFilter
+				  , const TextureFilter& magFilter				  , const TextureWrap& wrapS
+				  , const TextureWrap& wrapT
+				  , const TextureWrap& wrapR				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
 			: name(name)
 			, type(type)
-			, attachPosition(attachPosition)			, filter(filter)			, wrap(wrap)			, internalChannel(internalChannel)			, channel(channel)			, dataType(dataType)
+			, attachPosition(attachPosition)			, minFilter(minFilter)
+			, magFilter(magFilter)			, wrapS(wrapS)
+			, wrapT(wrapT)
+			, wrapR(wrapR)			, internalChannel(internalChannel)			, channel(channel)			, dataType(dataType)
 		{
 
 		}
+
+		/*
+		* @author HCL
+		* @info 2023|5|18
+		* @brief 创建2D专用
+		*/
+		TextureInfo(const std::string& name
+				  , const TextureType& type
+				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& minFilter
+				  , const TextureFilter& magFilter				  , const TextureWrap& wrapS
+				  , const TextureWrap& wrapT				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
+			: name(name)
+			, type(type)
+			, attachPosition(attachPosition)			, minFilter(minFilter)
+			, magFilter(magFilter)			, wrapS(wrapS)
+			, wrapT(wrapT)
+			, wrapR(TextureWrap::Repeat)			, internalChannel(internalChannel)			, channel(channel)			, dataType(dataType)
+		{
+
+		}
+
+
 		/*
 		* @author HCL
 		* @info 2023|5|17
@@ -44,6 +75,9 @@ namespace tezcat::Tiny
 						, TextureType::TextureCube
 						, TextureAttachPosition::ColorComponent
 						, TextureFilter::Linear
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, TextureWrap::Repeat
 						, TextureWrap::Repeat
 						, TextureChannel::None
 						, TextureChannel::None
@@ -65,6 +99,9 @@ namespace tezcat::Tiny
 						, TextureType::Texture2D
 						, TextureAttachPosition::ColorComponent
 						, filter
+						, filter
+						, wrap
+						, wrap
 						, wrap
 						, internalChannel
 						, internalChannel
@@ -87,6 +124,9 @@ namespace tezcat::Tiny
 						, type
 						, attachPosition
 						, TextureFilter::Linear
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, TextureWrap::Repeat
 						, TextureWrap::Repeat
 						, internalChannel
 						, internalChannel
@@ -110,6 +150,9 @@ namespace tezcat::Tiny
 						, TextureType::Texture2D
 						, attachPosition
 						, TextureFilter::Linear
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, TextureWrap::Repeat
 						, TextureWrap::Repeat
 						, internalChannel
 						, channel
@@ -133,6 +176,9 @@ namespace tezcat::Tiny
 						, TextureType::Texture2D
 						, attachPosition
 						, TextureFilter::Linear
+						, TextureFilter::Linear
+						, TextureWrap::Repeat
+						, TextureWrap::Repeat
 						, TextureWrap::Repeat
 						, internalChannel
 						, channel
@@ -147,27 +193,16 @@ namespace tezcat::Tiny
 		TINY_RTTI_H(Texture);
 	public:
 		Texture();
-
-		Texture(const TextureChannel& internalChannel
-			  , const TextureWrap& wrap
-			  , const TextureFilter& filter
-			  , const bool& isManagered = false);
+		Texture(const TextureAttachPosition& attachPosition
+			  , const TextureChannel& internalChannel
+			  , const TextureChannel& channel
+			  , const TextureFilter& minFilter
+			  , const TextureFilter& magFilter
+			  , const DataType& dataType);
 		virtual ~Texture();
 
 		virtual TextureType getTextureType() const = 0;
 		uint32_t getTextureID() const { return mTextureID; }
-
-		const TexWrapWrapper& getWrap() const { return mWrap; }
-		void setWrap(const TextureWrap& val)
-		{
-			mWrap = ContextMap::TextureWrapArray[(int)val];
-		}
-
-		const TexFilterWrapper& getFilter() const { return mFilter; }
-		void setFilter(const TextureFilter& val)
-		{
-			mFilter = ContextMap::TextureFilterArray[(int)val];
-		}
 
 		const TexChannelWrapper& getInternalChannel() const { return mInternalChannel; }
 		const TexChannelWrapper& getChannel() const { return mChannel; }
@@ -175,11 +210,11 @@ namespace tezcat::Tiny
 
 		const uint32_t getUID() const { return mUID; }
 
-		bool isManagered() { return mIsManagered; }
-		void setManagered(bool value) { mIsManagered = value; }
-
 		const TextureAttachPosition& getAttachPosition() const { return mAttachPosition; }
 		void setAttachPosition(const TextureAttachPosition& val) { mAttachPosition = val; }
+
+		virtual void bind() {}
+		virtual void genMipmap() {}
 
 	public:
 		static TexChannelWrapper getTextureChannels(const Image& image);
@@ -187,13 +222,12 @@ namespace tezcat::Tiny
 	protected:
 		uint32_t mUID;
 		uint32_t mTextureID;
-		TexWrapWrapper mWrap;
-		TexFilterWrapper mFilter;
+		TextureAttachPosition mAttachPosition;
+		TexFilterWrapper mMinFilter;
+		TexFilterWrapper mMagFilter;
 		TexChannelWrapper mInternalChannel;
 		TexChannelWrapper mChannel;
 		DataTypeWrapper mDataType;
-		TextureAttachPosition mAttachPosition;
-		bool mIsManagered;
 
 	private:
 		static uint32_t sUIDGiver;
@@ -205,7 +239,15 @@ namespace tezcat::Tiny
 	{
 		TINY_RTTI_H(Texture2D);
 	public:
-		Texture2D();
+		Texture2D(const TextureWrap& wrapS
+				, const TextureWrap& wrapT
+				, const TextureAttachPosition& attachPosition
+				, const TextureChannel& internalChannel
+				, const TextureChannel& channel
+				, const TextureFilter& minFilter
+				, const TextureFilter& magFilter
+				, const DataType& dataType);
+
 		virtual ~Texture2D() = default;
 
 		TextureType getTextureType() const override { return TextureType::Texture2D; }
@@ -216,7 +258,7 @@ namespace tezcat::Tiny
 						   , const DataType& dataType) {};
 		virtual void create(const int& width, const int& height, const TextureInfo& info) {};
 
-		void setSize(const int& width, const int& height)
+		virtual void setSize(const int& width, const int& height)
 		{
 			mWidth = width;
 			mHeight = height;
@@ -228,6 +270,9 @@ namespace tezcat::Tiny
 	protected:
 		uint32_t mWidth;
 		uint32_t mHeight;
+		TexWrapWrapper mWrapS;
+		TexWrapWrapper mWrapT;
+
 	};
 
 	class TINY_API Texture3D : public Texture
@@ -237,18 +282,36 @@ namespace tezcat::Tiny
 		virtual ~Texture3D() = default;
 
 		TextureType getTextureType() const final { return TextureType::Texture3D; }
+
+	protected:
+		TexWrapWrapper mWrapS;
+		TexWrapWrapper mWrapT;
+		TexWrapWrapper mWrapR;
 	};
 
 	class TINY_API TextureCube : public Texture
 	{
 		TINY_RTTI_H(TextureCube);
 	public:
+		TextureCube(const TextureWrap& wrapS
+				, const TextureWrap& wrapT
+				, const TextureWrap& wrapR
+				, const TextureAttachPosition& attachPosition
+				, const TextureChannel& internalChannel
+				, const TextureChannel& channel
+				, const TextureFilter& minFilter
+				, const TextureFilter& magFilter
+				, const DataType& dataType);
 		virtual ~TextureCube() = default;
 
 		TextureType getTextureType() const final { return TextureType::TextureCube; }
 		virtual void create(const std::array<Image, 6>& images, const TextureInfo& info) = 0;
 		virtual void create(const int& width, const int& hegiht, const TextureInfo& info) = 0;
 
+	protected:
+		TexWrapWrapper mWrapS;
+		TexWrapWrapper mWrapT;
+		TexWrapWrapper mWrapR;
 	};
 
 	/// <summary>
@@ -259,6 +322,7 @@ namespace tezcat::Tiny
 	{
 		TINY_RTTI_H(TextureRender2D);
 	public:
+		TextureRender2D();
 		virtual ~TextureRender2D() = default;
 
 		TextureType getTextureType() const override { return TextureType::TextureRender2D; }

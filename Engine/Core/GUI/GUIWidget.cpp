@@ -53,11 +53,11 @@ namespace tezcat::Tiny
 
 	void GUIParentWidget::update()
 	{
-		this->begin();
-
-		this->onUpdate();
-		this->onRender();
-
+		if (this->begin())
+		{
+			this->onUpdate();
+			this->onRender();
+		}
 		this->end();
 	}
 
@@ -65,18 +65,21 @@ namespace tezcat::Tiny
 	//-------------------------------------------------------
 	GUIWindow::GUIWindow(const std::u8string& name)
 		: GUIParentWidget(name)
+		, mIsOpen(true)
 	{
 
 	}
 
 	GUIWindow::GUIWindow(const std::string& name)
 		: GUIParentWidget(name)
+		, mIsOpen(true)
 	{
 
 	}
 
 	GUIWindow::GUIWindow(const char* name)
 		: GUIParentWidget(name)
+		, mIsOpen(true)
 	{
 
 	}
@@ -86,9 +89,9 @@ namespace tezcat::Tiny
 
 	}
 
-	void GUIWindow::begin()
+	bool GUIWindow::begin()
 	{
-		ImGui::Begin(this->getName(), 0);
+		return ImGui::Begin(this->getName(), 0);
 	}
 
 	void GUIWindow::end()
@@ -104,7 +107,8 @@ namespace tezcat::Tiny
 
 	void GUIWindow::close()
 	{
-		mHost->removeWindow(this);
+		mIsOpen = true;
+		//mHost->removeWindow(this);
 	}
 
 

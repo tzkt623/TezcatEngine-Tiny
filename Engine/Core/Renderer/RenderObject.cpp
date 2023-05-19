@@ -77,7 +77,7 @@ namespace tezcat::Tiny
 		, mFarFace(100.0f)
 		, mFOV(60.0f)
 		, mProjectionMatrix(1.0f)
-		, mViewType(ViewType::Perspective)
+		, mViewType(ViewType::Screen)
 		, mOrder(0)
 		, mPMatDirty(true)
 		, mRenderPhase(RenderPhase::Forward)

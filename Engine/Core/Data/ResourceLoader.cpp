@@ -49,6 +49,7 @@ namespace tezcat::Tiny
 		this->createPlane();
 		this->createSkybox();
 		this->createGridSquare();
+		this->createRect();
 	}
 
 	void ResourceLoader::createCube()
@@ -264,10 +265,47 @@ namespace tezcat::Tiny
 	void ResourceLoader::createSquare()
 	{
 		MeshData mesh_data("Square");
-		mesh_data.vertices.emplace_back(-0.5f, -0.5f, 0.0f);	//
-		mesh_data.vertices.emplace_back(0.5f, -0.5f, 0.0f);	//
-		mesh_data.vertices.emplace_back(0.5f, 0.5f, 0.0f);		//
-		mesh_data.vertices.emplace_back(-0.5f, 0.5f, 0.0f);	//
+		mesh_data.vertices.emplace_back(-0.5f, -0.5f, 0.0f);
+		mesh_data.vertices.emplace_back(0.5f, -0.5f, 0.0f);
+		mesh_data.vertices.emplace_back(0.5f, 0.5f, 0.0f);
+		mesh_data.vertices.emplace_back(-0.5f, 0.5f, 0.0f);
+
+		mesh_data.indices.emplace_back(0);
+		mesh_data.indices.emplace_back(1);
+		mesh_data.indices.emplace_back(3);
+
+		mesh_data.indices.emplace_back(1);
+		mesh_data.indices.emplace_back(2);
+		mesh_data.indices.emplace_back(3);
+
+		mesh_data.colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+		mesh_data.colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+		mesh_data.colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+		mesh_data.colors.emplace_back(1.0f, 1.0f, 1.0f, 1.0f);
+
+		mesh_data.uvs.emplace_back(0.0f, 0.0f);
+		mesh_data.uvs.emplace_back(1.0f, 0.0f);
+		mesh_data.uvs.emplace_back(1.0f, 1.0f);
+		mesh_data.uvs.emplace_back(0.0f, 1.0f);
+
+		mesh_data.normals.emplace_back(0.0f, 0.0f, 1.0f);
+		mesh_data.normals.emplace_back(0.0f, 0.0f, 1.0f);
+		mesh_data.normals.emplace_back(0.0f, 0.0f, 1.0f);
+		mesh_data.normals.emplace_back(0.0f, 0.0f, 1.0f);
+
+		mesh_data.apply();
+
+		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
+	}
+
+	void ResourceLoader::createRect()
+	{
+		MeshData mesh_data("Rect");
+
+		mesh_data.vertices.emplace_back(-1.0f, -1.0f, 0.0f);
+		mesh_data.vertices.emplace_back(1.0f, -1.0f, 0.0f);
+		mesh_data.vertices.emplace_back(1.0f, 1.0f, 0.0f);
+		mesh_data.vertices.emplace_back(-1.0f, 1.0f, 0.0f);
 
 		mesh_data.indices.emplace_back(0);
 		mesh_data.indices.emplace_back(1);

@@ -15,9 +15,9 @@ MyViewPortWindow::~MyViewPortWindow()
 
 }
 
-void MyViewPortWindow::begin()
+bool MyViewPortWindow::begin()
 {
-	ImGui::Begin(this->getName(), 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_MenuBar);
+	return ImGui::Begin(this->getName(), 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_MenuBar);
 }
 
 void MyViewPortWindow::onUpdate()
@@ -179,3 +179,5 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 		ImGui::End();
 	}
 }
+
+

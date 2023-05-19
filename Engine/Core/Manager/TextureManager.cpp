@@ -101,9 +101,7 @@ namespace tezcat::Tiny
 		{
 			auto it = mTextureMap.tryEmplace(info.name, [&]()
 			{
-				auto tex = mCreator->create2D(width, height, info);
-				tex->setManagered(true);
-				return tex;
+				return mCreator->create2D(width, height, info);
 			});
 			return (Texture2D*)(it.first->second);
 		}
@@ -117,7 +115,6 @@ namespace tezcat::Tiny
 		auto it = mTextureMap.tryEmplace(name, [&]()
 		{
 			auto tex = mCreator->createCube(images, TextureInfo(name));
-			tex->setManagered(true);
 			return tex;
 		});
 		return (TextureCube*)(it.first->second);
@@ -130,7 +127,6 @@ namespace tezcat::Tiny
 			auto it = mTextureMap.tryEmplace(info.name, [&]()
 			{
 				auto tex = mCreator->createCube(width, height, info);
-				tex->setManagered(true);
 				return tex;
 			});
 			return (TextureCube*)(it.first->second);
@@ -156,14 +152,13 @@ namespace tezcat::Tiny
 
 		if (img.isHDR())
 		{
-			info.internalChannel = TextureChannel::RGBF16;
+			info.internalChannel = TextureChannel::RGB16f;
 			info.dataType = DataType::Float32;
 		}
 
 		auto it = mTextureMap.tryEmplace(info.name, [&]()
 		{
 			auto tex = mCreator->create2D(img, info);
-			tex->setManagered(true);
 			tex->setSize(img.getWidth(), img.getHeight());
 			return tex;
 		});
@@ -178,7 +173,6 @@ namespace tezcat::Tiny
 			auto it = mTextureMap.tryEmplace(info.name, [&]()
 			{
 				auto tex = mCreator->createRender2D(width, height, info);
-				tex->setManagered(true);
 				return tex;
 			});
 

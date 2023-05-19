@@ -11,6 +11,14 @@ namespace tezcat::Tiny::GL
 	//
 	TINY_RTTI_CPP(GLTexture2D);
 	GLTexture2D::GLTexture2D()
+		: Texture2D(TextureWrap::Repeat
+				  , TextureWrap::Repeat
+				  , TextureAttachPosition::ColorComponent
+				  , TextureChannel::None
+				  , TextureChannel::None
+				  , TextureFilter::Linear
+				  , TextureFilter::Linear
+				  , DataType::UByte)
 	{
 		glGenTextures(1, &mTextureID);
 	}
@@ -25,35 +33,38 @@ namespace tezcat::Tiny::GL
 		mWidth = image.getWidth();
 		mHeight = image.getHeight();
 
-		mWrap = ContextMap::TextureWrapArray[(uint32_t)info.wrap];
-		mFilter = ContextMap::TextureFilterArray[(uint32_t)info.filter];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)info.wrapS];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)info.wrapT];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)info.minFilter];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)info.magFilter];
 		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)info.internalChannel];
 		mChannel = ContextMap::TextureChannelArray[(uint32_t)info.channel];
 		mDataType = ContextMap::DataTypeArray[(uint32_t)info.dataType];
 
 		glBindTexture(GL_TEXTURE_2D, mTextureID);
+		glTexImage2D(GL_TEXTURE_2D
+				   , 0
+				   , mInternalChannel.platform
+				   , image.getWidth(), image.getHeight()
+				   , 0
+				   , mChannel.platform
+				   , mDataType.platform
+				   , image.getData());
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrap.platform);
-
-		if (mWrap.tiny == TextureWrap::Clamp_To_Border)
+		if (mWrapS.tiny == TextureWrap::Clamp_To_Border
+			|| mWrapT.tiny == TextureWrap::Clamp_To_Border)
 		{
 			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 		}
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mFilter.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mFilter.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT.platform);
 
-		glTexImage2D(GL_TEXTURE_2D
-					, 0
-					, mInternalChannel.platform
-					, image.getWidth(), image.getHeight()
-					, 0
-					, mChannel.platform
-					, mDataType.platform
-					, image.getData());
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter.platform);
+
+		this->genMipmap();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -80,10 +91,21 @@ namespace tezcat::Tiny::GL
 					, mDataType.platform
 					, nullptr);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mFilter.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mFilter.platform);
+		if (mWrapS.tiny == TextureWrap::Clamp_To_Border
+			|| mWrapT.tiny == TextureWrap::Clamp_To_Border)
+		{
+			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+		}
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT.platform);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter.platform);
+
+		this->genMipmap();
+
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -92,34 +114,54 @@ namespace tezcat::Tiny::GL
 		mWidth = width;
 		mHeight = height;
 
-		mWrap = ContextMap::TextureWrapArray[(uint32_t)info.wrap];
-		mFilter = ContextMap::TextureFilterArray[(uint32_t)info.filter];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)info.wrapS];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)info.wrapT];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)info.minFilter];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)info.magFilter];
 		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)info.internalChannel];
 		mChannel = ContextMap::TextureChannelArray[(uint32_t)info.channel];
 		mDataType = ContextMap::DataTypeArray[(uint32_t)info.dataType];
 
 		glBindTexture(GL_TEXTURE_2D, mTextureID);
 		glTexImage2D(GL_TEXTURE_2D
-					, 0
-					, mInternalChannel.platform
-					, width, height
-					, 0
-					, mChannel.platform
-					, mDataType.platform
-					, nullptr);
+				   , 0
+				   , mInternalChannel.platform
+				   , width, height
+				   , 0
+				   , mChannel.platform
+				   , mDataType.platform
+				   , nullptr);
 
-		if (mWrap.tiny == TextureWrap::Clamp_To_Border)
+		if (mWrapS.tiny == TextureWrap::Clamp_To_Border
+			|| mWrapT.tiny == TextureWrap::Clamp_To_Border)
 		{
 			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 		}
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mFilter.platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mFilter.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT.platform);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mMinFilter.platform);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mMagFilter.platform);
+
+		this->genMipmap();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void GLTexture2D::genMipmap()
+	{
+		if (mMinFilter.tiny == TextureFilter::Linear_Mipmap_Linear
+			|| mMagFilter.tiny == TextureFilter::Linear_Mipmap_Linear)
+		{
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+	}
+
+	void GLTexture2D::bind()
+	{
+		glBindTexture(GL_TEXTURE_2D, mTextureID);
 	}
 
 	//-------------------------------------------
@@ -128,6 +170,15 @@ namespace tezcat::Tiny::GL
 	//
 	TINY_RTTI_CPP(GLTextureCube);
 	GLTextureCube::GLTextureCube()
+		: TextureCube(TextureWrap::Repeat
+					, TextureWrap::Repeat
+					, TextureWrap::Repeat
+					, TextureAttachPosition::ColorComponent
+					, TextureChannel::None
+					, TextureChannel::None
+					, TextureFilter::Linear
+					, TextureFilter::Linear
+					, DataType::UByte)
 	{
 		glGenTextures(1, &mTextureID);
 	}
@@ -139,8 +190,11 @@ namespace tezcat::Tiny::GL
 
 	void GLTextureCube::create(const std::array<Image, 6>& images, const TextureInfo& info)
 	{
-		mFilter = ContextMap::TextureFilterArray[(uint32_t)info.filter];
-		mWrap = ContextMap::TextureWrapArray[(uint32_t)info.wrap];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)info.minFilter];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)info.magFilter];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)info.wrapS];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)info.wrapT];
+		mWrapR = ContextMap::TextureWrapArray[(uint32_t)info.wrapR];
 		mDataType = ContextMap::DataTypeArray[(uint32_t)info.dataType];
 
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureID);
@@ -158,20 +212,25 @@ namespace tezcat::Tiny::GL
 						, image.getData());
 		}
 
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mFilter.platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mFilter.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mWrapS.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrapT.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrapR.platform);
 
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrap.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mMinFilter.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mMagFilter.platform);
+
+		this->genMipmap();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void GLTextureCube::create(const int& width, const int& hegiht, const TextureInfo& info)
 	{
-		mFilter = ContextMap::TextureFilterArray[(uint32_t)info.filter];
-		mWrap = ContextMap::TextureWrapArray[(uint32_t)info.wrap];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)info.minFilter];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)info.magFilter];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)info.wrapS];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)info.wrapT];
+		mWrapR = ContextMap::TextureWrapArray[(uint32_t)info.wrapR];
 		mDataType = ContextMap::DataTypeArray[(uint32_t)info.dataType];
 		mInternalChannel = ContextMap::TextureChannelArray[(uint32_t)info.internalChannel];
 		mChannel = ContextMap::TextureChannelArray[(uint32_t)info.channel];
@@ -190,14 +249,30 @@ namespace tezcat::Tiny::GL
 						, nullptr);
 		}
 
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mFilter.platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mFilter.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mWrapS.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrapT.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrapR.platform);
 
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mWrap.platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mWrap.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mMinFilter.platform);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mMagFilter.platform);
+
+		this->genMipmap();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void GLTextureCube::genMipmap()
+	{
+		if (mMinFilter.tiny == TextureFilter::Linear_Mipmap_Linear
+			|| mMagFilter.tiny == TextureFilter::Linear_Mipmap_Linear)
+		{
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		}
+	}
+
+	void GLTextureCube::bind()
+	{
+		glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureID);
 	}
 
 	//----------------------------------------------
@@ -225,6 +300,17 @@ namespace tezcat::Tiny::GL
 		glBindRenderbuffer(GL_RENDERBUFFER, mTextureID);
 		glRenderbufferStorage(GL_RENDERBUFFER, mInternalChannel.platform, width, height);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	}
+
+	void GLTextureRender2D::bind()
+	{
+		glBindRenderbuffer(GL_RENDERBUFFER, mTextureID);
+	}
+
+	void GLTextureRender2D::setSize(const int& width, const int& height)
+	{
+		Texture2D::setSize(width, height);
+		glRenderbufferStorage(GL_RENDERBUFFER, mInternalChannel.platform, width, height);
 	}
 
 	//----------------------------------------------

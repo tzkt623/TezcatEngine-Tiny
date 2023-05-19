@@ -77,33 +77,47 @@
 
             vec3 N = normalize(myNormal);
             vec3 V = normalize(TINY_ViewPosition - myWorldPosition);
-
+            vec3 R = reflect(-V, N); 
 
             //计算一个灯的光照
             vec3 Lo = vec3(0.0);
-            vec3 L = normalize(-TINY_LitDir.direction);
-            vec3 H = normalize(V + L); 
-            float cosTheta = max(dot(N, L), 0.0);
-            vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
+            {
+                vec3 L = normalize(-TINY_LitDir.direction);
+                vec3 H = normalize(V + L); 
+                float cosTheta = max(dot(N, L), 0.0);
+                vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
 
-            float NDF = DistributionGGX(N, H, roughness);
-            float G = GeometrySmith(N, V, L, remapADirect(roughness));
-            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+                float NDF = distributionGGX(N, H, roughness);
+                float G = geometrySmith(N, V, L, roughness);
+                vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
+                vec3 kS = F;
+                vec3 kD = vec3(1.0) - kS;
+                kD *= 1.0 - metallic;
+
+                vec3 nominator = NDF * G * F;
+                float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
+                vec3 specular = nominator / denominator;
+
+                // add to outgoing radiance Lo
+                float NdotL = max(dot(N, L), 0.0);                
+                Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+            }
+
+            vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    
             vec3 kS = F;
-            vec3 kD = vec3(1.0) - kS;
-            kD *= 1.0 - metallic;
+            vec3 kD = 1.0 - kS;
+            kD *= 1.0 - metallic;	  
+            vec3 irradiance = texture(TINY_TexIrradiance, N).rgb;
+            vec3 diffuse = irradiance * albedo;
 
-            vec3 nominator = NDF * G * F;
-            float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
-            vec3 specular = nominator / denominator;
+            const float MAX_REFLECTION_LOD = 4.0;
+            vec3 prefilteredColor = textureLod(TINY_TexPrefilter, R,  roughness * MAX_REFLECTION_LOD).rgb;    
+            vec2 brdf = texture(TINY_TexBRDFLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+            vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-            // add to outgoing radiance Lo
-            float NdotL = max(dot(N, L), 0.0);                
-            Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
-
-            //计算漫反射颜色
-            vec3 ambient = vec3(0.03) * albedo * ao;
+            vec3 ambient = (kD * diffuse + specular) * ao;
             vec3 color = ambient + Lo;
 
             color = color / (color + vec3(1.0));

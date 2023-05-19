@@ -9,7 +9,7 @@ public:
 	virtual ~MyViewPortWindow();
 
 protected:
-	void begin() override;
+	bool begin() override;
 	void onUpdate() override;
 	void onRender() override;
 
@@ -22,5 +22,6 @@ private:
 
 	std::vector<float> mFrameTimeBuffer;
 };
+
 
 

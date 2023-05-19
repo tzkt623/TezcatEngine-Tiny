@@ -38,8 +38,9 @@ namespace tezcat::Tiny
 
 	std::array<TexFilterWrapper, (std::size_t)TextureFilter::Count> ContextMap::TextureFilterArray =
 	{
-		TexFilterWrapper(TextureFilter::Nearest,	0),
-		TexFilterWrapper(TextureFilter::Linear,		0)
+		TexFilterWrapper(TextureFilter::Nearest,				0),
+		TexFilterWrapper(TextureFilter::Linear,					0),
+		TexFilterWrapper(TextureFilter::Linear_Mipmap_Linear,	0),
 	};
 
 	std::array<TexChannelWrapper, (std::size_t)TextureChannel::Count> ContextMap::TextureChannelArray =
@@ -58,7 +59,8 @@ namespace tezcat::Tiny
 		TexChannelWrapper(TextureChannel::Depth24_Stencil8,		0),
 		TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	0),
 		TexChannelWrapper(TextureChannel::Stencil8,				0),
-		TexChannelWrapper(TextureChannel::RGBF16,				0),
+		TexChannelWrapper(TextureChannel::RG16f,				0),
+		TexChannelWrapper(TextureChannel::RGB16f,				0),
 	};
 
 	std::array<ColorBufferWrapper, (std::size_t)ColorBuffer::Count> ContextMap::ColorBufferArray =

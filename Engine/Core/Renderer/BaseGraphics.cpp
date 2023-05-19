@@ -74,8 +74,8 @@ namespace tezcat::Tiny
 		Profiler_ResetPassCount();
 
 		mShadowCasterManager->calculate(this);
-		mCameraManager->calculate(this);
 		mEnvLighting->calculate(this);
+		mCameraManager->calculate(this);
 	}
 
 	void BaseGraphics::onRender()

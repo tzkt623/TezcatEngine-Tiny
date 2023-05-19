@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/EnvMap;
+    str Name = Unlit/EnvMakeIrradiance;
 }
 #TINY_HEAD_END
 
@@ -8,13 +8,13 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = EnvMap;
+        str Name = EnvMakeIrradiance;
         int Version = 330;
         int OrderID = 50;
-        str Queue = Preparea;
-        str DepthTest = LessEqual;
+        str Queue = Prepare;
+        str DepthTest = Off;
         bool ZWrite = true;
-        str CullFace = Off;
+        str CullFace = Front;
     }
     #TINY_CFG_END
 
@@ -23,12 +23,11 @@
         #include "tiny_vs_base"
 
         layout (location = 0) in vec3 aPos;
-        out vec3 myUV;
-        out vec4 clipsPos[6];
+        out vec3 myWorldPosition;
 
         void main()
         {
-            myUV = aPos;
+            myWorldPosition = aPos;
             gl_Position = TINY_MatrixP * TINY_MatrixV * vec4(aPos, 1.0);
         }
     }
@@ -37,8 +36,9 @@
     #TINY_FS_BEGIN
     {
         #include "tiny_fs_texture"
+        #include "tiny_fs_pbr_func"
         
-        in vec3 myUV;
+        in vec3 myWorldPosition;
         out vec4 myFinalColor;
 
         void main()
@@ -48,14 +48,14 @@
             // incoming radiance of the environment. The result of this radiance
             // is the radiance of light coming from -Normal direction, which is what
             // we use in the PBR shader to sample irradiance.
-            vec3 N = normalize(myUV);
+            vec3 N = normalize(myWorldPosition);
 
             vec3 irradiance = vec3(0.0);   
             
             // tangent space calculation from origin point
-            vec3 up    = vec3(0.0, 1.0, 0.0);
+            vec3 up = vec3(0.0, 1.0, 0.0);
             vec3 right = normalize(cross(up, N));
-            up         = normalize(cross(N, right));
+            up = normalize(cross(N, right));
             
             float sampleDelta = 0.025;
             float nrSamples = 0.0;

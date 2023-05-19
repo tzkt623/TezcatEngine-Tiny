@@ -41,7 +41,7 @@ namespace tezcat::Tiny
 
 	private:
 		std::vector<GUIWindow*> mInitList;
-		std::vector<GUIWindow*> mWindows;
+		std::list<GUIWindow*> mWindows;
 	};
 }
 

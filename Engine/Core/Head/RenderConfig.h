@@ -49,7 +49,7 @@ namespace tezcat::Tiny
 	{
 		Nearest = 0,
 		Linear,
-
+		Linear_Mipmap_Linear,
 		Count
 	};
 
@@ -78,7 +78,8 @@ namespace tezcat::Tiny
 		//internal only
 		Stencil8,
 
-		RGBF16,
+		RG16f,
+		RGB16f,
 
 		Count
 	};

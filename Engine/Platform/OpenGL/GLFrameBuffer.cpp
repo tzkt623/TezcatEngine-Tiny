@@ -196,14 +196,14 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLFrameBuffer::attachCube(TextureCube* tex, int colorIndex, int faceIndex)
+	void GLFrameBuffer::attachCube(TextureCube* tex, int colorIndex, int faceIndex, int level)
 	{
 		mColorCount = 1;
 		glFramebufferTexture2D(GL_FRAMEBUFFER
 							 , GL_COLOR_ATTACHMENT0 + colorIndex
 							 , GL_TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex
 							 , tex->getTextureID()
-							 , 0);
+							 , level);
 
 		if (mBuild)
 		{

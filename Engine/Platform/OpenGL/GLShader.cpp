@@ -132,7 +132,8 @@ namespace tezcat::Tiny::GL
 
 	void GLShader::setFloat1(const char* name, float* data)
 	{
-		glUniform1fv(glGetUniformLocation(mProgramID, name), 1, data);
+		auto id = glGetUniformLocation(mProgramID, name);
+		glUniform1fv(id, 1, data);
 	}
 
 	void GLShader::setFloat1(UniformID& uniform, float* data)
@@ -346,6 +347,12 @@ namespace tezcat::Tiny::GL
 
 	void GLShader::setTextureCube(UniformID& uniform, TextureCube* data)
 	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+
+		glUniform1i(mTinyUniformList[uniform], mGlobalTexture + mLocalTexure);
 		glActiveTexture(GL_TEXTURE0 + mGlobalTexture + mLocalTexure);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
 		++mLocalTexure;
@@ -353,6 +360,12 @@ namespace tezcat::Tiny::GL
 
 	void GLShader::setGlobalTextureCube(UniformID& uniform, TextureCube* data)
 	{
+		if (mTinyUniformList[uniform] < 0)
+		{
+			return;
+		}
+
+		glUniform1i(mTinyUniformList[uniform], mGlobalTexture);
 		glActiveTexture(GL_TEXTURE0 + mGlobalTexture);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
 		++mGlobalTexture;

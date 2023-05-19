@@ -23,7 +23,7 @@ namespace tezcat::Tiny::GL
 		void attach2D(Texture2D* tex) final {}
 		void attachRender(TextureRender2D* tex) final {}
 		void attachCube(TextureCube* tex) final {}
-		void attachCube(TextureCube* tex, int colorIndex, int faceIndex) {};
+		void attachCube(TextureCube* tex, int colorIndex, int faceIndex, int level) {};
 
 	protected:
 		void bind() final;
@@ -46,7 +46,7 @@ namespace tezcat::Tiny::GL
 		void attach2D(Texture2D* tex) override;
 		void attachRender(TextureRender2D* tex) override;
 		void attachCube(TextureCube* tex) override;
-		void attachCube(TextureCube* tex, int colorIndex, int faceIndex) override;
+		void attachCube(TextureCube* tex, int colorIndex, int faceIndex, int level = 0) override;
 
 	protected:
 		void bind() override;

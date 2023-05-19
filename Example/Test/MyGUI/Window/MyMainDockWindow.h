@@ -13,7 +13,7 @@ protected:
 	void onRender() override;
 
 public:
-	void begin() override;
+	bool begin() override;
 	void end() override;
 
 private:

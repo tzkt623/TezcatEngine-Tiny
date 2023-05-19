@@ -43,13 +43,15 @@
 
         void main()
         {
-            vec3 color = texture(TINY_TexCube, myUV).rgb;
+            //vec3 color = texture(TINY_TexCube, myUV).rgb;
+            vec3 color = textureLod(TINY_TexCube, myUV, 0).rgb;
             if(TINY_IsHDR)
             {
                 color = color / (color + vec3(1.0));
                 color = pow(color, vec3(1.0/2.2)); 
             }
             myFinalColor = vec4(color, 1.0);
+            //myFinalColor = vec4(1.0);
         }
     }
     #TINY_FS_END

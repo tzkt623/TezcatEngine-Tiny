@@ -10,14 +10,18 @@ Notice!Tiny Use The C++20 Ver.
 
 To Do
 
-- [ ] PBR IBL
+- [x] Basic PBR
 - [ ] Camera Culling
 - [ ] Multi-Thread Rendering
 - [ ] Multi-Light Support
+- [ ] Mode Load Support
+- [ ] Transparent Sort
 - [x] Octree
-- [x] RenderCommad Based Rendering
+- [x] Commad Based Rendering
 - [x] Basic GL Shader Parser
 - [x] Basic ShadowMap
+- [x] Basic Memory Manager
+- [x] Runtime Shader Rebuild
 
 ## **编辑器(Editor)**
 

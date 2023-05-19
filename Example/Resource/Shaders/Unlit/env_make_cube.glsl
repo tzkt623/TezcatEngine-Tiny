@@ -11,10 +11,10 @@
         str Name = EnvMakeCube;
         int Version = 330;
         int OrderID = 50;
-        str Queue = Opaque;
-        str DepthTest = LessEqual;
+        str Queue = Prepare;
+        str DepthTest = Off;
         bool ZWrite = true;
-        str CullFace = Off;
+        str CullFace = Front;
     }
     #TINY_CFG_END
 
@@ -23,11 +23,11 @@
         #include "tiny_vs_base"
 
         layout (location = 0) in vec3 aPos;
-        out vec3 myUV;
+        out vec3 myWorldPosition;
 
         void main()
         {
-            myUV = aPos;
+            myWorldPosition = aPos;
             gl_Position = TINY_MatrixP * TINY_MatrixV * vec4(aPos, 1.0);
         }
     }
@@ -37,7 +37,7 @@
     {
         #include "tiny_fs_texture"
         
-        in vec3 myUV;
+        in vec3 myWorldPosition;
         out vec4 myFinalColor;
 
         const vec2 invAtan = vec2(0.1591, 0.3183);
@@ -51,7 +51,7 @@
 
         void main()
         {
-            vec2 uv = sampleSphericalMap(normalize(myUV));
+            vec2 uv = sampleSphericalMap(normalize(myWorldPosition));
             vec3 color = texture(TINY_TexColor, uv).rgb;
 
             myFinalColor = vec4(color, 1.0f);

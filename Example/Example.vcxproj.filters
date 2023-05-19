@@ -75,6 +75,9 @@
     <ClCompile Include="Test\MyObserver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test\MyGUI\Window\MyTextureViewerWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test\MyGUI\MyGUI.h">
@@ -132,6 +135,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyObserver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\MyGUI\Window\MyTextureViewerWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

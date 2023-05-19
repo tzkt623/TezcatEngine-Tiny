@@ -20,7 +20,9 @@ namespace tezcat::Tiny
 	UniformID ShaderParam::TexColor;
 	UniformID ShaderParam::TexCube;
 	UniformID ShaderParam::TexDepth;
-	UniformID ShaderParam::TexEnv;
+	UniformID ShaderParam::TexIrradiance;
+	UniformID ShaderParam::TexPrefilter;
+	UniformID ShaderParam::TexBRDFLUT;
 
 // 	UniformID ShaderParam::LightPosition;
 // 	UniformID ShaderParam::LightColor;
@@ -86,7 +88,9 @@ namespace tezcat::Tiny
 		ShaderParam::TexColor = "TINY_TexColor";
 		ShaderParam::TexCube = "TINY_TexCube";
 		ShaderParam::TexDepth = "TINY_TexDepth";
-		ShaderParam::TexEnv = "TINY_TexEnv";
+		ShaderParam::TexIrradiance = "TINY_TexIrradiance";
+		ShaderParam::TexPrefilter = "TINY_TexPrefilter";
+		ShaderParam::TexBRDFLUT = "TINY_TexBRDFLUT";
 
 		//5
 // 		ShaderParam::LightPosition = "TINY_LightPosition";

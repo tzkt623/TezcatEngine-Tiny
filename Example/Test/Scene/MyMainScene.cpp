@@ -21,11 +21,11 @@ void MyMainScene::onEnter()
 	float gateWidth = 1920.0f / 4;
 	float gateHigh = 1080.0f / 4;
 
-	mController = GameObject::create("Controller");
-	mController->addComponent<Transform>();
-	mController->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-	mController->addComponent<FlyController>();
-	MyInputer::getInstance()->setController(mController->addComponent<FlyController>());
+// 	mController = GameObject::create("Controller");
+// 	mController->addComponent<Transform>();
+// 	mController->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+// 	mController->addComponent<FlyController>();
+//  MyInputer::getInstance()->setController(mController->addComponent<FlyController>());
 
 	if (true)
 	{
@@ -38,8 +38,8 @@ void MyMainScene::onEnter()
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		go->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-		go->getTransform()->setParent(mController->getTransform());
-		//MyInputer::getInstance()->setController(go->addComponent<FlyController>());
+		//go->getTransform()->setParent(mController->getTransform());
+		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 
 		auto frame = FrameBufferMgr::getInstance()->create(
 			"FB_Viewport",
@@ -77,29 +77,29 @@ void MyMainScene::onEnter()
 	this->createDirectionLight();
 	this->createPaintings();
 	this->createPlane();
-	this->createTransparentObject();
+	//this->createTransparentObject();
 	this->createPBR();
 	this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
 	//灯光深度图
-	if (true)
-	{
-		auto lit_depth = GameObject::create("TextureDepth");
-		lit_depth->addComponent<Transform>();
-		lit_depth->getTransform()->setPosition(glm::vec3(960.0f, 0.0f, 0.0f));
-		lit_depth->getTransform()->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
-		lit_depth->getTransform()->setScale(glm::vec3(1024.0f, 1024.0f, 1.0f));
-		//depth->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1.0f));
-
-		auto depth_material = Material::create("Unlit/TextureDepth");
-		depth_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "Shadow");
-
-		auto mr = lit_depth->addComponent<MeshRenderer>();
-		mr->setMaterial(depth_material);
-		mr->setMesh("Square");
-	}
-
+// 	if (true)
+// 	{
+// 		auto lit_depth = GameObject::create("TextureDepth");
+// 		lit_depth->addComponent<Transform>();
+// 		lit_depth->getTransform()->setPosition(glm::vec3(960.0f, 0.0f, 0.0f));
+// 		lit_depth->getTransform()->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
+// 		lit_depth->getTransform()->setScale(glm::vec3(1024.0f, 1024.0f, 1.0f));
+// 		//depth->getTransform()->setScale(glm::vec3(1920.0f, 1080.0f, 1.0f));
+// 
+// 		auto depth_material = Material::create("Unlit/Texture");
+// 		depth_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "CB_BRDF_LUT");
+		//depth_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "Shadow");
+// 
+// 		auto mr = lit_depth->addComponent<MeshRenderer>();
+// 		mr->setMaterial(depth_material);
+// 		mr->setMesh("Square");
+// 
 	EnvLighting::getInstance()->setDirty("blue_photo_studio_2k");
 }
 
@@ -294,10 +294,10 @@ void MyMainScene::createDirectionLight()
 	shadow_caster->setCullLayer(0);
 	shadow_caster->setShadowMap(4096, 4096, "Shadow");
 
-	dir_light->startLogic([=]()
-	{
-		go->getTransform()->rotate(glm::vec3(0.0f, 10.0f * Engine::getDeltaTime(), 0.0f));
-	});
+// 	dir_light->startLogic([=]()
+// 	{
+// 		go->getTransform()->rotate(glm::vec3(0.0f, 10.0f * Engine::getDeltaTime(), 0.0f));
+// 	});
 }
 
 void MyMainScene::createPBR()
@@ -323,7 +323,7 @@ void MyMainScene::createPBR()
 			material->addUniform<UniformF3>(ShaderParam::MatPBR_Test::Albedo, glm::vec3(1.0f, 0.0f, 0.0f));
 			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Metallic, x * 0.2f + 0.001f);
 			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, y * 0.2f + 0.001f);
-			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::AO, 0.5f);
+			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::AO, 1.0f);
 			mr->setMaterial(material);
 			mr->setMesh("Sphere");
 		}

@@ -13,16 +13,6 @@ MyGCInfoWindow::~MyGCInfoWindow()
 
 }
 
-void MyGCInfoWindow::begin()
-{
-	GUIWindow::begin();
-}
-
-void MyGCInfoWindow::end()
-{
-	GUIWindow::end();
-}
-
 void MyGCInfoWindow::onRender()
 {
 	auto& infos = TinyGC::getGCInfos();

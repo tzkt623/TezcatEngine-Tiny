@@ -9,6 +9,8 @@ namespace tezcat::Tiny
 	class BaseGraphics;
 	class Skybox;
 	class TextureCube;
+	class TextureRender2D;
+	class Texture2D;
 	class FrameBuffer;
 	class TINY_API EnvObserver : public TinyObject, public IRenderObserver
 	{
@@ -29,25 +31,45 @@ namespace tezcat::Tiny
 		~EnvironmentLighting();
 
 		void init();
+
+		void createBRDF_LUT();
+
 		void calculate(BaseGraphics* graphics);
 		void setDirty(const std::string& texName);
 		void submit(Shader* shader);
+		void showIrradianceMap();
+		void showPrefilterMap();
+		void showSkybox();
 
+	private:
+		void createCube();
+		void createIrradiance();
+		void createPrefilter();
 	private:
 		bool mDirty;
 		std::string mHDRTexName;
 
+		uint32_t mCubeSize;
+		uint32_t mIrrSize;
+
 		TextureCube* mCubeMap;
-		TextureCube* mEnvMap;
+		TextureCube* mIrradianceMap;
+		TextureCube* mPrefilterMap;
+		Texture2D* mBRDFLUTMap;
+		TextureRender2D* mRender2D;
 
-		FrameBuffer* mToCubeFB;
-		FrameBuffer* mToEnvFB;
+		FrameBuffer* mCubeFB;
+		FrameBuffer* mIrradianceFB;
+		FrameBuffer* mPrefilterFB;
 
-		EnvObserver* mToCubeObserver;
-		EnvObserver* mToEnvObserver;
+		EnvObserver* mCubeObserver;
+		EnvObserver* mIrradianceObserver;
+		EnvObserver* mPrefilterObserver;
+		EnvObserver* mBRDFLUTObserver;
 
 
 		Skybox* mSkybox;
+		
 	};
 
 	using EnvLighting = SG<EnvironmentLighting>;

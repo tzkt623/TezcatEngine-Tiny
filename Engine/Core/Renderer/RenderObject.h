@@ -150,10 +150,11 @@ namespace tezcat::Tiny
 	class TINY_API IRenderObserver : public IRenderObject
 	{
 	public:
-		enum class ViewType
+		enum class ViewType : uint8_t
 		{
+			Screen,
 			Ortho,
-			Perspective
+			Perspective,	
 		};
 
 	public:

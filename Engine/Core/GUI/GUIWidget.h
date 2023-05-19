@@ -48,7 +48,7 @@ namespace tezcat::Tiny
 		virtual void onRender() = 0;
 		virtual void onUpdate() = 0;
 
-	private:
+	protected:
 		std::string mName;
 	};
 
@@ -59,7 +59,7 @@ namespace tezcat::Tiny
 	public:
 		void update() final;
 	protected:
-		virtual void begin() = 0;
+		virtual bool begin() = 0;
 		virtual void end() = 0;
 		void onRender() override;
 	};
@@ -74,15 +74,18 @@ namespace tezcat::Tiny
 		virtual ~GUIWindow();
 
 	public:
-		void begin() override;
+		bool begin() override;
 		void end() override;
-
+		bool isClosed() { return !mIsOpen; }
+		void setClose() { mIsOpen = false; }
+		GUI* getHost() { return mHost; }
 	public:
 		void open(GUI* gui) override;
 		void close() override;
 
 	protected:
 		GUI* mHost;
+		bool mIsOpen;
 	};
 
 

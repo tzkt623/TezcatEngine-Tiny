@@ -56,7 +56,7 @@ namespace tezcat::Tiny
 		void createPlane();
 		void createGridSquare();
 		void createSphere2(uint32_t X_SEGMENTS, uint32_t Y_SEGMENTS);
-
+		void createRect();
 	protected:
 		int mWindowWidth;
 		int mWindowHeight;

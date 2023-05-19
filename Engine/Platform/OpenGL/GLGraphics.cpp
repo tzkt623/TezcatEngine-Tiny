@@ -41,6 +41,7 @@ namespace tezcat::Tiny::GL
 	{
 		this->initContext();
 		BaseGraphics::init(engine);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
 	void GLGraphics::initContext()
@@ -77,7 +78,7 @@ namespace tezcat::Tiny::GL
 		{
 			TexTypeWrapper(TextureType::Texture1D,			GL_TEXTURE_1D),
 			TexTypeWrapper(TextureType::Texture2D,			GL_TEXTURE_2D),
-			TexTypeWrapper(TextureType::Texture2D,			GL_TEXTURE_3D),
+			TexTypeWrapper(TextureType::Texture3D,			GL_TEXTURE_3D),
 			TexTypeWrapper(TextureType::TextureCube,		GL_TEXTURE_CUBE_MAP),
 			TexTypeWrapper(TextureType::Texture1DA,			GL_TEXTURE_1D_ARRAY),
 			TexTypeWrapper(TextureType::Texture2DA,			GL_TEXTURE_2D_ARRAY),
@@ -86,8 +87,9 @@ namespace tezcat::Tiny::GL
 
 		ContextMap::TextureFilterArray =
 		{
-			TexFilterWrapper(TextureFilter::Nearest,	GL_NEAREST),
-			TexFilterWrapper(TextureFilter::Linear,		GL_LINEAR),
+			TexFilterWrapper(TextureFilter::Nearest,				GL_NEAREST),
+			TexFilterWrapper(TextureFilter::Linear,					GL_LINEAR),
+			TexFilterWrapper(TextureFilter::Linear_Mipmap_Linear,	GL_LINEAR_MIPMAP_LINEAR),
 		};
 
 		ContextMap::TextureWrapArray =
@@ -114,7 +116,8 @@ namespace tezcat::Tiny::GL
 			TexChannelWrapper(TextureChannel::Depth24_Stencil8,		GL_DEPTH24_STENCIL8),
 			TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	GL_DEPTH32F_STENCIL8),
 			TexChannelWrapper(TextureChannel::Stencil8,				GL_STENCIL_INDEX8),
-			TexChannelWrapper(TextureChannel::RGBF16,				GL_RGB16),
+			TexChannelWrapper(TextureChannel::RG16f,				GL_RG16F),
+			TexChannelWrapper(TextureChannel::RGB16f,				GL_RGB16F),
 		};
 
 		ContextMap::ColorBufferArray =

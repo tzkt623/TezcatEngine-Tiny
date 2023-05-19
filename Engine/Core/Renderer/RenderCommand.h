@@ -14,6 +14,7 @@ namespace tezcat::Tiny
 	class Material;
 	class Texture2D;
 	class TextureCube;
+	class TextureRender2D;
 	class FrameBuffer;
 
 	enum class CMDLife
@@ -137,19 +138,46 @@ namespace tezcat::Tiny
 		FrameBuffer* mFrameBuffer;
 	};
 
-	class RenderCMD_EnvMap : public RenderCommand
+	class RenderCMD_EnvMakeIrradiance : public RenderCommand
 	{
 	public:
-		RenderCMD_EnvMap(Vertex* vertex, TextureCube* cube, TextureCube* env, Shader* shader, FrameBuffer* frameBuffer);
-		virtual ~RenderCMD_EnvMap();
+		RenderCMD_EnvMakeIrradiance(Vertex* vertex, TextureCube* cube, TextureCube* irradiance, Shader* shader, FrameBuffer* frameBuffer);
+		virtual ~RenderCMD_EnvMakeIrradiance();
 
 		void draw(BaseGraphics* graphics, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
 		TextureCube* mCubeMap;
-		TextureCube* mEnvMap;
+		TextureCube* mIrradianceMap;
 		FrameBuffer* mFrameBuffer;
+	};
+
+	class RenderCMD_EnvMakePrefilter : public RenderCommand
+	{
+	public:
+		RenderCMD_EnvMakePrefilter(Vertex* vertex
+			, TextureCube* cube
+			, TextureCube* prefitler
+			, TextureRender2D* render2D
+			, Shader* shader
+			, FrameBuffer* frameBuffer
+			, uint32_t mipMaxLevel
+			, uint32_t mipWidth
+			, uint32_t mipHeight);
+		virtual ~RenderCMD_EnvMakePrefilter();
+
+		void draw(BaseGraphics* graphics, Shader* shader) override;
+
+	private:
+		Vertex* mVertex;
+		TextureCube* mCubeMap;
+		TextureCube* mPrefilterMap;
+		TextureRender2D* mRender2D;
+		FrameBuffer* mFrameBuffer;
+		uint32_t mMipMaxLevel;
+		uint32_t mMipWidth;
+		uint32_t mMipHeight;
 	};
 
 	class RenderCMD_Bath2D : public RenderCommand

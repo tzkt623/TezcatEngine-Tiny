@@ -65,18 +65,31 @@ namespace tezcat::Tiny
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		for (auto w : mWindows)
+		auto it = mWindows.begin();
+		auto end = mWindows.end();
+
+		while (it != end)
 		{
-			w->update();
+			if ((*it)->isClosed())
+			{
+				delete (*it);
+				it = mWindows.erase(it);
+				end = mWindows.end();
+			}
+			else
+			{
+				(*it)->update();
+				++it;
+			}
 		}
 
 		ImGui::Render();
 
-// 		int display_w, display_h;
-// 		glfwGetFramebufferSize(window, &display_w, &display_h);
-// 		glViewport(0, 0, display_w, display_h);
-// 		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-// 		glClear(GL_COLOR_BUFFER_BIT);
+		// 		int display_w, display_h;
+		// 		glfwGetFramebufferSize(window, &display_w, &display_h);
+		// 		glViewport(0, 0, display_w, display_h);
+		// 		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+		// 		glClear(GL_COLOR_BUFFER_BIT);
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

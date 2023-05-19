@@ -77,7 +77,8 @@ namespace tezcat::Tiny
 		mViewInfo.Width = width;
 		mViewInfo.Height = height;
 
-		mFrameBuffer = FrameBufferMgr::getInstance()->create("Shadow",
+		mFrameBuffer = FrameBufferMgr::getInstance()->create(
+			"Shadow",
 			width, height,
 			{
 				//shadow texture
@@ -85,6 +86,8 @@ namespace tezcat::Tiny
 						  , TextureType::Texture2D
 						  , TextureAttachPosition::DepthComponent
 						  , TextureFilter::Nearest
+						  , TextureFilter::Nearest
+						  , TextureWrap::Clamp_To_Border
 						  , TextureWrap::Clamp_To_Border
 						  , TextureChannel::Depth
 						  , TextureChannel::Depth

@@ -41,7 +41,9 @@ namespace tezcat::Tiny
 		static UniformID TexColor;
 		static UniformID TexCube;
 		static UniformID TexDepth;
-		static UniformID TexEnv;
+		static UniformID TexIrradiance;
+		static UniformID TexPrefilter;
+		static UniformID TexBRDFLUT;
 
 // 		static UniformID LightPosition;
 // 		static UniformID LightColor;

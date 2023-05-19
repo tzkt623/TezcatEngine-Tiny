@@ -156,7 +156,7 @@ namespace tezcat::Tiny
 		glm::mat4 captureViews[] =
 		{
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
@@ -174,33 +174,36 @@ namespace tezcat::Tiny
 			graphics->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 			graphics->draw(mVertex);
 		}
+
+		mCube->bind();
+		mCube->genMipmap();
 	}
 
 	//-------------------------------------------------------
 	//
-	//	RenderCMD_EnvMap
+	//	RenderCMD_EnvMakeIrradiance
 	//
-	RenderCMD_EnvMap::RenderCMD_EnvMap(Vertex* vertex, TextureCube* cube, TextureCube* env, Shader* shader, FrameBuffer* frameBuffer)
+	RenderCMD_EnvMakeIrradiance::RenderCMD_EnvMakeIrradiance(Vertex* vertex, TextureCube* cube, TextureCube* irradiance, Shader* shader, FrameBuffer* frameBuffer)
 		: RenderCommand(shader)
 		, mVertex(vertex)
 		, mCubeMap(cube)
-		, mEnvMap(env)
+		, mIrradianceMap(irradiance)
 		, mFrameBuffer(frameBuffer)
 	{
 
 	}
 
-	RenderCMD_EnvMap::~RenderCMD_EnvMap()
+	RenderCMD_EnvMakeIrradiance::~RenderCMD_EnvMakeIrradiance()
 	{
 
 	}
 
-	void RenderCMD_EnvMap::draw(BaseGraphics* graphics, Shader* shader)
+	void RenderCMD_EnvMakeIrradiance::draw(BaseGraphics* graphics, Shader* shader)
 	{
 		glm::mat4 captureViews[] =
 		{
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
@@ -212,11 +215,80 @@ namespace tezcat::Tiny
 
 		for (uint32_t i = 0; i < 6; i++)
 		{
-			mFrameBuffer->attachCube(mEnvMap, 0, i);
+			mFrameBuffer->attachCube(mIrradianceMap, 0, i);
 			shader->setViewMatrix(captureViews[i]);
 
 			graphics->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 			graphics->draw(mVertex);
+		}
+	}
+
+	//-------------------------------------------------------
+	//
+	//	RenderCMD_EnvMakePrefilter
+	//
+	RenderCMD_EnvMakePrefilter::RenderCMD_EnvMakePrefilter(Vertex* vertex
+		, TextureCube* cube
+		, TextureCube* prefitler
+		, TextureRender2D* render2D
+		, Shader* shader
+		, FrameBuffer* frameBuffer
+		, uint32_t mipMaxLevel
+		, uint32_t mipWidth
+		, uint32_t mipHeight)
+		: RenderCommand(shader)
+		, mVertex(vertex)
+		, mCubeMap(cube)
+		, mPrefilterMap(prefitler)
+		, mRender2D(render2D)
+		, mFrameBuffer(frameBuffer)
+		, mMipMaxLevel(mipMaxLevel)
+		, mMipWidth(mipWidth)
+		, mMipHeight(mipHeight)
+
+	{
+
+	}
+
+	RenderCMD_EnvMakePrefilter::~RenderCMD_EnvMakePrefilter()
+	{
+
+	}
+
+	void RenderCMD_EnvMakePrefilter::draw(BaseGraphics* graphics, Shader* shader)
+	{
+		glm::mat4 captureViews[] =
+		{
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+		};
+
+		shader->resetLocalState();
+		shader->setTextureCube(ShaderParam::TexCube, mCubeMap);
+		//mRender2D->bind();
+
+		for (uint32_t mip = 0; mip < mMipMaxLevel; ++mip)
+		{
+			uint32_t mip_width = static_cast<uint32_t>(mMipWidth * std::pow(0.5, mip));
+			uint32_t mip_height = static_cast<uint32_t>(mMipHeight * std::pow(0.5, mip));
+			//mRender2D->setSize(mip_width, mip_height);
+			graphics->setViewport(ViewportInfo(0, 0, mip_width, mip_height));
+
+			float roughness = (float)mip / (float)(mMipMaxLevel - 1);
+			shader->setFloat1("roughness", &roughness);
+
+			for (uint32_t i = 0; i < 6; ++i)
+			{
+				mFrameBuffer->attachCube(mPrefilterMap, 0, i, mip);
+				shader->setViewMatrix(captureViews[i]);
+
+				graphics->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+				graphics->draw(mVertex);
+			}
 		}
 	}
 }

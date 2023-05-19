@@ -25,6 +25,9 @@ namespace tezcat::Tiny::GL
 				   , const DataType& dataType) override;
 
 		void create(const int& width, const int& height, const TextureInfo& info) override;
+
+		void bind() override;
+		void genMipmap() override;
 	};
 
 	class TINY_API GLTextureCube : public TextureCube
@@ -39,6 +42,9 @@ namespace tezcat::Tiny::GL
 		void create(const std::array<Image, 6>& images, const TextureInfo& info) override;
 		void create(const int& width, const int& hegiht, const TextureInfo& info) override;
 
+		void bind() override;
+		void genMipmap() override;
+
 	private:
 
 	};
@@ -51,6 +57,8 @@ namespace tezcat::Tiny::GL
 	public:
 		virtual ~GLTextureRender2D();
 
+		void bind();
+		void setSize(const int& width, const int& height) override;
 		void create(const int& width
 			, const int& height
 			, const TextureChannel& internalChannel) override;

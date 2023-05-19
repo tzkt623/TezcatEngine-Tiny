@@ -27,7 +27,7 @@ namespace tezcat::Tiny
 		virtual void attach2D(Texture2D* tex) = 0;
 		virtual void attachRender(TextureRender2D* tex) = 0;
 		virtual void attachCube(TextureCube* tex) = 0;
-		virtual void attachCube(TextureCube* tex, int colorIndex, int faceIndex) = 0;
+		virtual void attachCube(TextureCube* tex, int colorIndex, int faceIndex, int level = 0) = 0;
 
 		Texture* getBuffer(const int& index);
 
