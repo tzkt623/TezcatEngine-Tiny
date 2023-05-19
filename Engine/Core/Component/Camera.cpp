@@ -21,7 +21,6 @@
 #include "../Renderer/BaseGraphics.h"
 #include "../Renderer/FrameBuffer.h"
 #include "../Renderer/LayerMask.h"
-#include "../Renderer/ShadowRenderer.h"
 #include "../Renderer/RenderLayer.h"
 #include "../Renderer/RenderPass.h"
 

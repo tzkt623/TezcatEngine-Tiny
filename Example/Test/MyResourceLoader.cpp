@@ -51,7 +51,7 @@ void MyResourceLoader::prepareGame(Engine* engine)
 	CreateWindow(gui_host, MyGCInfoWindow);
 
  	SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
- 	SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
+ 	//SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
  	SceneMgr::getInstance()->prepareScene(Tutorial01::create("Tutorial01"));
 }
 

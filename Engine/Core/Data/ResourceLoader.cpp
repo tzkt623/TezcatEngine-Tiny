@@ -1,7 +1,7 @@
 #include "ResourceLoader.h"
 #include "../Renderer/BaseGraphics.h"
 #include "../Manager/ShaderManager.h"
-#include "../Manager/BufferManager.h"
+#include "../Manager/VertexBufferManager.h"
 #include "../Data/MeshData.h"
 
 
@@ -145,7 +145,7 @@ namespace tezcat::Tiny
 
 		mesh_data.apply();
 
-		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
+		VertexBufMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createSphere()
@@ -210,7 +210,7 @@ namespace tezcat::Tiny
 		//indices.clear();
 		mesh_data->apply(DrawMode::Triangles_Strip);
 
-		BufferMgr::getInstance()->createVertexAndCached(mesh_data.get());
+		VertexBufMgr::getInstance()->createVertexAndCached(mesh_data.get());
 	}
 
 	void ResourceLoader::createSphere(int prec)
@@ -259,7 +259,7 @@ namespace tezcat::Tiny
 
 
 		mesh_data->apply();
-		BufferMgr::getInstance()->createVertexAndCached(mesh_data.get());
+		VertexBufMgr::getInstance()->createVertexAndCached(mesh_data.get());
 	}
 
 	void ResourceLoader::createSquare()
@@ -295,7 +295,7 @@ namespace tezcat::Tiny
 
 		mesh_data.apply();
 
-		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
+		VertexBufMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createRect()
@@ -332,7 +332,7 @@ namespace tezcat::Tiny
 
 		mesh_data.apply();
 
-		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
+		VertexBufMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createGridSquare()
@@ -352,7 +352,7 @@ namespace tezcat::Tiny
 		mesh_data.indices.emplace_back(3);
 
 		mesh_data.apply();
-		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
+		VertexBufMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createPlane()
@@ -388,7 +388,7 @@ namespace tezcat::Tiny
 		mesh_data.normals.emplace_back(0.0f, 1.0f, 0.0f);
 
 		mesh_data.apply();
-		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
+		VertexBufMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 
 	void ResourceLoader::createSkybox()
@@ -438,6 +438,6 @@ namespace tezcat::Tiny
 		mesh_data.vertices.emplace_back(1.0f, -1.0f, 1.0f);
 
 		mesh_data.apply();
-		BufferMgr::getInstance()->createVertexAndCached(&mesh_data);
+		VertexBufMgr::getInstance()->createVertexAndCached(&mesh_data);
 	}
 }

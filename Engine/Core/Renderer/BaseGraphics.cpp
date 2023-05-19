@@ -1,15 +1,13 @@
 #include "BaseGraphics.h"
 #include "RenderObject.h"
-#include "ShadowRenderer.h"
-#include "RenderHelper.h"
 
 #include "../Manager/CameraManager.h"
 #include "../Manager/LightManager.h"
 #include "../Manager/FrameBufferManager.h"
 #include "../Manager/ShadowCasterManager.h"
+#include "../Manager/EnvironmentLightManager.h"
 
 #include "../Renderer/RenderLayer.h"
-#include "../Renderer/EnvironmentLighting.h"
 #include "../Renderer/RenderPass.h"
 
 #include "../Component/Camera.h"
@@ -28,7 +26,7 @@ namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
 		: mShadowCasterManager(new ShadowCasterManager())
-		, mEnvLighting(new EnvironmentLighting())
+		, mEnvLitManager(new EnvironmentLightManager())
 		, mCameraManager(new CameraManager())
 		, mLightManager(new LightManager())
 
@@ -39,7 +37,7 @@ namespace tezcat::Tiny
 	BaseGraphics::~BaseGraphics()
 	{
 		delete mShadowCasterManager;
-		delete mEnvLighting;
+		delete mEnvLitManager;
 		delete mCameraManager;
 		delete mLightManager;
 	}
@@ -47,7 +45,7 @@ namespace tezcat::Tiny
 
 	void BaseGraphics::init(Engine* engine)
 	{
-		mEnvLighting->init();
+		mEnvLitManager->init();
 	}
 
 	void BaseGraphics::setPipeline(RenderPhase type, const std::string& name, Pipeline* pl)
@@ -74,7 +72,7 @@ namespace tezcat::Tiny
 		Profiler_ResetPassCount();
 
 		mShadowCasterManager->calculate(this);
-		mEnvLighting->calculate(this);
+		mEnvLitManager->calculate(this);
 		mCameraManager->calculate(this);
 	}
 

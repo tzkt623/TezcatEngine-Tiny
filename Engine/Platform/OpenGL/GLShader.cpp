@@ -326,8 +326,8 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
-		glUniform1i(mTinyUniformList[uniform], mGlobalTexture);
-		glActiveTexture(GL_TEXTURE0 + mGlobalTexture);
+		glUniform1i(mTinyUniformList[uniform], mGlobalTexture + mLocalTexure);
+		glActiveTexture(GL_TEXTURE0 + mGlobalTexture + mLocalTexure);
 		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
 		++mGlobalTexture;
 	}
@@ -365,8 +365,8 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
-		glUniform1i(mTinyUniformList[uniform], mGlobalTexture);
-		glActiveTexture(GL_TEXTURE0 + mGlobalTexture);
+		glUniform1i(mTinyUniformList[uniform], mGlobalTexture + mLocalTexure);
+		glActiveTexture(GL_TEXTURE0 + mGlobalTexture + mLocalTexure);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
 		++mGlobalTexture;
 	}

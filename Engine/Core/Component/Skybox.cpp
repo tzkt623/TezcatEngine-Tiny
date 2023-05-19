@@ -10,7 +10,7 @@
 #include "../Renderer/RenderLayer.h"
 #include "../Renderer/RenderCommand.h"
 
-#include "../Manager/BufferManager.h"
+#include "../Manager/VertexBufferManager.h"
 #include "../Event/EngineEvent.h"
 
 namespace tezcat::Tiny

@@ -101,7 +101,10 @@ namespace tezcat::Tiny
 		{
 			auto it = mTextureMap.tryEmplace(info.name, [&]()
 			{
-				return mCreator->create2D(width, height, info);
+				auto tex = mCreator->create2D(width, height, info);
+				tex->setName(info.name);
+				return tex;
+
 			});
 			return (Texture2D*)(it.first->second);
 		}
@@ -115,8 +118,10 @@ namespace tezcat::Tiny
 		auto it = mTextureMap.tryEmplace(name, [&]()
 		{
 			auto tex = mCreator->createCube(images, TextureInfo(name));
+			tex->setName(name);
 			return tex;
 		});
+
 		return (TextureCube*)(it.first->second);
 	}
 
@@ -127,6 +132,7 @@ namespace tezcat::Tiny
 			auto it = mTextureMap.tryEmplace(info.name, [&]()
 			{
 				auto tex = mCreator->createCube(width, height, info);
+				tex->setName(info.name);
 				return tex;
 			});
 			return (TextureCube*)(it.first->second);
@@ -159,7 +165,7 @@ namespace tezcat::Tiny
 		auto it = mTextureMap.tryEmplace(info.name, [&]()
 		{
 			auto tex = mCreator->create2D(img, info);
-			tex->setSize(img.getWidth(), img.getHeight());
+			tex->setName(name);
 			return tex;
 		});
 
@@ -173,6 +179,7 @@ namespace tezcat::Tiny
 			auto it = mTextureMap.tryEmplace(info.name, [&]()
 			{
 				auto tex = mCreator->createRender2D(width, height, info);
+				tex->setName(info.name);
 				return tex;
 			});
 
@@ -191,6 +198,20 @@ namespace tezcat::Tiny
 		}
 
 		return nullptr;
+	}
+
+	void TextureManager::outputAll2DHDR(std::vector<Texture2D*>& container)
+	{
+		for (auto& pair : mTextureMap)
+		{
+			if (pair.second->getTextureType() == TextureType::Texture2D)
+			{
+				if (static_cast<Texture2D*>(pair.second)->isHDR())
+				{
+					container.push_back(static_cast<Texture2D*>(pair.second));
+				}
+			}
+		}
 	}
 
 	//------------------------------------------------------------

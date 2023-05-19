@@ -12,14 +12,14 @@
 #include "Core/Renderer/Vertex.h"
 #include "Core/Renderer/RenderCommand.h"
 #include "Core/Renderer/RenderPass.h"
-#include "Core/Renderer/EnvironmentLighting.h"
 
+#include "Core/Manager/EnvironmentLightManager.h"
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/CameraManager.h"
 #include "Core/Manager/TextureManager.h"
 #include "Core/Manager/FrameBufferManager.h"
 #include "Core/Manager/ShaderManager.h"
-#include "Core/Manager/BufferManager.h"
+#include "Core/Manager/VertexBufferManager.h"
 
 #include "Core/Scene/Scene.h"
 

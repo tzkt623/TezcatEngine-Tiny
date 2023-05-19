@@ -1,7 +1,7 @@
 #include "RenderObject.h"
 #include "FrameBuffer.h"
 #include "RenderPass.h"
-#include "../Manager/BufferManager.h"
+#include "../Manager/VertexBufferManager.h"
 
 
 namespace tezcat::Tiny
@@ -44,7 +44,7 @@ namespace tezcat::Tiny
 			mVertex->subRef();
 		}
 
-		mVertex = BufferMgr::getInstance()->getVertex(meshName);
+		mVertex = VertexBufMgr::getInstance()->getVertex(meshName);
 		mVertex->addRef();
 		mRenderAgent->setVertex(mVertex);
 	}
@@ -56,7 +56,7 @@ namespace tezcat::Tiny
 			mVertex->subRef();
 		}
 
-		mVertex = BufferMgr::getInstance()->getVertex(meshData);
+		mVertex = VertexBufMgr::getInstance()->getVertex(meshData);
 		mVertex->addRef();
 		mRenderAgent->setVertex(mVertex);
 	}

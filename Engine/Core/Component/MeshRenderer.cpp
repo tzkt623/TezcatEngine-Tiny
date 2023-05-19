@@ -13,13 +13,12 @@
 #include "../Renderer/Vertex.h"
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/VertexBuffer.h"
-#include "../Renderer/ShadowRenderer.h"
 #include "../Renderer/RenderAgent.h"
 #include "../Renderer/RenderLayer.h"
 #include "../Renderer/RenderCommand.h"
 
 #include "../Manager/ShadowCasterManager.h"
-#include "../Manager/BufferManager.h"
+#include "../Manager/VertexBufferManager.h"
 
 
 namespace tezcat::Tiny

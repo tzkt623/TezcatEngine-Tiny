@@ -70,7 +70,7 @@
     <ClCompile Include="Core\Component\MeshRenderer.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Manager\BufferManager.cpp">
+    <ClCompile Include="Core\Manager\VertexBufferManager.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
     <ClCompile Include="Core\Shader\ShaderParam.cpp">
@@ -144,7 +144,6 @@
     <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
     <ClCompile Include="Core\Manager\FrameBufferManager.cpp" />
     <ClCompile Include="Core\Tool\FileTool.cpp" />
-    <ClCompile Include="Core\Renderer\ShadowRenderer.cpp" />
     <ClCompile Include="Core\Component\FlyController.cpp" />
     <ClCompile Include="Core\Tool\Log.cpp" />
     <ClCompile Include="Core\Tool\Event.cpp" />
@@ -153,7 +152,6 @@
     <ClCompile Include="Core\Base\TinyGC.cpp" />
     <ClCompile Include="Core\Base\TinyRefObject.cpp" />
     <ClCompile Include="Core\Renderer\RenderAgent.cpp" />
-    <ClCompile Include="Core\Renderer\RenderHelper.cpp" />
     <ClCompile Include="Core\Base\TinyGCInfo.cpp" />
     <ClCompile Include="Core\Component\ShadowCaster.cpp" />
     <ClCompile Include="Core\Manager\ShadowCasterManager.cpp" />
@@ -163,7 +161,7 @@
     <ClCompile Include="Core\Tool\Octree\OctreeConfig.cpp" />
     <ClCompile Include="Core\Tool\Octree\OctreeNode.cpp" />
     <ClCompile Include="Core\Tool\Collision\BoundingBox.cpp" />
-    <ClCompile Include="Core\Renderer\EnvironmentLighting.cpp" />
+    <ClCompile Include="Core\Manager\EnvironmentLightManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1188,7 +1186,7 @@
     <ClInclude Include="Core\Component\MeshRenderer.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Manager\BufferManager.h">
+    <ClInclude Include="Core\Manager\VertexBufferManager.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
     <ClInclude Include="Core\Shader\ShaderParam.h">
@@ -1281,8 +1279,6 @@
     <ClInclude Include="Core\Manager\FrameBufferManager.h" />
     <ClInclude Include="Core\Manager\Manager.h" />
     <ClInclude Include="Core\Tool\FileTool.h" />
-    <ClInclude Include="Core\Renderer\ShadowRenderer.h" />
-    <ClInclude Include="Core\Manager\ObserverManager.h" />
     <ClInclude Include="Core\Component\FlyController.h" />
     <ClInclude Include="Core\Tool\Log.h" />
     <ClInclude Include="Core\Event\EngineEvent.h" />
@@ -1291,7 +1287,6 @@
     <ClInclude Include="Core\Base\TinyGC.h" />
     <ClInclude Include="Core\Head\TinyCpp.h" />
     <ClInclude Include="Core\Renderer\RenderAgent.h" />
-    <ClInclude Include="Core\Renderer\RenderHelper.h" />
     <ClInclude Include="Core\Base\TinyGCInfo.h" />
     <ClInclude Include="Core\Component\ShadowCaster.h" />
     <ClInclude Include="Core\Manager\ShadowCasterManager.h" />
@@ -1301,7 +1296,7 @@
     <ClInclude Include="Core\Tool\Octree\OctreeAgentList.h" />
     <ClInclude Include="Core\Tool\Octree\OctreeConfig.h" />
     <ClInclude Include="Core\Tool\Octree\OctreeNode.h" />
-    <ClInclude Include="Core\Renderer\EnvironmentLighting.h" />
+    <ClInclude Include="Core\Manager\EnvironmentLightManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

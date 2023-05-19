@@ -2,7 +2,7 @@
 
 #include "Core/Renderer/Vertex.h"
 #include "Core/Renderer/VertexBuffer.h"
-#include "Core/Manager/BufferManager.h"
+#include "Core/Manager/VertexBufferManager.h"
 #include "Core/Head/GLMHead.h"
 
 namespace tezcat::Tiny::GL

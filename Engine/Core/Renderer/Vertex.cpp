@@ -1,6 +1,6 @@
 #include "Vertex.h"
 #include "../Data/MeshData.h"
-#include "../Manager/BufferManager.h"
+#include "../Manager/VertexBufferManager.h"
 #include "../Tool/Tool.h"
 
 #include "VertexBuffer.h"

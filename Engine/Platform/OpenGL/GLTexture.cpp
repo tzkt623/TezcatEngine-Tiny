@@ -32,6 +32,7 @@ namespace tezcat::Tiny::GL
 	{
 		mWidth = image.getWidth();
 		mHeight = image.getHeight();
+		mIsHDR = image.isHDR();
 
 		mWrapS = ContextMap::TextureWrapArray[(uint32_t)info.wrapS];
 		mWrapT = ContextMap::TextureWrapArray[(uint32_t)info.wrapT];
@@ -45,7 +46,7 @@ namespace tezcat::Tiny::GL
 		glTexImage2D(GL_TEXTURE_2D
 				   , 0
 				   , mInternalChannel.platform
-				   , image.getWidth(), image.getHeight()
+				   , mWidth, mHeight
 				   , 0
 				   , mChannel.platform
 				   , mDataType.platform
@@ -54,7 +55,7 @@ namespace tezcat::Tiny::GL
 		if (mWrapS.tiny == TextureWrap::Clamp_To_Border
 			|| mWrapT.tiny == TextureWrap::Clamp_To_Border)
 		{
-			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 		}
 
@@ -94,7 +95,7 @@ namespace tezcat::Tiny::GL
 		if (mWrapS.tiny == TextureWrap::Clamp_To_Border
 			|| mWrapT.tiny == TextureWrap::Clamp_To_Border)
 		{
-			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 		}
 
@@ -135,7 +136,7 @@ namespace tezcat::Tiny::GL
 		if (mWrapS.tiny == TextureWrap::Clamp_To_Border
 			|| mWrapT.tiny == TextureWrap::Clamp_To_Border)
 		{
-			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 		}
 
@@ -155,6 +156,8 @@ namespace tezcat::Tiny::GL
 		if (mMinFilter.tiny == TextureFilter::Linear_Mipmap_Linear
 			|| mMagFilter.tiny == TextureFilter::Linear_Mipmap_Linear)
 		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 5);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 	}
@@ -266,6 +269,8 @@ namespace tezcat::Tiny::GL
 		if (mMinFilter.tiny == TextureFilter::Linear_Mipmap_Linear
 			|| mMagFilter.tiny == TextureFilter::Linear_Mipmap_Linear)
 		{
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 5);
 			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		}
 	}

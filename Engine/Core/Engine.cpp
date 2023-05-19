@@ -3,7 +3,7 @@
 #include "Manager/ShaderManager.h"
 #include "Manager/SceneManager.h"
 #include "Manager/CameraManager.h"
-#include "Manager/BufferManager.h"
+#include "Manager/VertexBufferManager.h"
 #include "Manager/FrameBufferManager.h"
 #include "Manager/TextureManager.h"
 
@@ -57,7 +57,7 @@ namespace tezcat::Tiny
 		mSceneManager = new SceneManager();
 		mFrameBufferManager = new FrameBufferManager();
 		mTextureManager = new TextureManager();
-		mVertexManager = new BufferManager();
+		mVertexManager = new VertexBufferManager();
 		mInputSystem = new InputSystem();
 
 		if (!this->preInit())

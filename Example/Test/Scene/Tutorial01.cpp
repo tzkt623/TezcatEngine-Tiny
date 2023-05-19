@@ -48,7 +48,7 @@ void Tutorial01::onEnter()
 	mesh.vertices.emplace_back(0.0f, 0.5f, 0.0f);	// top
 	mesh.apply();
 
-	mVertex = BufferMgr::getInstance()->createVertex(&mesh);
+	mVertex = VertexBufMgr::getInstance()->createVertex(&mesh);
 	mVertex->addRef();
 
 	auto shader = ShaderMgr::getInstance()->findPackage("Tutorial/t01")->getShaders()[0];

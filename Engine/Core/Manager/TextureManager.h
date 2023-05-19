@@ -53,6 +53,7 @@ namespace tezcat::Tiny
 
 	public:
 		Texture* findTexture(const std::string& name);
+		void outputAll2DHDR(std::vector<Texture2D*>& container);
 
 	private:
 		TinyUMap<std::string, Texture*> mTextureMap;

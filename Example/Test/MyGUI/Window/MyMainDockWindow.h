@@ -19,6 +19,8 @@ public:
 private:
 	ImGuiWindowFlags mWindowFlags;
 	ImGuiDockNodeFlags mDockspaceFlags;
+
+	std::vector<Texture2D*> mHDR;
 };
 
 

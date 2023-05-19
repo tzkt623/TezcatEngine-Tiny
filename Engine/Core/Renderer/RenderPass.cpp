@@ -5,12 +5,12 @@
 #include "RenderObject.h"
 #include "RenderCommand.h"
 #include "FrameBuffer.h"
-#include "EnvironmentLighting.h"
 
 #include "../Head/GLMHead.h"
 
 #include "../Shader/Shader.h"
 
+#include "../Manager/EnvironmentLightManager.h"
 #include "../Manager/LightManager.h"
 #include "../Manager/TextureManager.h"
 #include "../Manager/CameraManager.h"
@@ -112,7 +112,7 @@ namespace tezcat::Tiny
 		{
 			graphics->getLightManager()->getDirectionalLight()->submit(mShader);
 			graphics->getShadowCasterManager()->submit(mShader);
-			graphics->getEnvLighting()->submit(mShader);
+			graphics->getEnvLitManager()->submit(mShader);
 			break;
 		}
 		case LightMode::ForwardAdd:

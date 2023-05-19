@@ -19,7 +19,7 @@ namespace tezcat::Tiny
 	class Pipeline;
 
 	class ShadowCasterManager;
-	class EnvironmentLighting;
+	class EnvironmentLightManager;
 	class CameraManager;
 	class LightManager;
 	class BaseQueue;
@@ -67,7 +67,7 @@ namespace tezcat::Tiny
 
 		LightManager* getLightManager() { return mLightManager; }
 		ShadowCasterManager* getShadowCasterManager() { return mShadowCasterManager; }
-		EnvironmentLighting* getEnvLighting() { return mEnvLighting; }
+		EnvironmentLightManager* getEnvLitManager() { return mEnvLitManager; }
 
 		void addBaseRenderPassQueue(BaseQueue* queue)
 		{
@@ -91,7 +91,7 @@ namespace tezcat::Tiny
 
 	private:
 		ShadowCasterManager* mShadowCasterManager;
-		EnvironmentLighting* mEnvLighting;
+		EnvironmentLightManager* mEnvLitManager;
 		CameraManager* mCameraManager;
 		LightManager* mLightManager;
 

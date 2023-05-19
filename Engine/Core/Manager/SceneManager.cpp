@@ -46,7 +46,7 @@ namespace tezcat::Tiny
 		if (it != mSceneWithName.end())
 		{
 			mScenes.push(it->second);
-			EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
+			EngineEvent::get()->dispatch({ EngineEventID::EE_OnPushScene });
 			it->second->onEnter();
 		}
 	}
@@ -64,7 +64,7 @@ namespace tezcat::Tiny
 		}
 
 		mScenes.push(scene);
-		EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
+		EngineEvent::get()->dispatch({ EngineEventID::EE_OnPushScene });
 		scene->onEnter();
 	}
 
@@ -77,7 +77,7 @@ namespace tezcat::Tiny
 
 		mScenes.top()->onExit();
 		mScenes.pop();
-		EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPopScene });
+		EngineEvent::get()->dispatch({ EngineEventID::EE_OnPopScene });
 
 		if (!mScenes.empty())
 		{

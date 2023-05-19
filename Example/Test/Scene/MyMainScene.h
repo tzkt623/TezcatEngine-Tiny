@@ -17,9 +17,11 @@ public:
 	void createInfinitePlane();
 	void createDirectionLight();
 	void createPBR();
+	void createSkybox();
 
 protected:
 	void onEnter() override;
+
 
 
 private:

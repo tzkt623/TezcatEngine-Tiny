@@ -12,7 +12,6 @@
 
 namespace tezcat::Tiny
 {
-
 	ShadowCasterManager::ShadowCasterManager()
 		: mShader(nullptr)
 		, mShadowTexture(nullptr)

@@ -230,21 +230,21 @@ namespace tezcat::Tiny
 	RenderCMD_EnvMakePrefilter::RenderCMD_EnvMakePrefilter(Vertex* vertex
 		, TextureCube* cube
 		, TextureCube* prefitler
-		, TextureRender2D* render2D
 		, Shader* shader
 		, FrameBuffer* frameBuffer
 		, uint32_t mipMaxLevel
 		, uint32_t mipWidth
-		, uint32_t mipHeight)
+		, uint32_t mipHeight
+		, float resolution)
 		: RenderCommand(shader)
 		, mVertex(vertex)
 		, mCubeMap(cube)
 		, mPrefilterMap(prefitler)
-		, mRender2D(render2D)
 		, mFrameBuffer(frameBuffer)
 		, mMipMaxLevel(mipMaxLevel)
 		, mMipWidth(mipWidth)
 		, mMipHeight(mipHeight)
+		, mResolution(resolution)
 
 	{
 
@@ -269,17 +269,16 @@ namespace tezcat::Tiny
 
 		shader->resetLocalState();
 		shader->setTextureCube(ShaderParam::TexCube, mCubeMap);
-		//mRender2D->bind();
 
 		for (uint32_t mip = 0; mip < mMipMaxLevel; ++mip)
 		{
 			uint32_t mip_width = static_cast<uint32_t>(mMipWidth * std::pow(0.5, mip));
 			uint32_t mip_height = static_cast<uint32_t>(mMipHeight * std::pow(0.5, mip));
-			//mRender2D->setSize(mip_width, mip_height);
 			graphics->setViewport(ViewportInfo(0, 0, mip_width, mip_height));
 
 			float roughness = (float)mip / (float)(mMipMaxLevel - 1);
 			shader->setFloat1("roughness", &roughness);
+			shader->setFloat1("resolution", &mResolution);
 
 			for (uint32_t i = 0; i < 6; ++i)
 			{

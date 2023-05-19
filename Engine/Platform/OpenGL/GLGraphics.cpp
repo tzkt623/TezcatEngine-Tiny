@@ -28,7 +28,7 @@ namespace tezcat::Tiny::GL
 
 		FrameBufferMgr::getInstance()->initCreator(new GLFrameBufferCreator());
 		TextureMgr::getInstance()->initCreator(new GLTextureCreator());
-		BufferMgr::getInstance()->initCreator(new GLBufferCreator());
+		VertexBufMgr::getInstance()->initCreator(new GLBufferCreator());
 		ShaderMgr::getInstance()->initCreator(new GLShaderCreator());
 	}
 
@@ -59,7 +59,7 @@ namespace tezcat::Tiny::GL
 			DataTypeWrapper(DataType::Int64,		GL_INT),
 			DataTypeWrapper(DataType::UInt64,		GL_UNSIGNED_INT),
 			DataTypeWrapper(DataType::Float32,		GL_FLOAT),
-			DataTypeWrapper(DataType::Float64,		GL_FLOAT),
+			DataTypeWrapper(DataType::Float64,		GL_DOUBLE),
 			DataTypeWrapper(DataType::UInt_24_8,	GL_UNSIGNED_INT_24_8),
 		};
 

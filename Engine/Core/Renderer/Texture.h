@@ -209,6 +209,8 @@ namespace tezcat::Tiny
 		const DataTypeWrapper& getDataType() const { return mDataType; }
 
 		const uint32_t getUID() const { return mUID; }
+		const std::string& getName() const { return mName; }
+		void setName(const std::string& name) { mName = name; }
 
 		const TextureAttachPosition& getAttachPosition() const { return mAttachPosition; }
 		void setAttachPosition(const TextureAttachPosition& val) { mAttachPosition = val; }
@@ -220,6 +222,7 @@ namespace tezcat::Tiny
 		static TexChannelWrapper getTextureChannels(const Image& image);
 
 	protected:
+		std::string mName;
 		uint32_t mUID;
 		uint32_t mTextureID;
 		TextureAttachPosition mAttachPosition;
@@ -267,12 +270,14 @@ namespace tezcat::Tiny
 		uint32_t getWidth() const { return mWidth; }
 		uint32_t getHeight() const { return mHeight; }
 
+		bool isHDR() const { return mIsHDR; }
+
 	protected:
 		uint32_t mWidth;
 		uint32_t mHeight;
 		TexWrapWrapper mWrapS;
 		TexWrapWrapper mWrapT;
-
+		bool mIsHDR;
 	};
 
 	class TINY_API Texture3D : public Texture

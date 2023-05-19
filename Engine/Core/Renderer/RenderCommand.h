@@ -159,12 +159,12 @@ namespace tezcat::Tiny
 		RenderCMD_EnvMakePrefilter(Vertex* vertex
 			, TextureCube* cube
 			, TextureCube* prefitler
-			, TextureRender2D* render2D
 			, Shader* shader
 			, FrameBuffer* frameBuffer
 			, uint32_t mipMaxLevel
 			, uint32_t mipWidth
-			, uint32_t mipHeight);
+			, uint32_t mipHeight
+			, float resolution);
 		virtual ~RenderCMD_EnvMakePrefilter();
 
 		void draw(BaseGraphics* graphics, Shader* shader) override;
@@ -173,11 +173,11 @@ namespace tezcat::Tiny
 		Vertex* mVertex;
 		TextureCube* mCubeMap;
 		TextureCube* mPrefilterMap;
-		TextureRender2D* mRender2D;
 		FrameBuffer* mFrameBuffer;
 		uint32_t mMipMaxLevel;
 		uint32_t mMipWidth;
 		uint32_t mMipHeight;
+		float mResolution;
 	};
 
 	class RenderCMD_Bath2D : public RenderCommand

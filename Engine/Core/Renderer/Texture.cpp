@@ -76,6 +76,7 @@ namespace tezcat::Tiny
 		, mHeight(0)
 		, mWrapS(ContextMap::TextureWrapArray[(uint32_t)wrapS])
 		, mWrapT(ContextMap::TextureWrapArray[(uint32_t)wrapT])
+		, mIsHDR(false)
 	{
 
 	}

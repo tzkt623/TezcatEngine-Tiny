@@ -122,6 +122,27 @@ void MyMainDockWindow::onRender()
 			ImGui::EndMenu();
 		}
 
+		//-------------------------------------------
+		if (ImGui::BeginMenu("EnvironmentLight"))
+		{
+			if (mHDR.empty())
+			{
+				TextureMgr::getInstance()->outputAll2DHDR(mHDR);
+			}
+			else
+			{
+				for (auto tex : mHDR)
+				{
+					if (ImGui::MenuItem(tex->getName().c_str()))
+					{
+						EngineEvent::get()->dispatch({ EngineEventID::EE_RenderEnv, (void*)&tex->getName() });
+					}
+				}
+			}
+
+			ImGui::EndMenu();
+		}
+
 		//-----------------------------------------
 		if (ImGui::BeginMenu("Debug"))
 		{
@@ -136,17 +157,17 @@ void MyMainDockWindow::onRender()
 
 			if (ImGui::MenuItem("Skybox"))
 			{
-				EnvLighting::getInstance()->showSkybox();
+				EnvLitMgr::getInstance()->showSkybox();
 			}
 
 			if (ImGui::MenuItem("IrradianceMap"))
 			{
-				EnvLighting::getInstance()->showIrradianceMap();
+				EnvLitMgr::getInstance()->showIrradianceMap();
 			}
 
 			if (ImGui::MenuItem("PrefilterMap"))
 			{
-				EnvLighting::getInstance()->showPrefilterMap();
+				EnvLitMgr::getInstance()->showPrefilterMap();
 			}
 
 			if (ImGui::MenuItem("BRDF LUT"))
