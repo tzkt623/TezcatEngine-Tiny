@@ -128,6 +128,7 @@ namespace tezcat::Tiny::GL
 	void GLShader::resetGlobalState()
 	{
 		mGlobalTexture = 0;
+		mLocalTexure = 0;
 	}
 
 	void GLShader::setFloat1(const char* name, float* data)

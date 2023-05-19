@@ -106,7 +106,7 @@
         {
             vec3 normal = normalize(myNormal);
             vec3 view_dir = normalize(TINY_ViewPosition - myWorldPosition);
-            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
+            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);          
         }
     }
     #TINY_FS_END

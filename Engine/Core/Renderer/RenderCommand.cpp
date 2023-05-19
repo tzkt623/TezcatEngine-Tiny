@@ -177,6 +177,7 @@ namespace tezcat::Tiny
 
 		mCube->bind();
 		mCube->genMipmap();
+		mCube->unbind();
 	}
 
 	//-------------------------------------------------------

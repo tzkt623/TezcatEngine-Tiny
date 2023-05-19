@@ -167,6 +167,11 @@ namespace tezcat::Tiny::GL
 		glBindTexture(GL_TEXTURE_2D, mTextureID);
 	}
 
+	void GLTexture2D::unbind()
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	//-------------------------------------------
 	//
 	//	Cube
@@ -280,6 +285,11 @@ namespace tezcat::Tiny::GL
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureID);
 	}
 
+	void GLTextureCube::unbind()
+	{
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
+
 	//----------------------------------------------
 	//
 	//	RenderBuffer2D
@@ -316,6 +326,11 @@ namespace tezcat::Tiny::GL
 	{
 		Texture2D::setSize(width, height);
 		glRenderbufferStorage(GL_RENDERBUFFER, mInternalChannel.platform, width, height);
+	}
+
+	void GLTextureRender2D::unbind()
+	{
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}
 
 	//----------------------------------------------

@@ -27,6 +27,7 @@ namespace tezcat::Tiny::GL
 		void create(const int& width, const int& height, const TextureInfo& info) override;
 
 		void bind() override;
+		void unbind() override;
 		void genMipmap() override;
 	};
 
@@ -43,6 +44,7 @@ namespace tezcat::Tiny::GL
 		void create(const int& width, const int& hegiht, const TextureInfo& info) override;
 
 		void bind() override;
+		void unbind() override;
 		void genMipmap() override;
 
 	private:
@@ -58,6 +60,7 @@ namespace tezcat::Tiny::GL
 		virtual ~GLTextureRender2D();
 
 		void bind();
+		void unbind();
 		void setSize(const int& width, const int& height) override;
 		void create(const int& width
 			, const int& height

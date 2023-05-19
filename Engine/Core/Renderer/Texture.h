@@ -216,6 +216,7 @@ namespace tezcat::Tiny
 		void setAttachPosition(const TextureAttachPosition& val) { mAttachPosition = val; }
 
 		virtual void bind() {}
+		virtual void unbind() {}
 		virtual void genMipmap() {}
 
 	public:

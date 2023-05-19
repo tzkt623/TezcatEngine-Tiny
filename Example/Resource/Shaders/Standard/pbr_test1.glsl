@@ -44,6 +44,7 @@
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
             myWorldPosition = vec3(position);
+            myLightPosition = TINY_MatrixLit * vec4(myWorldPosition, 1.0f);
 
             gl_Position = TINY_MatrixP * TINY_MatrixV * position;
         }
@@ -54,6 +55,7 @@
     {
         #include "tiny_fs_pbr_mat"
         #include "tiny_fs_pbr_func"
+        #include "tiny_fs_function"
         #include "tiny_fs_camera"
         #include "tiny_fs_texture"
         #include "tiny_fs_light"
@@ -62,6 +64,7 @@
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
+        in vec4 myLightPosition;
         
         out vec4 myFinalColor;
 
@@ -119,12 +122,16 @@
             vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
             vec3 ambient = (kD * diffuse + specular) * ao;
+
             //vec3 ambient = (kD * diffuse) * ao;
+            //float shadow = calcShadow(myLightPosition, N, normalize(-TINY_LitDir.direction), TINY_TexDepth);
 
             vec3 color = ambient + Lo;
 
             color = color / (color + vec3(1.0));
             color = pow(color, vec3(1.0 / 2.2)); 
+
+            //color = (1 - shadow) * color;
 
             myFinalColor = vec4(color, 1.0);
             //myFinalColor = vec4(prefilteredColor, 1.0);
