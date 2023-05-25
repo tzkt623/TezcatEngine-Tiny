@@ -24,6 +24,7 @@
 #include <tuple>
 #include <limits>
 #include <ranges>
+#include <filesystem>
 
 #include "ConfigHead.h"
 
@@ -60,7 +61,7 @@ namespace tezcat::Tiny
 #ifndef TINY_Release
 #define TinyThrow(x) throw x
 #define TinyThrow_Logic(x) throw std::logic_error(x)
-#define TinyAssert(x) static_assert(x)
+#define TinyAssert(x) assert(x)
 #else
 #define TinyThrow(x)
 #define TinyThrow_Logic(x)

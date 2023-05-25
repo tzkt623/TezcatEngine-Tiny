@@ -13,7 +13,7 @@ namespace tezcat::Tiny
 	{
 	public:
 		virtual ShaderPackage* create(const std::string& filePath) = 0;
-		virtual void rebuild(ShaderPackage* package) = 0;
+		virtual void rebuild(ShaderPackage* package, std::string& data) = 0;
 	};
 
 	class TINY_API ShaderManager : public Manager<ShaderCreator>
@@ -40,6 +40,9 @@ namespace tezcat::Tiny
 		void clearIncludeFiles();
 		void rebuildShaders();
 		void rebuild(ShaderPackage* package);
+		void rebuild(std::filesystem::path& path);
+		void rebuild(const std::string& shaderName, std::string& data);
+
 	private:
 		std::unordered_map<std::string, ShaderPackage*> mShaderPackageDict;
 		std::vector<ShaderPackage*> mShaderPackageAry;

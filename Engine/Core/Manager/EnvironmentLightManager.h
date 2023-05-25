@@ -44,6 +44,7 @@ namespace tezcat::Tiny
 		void showIrradianceMap();
 		void showPrefilterMap();
 		void showSkybox();
+		void setSkyboxLod(float skyboxLod);
 
 	private:
 		void createCube();
@@ -73,6 +74,7 @@ namespace tezcat::Tiny
 		EnvObserver* mBRDFLUTObserver;
 
 		Skybox* mSkybox;
+	public:
 	};
 
 	using EnvLitMgr = SG<EnvironmentLightManager>;

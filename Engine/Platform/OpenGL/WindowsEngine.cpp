@@ -248,7 +248,7 @@ namespace tezcat::Tiny::GL
 
 	void WindowsEditor::onUpdate()
 	{
-		mInputSystem->update();
+		//mInputSystem->update();
 		mSceneManager->update(mGraphics);
 		mGraphics->render();
 		mGUI->render();

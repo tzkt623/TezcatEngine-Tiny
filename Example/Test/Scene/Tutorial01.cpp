@@ -42,10 +42,10 @@ void Tutorial01::onEnter()
 
 
 	MeshData mesh;
-	mesh.name = "Triangle";
-	mesh.vertices.emplace_back(-0.5f, -0.5f, 0.0f);	// left
-	mesh.vertices.emplace_back(0.5f, -0.5f, 0.0f);	// right
-	mesh.vertices.emplace_back(0.0f, 0.5f, 0.0f);	// top
+	mesh.mName = "Triangle";
+	mesh.mVertices.emplace_back(-0.5f, -0.5f, 0.0f);	// left
+	mesh.mVertices.emplace_back(0.5f, -0.5f, 0.0f);	// right
+	mesh.mVertices.emplace_back(0.0f, 0.5f, 0.0f);	// top
 	mesh.apply();
 
 	mVertex = VertexBufMgr::getInstance()->createVertex(&mesh);

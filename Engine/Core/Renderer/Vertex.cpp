@@ -27,7 +27,7 @@ namespace tezcat::Tiny
 
 	void Vertex::init(MeshData* meshData)
 	{
-		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->drawMode];
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->mDrawMode];
 		mName = meshData->getName();
 	}
 

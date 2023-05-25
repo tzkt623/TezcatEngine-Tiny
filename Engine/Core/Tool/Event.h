@@ -5,8 +5,6 @@
 
 namespace tezcat::Tiny
 {
-#define BindEvent(x) std::bind(&x, this, std::placeholders::_1)
-
 	typedef uint32_t EventID;
 
 	struct EventData

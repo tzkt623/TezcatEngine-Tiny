@@ -34,6 +34,11 @@ namespace tezcat::Tiny
 			16.0f,
 			nullptr,
 			io.Fonts->GetGlyphRangesChineseFull());
+// 		io.Fonts->AddFontFromFileTTF(
+// 			"c:/windows/fonts/simhei.ttf",
+// 			16.0f,
+// 			nullptr,
+// 			io.Fonts->GetGlyphRangesChineseFull());
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;

@@ -18,34 +18,35 @@ namespace tezcat::Tiny
 	public:
 		MeshData();
 		MeshData(const std::string& name);
+		MeshData(const std::string& name, const int& index);
 		MeshData(MeshData&& other) noexcept;
 		~MeshData();
 
-		const std::string& getName() { return name; }
+		const std::string& getName() { return mName; }
 
 		size_t vertexSize()
 		{
-			return this->vertices.size() * sizeof(glm::vec3);
+			return this->mVertices.size() * sizeof(glm::vec3);
 		}
 
 		size_t normalSize()
 		{
-			return this->normals.size() * sizeof(glm::vec3);
+			return this->mNormals.size() * sizeof(glm::vec3);
 		}
 
 		size_t colorSize()
 		{
-			return this->colors.size() * sizeof(glm::vec4);
+			return this->mColors.size() * sizeof(glm::vec4);
 		}
 
 		size_t uvSize()
 		{
-			return this->uvs.size() * sizeof(glm::vec2);
+			return this->mUVs.size() * sizeof(glm::vec2);
 		}
 
 		size_t indexSize()
 		{
-			return this->indices.size() * sizeof(unsigned int);
+			return this->mIndices.size() * sizeof(unsigned int);
 		}
 
 		int getBufferSize();
@@ -64,20 +65,52 @@ namespace tezcat::Tiny
 		MeshData& operator=(MeshData&& other) noexcept;
 
 	public:
-		std::string name;
-		std::vector<glm::vec3> vertices;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec4> colors;
-		std::vector<glm::vec2> uvs;
+		int mIndex;
+		std::string mName;
+		std::vector<glm::vec3> mVertices;
+		std::vector<glm::vec3> mNormals;
+		std::vector<glm::vec4> mColors;
+		std::vector<glm::vec2> mUVs;
+		std::vector<glm::vec3> mTangents;
+		std::vector<glm::vec3> mBitTangents;
 
-		std::vector<unsigned int> indices;
-		DrawMode drawMode;
+		std::vector<unsigned int> mIndices;
 
-		std::vector<VertexPosition> layoutPositions;
-
+		DrawMode mDrawMode;
+		std::vector<VertexPosition> mLayoutPositions;
 
 	private:
 		std::vector<MeshData*>* mChildrenData;
 	};
+
+
+	class Texture;
+
+	class ModelNode
+	{
+	public:
+		ModelNode();
+		~ModelNode();
+
+		bool hasChildren() { return mChildrenData != nullptr; }
+		bool hasMesh() { return mMeshData != nullptr; }
+		void addChild(ModelNode* node);
+
+		std::string mName;
+		MeshData* mMeshData;
+		std::vector<ModelNode*>* mChildrenData;
+	};
+
+	class Model : public ModelNode
+	{
+	public:
+		Model();
+		virtual ~Model();
+
+	private:
+		std::string mName;
+	};
+
+
 }
 

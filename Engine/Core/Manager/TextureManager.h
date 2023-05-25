@@ -60,5 +60,7 @@ namespace tezcat::Tiny
 	};
 
 	using TextureMgr = SG<TextureManager>;
+
+
 }
 

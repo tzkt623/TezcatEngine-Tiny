@@ -1,6 +1,4 @@
 #include "FileTool.h"
-#include <iostream>
-#include <filesystem>
 
 namespace tezcat::Tiny
 {
@@ -14,10 +12,12 @@ namespace tezcat::Tiny
 
 	std::unordered_map<std::string, FileType> FileTool::sFileTypeUMap =
 	{
-		{ "text", FileType::FT_Text },
-		{ "jpg", FileType::FT_Jpg },
-		{ "png", FileType::FT_Png },
-		{ "hdr", FileType::FT_Hdr }
+		{ ".text", FileType::FT_Text },
+		{ ".tysl", FileType::FT_Tysl },
+		{ ".tyin", FileType::FT_Tyin },
+		{ ".jpg", FileType::FT_Jpg },
+		{ ".png", FileType::FT_Png },
+		{ ".hdr", FileType::FT_Hdr }
 	};
 
 	void FileTool::init(const std::string & resourceFolder)
@@ -53,7 +53,7 @@ namespace tezcat::Tiny
 	{
 		std::filesystem::path temp(path);
 		std::filesystem::directory_entry entry(temp);
-		if (entry.status().type() == std::filesystem::file_type::directory)
+		if (entry.is_directory())
 		{
 			std::filesystem::directory_iterator list(temp);
 			//必须是一个目录
@@ -66,12 +66,13 @@ namespace tezcat::Tiny
 				}
 				else
 				{
-					auto name = it.path().filename().string();
-					auto pos = name.find_last_of(".");
 					FileInfo file_info;
-					file_info.path = std::move(path + "/" + name);
-					file_info.name = std::move(name.substr(0, pos));
-					file_info.exp = std::move(name.substr(pos + 1, name.size() - pos));
+					file_info.path = it.path().string();
+
+					std::ranges::replace(file_info.path, '\\', '/');
+
+					file_info.name = it.path().stem().string();
+					file_info.ext = it.path().extension().string();
 
 					FileTool::parseFileType(file_info);
 					outFiles.emplace(file_info.name, std::move(file_info));
@@ -100,10 +101,31 @@ namespace tezcat::Tiny
 
 	void FileTool::parseFileType(FileInfo& fileInfo)
 	{
-		auto it = sFileTypeUMap.find(fileInfo.exp);
+		auto it = sFileTypeUMap.find(fileInfo.ext);
 		if (it != sFileTypeUMap.end())
 		{
 			fileInfo.type = it->second;
 		}
+	}
+
+	FileType FileTool::getFileType(const std::string& ext)
+	{
+		auto it = sFileTypeUMap.find(ext);
+		if (it != sFileTypeUMap.end())
+		{
+			return it->second;
+		}
+
+		return FileType::FT_Unknown;
+	}
+
+	void FileTool::saveFile(const std::string& path, std::string& data)
+	{
+		std::fstream io(path, std::ios::out | std::ios::binary);
+		if (io.is_open())
+		{
+			io << data;
+		}
+		io.close();
 	}
 }

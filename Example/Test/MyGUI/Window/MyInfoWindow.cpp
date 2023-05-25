@@ -20,8 +20,10 @@ void MyInfoWindow::init()
 
 }
 
-void MyInfoWindow::onUpdate()
+void MyInfoWindow::onRender()
 {
+	GUIWindow::onRender();
+
 	//gpu
 	ImGui::Text("GPU: %s", Profiler::GPU);
 	//memory

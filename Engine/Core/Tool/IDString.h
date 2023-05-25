@@ -128,7 +128,7 @@ namespace tezcat::Tiny
 
 		operator const char* ()
 		{
-			return s_StringArray[mID].data();
+			return sStringArray[mID].data();
 		}
 
 		inline const int getUID() const
@@ -138,12 +138,12 @@ namespace tezcat::Tiny
 
 		const char* getStringData() const
 		{
-			return s_StringArray[mID].data();
+			return sStringArray[mID].data();
 		}
 
 		const std::string_view& getString() const
 		{
-			return s_StringArray[mID];
+			return sStringArray[mID];
 		}
 
 	private:
@@ -152,9 +152,9 @@ namespace tezcat::Tiny
 			auto pair = sStringMap.try_emplace(data, mID);
 			if (pair.second)
 			{
-				mID = static_cast<int>(s_StringArray.size());
+				mID = static_cast<int>(sStringArray.size());
 				pair.first->second = mID;
-				s_StringArray.emplace_back(pair.first->first);
+				sStringArray.emplace_back(pair.first->first);
 			}
 			else
 			{
@@ -167,9 +167,9 @@ namespace tezcat::Tiny
 			auto pair = sStringMap.try_emplace(std::move(data), mID);
 			if (pair.second)
 			{
-				mID = static_cast<int>(s_StringArray.size());
+				mID = static_cast<int>(sStringArray.size());
 				pair.first->second = mID;
-				s_StringArray.emplace_back(pair.first->first);
+				sStringArray.emplace_back(pair.first->first);
 			}
 			else
 			{
@@ -183,9 +183,9 @@ namespace tezcat::Tiny
 			auto pair = sStringMap.try_emplace(data, mID);
 			if (pair.second)
 			{
-				mID = static_cast<int>(s_StringArray.size());
+				mID = static_cast<int>(sStringArray.size());
 				pair.first->second = mID;
-				s_StringArray.emplace_back(pair.first->first);
+				sStringArray.emplace_back(pair.first->first);
 			}
 			else
 			{
@@ -197,15 +197,15 @@ namespace tezcat::Tiny
 		int mID;
 
 	public:
-		static auto allStringCount() { return s_StringArray.size(); }
+		static auto allStringCount() { return sStringArray.size(); }
 
 		static bool tryAddString(const std::string& data)
 		{
 			auto pair = sStringMap.try_emplace(data, -1);
 			if (pair.second)
 			{
-				pair.first->second = static_cast<int>(s_StringArray.size());
-				s_StringArray.emplace_back(pair.first->first);
+				pair.first->second = static_cast<int>(sStringArray.size());
+				sStringArray.emplace_back(pair.first->first);
 				return true;
 			}
 
@@ -219,19 +219,19 @@ namespace tezcat::Tiny
 
 		static const std::string_view& getStringStatic(const int& id)
 		{
-			return s_StringArray[id];
+			return sStringArray[id];
 		}
 
 	private:
 		static std::unordered_map<std::string, int> sStringMap;
-		static std::vector<std::string_view> s_StringArray;
+		static std::vector<std::string_view> sStringArray;
 	};
 
 	template<typename Belong>
 	std::unordered_map<std::string, int> IDString<Belong>::sStringMap;
 
 	template<typename Belong>
-	std::vector<std::string_view> IDString<Belong>::s_StringArray;
+	std::vector<std::string_view> IDString<Belong>::sStringArray;
 
 	template<typename Belong>
 	std::ostream& operator << (std::ostream& out, IDString<Belong>& idString)

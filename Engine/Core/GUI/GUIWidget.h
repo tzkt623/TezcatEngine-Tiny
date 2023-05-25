@@ -29,9 +29,7 @@ namespace tezcat::Tiny
 		virtual ~GUIWidget();
 
 		virtual void init() { }
-
 		virtual void update();
-
 		const char* getName() { return mName.c_str(); }
 
 		void setName(const std::u8string& val)
@@ -46,26 +44,12 @@ namespace tezcat::Tiny
 
 	protected:
 		virtual void onRender() = 0;
-		virtual void onUpdate() = 0;
 
 	protected:
 		std::string mName;
 	};
 
-	class TINY_API GUIParentWidget : public GUIWidget
-	{
-		using GUIWidget::GUIWidget;
-
-	public:
-		void update() final;
-	protected:
-		virtual bool begin() = 0;
-		virtual void end() = 0;
-		void onRender() override;
-	};
-
-
-	class TINY_API GUIWindow : public GUIParentWidget
+	class TINY_API GUIWindow : public GUIWidget
 	{
 	public:
 		GUIWindow(const std::u8string& name);
@@ -74,11 +58,16 @@ namespace tezcat::Tiny
 		virtual ~GUIWindow();
 
 	public:
-		bool begin() override;
-		void end() override;
+		virtual bool begin();
+		virtual void end();
+
+		void update() override;
+		void onRender() override;
 		bool isClosed() { return !mIsOpen; }
 		void setClose() { mIsOpen = false; }
 		GUI* getHost() { return mHost; }
+
+		void setFocus();
 	public:
 		void open(GUI* gui) override;
 		void close() override;
@@ -86,181 +75,6 @@ namespace tezcat::Tiny
 	protected:
 		GUI* mHost;
 		bool mIsOpen;
-	};
-
-
-	class TINY_API GUIDragFloat : public GUIWidget
-	{
-	public:
-		GUIDragFloat(const std::u8string& name);
-		virtual ~GUIDragFloat();
-
-		std::function<void(float* data)> postFunction;
-		void setMinMax(float min, float max)
-		{
-			m_Min = min;
-			m_Max = max;
-		}
-
-		void setSpeed(float speed)
-		{
-			m_Speed = speed;
-		}
-
-
-	protected:
-		void onUpdate() override {}
-
-
-	protected:
-		float m_Speed;
-		float m_Min;
-		float m_Max;
-
-	private:
-		static void defaultPostFunction(float* data) {}
-	};
-
-
-	class TINY_API GUIDragFloat1 : public GUIDragFloat
-	{
-	public:
-		GUIDragFloat1(const std::u8string& name);
-		virtual ~GUIDragFloat1();
-
-		void setFloat(float x)
-		{
-			mData = x;
-		}
-
-		float getFloat()
-		{
-			return mData;
-		}
-
-	protected:
-		void onRender() override;
-
-	private:
-		float mData;
-	};
-
-	class TINY_API GUIDragFloat2 : public GUIDragFloat
-	{
-	public:
-		GUIDragFloat2(const std::u8string& name);
-		virtual ~GUIDragFloat2();
-
-		void setFloat2(float x, float y)
-		{
-			mData[0] = x;
-			mData[1] = y;
-		}
-
-		void setFloat2(float* v)
-		{
-			mData[0] = v[0];
-			mData[1] = v[1];
-		}
-
-		float* getFloat2()
-		{
-			return mData;
-		}
-
-	protected:
-		void onRender() override;
-
-	private:
-		float mData[2];
-	};
-
-	class TINY_API GUIDragFloat3 : public GUIDragFloat
-	{
-	public:
-		GUIDragFloat3(const std::u8string& name);
-		virtual ~GUIDragFloat3();
-
-		void setFloat3(float x, float y, float z)
-		{
-			mData[0] = x;
-			mData[1] = y;
-			mData[2] = z;
-		}
-
-		void setFloat3(float* v)
-		{
-			mData[0] = v[0];
-			mData[1] = v[1];
-			mData[2] = v[2];
-		}
-
-		float* getFloat3()
-		{
-			return mData;
-		}
-
-	protected:
-		void onRender() override;
-
-	private:
-		float mData[3];
-	};
-
-	class TINY_API GUIMatrix4 : public GUIWidget
-	{
-	public:
-		GUIMatrix4(const std::u8string& name);
-		virtual ~GUIMatrix4();
-
-		void setMat(glm::mat4* mat)
-		{
-			mData = mat;
-		}
-
-	protected:
-		void onRender() override;
-		void onUpdate() override {}
-
-	private:
-		glm::mat4* mData;
-	};
-
-	class TINY_API GUIText : public GUIWidget
-	{
-	public:
-		GUIText(const std::u8string& name);
-		virtual ~GUIText();
-
-		void setData(const char* data)
-		{
-			mData = data;
-		}
-
-		void setData(std::string&& data)
-		{
-			mData = std::move(data);
-		}
-
-		void onRender() override;
-		void onUpdate() override {}
-
-	private:
-		std::string mData;
-	};
-
-	class TINY_API GUIImage : public GUIWidget
-	{
-	public:
-		GUIImage(const std::u8string& name);
-		virtual ~GUIImage();
-
-		void refresh();
-
-	protected:
-		void onRender() override;
-		void onUpdate() override;
-
-	private:
+		bool mNeedFocus;
 	};
 }

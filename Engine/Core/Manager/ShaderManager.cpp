@@ -172,15 +172,24 @@ namespace tezcat::Tiny
 
 	void ShaderManager::rebuildShaders()
 	{
-		for (auto p : mShaderPackageAry)
-		{
-			mCreator->rebuild(p);
-		}
+
 	}
 
 	void ShaderManager::rebuild(ShaderPackage* package)
 	{
-		mCreator->rebuild(package);
+		//mCreator->rebuild(package);
+	}
+
+	void ShaderManager::rebuild(std::filesystem::path& path)
+	{
+// 		auto pair = mShaderPackageDict.find(path.filename().string());
+// 		mCreator->rebuild(pair->second, path);
+	}
+
+	void ShaderManager::rebuild(const std::string& shaderName, std::string& data)
+	{
+		auto pair = mShaderPackageDict.find(shaderName);
+		mCreator->rebuild(pair->second, data);
 	}
 }
 

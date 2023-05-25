@@ -74,7 +74,12 @@ namespace tezcat::Tiny
 			, this
 			, [this](const EventData& data)
 			{
+				if (mSkybox)
+				{
+					return;
+				}
 				mSkybox = static_cast<Skybox*>(data.userData);
+				mSkybox->getMaterial()->addUniform<UniformF1>("Lod", 0.0f);
 			});
 
 		EngineEvent::get()->addListener(EngineEventID::EE_RenderEnv
@@ -320,5 +325,10 @@ namespace tezcat::Tiny
 	void EnvironmentLightManager::showSkybox()
 	{
 		mSkybox->getMaterial()->setUniform<UniformTexCube>(ShaderParam::TexCube, mCubeMap);
+	}
+
+	void EnvironmentLightManager::setSkyboxLod(float skyboxLod)
+	{
+		mSkybox->getMaterial()->setUniformByName<UniformF1>("Lod", skyboxLod);
 	}
 }

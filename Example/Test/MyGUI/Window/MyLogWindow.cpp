@@ -1,9 +1,9 @@
 #include "MyLogWindow.h"
 
 
-
+CreateInstanceCPP(MyLogWindow);
 MyLogWindow::MyLogWindow()
-	: GUIWindow("Log")
+	: GUIWindow("记录(Log)")
 {
 	mAutoScroll = true;
 	this->clear();
@@ -12,7 +12,7 @@ MyLogWindow::MyLogWindow()
 
 MyLogWindow::~MyLogWindow()
 {
-
+	DeleteInstance();
 }
 /*
 void MyLogWindow::onRender()
@@ -93,6 +93,7 @@ void MyLogWindow::onRender()
 
 void MyLogWindow::onRender()
 {
+	GUIWindow::onRender();
 	// Options menu
 // 	if (ImGui::BeginPopup("Options"))
 // 	{
@@ -186,11 +187,6 @@ void MyLogWindow::onRender()
 
 	ImGui::EndChild();
 	//ImGui::End();
-}
-
-void MyLogWindow::onUpdate()
-{
-
 }
 
 void MyLogWindow::clear()

@@ -28,15 +28,16 @@ namespace tezcat::Tiny
 		UniformType* addUniform(const UniformID& uniformID, Args&&... value)
 		{
 			return (UniformType*)mUniforms.emplace_back(new UniformType(uniformID, std::forward<Args>(value)...));
+			//return (UniformType*)mUniforUMap.emplace_back(uniformID.getString(), new UniformType(uniformID, std::forward<Args>(value)...));
 		}
 
 		template<typename UniformType, typename Args>
 		void setUniform(const UniformID& uniformID, Args&& value)
 		{
 			auto result = std::ranges::find_if(mUniforms, [&](Uniform* uniform)
-				{
-					return uniform->ID == uniformID;
-				});
+			{
+				return uniform->ID == uniformID;
+			});
 
 			if (result != mUniforms.end())
 			{
@@ -45,6 +46,24 @@ namespace tezcat::Tiny
 			else
 			{
 				TinyThrow_Logic(StringTool::stringFormat("Material : This uniform [%s] not found!", uniformID.getStringData()));
+			}
+		}
+
+		template<typename UniformType, typename ValueType>
+		void setUniformByName(const std::string& name, ValueType&& value)
+		{
+			auto result = std::ranges::find_if(mUniforms, [&](Uniform* uniform)
+			{
+				return uniform->ID.getString() == name;
+			});
+
+			if (result != mUniforms.end())
+			{
+				static_cast<UniformType*>(*result)->value = std::forward<ValueType>(value);
+			}
+			else
+			{
+				TinyThrow_Logic(StringTool::stringFormat("Material : This uniform [%s] not found!", name.c_str()));
 			}
 		}
 

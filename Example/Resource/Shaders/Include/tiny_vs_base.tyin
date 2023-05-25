@@ -1,0 +1,5 @@
+uniform mat4 TINY_MatrixP;
+uniform mat4 TINY_MatrixV;
+uniform mat4 TINY_MatrixM;
+uniform mat3 TINY_MatrixN;
+uniform mat4 TINY_MatrixEnv[6];

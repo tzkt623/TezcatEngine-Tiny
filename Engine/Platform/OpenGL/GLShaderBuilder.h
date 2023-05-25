@@ -71,7 +71,7 @@ namespace tezcat::Tiny::GL
 	{
 	public:
 		ShaderPackage* create(const std::string& filePath) override;
-		void rebuild(ShaderPackage* package) override;
+		void rebuild(ShaderPackage* package, std::string& data) override;
 
 	private:
 		std::unordered_map<std::string, std::string> mShaderPath;

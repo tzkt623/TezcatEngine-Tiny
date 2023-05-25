@@ -43,15 +43,17 @@ namespace tezcat::Tiny
 	template<typename UniformValue>
 	struct TINY_API UniformT : public Uniform
 	{
+		using ValueType = UniformValue;
+
 		UniformT()
 		{}
-		UniformT(const UniformID& id, UniformValue&& value)
+		UniformT(const UniformID& id, ValueType&& value)
 			: Uniform(id)
-			, value(std::forward<UniformValue>(value))
+			, value(std::forward<ValueType>(value))
 		{}
 		virtual ~UniformT() {}
 
-		UniformValue value;
+		ValueType value;
 	};
 
 	struct TINY_API UniformI1 : public UniformT<int>

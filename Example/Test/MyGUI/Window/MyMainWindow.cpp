@@ -1,0 +1,168 @@
+#include "MyMainWindow.h"
+#include "MyTextureViewerWindow.h"
+#include "MyResourceWindow.h"
+#include "MyShaderEditorWindow.h"
+#include "MyObjectInfoWindow.h"
+#include "MyOverviewWindow.h"
+#include "MyGCInfoWindow.h"
+#include "MyLogWindow.h"
+#include "MyViewPortWindow.h"
+#include "MyLightingWindow.h"
+
+#include "../../MyEvent.h"
+
+MyMainWindow::MyMainWindow()
+	: GUIWindow("MainWindow")
+	, mWindowFlags(ImGuiWindowFlags_MenuBar
+		| ImGuiWindowFlags_NoDocking
+		| ImGuiWindowFlags_NoTitleBar
+		| ImGuiWindowFlags_NoCollapse
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoMove
+		| ImGuiWindowFlags_NoBringToFrontOnFocus
+		| ImGuiWindowFlags_NoNavFocus
+		| ImGuiWindowFlags_NoBackground)
+	, mDockspaceFlags(ImGuiDockNodeFlags_None)
+{
+	MyEvent::get()->addListener(MyEventID::Window_OpenShaderEditor, this, [this](const EventData& data)
+	{
+		auto path = (std::filesystem::path*)data.userData;
+		MyShaderEditorWindow::create(*path, this->getHost())->setFocus();
+	});
+}
+
+MyMainWindow::~MyMainWindow()
+{
+
+}
+
+void MyMainWindow::init()
+{
+	MyObjectInfoWindow::create(this->getHost());
+	MyOverviewWindow::create(this->getHost());
+	MyViewPortWindow::create(this->getHost());
+	MyResourceWindow::create(this->getHost());
+	MyLogWindow::create(this->getHost());
+	MyGCInfoWindow::create(this->getHost());
+}
+
+bool MyMainWindow::begin()
+{
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, 5.0f);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	return ImGui::Begin("Test", 0, mWindowFlags);
+}
+
+void MyMainWindow::end()
+{
+	ImGui::End();
+}
+void MyMainWindow::onRender()
+{
+	GUIWindow::onRender();
+
+	ImGui::PopStyleVar();
+	ImGui::PopStyleVar(2);
+
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	{
+		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), mDockspaceFlags);
+	}
+	else
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::Text("ERROR: Docking is not enabled! See Demo > Configuration.");
+		ImGui::Text("Set io.ConfigFlags |= ImGuiConfigFlags_DockingEnable in your code, or ");
+		ImGui::SameLine(0.0f, 0.0f);
+		if (ImGui::SmallButton("click here"))
+		{
+			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		}
+	}
+
+	//-----------------------------------------
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("场景(Scenes)"))
+		{
+			if (ImGui::MenuItem("关闭当前场景(Close Current Scene)"))
+			{
+				EngineEvent::get()->dispatch({ EngineEventID::EE_PopScene });
+			}
+
+			ImGui::Separator();
+
+			auto& scenes = SceneMgr::getInstance()->getAllScenes();
+			for (auto it : scenes)
+			{
+				if (ImGui::MenuItem(it.first.c_str()))
+				{
+					EngineEvent::get()->dispatch({ EngineEventID::EE_PopScene });
+					EngineEvent::get()->dispatch({ EngineEventID::EE_PushScene, it.second });
+				}
+			}
+
+			ImGui::EndMenu();
+		}
+
+		//----------------------------------
+		if (ImGui::BeginMenu("窗口(Windows)"))
+		{
+			if (ImGui::MenuItem("物体信息(ObjectInfo)"))
+			{
+				MyObjectInfoWindow::create(this->getHost())->setFocus();
+			}
+
+			if (ImGui::MenuItem("总览(Overview)"))
+			{
+				MyOverviewWindow::create(this->getHost())->setFocus();
+			}
+
+			if (ImGui::MenuItem("场景(Scene)"))
+			{
+				MyViewPortWindow::create(this->getHost())->setFocus();
+			}
+
+			if (ImGui::MenuItem("文件目录(FileSystem)"))
+			{
+				MyResourceWindow::create(this->getHost())->setFocus();
+			}
+
+			if (ImGui::MenuItem("光照管理器(LightingManager)"))
+			{
+				MyLightingWindow::create(this->getHost())->setFocus();
+			}
+
+			if (ImGui::MenuItem("信息(Log)"))
+			{
+				MyLogWindow::create(this->getHost())->setFocus();
+			}
+
+			if (ImGui::MenuItem("内存信息(GCInfo)"))
+			{
+				MyGCInfoWindow::create(this->getHost())->setFocus();
+			}
+
+			if (ImGui::MenuItem("着色器编辑器(ShaderEditor)"))
+			{
+				MyShaderEditorWindow::create(this->getHost())->setFocus();
+			}
+
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMenuBar();
+	}
+
+}
+

@@ -2,9 +2,9 @@
 
 
 
-
+CreateInstanceCPP(MyViewPortWindow);
 MyViewPortWindow::MyViewPortWindow()
-	: GUIWindow("Viewport")
+	: GUIWindow("场景(Scene)")
 	, mColorBuffer(nullptr)
 {
 
@@ -12,17 +12,12 @@ MyViewPortWindow::MyViewPortWindow()
 
 MyViewPortWindow::~MyViewPortWindow()
 {
-
+	DeleteInstance();
 }
 
 bool MyViewPortWindow::begin()
 {
 	return ImGui::Begin(this->getName(), 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_MenuBar);
-}
-
-void MyViewPortWindow::onUpdate()
-{
-
 }
 
 void MyViewPortWindow::calculate(const ImVec2& inTextureSize, const ImVec2& inWindowSize
@@ -72,9 +67,11 @@ void MyViewPortWindow::calculate(const ImVec2& inTextureSize, const ImVec2& inWi
 
 void MyViewPortWindow::onRender()
 {
-	static bool bInfo;
+	GUIWindow::onRender();
+
 	if (ImGui::BeginMenuBar())
 	{
+		static bool bInfo;
 		ImGui::MenuItem("Info", 0, &bInfo);
 		if (bInfo)
 		{
@@ -124,6 +121,11 @@ void MyViewPortWindow::onRender()
 							, ImVec2(0, 1)
 							, ImVec2(1, 0));
 			}
+		}
+
+		if (ImGui::IsWindowFocused())
+		{
+			InputSys::getInstance()->update();
 		}
 
 		ImGui::EndChild();
@@ -179,5 +181,3 @@ void MyViewPortWindow::drawInfo(const ImVec2& pos)
 		ImGui::End();
 	}
 }
-
-

@@ -5,13 +5,10 @@
 
 class MyLogWindow : public GUIWindow
 {
-public:
-	MyLogWindow();
-	virtual ~MyLogWindow();
+	CreateInstanceH(MyLogWindow);
 
 protected:
 	void onRender() override;
-	void onUpdate() override;
 
 	void clear();
 	void addLog(const char* fmt, ...) IM_FMTARGS(2);

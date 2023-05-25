@@ -35,6 +35,8 @@ void MyResourceLoader::prepareResource(Engine* engine)
 {
 	ResourceLoader::prepareResource(engine);
 	TextureMgr::getInstance()->loadResource("/Image");
+
+	//ModelMgr::getInstance()->loadModel("./Resource/Model/Tree04.fbx");
 }
 
 void MyResourceLoader::prepareGame(Engine* engine)
@@ -43,16 +45,13 @@ void MyResourceLoader::prepareGame(Engine* engine)
 	ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
 
 	auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
-	CreateWindow(gui_host, MyMainDockWindow);
-	CreateWindow(gui_host, MyViewPortWindow);
-	CreateWindow(gui_host, MyObjectWindow);
-	CreateWindow(gui_host, MyOverviewWindow);
-	CreateWindow(gui_host, MyLogWindow);
-	CreateWindow(gui_host, MyGCInfoWindow);
+	auto main_window = new MyMainWindow();
+	main_window->open(gui_host);
+	main_window->init();
 
- 	SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
- 	//SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
- 	SceneMgr::getInstance()->prepareScene(Tutorial01::create("Tutorial01"));
+	SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
+	//SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
+	SceneMgr::getInstance()->prepareScene(Tutorial01::create("Tutorial01"));
 }
 
 void MyResourceLoader::initYourShaderParam()

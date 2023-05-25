@@ -4,13 +4,10 @@
 
 class MyViewPortWindow : public GUIWindow
 {
-public:
-	MyViewPortWindow();
-	virtual ~MyViewPortWindow();
+	CreateInstanceH(MyViewPortWindow);
 
 protected:
 	bool begin() override;
-	void onUpdate() override;
 	void onRender() override;
 
 	void calculate(const ImVec2& inTextureSize, const ImVec2& inWindowSize, ImVec2& outDisplaySize, ImVec2& outOffset, ImVec2& outUV0, ImVec2& outUV1);
@@ -18,8 +15,6 @@ protected:
 
 private:
 	Texture2D* mColorBuffer;
-	Texture2D* mDepthBuffer;
-
 	std::vector<float> mFrameTimeBuffer;
 };
 

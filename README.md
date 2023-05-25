@@ -4,13 +4,16 @@
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo3.jpg?raw=true)
 
-注意!本引擎使用C++20版本
+There is a bug in switching scenes!!!
 
-Notice!Tiny Use The C++20 Ver.
+## **依赖库版本(Libs Version)**
 
-To Do
+- C++20(v143)
+- Windows sdk 10.0.22000.0
+- IDE VS2022
+
+## To Do
 
 - [x] Basic PBR
 - [ ] Camera Culling
@@ -18,18 +21,27 @@ To Do
 - [ ] Multi-Light Support
 - [ ] Mode Load Support
 - [ ] Transparent Sort
+- [ ] Resource Explorer
+- [ ] Node Based Shader Editor
 - [x] Octree
 - [x] Commad Based Rendering
 - [x] Basic GL Shader Parser
 - [x] Basic ShadowMap
 - [x] Basic Memory Manager
 - [x] Runtime Shader Rebuild
+- [x] Basic Shader Editor
 
 ## **编辑器(Editor)**
 
 现在可以在菜单里面切换两个场景
 
 Now you can switch scenes in the menu
+
+### 着色器编辑器(Shader Editor)
+
+双击资源管理器里的shader文件打开内置编辑器
+
+Double-click the shader file in Explorer to open the built-in editor
 
 ### 场景总览(Scene Overview)
 
@@ -192,6 +204,40 @@ fb = FrameBufferMgr::getInstance()->find("FB_World1");
 camera->setFrameBuffer(nullptr);
 ```
 
+或者是这样
+
+or like this
+
+```cpp
+    auto cube = TextureMgr::getInstance()->createCube(
+        cube_size, cube_size,
+        TextureInfo("CB_CubeMap"
+            , TextureType::TextureCube
+            , TextureAttachPosition::ColorComponent
+            , TextureFilter::Linear_Mipmap_Linear
+            , TextureFilter::Linear
+            , TextureWrap::Clamp_To_Edge
+            , TextureWrap::Clamp_To_Edge
+            , TextureWrap::Clamp_To_Edge
+            , TextureChannel::RGB16f
+            , TextureChannel::RGB
+            , DataType::Float32));
+
+    auto render2d = TextureMgr::getInstance()->createRender2D(
+        cube_size, cube_size,
+        TextureInfo("DB_CubeMap"
+            , TextureType::TextureRender2D
+            , TextureAttachPosition::DepthComponent
+            , TextureChannel::Depth24));
+
+
+    auto fb = FrameBufferMgr::getInstance()->create("FB_Cube");
+    fb->beginBuild();
+    fb->attachCube(cube, 0, 0);
+    fb->attach(render2d);
+    fb->endBuild();
+```
+
 **具体使用方法请看Example.**
 
 **Please check the Example project to get more infos.**
@@ -270,12 +316,9 @@ Attention! The .exe file must be in the same directory as the resource folder
         ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
 
         auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
-        CreateWindow(gui_host, MyMainDockWindow);
-        CreateWindow(gui_host, MyViewPortWindow);
-        CreateWindow(gui_host, MyObjectWindow);
-        CreateWindow(gui_host, MyOverviewWindow);
-        CreateWindow(gui_host, MyLogWindow);
-        CreateWindow(gui_host, MyGCInfoWindow);
+        auto main_window = new MyMainWindow();
+        main_window->open(gui_host);
+        main_window->init();
 
         SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
         SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
@@ -295,39 +338,53 @@ Tiny Current Buildin Uniform Values
 
 独立型变量 individual variable
 
-|   TinyName   | CommonType  |       Useage        |
-| :----------: | :---------: | :-----------------: |
-|   MatrixP    |    mat4     |    ProjectionMat    |
-|   MatrixV    |    mat4     |       ViewMat       |
-|   MatrixM    |    mat4     |      ModelMat       |
-|   MatrixN    |    mat3     |      NormalMat      |
-|  MatrixSBV   |    mat4     |    SkyboxViewMat    |
-|  MatrixLit   |    mat4     |   LightSpacePVMat   |
-| MatrixEnv[6] |    mat4     |       EnvMats       |
-| ViewPosition |    vec3     |    ViewPosition     |
-| ViewNearFar  |    vec2     | View`s Near And Far |
-| VertexColor  |    vec4     |   Vertex`s Color    |
-|   TexColor   |  Texture2D  |   Color`s Texture   |
-|   TexCube    | TextureCube |   Cube`s Texture    |
-|   TexDepth   |  Texture2D  |   Depth`s Texture   |
-|    TexEnv    | TextureCube |    Env`s Texture    |
+|      TinyName      | CommonType  |  ShaderParam  |
+| :----------------: | :---------: | :-----------: |
+|    TINY_MatrixP    |    mat4     |    MatrixP    |
+|    TINY_MatrixV    |    mat4     |    MatrixV    |
+|    TINY_MatrixM    |    mat4     |    MatrixM    |
+|    TINY_MatrixN    |    mat3     |    MatrixN    |
+|   TINY_MatrixSBV   |    mat4     |   MatrixSBV   |
+|   TINY_MatrixLit   |    mat4     |   MatrixLit   |
+| TINY_MatrixEnv[6]  |    mat4     |   MatrixEnv   |
+| TINY_ViewPosition  |    vec3     | ViewPosition  |
+|  TINY_ViewNearFar  |    vec2     |  ViewNearFar  |
+| TINY_ScreenLength  |    vec2     | ScreenLength  |
+|     TINY_IsHDR     |    bool     |     IsHDR     |
+|  TINY_VertexColor  |    vec4     |  VertexColor  |
+|   TINY_TexColor    |  Texture2D  |   TexColor    |
+|    TINY_TexCube    | TextureCube |    TexCube    |
+|   TINY_TexDepth    |  Texture2D  |   TexDepth    |
+| TINY_TexIrradiance | TextureCube | TexIrradiance |
+| TINY_TexPrefilter  | TextureCube | TexPrefilter  |
+|  TINY_TexBRDFLUT   |  Texture2D  |  TexBRDFLUT   |
 
 结构型变量 struct variable
-|         TinyName          | CommonType |       Useage        |
-| :-----------------------: | :--------: | :-----------------: |
-|   StdMaterial::Diffuse    | Texture2D  |  Diffuse`s Texture  |
-|    StdMaterial::Normal    | Texture2D  |  Normal`s Texture   |
-|   StdMaterial::Specular   | Texture2D  | Specular`s Texture  |
-|  StdMaterial::Shininess   |   float    | Specular  Shininess |
-| LightDirection::Direction |    vec3    |                     |
-|  LightDirection::Ambient  |    vec3    |                     |
-|  LightDirection::Diffuse  |    vec3    |                     |
-| LightDirection::Specular  |    vec3    |                     |
-|   LightPoint::Position    |    vec3    |                     |
-|    LightPoint::Ambient    |    vec3    |                     |
-|    LightPoint::Diffuse    |    vec3    |                     |
-|   LightPoint::Specular    |    vec3    |                     |
-|    LightPoint::Config     |    vec3    |                     |
+
+MatStd
+|       TinyName        | CommonType |       Useage        |
+| :-------------------: | :--------: | :-----------------: |
+|  TINY_MatStd.diffuse  | Texture2D  |  Diffuse`s Texture  |
+|  TINY_MatStd.normal   | Texture2D  |  Normal`s Texture   |
+| TINY_MatStd.specular  | Texture2D  | Specular`s Texture  |
+| TINY_MatStd.shininess |   float    | Specular  Shininess |
+
+DirLit
+|       TinyName        | CommonType | Useage |
+| :-------------------: | :--------: | :----: |
+| TINY_LitDir.direction |    vec3    |        |
+|  TINY_LitDir.ambient  |    vec3    |        |
+|  TINY_LitDir.diffuse  |    vec3    |        |
+| TINY_LitDir.specular  |    vec3    |        |
+
+PointLit
+|        TinyName        | CommonType | Useage |
+| :--------------------: | :--------: | :----: |
+| TINY_LitPoint.position |    vec3    |        |
+| TINY_LitPoint.ambient  |    vec3    |        |
+| TINY_LitPoint.diffuse  |    vec3    |        |
+| TINY_LitPoint.specular |    vec3    |        |
+|  TINY_LitPoint.config  |    vec3    |        |
 
 **目前内建材质变量类型有**(后续会慢慢添加)
 

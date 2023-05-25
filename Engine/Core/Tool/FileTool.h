@@ -8,7 +8,11 @@ namespace tezcat::Tiny
 	enum FileType : uint32_t
 	{
 		FT_None = 0,
+		FT_Text_Begin,
 		FT_Text,
+		FT_Tysl,
+		FT_Tyin,
+		FT_Text_End,
 
 		FT_Img_Begin,
 		FT_Jpg,
@@ -23,15 +27,17 @@ namespace tezcat::Tiny
 	{
 		FileType type;
 		std::string path;
-		std::string exp;
+		std::string ext;
 		std::string name;
 
-		FileInfo() {}
+		FileInfo()
+			: type(FileType::FT_Unknown)
+		{}
 
 		FileInfo(FileInfo&& other) noexcept
 			: type(other.type)
 			, path(std::move(other.path))
-			, exp(std::move(other.exp))
+			, ext(std::move(other.ext))
 			, name(std::move(other.name))
 		{
 
@@ -53,9 +59,11 @@ namespace tezcat::Tiny
 		static void loadFiles(const std::string& path, FileInfoMap& outFiles);
 
 		static std::string loadText(const std::string& path);
+		static void saveFile(const std::string& path, std::string& data);
 
 		static void findAllFiles(const std::string& path, FileInfoMap& outFiles);
 
+		static FileType getFileType(const std::string& ext);
 	private:
 		static std::string EngineDir;
 		static std::string EngineResDir;

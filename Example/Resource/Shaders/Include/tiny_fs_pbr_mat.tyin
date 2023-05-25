@@ -1,0 +1,19 @@
+struct MatPBR_Test
+{
+    vec3 albedo;
+    float metallic;
+    float roughness;
+    float ao;
+};
+
+uniform MatPBR_Test TINY_MatPBR_Test;
+
+struct MatPBR_Std1
+{
+    sampler2D albedo2D;
+    sampler2D metallic2D;
+    sampler2D roughness2D;
+    sampler2D ao2D;
+};
+
+uniform MatPBR_Std1 TINY_MatPBR_Std1;

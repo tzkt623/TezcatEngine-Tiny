@@ -18,7 +18,6 @@ private:
 protected:
 
 	void onRender() override;
-	void onUpdate() override;
 
 };
 

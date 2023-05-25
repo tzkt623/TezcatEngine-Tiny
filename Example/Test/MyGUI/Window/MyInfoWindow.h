@@ -11,7 +11,7 @@ public:
 	void init() override;
 
 protected:
-	void onUpdate() override;
+	void onRender() override;
 
 private:
 	std::vector<float> mFrameTimeBuffer;

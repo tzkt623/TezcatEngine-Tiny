@@ -1,0 +1,2 @@
+uniform vec3 TINY_ViewPosition;
+uniform vec2 TINY_ViewNearFar;

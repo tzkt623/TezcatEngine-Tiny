@@ -24,29 +24,27 @@ bool MyTextureViewerWindow::begin()
 
 void MyTextureViewerWindow::onRender()
 {
+	GUIWindow::onRender();
+
 	if (ImGui::BeginChild("Viewport"))
 	{
-		switch (mTex->getTextureType())
+		if (mTex)
 		{
-		case TextureType::Texture2D:
-			ImGui::Image((ImTextureID)mTex->getTextureID()
-				, ImGui::GetWindowSize()
-				, ImVec2(0, 1)
-				, ImVec2(1, 0));
-			break;
-		case TextureType::TextureCube:
-			break;
-		default:
-			break;
+			switch (mTex->getTextureType())
+			{
+			case TextureType::Texture2D:
+				ImGui::Image((ImTextureID)mTex->getTextureID()
+					, ImGui::GetWindowSize()
+					, ImVec2(0, 1)
+					, ImVec2(1, 0));
+				break;
+			case TextureType::TextureCube:
+				break;
+			default:
+				break;
+			}
 		}
-
-
 	}
+
 	ImGui::EndChild();
 }
-
-void MyTextureViewerWindow::onUpdate()
-{
-
-}
-

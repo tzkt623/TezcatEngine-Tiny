@@ -146,8 +146,8 @@ namespace tezcat::Tiny
 	{
 		vertex->bind();
 
-		vertex->init(meshData->getName(), meshData->vertices.size(), meshData->drawMode);
-		for (auto p : meshData->layoutPositions)
+		vertex->init(meshData->getName(), meshData->mVertices.size(), meshData->mDrawMode);
+		for (auto p : meshData->mLayoutPositions)
 		{
 			auto [length, data] = meshData->getVertexData(p);
 			auto vbuffer = this->createVertexBuffer(data, length);
@@ -155,16 +155,27 @@ namespace tezcat::Tiny
 			vertex->setVertexBuffer(vbuffer);
 		}
 
-		vertex->setVertexCount(meshData->vertices.size());
+		vertex->setVertexCount(meshData->mVertices.size());
 
-		if (!meshData->indices.empty())
+		if (!meshData->mIndices.empty())
 		{
-			auto ibuffer = this->createIndexBuffer(meshData->indices.data(), meshData->indexSize());
+			auto ibuffer = this->createIndexBuffer(meshData->mIndices.data(), meshData->indexSize());
 			vertex->setIndexBuffer(ibuffer);
-			vertex->setIndexCount(meshData->indices.size());
+			vertex->setIndexCount(meshData->mIndices.size());
 		}
 
 		vertex->unbind();
+	}
+
+	uint32_t VertexBufferManager::loadMeshData(MeshData* meshData)
+	{
+		auto size = mVertexAry.size();
+
+		auto vertex = mCreator->createVertex();
+		this->buildVertex(vertex, meshData);
+		mVertexAry.push_back(vertex);
+
+		return size;
 	}
 
 }

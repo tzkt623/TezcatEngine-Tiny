@@ -57,6 +57,8 @@ namespace tezcat::Tiny
 		void addMeshData(MeshData* meshData);
 		MeshData* findMeshData(const std::string& name);
 
+		uint32_t loadMeshData(MeshData* meshData);
+
 	private:
 
 		void buildVertex(Vertex* vertex, MeshData* meshData);
@@ -66,6 +68,8 @@ namespace tezcat::Tiny
 	private:
 		std::unordered_map<std::string, Vertex*> mVertexUMap;
 		std::unordered_map<std::string, MeshData*> mMeshDataUMap;
+
+		std::vector<Vertex*> mVertexAry;
 	};
 
 	using VertexBufMgr = SG<VertexBufferManager>;

@@ -382,8 +382,9 @@ namespace tezcat::Tiny::GL
 			//struct内容解析规则
 			std::regex regex_struct_data(R"(struct\s+\w+\s+\{([\w\W]+)\};)");
 			//type和name的解析规则
-			//std::regex regex_argument(R"((\w+)\s*(\w+)(?=[\S]*;))");
-			std::regex regex_argument(R"((\w+)\s*(\w+)(\[\d+\])*;)");
+			std::regex regex_argument(R"((\w+)\s*(\w+)(\[\w*\]|\s*=\s*\S*)*;)");
+			//这个专门解析数组
+			//std::regex regex_argument(R"((\w+)\s*(\w+)(\[\d+\])*;)");
 
 			//分析struct
 			for (auto struct_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_struct); struct_i != end; struct_i++)
@@ -408,8 +409,9 @@ namespace tezcat::Tiny::GL
 			}
 
 			//分析Uniform
-			//std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(?=[\s\S]*;))");
-			std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(\[\d+\])*;)");
+			std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(\[\w*\]|\s*=\s*\S*)*;)");
+			//这个专门解析数组
+			//std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(\[\d+\])*;)");
 			for (auto uniform_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_uniform); uniform_i != end; uniform_i++)
 			{
 				std::string type = (*uniform_i)[1];
@@ -520,9 +522,8 @@ namespace tezcat::Tiny::GL
 	}
 
 	//
-	void GLShaderCreator::rebuild(ShaderPackage* package)
+	void GLShaderCreator::rebuild(ShaderPackage* package, std::string& data)
 	{
-		auto data = FileTool::loadText(mShaderPath[package->getName()]);
 		GLShaderBuilder builder;
 		builder.splitPackage(package, data);
 		Log_Engine(StringTool::stringFormat("Rebuild ShaderPackage>>> %s", package->getName().c_str()));

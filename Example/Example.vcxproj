@@ -138,7 +138,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>
       </EntryPointSymbol>
       <NoEntryPoint>false</NoEntryPoint>
@@ -172,14 +172,15 @@
     <ClCompile Include="Test\MyEvent.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUI.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUIContext.cpp" />
-    <ClCompile Include="Test\MyGUI\Widget\TransformWidget.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyResourceWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyGCInfoWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyInfoWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyLightingWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyLogWindow.cpp" />
-    <ClCompile Include="Test\MyGUI\Window\MyMainCameraWindow.cpp" />
-    <ClCompile Include="Test\MyGUI\Window\MyMainDockWindow.cpp" />
-    <ClCompile Include="Test\MyGUI\Window\MyObjectWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyMainWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyOverviewWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyObjectInfoWindow.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyShaderEditorWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyTextureViewerWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyViewPortWindow.cpp" />
     <ClCompile Include="Test\MyInputer.cpp" />
@@ -194,14 +195,15 @@
     <ClInclude Include="Test\MyEvent.h" />
     <ClInclude Include="Test\MyGUI\MyGUI.h" />
     <ClInclude Include="Test\MyGUI\MyGUIContext.h" />
-    <ClInclude Include="Test\MyGUI\Widget\TransformWidget.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyResourceWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyGCInfoWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyInfoWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyLightingWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyLogWindow.h" />
-    <ClInclude Include="Test\MyGUI\Window\MyMainCameraWindow.h" />
-    <ClInclude Include="Test\MyGUI\Window\MyMainDockWindow.h" />
-    <ClInclude Include="Test\MyGUI\Window\MyObjectWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyMainWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyOverviewWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyObjectInfoWindow.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyShaderEditorWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyTextureViewerWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyViewPortWindow.h" />
     <ClInclude Include="Test\MyInputer.h" />

@@ -291,22 +291,24 @@ void MyMainScene::createPBR()
 	auto transform = go->addComponent<Transform>();
 	transform->setPosition(glm::vec3(0.0f, 0.0f, -20.0f));
 
-	for (int y = 0; y <= 5; y++)
+	int number = 6;
+	float rate = 1.0f / (float)number;
+	for (int y = 0; y < number; y++)
 	{
-		for (int x = 0; x <= 5; x++)
+		for (int x = 0; x <= number; x++)
 		{
 			auto go = GameObject::create(StringTool::stringFormat("PBRBall_%d_%d", x, y));
 			go->addComponent<Transform>();
-			go->getTransform()->setPosition(glm::vec3(x * 30.0f, y * 30.0f, -60.0f));
+			go->getTransform()->setPosition(glm::vec3(x * 25.0f, y * 25.0f, -60.0f));
 			go->getTransform()->setScale(glm::vec3(10.0f));
 			go->getTransform()->setRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 			go->getTransform()->setParent(transform);
 
 			auto mr = go->addComponent<MeshRenderer>();
 			auto material = Material::create("Standard/PBRTest1");
-			material->addUniform<UniformF3>(ShaderParam::MatPBR_Test::Albedo, glm::vec3(1.0f, 0.0f, 0.0f));
-			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Metallic, x * 0.2f);
-			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, y * 0.2f);
+			material->addUniform<UniformF3>(ShaderParam::MatPBR_Test::Albedo, glm::vec3(1.0f, 1.0f, 1.0f));
+			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Metallic, x * rate);
+			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, y * rate + rate);
 			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::AO, 1.0f);
 			mr->setMaterial(material);
 			mr->setMesh("Sphere");

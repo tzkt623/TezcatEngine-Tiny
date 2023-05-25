@@ -24,6 +24,11 @@ namespace tezcat::Tiny
 	};
 
 
+	/*
+	* FrameBufferManager
+	* 
+	* @brief 帧缓冲管理器,负责创建,保存,查找
+	*/
 	class TINY_API FrameBufferManager : public Manager<FrameBufferCreator>
 	{
 	public:
@@ -48,7 +53,7 @@ namespace tezcat::Tiny
 		/*
 		* @author HCL
 		* @info 2023|5|17
-		* @brief 创建一个配置的FB,并保存在Manager中
+		* @brief 创建一个已配置的FB,并保存在Manager中
 		*/
 		FrameBuffer* create(const std::string& name
 						  , const int& width

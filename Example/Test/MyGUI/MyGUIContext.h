@@ -2,9 +2,6 @@
 
 #include "Tiny.h"
 
-class MyObjectWindow;
-class MyOverviewWindow;
-
 struct ValueConfig
 {
 	bool isColor;
@@ -12,12 +9,12 @@ struct ValueConfig
 	float min;
 	float max;
 
-// 	ValueConfig()
-// 		: isColor(false)
-// 		, speed(0)
-// 		, min(0)
-// 		, max(0)
-// 	{}
+	// 	ValueConfig()
+	// 		: isColor(false)
+	// 		, speed(0)
+	// 		, min(0)
+	// 		, max(0)
+	// 	{}
 
 
 };
@@ -36,11 +33,8 @@ public:
 
 private:
 	MyGUIContext();
-
-	void initValueConfig();
-
 	~MyGUIContext();
-
+	void initValueConfig();
 
 private:
 
@@ -52,3 +46,46 @@ public:
 
 };
 
+class MyWindow : public GUIWindow
+{
+public:
+	MyWindow(const std::string& name)
+		: GUIWindow(name)
+	{
+	}
+
+	virtual ~MyWindow()
+	{
+		mOnCloseCallback();
+	}
+
+	void setCloseCallback(const std::function<void()>& callback)
+	{
+		mOnCloseCallback = callback;
+	}
+
+protected:
+	std::function<void()> mOnCloseCallback;
+};
+
+#define CreateInstanceH(class_name)\
+	class_name();\
+public:\
+	virtual ~class_name();\
+	static class_name* create(GUI* host);\
+private:\
+	static class_name* sInstance
+
+#define CreateInstanceCPP(class_name)\
+	class_name* class_name::create(GUI* host)\
+	{\
+		if (sInstance == nullptr)\
+		{\
+			sInstance = new class_name();\
+			sInstance->open(host);\
+		}\
+		return sInstance;\
+	}\
+	class_name* class_name::sInstance = nullptr
+
+#define DeleteInstance() TinyAssert(sInstance == this); sInstance = nullptr

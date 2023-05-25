@@ -1,0 +1,6 @@
+uniform samplerCube TINY_TexCube;
+uniform sampler2D TINY_TexDepth;
+uniform sampler2D TINY_TexColor;
+uniform samplerCube TINY_TexIrradiance;
+uniform samplerCube TINY_TexPrefilter;
+uniform sampler2D TINY_TexBRDFLUT;

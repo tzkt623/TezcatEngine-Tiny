@@ -20,6 +20,7 @@
 #include "Core/Manager/FrameBufferManager.h"
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Manager/VertexBufferManager.h"
+#include "Core/Manager/ModelManager.h"
 
 #include "Core/Scene/Scene.h"
 

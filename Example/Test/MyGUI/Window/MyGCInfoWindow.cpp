@@ -1,7 +1,7 @@
 #include "MyGCInfoWindow.h"
 
 
-
+CreateInstanceCPP(MyGCInfoWindow);
 MyGCInfoWindow::MyGCInfoWindow()
 	: GUIWindow("GCInfo")
 {
@@ -10,11 +10,13 @@ MyGCInfoWindow::MyGCInfoWindow()
 
 MyGCInfoWindow::~MyGCInfoWindow()
 {
-
+	DeleteInstance();
 }
 
 void MyGCInfoWindow::onRender()
 {
+	GUIWindow::onRender();
+
 	auto& infos = TinyGC::getGCInfos();
 
 	for (auto i : infos)
@@ -36,8 +38,4 @@ void MyGCInfoWindow::onRender()
 				, "FreeSlot");
 		}
 	}
-}
-
-void MyGCInfoWindow::onUpdate()
-{
 }

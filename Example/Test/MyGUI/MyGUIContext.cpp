@@ -1,5 +1,5 @@
 #include "MyGUIContext.h"
-#include "Window/MyOverviewWindow.h"
+#include "Window/MyObjectInfoWindow.h"
 
 
 MyGUIContext::MyGUIContext()
