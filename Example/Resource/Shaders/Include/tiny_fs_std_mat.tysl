@@ -1,9 +1,0 @@
-struct StdMaterial
-{
-    sampler2D diffuse;
-    sampler2D normal;
-    sampler2D specular;
-    float shininess;
-};
-
-uniform StdMaterial TINY_MatStd;
