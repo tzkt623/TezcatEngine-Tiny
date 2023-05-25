@@ -27,6 +27,8 @@
 *.a
 *.lib
 !glfw3.lib
+!assimp-vc143-mt.lib
+!assimp-vc143-mt.dll
 
 # Executables
 *.exe
