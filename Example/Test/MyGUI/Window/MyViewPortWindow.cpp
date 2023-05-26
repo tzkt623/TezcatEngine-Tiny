@@ -121,11 +121,11 @@ void MyViewPortWindow::onRender()
 							, ImVec2(0, 1)
 							, ImVec2(1, 0));
 			}
-		}
 
-		if (ImGui::IsWindowFocused())
-		{
-			InputSys::getInstance()->update();
+			if (ImGui::IsItemHovered())
+			{
+				InputSys::getInstance()->update();
+			}
 		}
 
 		ImGui::EndChild();

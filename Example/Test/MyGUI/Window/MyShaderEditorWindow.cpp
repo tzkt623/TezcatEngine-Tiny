@@ -21,7 +21,9 @@ MyShaderEditorWindow::MyShaderEditorWindow()
 	mShaderEditor->setFontScale(1.5f);
 	mShaderEditor->SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL_TINY(
 		{
-			"vec2", "vec3", "vec4", "mat3", "mat4", "sampler2D", "samplerCube"
+			"vec2", "vec3", "vec4"
+			, "mat3", "mat4"
+			, "sampler2D", "samplerCube"
 			, "uniform", "layout", "in", "out", "location"
 		},
 		uniforms));

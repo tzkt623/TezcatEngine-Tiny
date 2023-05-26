@@ -4,7 +4,7 @@
 
 CreateInstanceCPP(MyOverviewWindow);
 MyOverviewWindow::MyOverviewWindow()
-	: GUIWindow("场景总览(Scene)")
+	: GUIWindow("场景总览(Overview)")
 	, mSelectedGameObject(nullptr)
 {
 

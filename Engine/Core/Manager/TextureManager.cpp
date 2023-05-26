@@ -206,7 +206,8 @@ namespace tezcat::Tiny
 		{
 			if (pair.second->getTextureType() == TextureType::Texture2D)
 			{
-				if (static_cast<Texture2D*>(pair.second)->isHDR())
+				auto type = static_cast<Texture2D*>(pair.second)->getInternalChannel().tiny;
+				if (type == TextureChannel::RGB16f)
 				{
 					container.push_back(static_cast<Texture2D*>(pair.second));
 				}
