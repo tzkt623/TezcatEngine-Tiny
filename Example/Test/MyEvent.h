@@ -17,6 +17,6 @@ enum MyEventID : EventID
 {
 	Window_ObjectSelected = 0,
 	Window_OpenShaderEditor,
-
+	Window_OpenImageViwer,
 	Count
 };

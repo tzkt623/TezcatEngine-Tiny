@@ -41,7 +41,7 @@ namespace tezcat::Tiny
 
 	public:
 		void render(BaseGraphics* graphics) override;
-		void submit(Shader* shader) override;
+		void submit(BaseGraphics* graphics, Shader* shader) override;
 
 		glm::vec3& getDirection() { return mDirection; }
 		void setDirection(const glm::vec3& val) { mDirection = val; }
@@ -112,7 +112,7 @@ namespace tezcat::Tiny
 			mConfig.z = quadratic;
 		}
 
-		void submit(Shader* shader) override;
+		void submit(BaseGraphics* graphics, Shader* shader) override;
 
 	protected:
 		void onEnable() override;

@@ -10,6 +10,6 @@ public:
 	virtual ~MyObserver();
 
 public:
-	void submit(Shader* shader) override;
+	void submit(BaseGraphics* graphics, Shader* shader) override;
 };
 

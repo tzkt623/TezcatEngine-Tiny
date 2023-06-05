@@ -76,7 +76,7 @@ namespace tezcat::Tiny
 				for (auto& index : cull_list)
 				{
 					//剔除到对应的渲染通道
-					RenderLayer::getRenderLayer(index)->culling(camera, queue);
+					RenderLayer::getRenderLayer(index)->culling(graphics, camera, queue);
 				}
 			}
 		}

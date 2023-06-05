@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = PBRTest1;
+        str Name = Standard/PBRTest1;
         int Version = 330;
         int OrderID = 50;
         str LightMode = Forward;
@@ -22,8 +22,8 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
-        #include "tiny_vs_shadow"
+        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs_shadow.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
@@ -53,12 +53,12 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_pbr_mat"
-        #include "tiny_fs_pbr_func"
-        #include "tiny_fs_function"
-        #include "tiny_fs_camera"
-        #include "tiny_fs_texture"
-        #include "tiny_fs_light"
+        #include "../Include/tiny_fs_pbr_mat.tyin"
+        #include "../Include/tiny_fs_pbr_func.tyin"
+        #include "../Include/tiny_fs_function.tyin"
+        #include "../Include/tiny_fs_camera.tyin"
+        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs_light.tyin"
 
         in vec4 myColor;
         in vec2 myUV;
@@ -88,9 +88,10 @@
                 vec3 L = normalize(-TINY_LitDir.direction);
                 vec3 H = normalize(V + L); 
                 float cosTheta = max(dot(N, L), 0.0);
-                vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
+                vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;
 
-                float NDF = distributionGGX(N, H, roughness);
+                float NdotH = max(dot(N, H), 0.0);
+                float NDF = distributionGGX(NdotH, roughness);
                 float G = geometrySmith(N, V, L, roughness);
                 vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
@@ -103,7 +104,7 @@
                 vec3 specular = nominator / denominator;
 
                 // add to outgoing radiance Lo
-                float NdotL = max(dot(N, L), 0.0);                
+                float NdotL = max(dot(N, L), 0.0);
                 Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
             }
 
@@ -118,7 +119,7 @@
 
             const float MAX_REFLECTION_LOD = 4.0;
             vec3 prefilteredColor = textureLod(TINY_TexPrefilter, R, roughness * MAX_REFLECTION_LOD).rgb;    
-            vec2 brdf = texture(TINY_TexBRDFLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+            vec2 brdf = texture(TINY_TexBRDFLUT, vec2(max(dot(N, V) - 0.001f, 0.0), roughness)).rg;
             vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
             vec3 ambient = (kD * diffuse + specular) * ao;
@@ -134,7 +135,7 @@
             //color = (1 - shadow) * color;
 
             myFinalColor = vec4(color, 1.0);
-            //myFinalColor = vec4(prefilteredColor, 1.0);
+            //myFinalColor = vec4(specular, 1.0);
             //myFinalColor = vec4(R, 1.0);
             //myFinalColor = vec4(brdf.x, brdf.y, 0.0, 1.0);     
         }
@@ -142,3 +143,6 @@
     #TINY_FS_END
 }
 #TINY_PASS_END
+
+
+

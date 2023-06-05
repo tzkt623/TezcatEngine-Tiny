@@ -34,14 +34,14 @@ namespace tezcat::Tiny
 
 	}
 
-	void DirectionalLight::submit(Shader* shader)
+	void DirectionalLight::submit(BaseGraphics* graphics, Shader* shader)
 	{
 		auto transform = this->getTransform();
 		mDirection = glm::normalize(transform->getForward());
-		shader->setFloat3(ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
-		shader->setFloat3(ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
-		shader->setFloat3(ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));
-		shader->setFloat3(ShaderParam::LightDirection::Specular, glm::value_ptr(mSpecular));
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Specular, glm::value_ptr(mSpecular));
 	}
 
 	void DirectionalLight::onEnable()
@@ -75,13 +75,13 @@ namespace tezcat::Tiny
 
 	}
 
-	void PointLight::submit(Shader* shader)
+	void PointLight::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		shader->setFloat3(ShaderParam::LightPoint::Position, glm::value_ptr(this->getTransform()->getPosition()));
-		shader->setFloat3(ShaderParam::LightPoint::Ambient, glm::value_ptr(mAmbient));
-		shader->setFloat3(ShaderParam::LightPoint::Diffuse, glm::value_ptr(mDiffuse));
-		shader->setFloat3(ShaderParam::LightPoint::Specular, glm::value_ptr(mSpecular));
-		shader->setFloat3(ShaderParam::LightPoint::Config, glm::value_ptr(mConfig));
+		graphics->setFloat3(shader, ShaderParam::LightPoint::Position, glm::value_ptr(this->getTransform()->getPosition()));
+		graphics->setFloat3(shader, ShaderParam::LightPoint::Ambient, glm::value_ptr(mAmbient));
+		graphics->setFloat3(shader, ShaderParam::LightPoint::Diffuse, glm::value_ptr(mDiffuse));
+		graphics->setFloat3(shader, ShaderParam::LightPoint::Specular, glm::value_ptr(mSpecular));
+		graphics->setFloat3(shader, ShaderParam::LightPoint::Config, glm::value_ptr(mConfig));
 	}
 
 	void PointLight::onEnable()

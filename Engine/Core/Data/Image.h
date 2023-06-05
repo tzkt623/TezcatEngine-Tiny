@@ -3,34 +3,36 @@
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
 #include "../Tool/FileTool.h"
+#include "../Base/TinyObject.h"
 
 namespace tezcat::Tiny
 {
-	class TINY_API Image
+	class TINY_API Image : public TinyObject
 	{
-	public:
 		Image();
-		Image(Image&& other) noexcept;
-		~Image();
+		TINY_Factory(Image);
+		TINY_RTTI_H(Image);
+	public:
+		virtual ~Image();
 
-		void openFile(const std::string& path, bool flip = false);
-		void openFile(const FileInfo& info, bool flip = false);
+		bool openFile(const std::string& path, bool flip = false);
+		bool openFile(const FileInfo& info, bool flip = false);
 
 		inline const int& getWidth() const { return mWidth; }
 		inline const int& getHeight() const { return mHeight; }
 		inline const int& getChannels() const { return mChannels; }
-		inline void* getData() const { return mData; }
-		inline bool isHDR() const { return mIsHDR; }
-
-		Image& operator=(Image&& other) noexcept
+		uint64_t getDataSize() const
 		{
-			mWidth = other.mWidth;
-			mHeight = other.mHeight;
-			mChannels = other.mChannels;
-			mData = other.mData;
-			other.mData = nullptr;
-			return *this;
+			return mWidth * mHeight * mChannels * uint64_t(mIsHDR ? sizeof(float) : sizeof(uint8_t));
 		}
+		inline void* getData() const { return mData; }
+		inline void* moveData()
+		{
+			auto temp = mData;
+			mData = nullptr;
+			return temp;
+		}
+		inline bool isHDR() const { return mIsHDR; }
 
 	private:
 		int mWidth;

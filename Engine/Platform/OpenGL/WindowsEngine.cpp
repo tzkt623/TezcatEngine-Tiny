@@ -1,9 +1,9 @@
 #include "WindowsEngine.h"
+#include "Core/EngineIniter.h"
 #include "Core/Manager/LightManager.h"
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/CameraManager.h"
-#include "Core/Data/ResourceLoader.h"
 #include "Core/Input/InputSystem.h"
 #include "Core/Renderer/LayerMask.h"
 #include "Core/Component/GameObject.h"
@@ -12,6 +12,7 @@
 
 #include "../OpenGL/GLGraphics.h"
 
+#include <semaphore>
 
 namespace tezcat::Tiny::GL
 {
@@ -127,99 +128,12 @@ namespace tezcat::Tiny::GL
 
 	bool WindowsEditor::onInit()
 	{
-		glfwInit();
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, mGLMajor);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, mGLMinor);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-		mWindow = glfwCreateWindow(ScreenWidth, ScreenHeight, mResourceLoader->getName().c_str(), nullptr, nullptr);
-		if (mWindow == nullptr)
-		{
-			//std::cout << "Failed to create GLFW window" << std::endl;
-			Log_Error("Failed to create GLFW window");
-			glfwTerminate();
-			return false;
-		}
-
-		glfwMakeContextCurrent(mWindow);
-		glfwSwapInterval(mResourceLoader->isEnabelVsync() ? 1 : 0);
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		{
-			Log_Error("Failed to initialize GLAD");
-			TinyThrow_Logic("Failed to initialize GLAD");
-		}
-
-		GLint max;
-		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
-		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		Log_Engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
-
-		auto get_default_color_buffer = [&](GLint id)
-		{
-			switch (id)
-			{
-			case GL_NONE:
-				//std::cout << "Default ColorBuffer: GL_NONE" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_NONE");
-				break;
-			case GL_FRONT_LEFT:
-				//std::cout << "Default ColorBuffer: GL_FRONT_LEFT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT_LEFT");
-				break;
-			case GL_FRONT_RIGHT:
-				//std::cout << "Default ColorBuffer: GL_FRONT_RIGHT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT_RIGHT");
-				break;
-			case GL_BACK_LEFT:
-				//std::cout << "Default ColorBuffer: GL_BACK_LEFT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_BACK_LEFT");
-				break;
-			case GL_BACK_RIGHT:
-				//std::cout << "Default ColorBuffer: GL_BACK_RIGHT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_BACK_RIGHT");
-				break;
-			case GL_FRONT:
-				//std::cout << "Default ColorBuffer: GL_FRONT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT");
-				break;
-			case GL_BACK:
-				//std::cout << "Default ColorBuffer: GL_BACK" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_BACK");
-				break;
-			case GL_LEFT:
-				//std::cout << "Default ColorBuffer: GL_LEFT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_LEFT");
-				break;
-			case GL_RIGHT:
-				//std::cout << "Default ColorBuffer: GL_RIGHT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_RIGHT");
-				break;
-			case GL_FRONT_AND_BACK:
-				//std::cout << "Default ColorBuffer: GL_FRONT_AND_BACK" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT_AND_BACK");
-				break;
-			default:
-				break;
-			}
-		};
-
-		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
-		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		Log_Engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
-
-		glGetIntegerv(GL_DRAW_BUFFER, &max);
-		get_default_color_buffer(max);
-		glGetIntegerv(GL_READ_BUFFER, &max);
-		get_default_color_buffer(max);
-
-		mGUI = new GUI();
-		mGUI->init(mWindow);
-
 		return Engine::onInit();
 	}
 
 	bool WindowsEditor::postInit()
 	{
+		mWindow = ((GLGraphics*)mGraphics)->getGLFWwindow();
 		mInputSystem->setWindow(mWindow);
 		return Engine::postInit();
 	}
@@ -240,7 +154,6 @@ namespace tezcat::Tiny::GL
 	void WindowsEditor::preUpdate()
 	{
 		Engine::preUpdate();
-		glfwPollEvents();
 		mTimeNow = glfwGetTime();
 		sDeltaTime = static_cast<float>(mTimeNow - mTimeOld);
 		mTimeOld = mTimeNow;
@@ -249,9 +162,13 @@ namespace tezcat::Tiny::GL
 	void WindowsEditor::onUpdate()
 	{
 		//mInputSystem->update();
-		mSceneManager->update(mGraphics);
+		mSceneManager->update();
+	}
+
+	void WindowsEditor::notifyRender()
+	{
 		mGraphics->render();
-		mGUI->render();
+		glfwPollEvents();
 		glfwSwapBuffers(mWindow);
 	}
 
@@ -271,16 +188,4 @@ namespace tezcat::Tiny::GL
 			break;
 		}
 	}
-
-	void WindowsEditor::setGLVersion(int major, int minor)
-	{
-		mGLMajor = major;
-		mGLMinor = minor;
-	}
-
-	GUI* WindowsEditor::getGUI()
-	{
-		return mGUI;
-	}
-
 }

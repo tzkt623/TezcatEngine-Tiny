@@ -19,7 +19,7 @@ namespace tezcat::Tiny
 	{
 		std::regex pattern(R"((skybox_\w+)_(\w+))");
 		std::smatch result;
-		std::array<Image, 6> skybox_images;
+		std::array<Image*, 6> skybox_images;
 		std::unordered_map<std::string, std::array<std::string, 6>> skybox_path_cache;
 
 		std::string temp_name;
@@ -76,9 +76,13 @@ namespace tezcat::Tiny
 			}
 			else
 			{
-				Image img;
-				img.openFile(info, true);
-				this->create2D(info.name, img);
+				Image* image = Image::create();
+				image->openFile(info, true);
+				Texture2D* t2d = Texture2D::create(info.name);
+				t2d->setData(image);
+				t2d->generate();
+
+				this->add(t2d->getName(), t2d);
 			}
 		}
 
@@ -86,110 +90,21 @@ namespace tezcat::Tiny
 		{
 			for (int i = 0; i < 6; i++)
 			{
-				Image image;
-				image.openFile(pair.second[i]);
-				skybox_images[i] = std::move(image);
+				Image* image = Image::create();
+				image->openFile(pair.second[i]);
+				skybox_images[i] = image;
 			}
 
-			this->createCube(pair.first, skybox_images);
+			TextureCube* cube = TextureCube::create(pair.first);
+			cube->setData(skybox_images);
+			cube->generate();
+
+			this->add(cube->getName(), cube);
 		}
 	}
+	
 
-	Texture2D* TextureManager::create2D(const int& width, const int& height, const TextureInfo& info)
-	{
-		if (!info.name.empty())
-		{
-			auto it = mTextureMap.tryEmplace(info.name, [&]()
-			{
-				auto tex = mCreator->create2D(width, height, info);
-				tex->setName(info.name);
-				return tex;
-
-			});
-			return (Texture2D*)(it.first->second);
-		}
-
-
-		return mCreator->create2D(width, height, info);
-	}
-
-	TextureCube* TextureManager::createCube(const std::string& name, const std::array<Image, 6>& images)
-	{
-		auto it = mTextureMap.tryEmplace(name, [&]()
-		{
-			auto tex = mCreator->createCube(images, TextureInfo(name));
-			tex->setName(name);
-			return tex;
-		});
-
-		return (TextureCube*)(it.first->second);
-	}
-
-	TextureCube* TextureManager::createCube(const int& width, const int& height, const TextureInfo& info)
-	{
-		if (!info.name.empty())
-		{
-			auto it = mTextureMap.tryEmplace(info.name, [&]()
-			{
-				auto tex = mCreator->createCube(width, height, info);
-				tex->setName(info.name);
-				return tex;
-			});
-			return (TextureCube*)(it.first->second);
-		}
-
-		return mCreator->createCube(width, height, info);
-	}
-
-	Texture2D* TextureManager::create2D(const std::string& name, const Image& img)
-	{
-		TextureChannel channel;
-		switch (img.getChannels())
-		{
-		case 1: channel = TextureChannel::R; break;
-		case 2: channel = TextureChannel::RG; break;
-		case 3: channel = TextureChannel::RGB; break;
-		case 4: channel = TextureChannel::RGBA; break;
-		default:
-			break;
-		}
-
-		TextureInfo info(name, channel);
-
-		if (img.isHDR())
-		{
-			info.internalChannel = TextureChannel::RGB16f;
-			info.dataType = DataType::Float32;
-		}
-
-		auto it = mTextureMap.tryEmplace(info.name, [&]()
-		{
-			auto tex = mCreator->create2D(img, info);
-			tex->setName(name);
-			return tex;
-		});
-
-		return (Texture2D*)(it.first->second);
-	}
-
-	TextureRender2D* TextureManager::createRender2D(const int& width, const int& height, const TextureInfo& info)
-	{
-		if (!info.name.empty())
-		{
-			auto it = mTextureMap.tryEmplace(info.name, [&]()
-			{
-				auto tex = mCreator->createRender2D(width, height, info);
-				tex->setName(info.name);
-				return tex;
-			});
-
-			return (TextureRender2D*)(it.first->second);
-		}
-
-		return mCreator->createRender2D(width, height, info);
-	}
-
-	Texture* TextureManager::findTexture(const std::string& name)
+	Texture* TextureManager::find(const std::string& name)
 	{
 		auto it = mTextureMap.find(name);
 		if (it != mTextureMap.end())
@@ -215,47 +130,51 @@ namespace tezcat::Tiny
 		}
 	}
 
-	//------------------------------------------------------------
-	//
-	//	Creator
-	//
-	Texture2D* TextureCreator::create2D(const Image& img, const TextureInfo& info)
+	void TextureManager::add(const std::string& name, Texture* tex)
 	{
-		auto tex = this->create2D();
-		tex->create(img, info);
-		tex->setAttachPosition(info.attachPosition);
-		return tex;
+		auto result = mTextureMap.try_emplace(name, tex);
+		tex->addRef();
+		if (!result.second)
+		{
+			result.first->second->subRef();
+			result.first->second = tex;
+		}
 	}
 
-	TextureCube* TextureCreator::createCube(const std::array<Image, 6>& images, const TextureInfo& info)
+	Texture2D* TextureManager::create2D(const std::string& name)
 	{
-		auto tex = this->createCube();
-		tex->create(images, info);
-		tex->setAttachPosition(info.attachPosition);
-		return tex;
+		auto result = mTextureMap.try_emplace(name, nullptr);
+		if (result.second)
+		{
+			auto t = Texture2D::create(name);
+			t->addRef();
+			result.first->second = t;
+		}
+		return (Texture2D*)result.first->second;
 	}
 
-	TextureCube* TextureCreator::createCube(const int& width, const int& height, const TextureInfo& info)
+	TextureCube* TextureManager::createCube(const std::string& name)
 	{
-		auto tex = this->createCube();
-		tex->create(width, height, info);
-		tex->setAttachPosition(info.attachPosition);
-		return tex;
+		auto result = mTextureMap.try_emplace(name, nullptr);
+		if (result.second)
+		{
+			auto t = TextureCube::create(name);
+			t->addRef();
+			result.first->second = t;
+		}
+		return (TextureCube*)result.first->second;
 	}
 
-	Texture2D* TextureCreator::create2D(const int& width, const int& height, const TextureInfo& info)
+	TextureRender2D* TextureManager::createRender2D(const std::string& name)
 	{
-		auto tex = this->create2D();
-		tex->create(width, height, info.internalChannel, info.channel, info.dataType);
-		tex->setAttachPosition(info.attachPosition);
-		return tex;
+		auto result = mTextureMap.try_emplace(name, nullptr);
+		if (result.second)
+		{
+			auto t = TextureRender2D::create(name);
+			t->addRef();
+			result.first->second = t;
+		}
+		return (TextureRender2D*)result.first->second;
 	}
 
-	TextureRender2D* TextureCreator::createRender2D(const int& width, const int& height, const TextureInfo& info)
-	{
-		auto tex = this->createRender2D();
-		tex->create(width, height, info.internalChannel);
-		tex->setAttachPosition(info.attachPosition);
-		return tex;
-	}
 }

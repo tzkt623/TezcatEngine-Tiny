@@ -12,57 +12,20 @@ namespace tezcat::Tiny
 	class IndexBuffer;
 	class MeshData;
 
-
-	class TINY_API BufferCreator
-	{
-	public:
-		virtual ~BufferCreator() = default;
-
-		virtual VertexBuffer* createVertexBuffer() = 0;
-		virtual IndexBuffer* createIndexBuffer() = 0;
-		virtual Vertex* createVertex() = 0;
-
-	};
-
-	class TINY_API VertexBufferManager : public Manager<BufferCreator>
+	class TINY_API VertexBufferManager
 	{
 	public:
 		VertexBufferManager();
 		virtual ~VertexBufferManager();
 
-	public:
-		/*
-		* @author HCL
-		* @info 2023|5|16
-		* @brief 创建Vertex并且保存
-		*/
-		Vertex* createVertexAndCached(MeshData* meshData);
-
-
-		/*
-		* @author HCL
-		* @info 2023|5|16
-		* @brief 创建Vertex但是不保存
-		*/
-		Vertex* createVertex(MeshData* meshData);
-
-		VertexBuffer* createVertexBuffer(const void* data, const size_t& length);
-		VertexBuffer* createVertexBuffer(const size_t& length);
-		IndexBuffer* createIndexBuffer(const void* data, const size_t& length);
 
 	public:
-		Vertex* getVertex(const std::string& name);
-		Vertex* getVertex(MeshData* meshData);
+		Vertex* create(const std::string& name);
 
-		void addMeshData(MeshData* meshData);
+		void add(MeshData* meshData);
+		void add(Vertex* vertex);
+
 		MeshData* findMeshData(const std::string& name);
-
-		uint32_t loadMeshData(MeshData* meshData);
-
-	private:
-
-		void buildVertex(Vertex* vertex, MeshData* meshData);
-		void buildChild(Vertex* vertexParent, MeshData* meshParent);
 		Vertex* findVertex(const std::string& name);
 
 	private:
@@ -73,7 +36,4 @@ namespace tezcat::Tiny
 	};
 
 	using VertexBufMgr = SG<VertexBufferManager>;
-
-
-
 }

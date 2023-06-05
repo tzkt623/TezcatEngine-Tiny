@@ -25,6 +25,7 @@ namespace tezcat::Tiny
 		std::string& getName() { return mName; }
 		int getUID() const { return mUID; }
 		Shader* findShader(const std::string& name);
+		Shader* getShader(int index = 0) { return mShaders[index]; }
 
 	private:
 		int mUID;

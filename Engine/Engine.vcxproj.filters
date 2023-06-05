@@ -109,7 +109,7 @@
     <ClCompile Include="Core\Manager\LightManager.cpp">
       <Filter>Engine\Core\Renderer\Object\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Data\ResourceLoader.cpp">
+    <ClCompile Include="Core\EngineIniter.cpp">
       <Filter>Engine\Core\Data</Filter>
     </ClCompile>
     <ClCompile Include="Core\Renderer\LayerMask.cpp">
@@ -125,15 +125,12 @@
     <ClCompile Include="Platform\OpenGL\WindowsEngine.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLBuffer.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Core\Layer\Layer.cpp" />
     <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
     <ClCompile Include="Core\Head\RenderConfig.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
     <ClCompile Include="Core\Shader\Uniform.cpp" />
     <ClCompile Include="Core\Manager\TextureManager.cpp" />
     <ClCompile Include="Core\Layer\LightLayer.cpp" />
@@ -141,7 +138,6 @@
     <ClCompile Include="Core\Tool\Collision\FrustumCulling.cpp" />
     <ClCompile Include="Core\Component\Skybox.cpp" />
     <ClCompile Include="Core\Renderer\FrameBuffer.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
     <ClCompile Include="Core\Manager\FrameBufferManager.cpp" />
     <ClCompile Include="Core\Tool\FileTool.cpp" />
     <ClCompile Include="Core\Component\FlyController.cpp" />
@@ -164,6 +160,12 @@
     <ClCompile Include="Core\Manager\EnvironmentLightManager.cpp" />
     <ClCompile Include="Core\Manager\ModelManager.cpp" />
     <ClCompile Include="ThirdParty\imgui\TextEditor\TextEditor.cpp" />
+    <ClCompile Include="Core\Data\Resource.cpp" />
+    <ClCompile Include="ThirdParty\Hash\city.cc" />
+    <ClCompile Include="Core\Renderer\BuildCommand.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLBuildCommand.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLRenderCommand.cpp" />
+    <ClCompile Include="Core\Data\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1230,7 +1232,7 @@
     <ClInclude Include="Core\Component\Light.h">
       <Filter>Engine\Core\Renderer\Object\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Data\ResourceLoader.h">
+    <ClInclude Include="Core\EngineIniter.h">
       <Filter>Engine\Core\Data</Filter>
     </ClInclude>
     <ClInclude Include="Core\Renderer\LayerMask.h">
@@ -1254,13 +1256,10 @@
     <ClInclude Include="Platform\OpenGL\WindowsEngine.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
-    <ClInclude Include="Platform\OpenGL\GLBuffer.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Layer\Layer.h" />
     <ClInclude Include="Core\Renderer\RenderLayer.h" />
-    <ClInclude Include="Platform\OpenGL\GLTexture.h" />
     <ClInclude Include="Core\Head\RenderConfig.h" />
-    <ClInclude Include="Platform\OpenGL\GLShader.h" />
     <ClInclude Include="Core\Tool\IDString.h" />
     <ClInclude Include="Core\Shader\Uniform.h" />
     <ClInclude Include="Core\Tool\Any.h" />
@@ -1277,7 +1276,6 @@
     <ClInclude Include="Core\Base\TinyObject.h" />
     <ClInclude Include="Core\Component\Skybox.h" />
     <ClInclude Include="Core\Renderer\FrameBuffer.h" />
-    <ClInclude Include="Platform\OpenGL\GLFrameBuffer.h" />
     <ClInclude Include="Core\Manager\FrameBufferManager.h" />
     <ClInclude Include="Core\Manager\Manager.h" />
     <ClInclude Include="Core\Tool\FileTool.h" />
@@ -1383,6 +1381,12 @@
     <ClInclude Include="ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="Core\Manager\ModelManager.h" />
     <ClInclude Include="ThirdParty\imgui\TextEditor\TextEditor.h" />
+    <ClInclude Include="Core\Data\Resource.h" />
+    <ClInclude Include="ThirdParty\Hash\city.h" />
+    <ClInclude Include="Core\Renderer\BuildCommand.h" />
+    <ClInclude Include="Platform\OpenGL\GLBuildCommand.h" />
+    <ClInclude Include="Platform\OpenGL\GLRenderCommand.h" />
+    <ClInclude Include="Core\Data\Text.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

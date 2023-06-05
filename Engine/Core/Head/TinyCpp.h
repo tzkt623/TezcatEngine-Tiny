@@ -157,6 +157,8 @@ namespace tezcat::Tiny
 		using const_reference = std::stack<T>::const_reference;
 
 	public:
+
+
 		~TinyStack()
 		{
 			this->clear();
@@ -498,7 +500,7 @@ namespace tezcat::Tiny
 			auto pair = mData.emplace(std::forward<Values>(values)...);
 			if (pair.second)
 			{
-				pair.first->addRef();
+				pair.first->second->addRef();
 			}
 
 			return pair;
@@ -527,31 +529,13 @@ namespace tezcat::Tiny
 		template<class Values>
 		pair<iterator, bool> try_emplace(const key_type& key, Values&& values)
 		{
-			auto pair = mData.try_emplace(key, nullptr);
-			if (pair.second)
-			{
-				pair.first->second = std::forward<Values>(values);
-				pair.first->second->addRef();
-			}
-
-			return pair;
-
-			//return mData.try_emplace(key, std::forward<Values>(values)...);
+			return mData.try_emplace(key, std::forward<Values>(values));
 		}
 
 		template<class Values>
 		pair<iterator, bool> try_emplace(key_type&& key, Values&& values)
 		{
-			auto pair = mData.try_emplace(std::forward<key_type>(key), nullptr);
-			if (pair.second)
-			{
-				pair.first->second = std::forward<Values>(values);
-				pair.first->second->addRef();
-			}
-
-			return pair;
-
-			//return mData.try_emplace(std::forward<key_type>(key), std::forward<Values>(values)...);
+			return mData.try_emplace(std::forward<key_type>(key), std::forward<Values>(values));
 		}
 
 		constexpr iterator find(const key_type& key)

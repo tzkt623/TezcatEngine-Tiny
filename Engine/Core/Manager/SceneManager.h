@@ -14,7 +14,7 @@ namespace tezcat::Tiny
 		~SceneManager();
 
 		void init();
-		bool update(BaseGraphics* graphics);
+		bool update();
 
 	public:
 		void prepareScene(Scene* scene);

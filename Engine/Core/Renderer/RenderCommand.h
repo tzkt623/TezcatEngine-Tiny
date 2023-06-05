@@ -1,21 +1,11 @@
 #pragma once
 
-#include "../Head/RenderConfig.h"
-#include "../Base/TinyObject.h"
+#include "../Head/TinyCpp.h"
 
 namespace tezcat::Tiny
 {
-	class MeshData;
-	class Vertex;
-	class RenderAgent;
 	class BaseGraphics;
 	class Shader;
-	class Transform;
-	class Material;
-	class Texture2D;
-	class TextureCube;
-	class TextureRender2D;
-	class FrameBuffer;
 
 	enum class CMDLife
 	{
@@ -24,8 +14,6 @@ namespace tezcat::Tiny
 		Continue,
 		Death
 	};
-
-
 
 	/*
 	* RenderCommand
@@ -62,127 +50,12 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~RenderCommand();
-		virtual void draw(BaseGraphics* graphics, Shader* shader) = 0;
+		virtual void run(BaseGraphics* graphics, Shader* shader) = 0;
 
 		Shader* getShader() { return mShader; }
 
 	protected:
 		Shader* mShader;
-	};
-
-	class RenderCMD_Vertex : public RenderCommand
-	{
-	public:
-		RenderCMD_Vertex(Vertex* vertex, Shader* shader);
-		virtual ~RenderCMD_Vertex();
-
-		void draw(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Vertex* mVertex;
-	};
-
-
-	class RenderCMD_Shadow : public RenderCommand
-	{
-	public:
-		RenderCMD_Shadow(Vertex* vertex, Transform* transform);
-		virtual ~RenderCMD_Shadow();
-
-		void draw(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Transform* mTransform;
-		Vertex* mVertex;
-	};
-
-	class RenderCMD_Skybox : public RenderCommand
-	{
-	public:
-		RenderCMD_Skybox(Vertex* vertex, Transform* transform, Material* material);
-		virtual ~RenderCMD_Skybox();
-
-		void draw(BaseGraphics* graphics, Shader* shader) override;
-	private:
-		Vertex* mVertex;
-		Transform* mTransform;
-		Material* mMaterial;
-	};
-
-	class RenderCMD_Mesh : public RenderCommand
-	{
-	public:
-		RenderCMD_Mesh(Vertex* vertex, Transform* transform, Material* material);
-		virtual ~RenderCMD_Mesh();
-
-		void draw(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Vertex* mVertex;
-		Transform* mTransform;
-		Material* mMaterial;
-	};
-
-	class RenderCMD_HDRToCube : public RenderCommand
-	{
-	public:
-		RenderCMD_HDRToCube(Vertex* vertex, Texture2D* hdr, TextureCube* cube, Shader* shader, FrameBuffer* frameBuffer);
-		virtual ~RenderCMD_HDRToCube();
-
-		void draw(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Vertex* mVertex;
-		Texture2D* mHDR;
-		TextureCube* mCube;
-		FrameBuffer* mFrameBuffer;
-	};
-
-	class RenderCMD_EnvMakeIrradiance : public RenderCommand
-	{
-	public:
-		RenderCMD_EnvMakeIrradiance(Vertex* vertex, TextureCube* cube, TextureCube* irradiance, Shader* shader, FrameBuffer* frameBuffer);
-		virtual ~RenderCMD_EnvMakeIrradiance();
-
-		void draw(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Vertex* mVertex;
-		TextureCube* mCubeMap;
-		TextureCube* mIrradianceMap;
-		FrameBuffer* mFrameBuffer;
-	};
-
-	class RenderCMD_EnvMakePrefilter : public RenderCommand
-	{
-	public:
-		RenderCMD_EnvMakePrefilter(Vertex* vertex
-			, TextureCube* cube
-			, TextureCube* prefitler
-			, Shader* shader
-			, FrameBuffer* frameBuffer
-			, uint32_t mipMaxLevel
-			, uint32_t mipWidth
-			, uint32_t mipHeight
-			, float resolution);
-		virtual ~RenderCMD_EnvMakePrefilter();
-
-		void draw(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Vertex* mVertex;
-		TextureCube* mCubeMap;
-		TextureCube* mPrefilterMap;
-		FrameBuffer* mFrameBuffer;
-		uint32_t mMipMaxLevel;
-		uint32_t mMipWidth;
-		uint32_t mMipHeight;
-		float mResolution;
-	};
-
-	class RenderCMD_Bath2D : public RenderCommand
-	{
-
 	};
 }
 

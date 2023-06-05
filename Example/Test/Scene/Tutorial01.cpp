@@ -18,22 +18,26 @@ void Tutorial01::onEnter()
 {
 	Scene::onEnter();
 
-	auto frame = FrameBufferMgr::getInstance()->create(
-		"FB_Viewport",
-		Engine::getScreenWidth(), Engine::getScreenHeight(),
-		{
-			TextureInfo("RB_Viewport"
-					  , TextureAttachPosition::ColorComponent
-					  , TextureChannel::RGBA
-					  , TextureChannel::RGBA
-					  , DataType::UByte),
+	auto frame = FrameBufferMgr::getInstance()->create("FB_Viewport");
+	auto rb = TextureMgr::getInstance()->create2D("RB_Viewport");
+	rb->setData(Engine::getScreenWidth()
+		, Engine::getScreenHeight()
+		, TextureInfo(TextureAttachPosition::ColorComponent
+			, TextureChannel::RGBA
+			, TextureChannel::RGBA
+			, DataType::UByte));
 
-			TextureInfo("DS_Viewport"
-					  , TextureAttachPosition::DepthComponent
-					  , TextureChannel::Depth
-					  , TextureChannel::Depth
-					  , DataType::UByte)
-		});
+	auto ds = TextureMgr::getInstance()->create2D("DS_Viewport");
+	ds->setData(Engine::getScreenWidth()
+		, Engine::getScreenHeight()
+		, TextureInfo(TextureAttachPosition::DepthComponent
+			, TextureChannel::Depth
+			, TextureChannel::Depth
+			, DataType::UByte));
+
+	frame->addAttachment(rb);
+	frame->addAttachment(ds);
+	frame->generate();
 
 	mObserver = new MyObserver();
 	mObserver->setFrameBuffer(frame);
@@ -41,24 +45,26 @@ void Tutorial01::onEnter()
 	mObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 
 
-	MeshData mesh;
-	mesh.mName = "Triangle";
-	mesh.mVertices.emplace_back(-0.5f, -0.5f, 0.0f);	// left
-	mesh.mVertices.emplace_back(0.5f, -0.5f, 0.0f);	// right
-	mesh.mVertices.emplace_back(0.0f, 0.5f, 0.0f);	// top
-	mesh.apply();
+	MeshData* mesh = MeshData::create();
+	mesh->mName = "Triangle";
+	mesh->mVertices.emplace_back(-0.5f, -0.5f, 0.0f);	// left
+	mesh->mVertices.emplace_back(0.5f, -0.5f, 0.0f);	// right
+	mesh->mVertices.emplace_back(0.0f, 0.5f, 0.0f);	// top
+	mesh->apply();
 
-	mVertex = VertexBufMgr::getInstance()->createVertex(&mesh);
+	mVertex = Vertex::create();
+	mVertex->init(mesh);
+	mVertex->generate();
 	mVertex->addRef();
 
-	auto shader = ShaderMgr::getInstance()->findPackage("Tutorial/t01")->getShaders()[0];
+	auto shader = ShaderMgr::getInstance()->find("Tutorial/t01");
 	auto queue = mObserver->getRenderQueue();
 	this->addLogicFunction(this, [=]()
-		{
-			auto render_command = new RenderCMD_Vertex(mVertex, shader);
-			queue->addRenderCommand(render_command);
-			Graphics::getInstance()->addPreRenderPassQueue((ExtraQueue*)queue);
-		});
+	{
+		auto render_command = Graphics::getInstance()->createDrawVertexCMD(shader, mVertex);
+		queue->addRenderCommand(render_command);
+		Graphics::getInstance()->addPreRenderPassQueue((ExtraQueue*)queue);
+	});
 }
 
 void Tutorial01::onExit()

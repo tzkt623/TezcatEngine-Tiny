@@ -34,6 +34,7 @@ namespace tezcat::Tiny
 				TinyGC::recycle(mGCInfo);
 			}
 
+			this->onClose();
 			delete this;
 		}
 	}

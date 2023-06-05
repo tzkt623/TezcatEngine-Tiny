@@ -26,7 +26,8 @@ namespace tezcat::Tiny
 
 		EE_SetMainCamera,
 		EE_ActiveSkybox,
-		EE_RenderEnv,
+		EE_ChangeEnvLightingImage,
+		EE_ChangeEnvLightingTexture,
 
 		EE_IDCount
 	};

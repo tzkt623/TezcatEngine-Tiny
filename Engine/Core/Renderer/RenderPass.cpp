@@ -75,9 +75,7 @@ namespace tezcat::Tiny
 			return false;
 		}
 
-		mShader->setStateOptions();
 		mShader->resetGlobalState();
-		mShader->bind();
 
 		Profiler_PassCount(1);
 		Profiler_DrawCall(static_cast<int>(mCommandList.size()));
@@ -96,9 +94,9 @@ namespace tezcat::Tiny
 		{
 			mDirty = false;
 			std::ranges::sort(mCommandList, [](RenderCommand* a, RenderCommand* b)
-				{
-					return a->mOrderID < b->mOrderID;
-				});
+			{
+				return a->mOrderID < b->mOrderID;
+			});
 		}
 
 		//分析shader的光照模式
@@ -110,9 +108,9 @@ namespace tezcat::Tiny
 			//前向光照模式
 		case LightMode::Forward:
 		{
-			graphics->getLightManager()->getDirectionalLight()->submit(mShader);
-			graphics->getShadowCasterManager()->submit(mShader);
-			graphics->getEnvLitManager()->submit(mShader);
+			graphics->getLightManager()->getDirectionalLight()->submit(graphics, mShader);
+			graphics->getShadowCasterManager()->submit(graphics, mShader);
+			graphics->getEnvLitManager()->submit(graphics, mShader);
 			break;
 		}
 		case LightMode::ForwardAdd:
@@ -125,7 +123,7 @@ namespace tezcat::Tiny
 
 		for (auto cmd : mCommandList)
 		{
-			cmd->draw(graphics, mShader);
+			cmd->run(graphics, mShader);
 			delete cmd;
 		}
 
@@ -170,7 +168,7 @@ namespace tezcat::Tiny
 
 	void ExtraQueue::render(BaseGraphics* graphics)
 	{
-		FrameBuffer::bind(mObserver->getFrameBuffer());
+		FrameBuffer::bind(graphics, mObserver->getFrameBuffer());
 		graphics->setViewport(mObserver->getViewportInfo());
 		graphics->clear(mObserver->getClearOption());
 
@@ -179,15 +177,17 @@ namespace tezcat::Tiny
 			if (pass->checkState())
 			{
 				auto shader = pass->getShader();
+				graphics->bind(shader);
+				graphics->setPassState(shader);
 
-				mObserver->submit(shader);
-				mObserver->submitViewMatrix(shader);
+				mObserver->submit(graphics, shader);
+				mObserver->submitViewMatrix(graphics, shader);
 
 				pass->render(graphics);
 			}
 		}
 
-		FrameBuffer::unbind(mObserver->getFrameBuffer());
+		FrameBuffer::unbind(graphics, mObserver->getFrameBuffer());
 	}
 
 	void ExtraQueue::addRenderCommand(RenderCommand* cmd)
@@ -203,10 +203,9 @@ namespace tezcat::Tiny
 		if (mPrepareAry[uid] == nullptr)
 		{
 			auto pass = RenderPass::create(shader);
-			mPasses.push_back(pass);
-
-			mPrepareAry[uid] = pass;
 			pass->addRef();
+			mPasses.push_back(pass);
+			mPrepareAry[uid] = pass;
 		}
 
 		mPrepareAry[uid]->addCommand(cmd);
@@ -223,7 +222,7 @@ namespace tezcat::Tiny
 
 	void BaseQueue::render(BaseGraphics* graphics)
 	{
-		FrameBuffer::bind(mObserver->getFrameBuffer());
+		FrameBuffer::bind(graphics, mObserver->getFrameBuffer());
 
 		graphics->setViewport(mObserver->getViewportInfo());
 		graphics->clear(mObserver->getClearOption());
@@ -235,7 +234,8 @@ namespace tezcat::Tiny
 		this->render(graphics, mOpaqueLast);
 		this->render(graphics, mOverlay);
 
-		FrameBuffer::unbind(mObserver->getFrameBuffer());
+		FrameBuffer::unbind(graphics, mObserver->getFrameBuffer());
+
 	}
 
 	void BaseQueue::render(BaseGraphics* graphics, std::vector<RenderPass*>& passes)
@@ -245,9 +245,11 @@ namespace tezcat::Tiny
 			if (pass->checkState())
 			{
 				auto shader = pass->getShader();
+				graphics->bind(shader);
+				graphics->setPassState(shader);
 
-				mObserver->submit(shader);
-				mObserver->submitViewMatrix(shader);
+				mObserver->submit(graphics, shader);
+				mObserver->submitViewMatrix(graphics, shader);
 
 				pass->render(graphics);
 			}

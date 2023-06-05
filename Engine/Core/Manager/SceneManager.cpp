@@ -87,10 +87,10 @@ namespace tezcat::Tiny
 
 	void SceneManager::prepareScene(Scene* scene)
 	{
-		mSceneWithName.try_emplace(scene->getName(), scene);
+		mSceneWithName.emplace(scene->getName(), scene);
 	}
 
-	bool SceneManager::update(BaseGraphics* graphics)
+	bool SceneManager::update()
 	{
 		TINY_PROFILER_TIMER_OUT(Profiler::LogicTime);
 		if (mScenes.empty())
@@ -98,7 +98,7 @@ namespace tezcat::Tiny
 			return false;
 		}
 
-		mScenes.top()->update(graphics);
+		mScenes.top()->update();
 		return true;
 	}
 

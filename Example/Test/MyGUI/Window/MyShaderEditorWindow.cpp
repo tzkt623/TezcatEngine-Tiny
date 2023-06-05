@@ -37,12 +37,12 @@ MyShaderEditorWindow::~MyShaderEditorWindow()
 
 void MyShaderEditorWindow::loadFile(std::filesystem::path& file)
 {
-	auto tex = FileTool::loadText(file.string());
-	mShaderEditor->SetText(tex);
 	mFilePath = std::move(file);
 	mName = mFilePath.filename().string();
-
 	mIsShader = mFilePath.extension().string() == ".tysl" ? true : false;
+
+	auto tex = FileTool::loadText(mFilePath.string());
+	mShaderEditor->SetText(tex);
 }
 
 bool MyShaderEditorWindow::begin()
@@ -142,7 +142,7 @@ void MyShaderEditorWindow::onRender()
 				auto textToSave = mShaderEditor->GetText();
 				FileTool::saveFile(mFilePath.string(), textToSave);
 
-				std::regex rg_find_name(R"(#TINY_HEAD_BEGIN[\s\S]*\{[\s\S]*str\s*Name\s*=\s*(.*);[\s\S]*\}[\s\S]*#TINY_HEAD_END)");
+				std::regex rg_find_name(R"(#TINY_CFG_BEGIN[\s\S]*\{[\s\S]*str\s*Name\s*=\s*(.*);[\s\S]*\}[\s\S]*#TINY_CFG_END)");
 				std::sregex_iterator it(textToSave.begin(), textToSave.end(), rg_find_name);
 				std::string name = (*it)[1];
 

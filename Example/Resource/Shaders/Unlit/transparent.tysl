@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Transparent;
+        str Name = Unlit/Transparent;
         int Version = 330;
         int OrderID = 50;
         str Queue = Transparent;
@@ -23,7 +23,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
+        #include "../Include/tiny_vs_base.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec2 aUV;
@@ -40,7 +40,7 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_texture"
+        #include "../Include/tiny_fs_texture.tyin"
 
         in vec2 myUV;
         out vec4 myFinalColor;

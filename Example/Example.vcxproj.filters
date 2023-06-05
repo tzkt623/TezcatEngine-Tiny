@@ -24,7 +24,7 @@
     <ClCompile Include="Test\MyInputer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyResourceLoader.cpp">
+    <ClCompile Include="Test\MyEngineIniter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Test\Scene\MyMainScene.cpp">
@@ -89,7 +89,7 @@
     <ClInclude Include="Test\MyInputer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyResourceLoader.h">
+    <ClInclude Include="Test\MyEngineIniter.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\Scene\MyMainScene.h">

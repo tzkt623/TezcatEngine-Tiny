@@ -29,6 +29,14 @@ MyMainWindow::MyMainWindow()
 		auto path = (std::filesystem::path*)data.userData;
 		MyShaderEditorWindow::create(*path, this->getHost())->setFocus();
 	});
+
+	MyEvent::get()->addListener(MyEventID::Window_OpenImageViwer, this, [this](const EventData& data)
+	{
+		auto path = (std::filesystem::path*)data.userData;
+		auto window = new MyTextureViewerWindow(path->filename().string());
+		window->loadTexture(*path);
+		window->open(this->getHost());
+	});
 }
 
 MyMainWindow::~MyMainWindow()

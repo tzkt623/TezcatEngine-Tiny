@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = TextureDepth;
+        str Name = Unlit/TextureDepth;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;
@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
+        #include "../Include/tiny_vs_base.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec2 aUV;
@@ -37,9 +37,9 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_texture"
-        #include "tiny_fs_camera"
-        #include "tiny_fs_function"
+        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs_camera.tyin"
+        #include "../Include/tiny_fs_function.tyin"
 
         out vec4 myFinalColor;
         in vec2 myUV;

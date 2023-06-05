@@ -15,7 +15,7 @@ namespace tezcat::Tiny
 		
 		virtual ~Skybox();
 
-		void sendToQueue(const RenderPhase& phase, RenderQueue* queue) override;
+		void sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue) override;
 
 	protected:
 		void onStart() override;

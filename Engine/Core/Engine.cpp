@@ -1,4 +1,6 @@
 #include "Engine.h"
+#include "EngineIniter.h"
+
 #include "Manager/LightManager.h"
 #include "Manager/ShaderManager.h"
 #include "Manager/SceneManager.h"
@@ -7,7 +9,6 @@
 #include "Manager/FrameBufferManager.h"
 #include "Manager/TextureManager.h"
 
-#include "Data/ResourceLoader.h"
 #include "Input/InputSystem.h"
 #include "Renderer/BaseGraphics.h"
 #include "Renderer/LayerMask.h"
@@ -24,6 +25,18 @@ namespace tezcat::Tiny
 	int Engine::ScreenHeight = 0;
 	int Engine::ScreenWidth = 0;
 	float Engine::sDeltaTime = 0;
+	std::string Engine::sName;
+
+	std::mutex Engine::sMainMutex;
+	std::condition_variable Engine::sCVLogicThread;
+	std::condition_variable Engine::sCVRenderThread;
+	std::atomic<bool> Engine::allowLogic(false);
+	std::atomic<bool> Engine::allowRender(false);
+
+	std::binary_semaphore Engine::sSemRenderThread(0);
+	std::binary_semaphore Engine::sSemLogicThread(0);
+
+	bool Engine::sMultiThread = false;
 
 	Engine::Engine()
 		: mResourceLoader(nullptr)
@@ -48,7 +61,7 @@ namespace tezcat::Tiny
 		delete mResourceLoader;
 	}
 
-	bool Engine::init(ResourceLoader* loader)
+	bool Engine::init(EngineIniter* loader)
 	{
 		EngineEvent::get()->init(EngineEventID::EE_IDCount);
 		mResourceLoader = loader;
@@ -83,8 +96,9 @@ namespace tezcat::Tiny
 		mResourceLoader->prepareEngine(this);
 		ScreenWidth = mResourceLoader->getWindowWidth();
 		ScreenHeight = mResourceLoader->getWindowHeight();
+		sName = mResourceLoader->getName();
 
-		ShaderParam::initAllParam(std::bind(&ResourceLoader::initYourShaderParam, mResourceLoader));
+		ShaderParam::initAllParam(std::bind(&EngineIniter::initYourShaderParam, mResourceLoader));
 
 		LayerMask::init();
 		FileTool::init(mResourceLoader->getResourceFolderName());
@@ -93,8 +107,62 @@ namespace tezcat::Tiny
 
 	bool Engine::onInit()
 	{
-		mGraphics = this->createGraphics();
-		mGraphics->init(this);
+		if (sMultiThread)
+		{
+			std::atomic<bool> render_thread_init(false);
+			mRenderThread = std::thread([this, &render_thread_init]()
+			{
+				{
+					//std::unique_lock lock(sMainMutex);
+
+					mGraphics = this->createGraphics();
+					mGraphics->init(this);
+					render_thread_init.store(true);
+					sSemLogicThread.release();
+
+					//lock.unlock();
+					//sCVLogicThread.notify_one();
+				}
+
+				allowRender.store(false);
+
+				while (mIsRunning)
+				{
+					//std::cout << "Render wait signal......\n";
+// 					std::unique_lock lock(sMainMutex);
+// 					sCVRenderThread.wait(lock, []() { return allowRender.load(); });
+					sSemRenderThread.acquire();
+					//std::cout << "Render running......\n";
+
+					mGraphics->render();
+
+					//allowRender.store(false);
+					//allowLogic.store(true);
+					//lock.unlock();
+					//sCVLogicThread.notify_one();
+
+					sSemLogicThread.release();
+				}
+			});
+
+
+			mRenderThread.detach();
+			sSemLogicThread.acquire();
+
+			/*
+			{
+				std::unique_lock lock(sMainMutex);
+				sCVLogicThread.wait(lock, [this, &render_thread_init]() { return render_thread_init.load(); });
+				std::cout << "wait render thread complete" << std::endl;
+			}
+			*/
+		}
+		else
+		{
+			mGraphics = this->createGraphics();
+			mGraphics->init(this);
+			mRenderThreadInited = true;
+		}
 
 		mResourceLoader->prepareResource(this);
 		return true;
@@ -109,7 +177,8 @@ namespace tezcat::Tiny
 
 	void Engine::beforeLoop()
 	{
-
+		allowLogic.store(true);
+		sSemLogicThread.release();
 	}
 
 	void Engine::endLoop()
@@ -123,9 +192,25 @@ namespace tezcat::Tiny
 
 		while (mIsRunning)
 		{
+			if (sMultiThread)
+			{
+				//std::cout << "Logic wait signal......\n";
+				//std::unique_lock lock(sMainMutex);
+				//sCVLogicThread.wait(lock, []() { return allowLogic.load(); });
+				sSemLogicThread.acquire();
+				//std::cout << "Logic running......\n";
+			}
+			//在多线程模式下
+			//需要延迟一帧删除数据
+			//但是如果所有渲染数据都是拷贝的
+			//则可以在帧最后删除
+			TinyGC::update();
+
 			this->preUpdate();
 			this->onUpdate();
 			this->postUpdate();
+
+			this->onRender();
 		}
 
 		this->endLoop();
@@ -139,17 +224,41 @@ namespace tezcat::Tiny
 	void Engine::onUpdate()
 	{
 		mInputSystem->update();
-		mSceneManager->update(mGraphics);
-		mGraphics->render();
+		mSceneManager->update();
+	}
+
+	void Engine::onRender()
+	{
+		if (sMultiThread)
+		{
+			this->notifyRenderThread();
+		}
+		else
+		{
+			this->notifyRender();
+		}
 	}
 
 	void Engine::postUpdate()
 	{
-		TinyGC::update();
+
 	}
 
 	void Engine::stop()
 	{
 		mIsRunning = false;
+	}
+
+	void Engine::notifyRender()
+	{
+		mGraphics->render();
+	}
+
+	void Engine::notifyRenderThread()
+	{
+		//allowLogic.store(false);
+		//allowRender.store(true);
+		//sCVRenderThread.notify_one();
+		sSemRenderThread.release();
 	}
 }

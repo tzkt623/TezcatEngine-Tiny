@@ -3,9 +3,13 @@
 ## **引擎二周目进行中**
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
 
-There is a bug in switching scenes!!!
+Update
+
+- [x] 重构了整个渲染逻辑以支持多线程(Refactor all rendering logic to support multi-thread)
+- [x] 基本的资源浏览器(Basic Resource Browse)
+- [x] 使用管理器创建的对象生命周期属于管理器,不使用管理器创建的对象生命周期手动管理(The life of objects created using the manager belongs to the manager. The life of objects created without the manager is managed manually)
+- [ ] 正在重构资源加载和管理方式(Refactor resoure loader and managers)
 
 ## **依赖库版本(Libs Version)**
 
@@ -15,27 +19,39 @@ There is a bug in switching scenes!!!
 
 ## To Do
 
+Engine
+
 - [x] Basic PBR
-- [ ] Camera Culling
-- [ ] Multi-Thread Rendering
-- [ ] Multi-Light Support
-- [ ] Mode Load Support
-- [ ] Transparent Sort
-- [ ] Resource Explorer
-- [ ] Node Based Shader Editor
 - [x] Octree
 - [x] Commad Based Rendering
 - [x] Basic GL Shader Parser
 - [x] Basic ShadowMap
 - [x] Basic Memory Manager
-- [x] Runtime Shader Rebuild
+- [x] Basic Multi-Thread Engine
+- [ ] Camera Culling
+- [ ] Multi-Light Support
+- [ ] Mode Load Support
+- [ ] Transparent Sort
+- [ ] Multi-Thread Rendering(Vulkan)
+
+Editor
+
 - [x] Basic Shader Editor
+- [x] Basic Lighting Manager
+- [x] Basic Memory Viewer
+- [x] Basic Log Viewer
+- [x] Basic Texture2D Viewer
+- [x] Runtime Shader Rebuild
+- [x] Basic Resource Explorer
+- [ ] Node Based Shader Editor
 
 ## **编辑器(Editor)**
 
 现在可以在菜单里面切换两个场景
 
 Now you can switch scenes in the menu
+
+There is a bug in switching scenes!!!
 
 ### 着色器编辑器(Shader Editor)
 
@@ -61,9 +77,15 @@ Now Object Overview can show components bind in object when you selected, and yo
 
 Now Editor can rebuild shader in runtime.
 
-主菜单->Shader->Rebuild之下选你想重新编译的,或者选all全部编译
+### 资源管理器(Resource Browse)
 
-MainMenu->Shader->Rebuild, Choose your want or All
+双击图片文件可以打开查看
+
+Double Click image file to open viwer
+
+可以拖拽图片给环境光照贴图
+
+Try Drag image file to envlighting map widget
 
 ## **内存管理(Memory Management)**
 
@@ -71,7 +93,7 @@ MainMenu->Shader->Rebuild, Choose your want or All
 
 A simple reference counting based memory management, just still debugging......
 
-## **代码结构(Code)**
+## **引擎(Engine)**
 
 ```cpp
 auto go = GameObject::create("World1_Camera");
@@ -166,36 +188,39 @@ mr1->setMesh("Square");
   Create a FrameBuffer
 
 ```cpp
-auto fb = FrameBufferMgr::getInstance()->create(
-    //Name for find, set null string means will not cache it
-    "FB_World1",
-    //width, high
-    Engine::getScreenWidth(), Engine::getScreenHeight(),
-    {
-        //Create a ColorBuffer Setting
-        TextureBufferInfo(
-            //a Name for find, set null string means will not cache it
-            "RB_World1"
-            //Buffer Type(FrameBuffer Component)
-            , TextureBufferType::ColorComponent
-            //Internal Format
-            , TextureChannel::RGBA
-            //Format
-            , TextureChannel::RGBA
-            //Data Type
-            , DataType::UByte),
-        //Create a write-only Buffer Setting for DepthAndStencil
-        TextureBufferInfo(
-            //a Name for find, set null string means will not cache it
-            "DS_World1"
-            //Buffer Type(FrameBuffer Component)
-            , TextureBufferType::DepthStencilComponent
-            //Internal Format
-            , TextureChannel::Depth24_Stencil8)
-    });
+//create a framebuffer named "FB_Viewport" and save in manager
+auto frame_buffer = FrameBufferMgr::getInstance()->create("FB_Viewport");
+
+//create a texture2D named "RB_Viewport" and save in manager
+Texture2D* tex2d = TextureMgr::getInstance()->create2D("RB_Viewport");
+tex2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
+    , TextureInfo(
+        //Buffer Type(FrameBuffer Component)
+        TextureAttachPosition::ColorComponent
+        //Internal Format
+        , TextureChannel::RGBA
+        //Format
+        , TextureChannel::RGBA
+        //Data Type
+        , DataType::UByte));
+
+//create a render2D named "DS_Viewport" and save in manager
+TextureRender2D* render2d = TextureMgr::getInstance()->createRender2D("DS_Viewport");
+render2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
+    , TextureInfo(TextureAttachPosition::DepthComponent
+        , TextureChannel::Depth
+        , TextureChannel::Depth
+        , DataType::UByte));
+
+//attach textures into framebuffer
+frame_buffer->addAttachment(tex2d);
+frame_buffer->addAttachment(render2d);
+//generate framebuffer
+//in multi-thread mode, this method just make a CMD and send it to render-thread
+frame_buffer->generate();
 
 //let camera render objects to this framebuffer
-camera->setFrameBuffer(fb);
+camera->setFrameBuffer(frame_buffer);
 
 //also you can find this framebuffer like
 fb = FrameBufferMgr::getInstance()->find("FB_World1");
@@ -204,38 +229,22 @@ fb = FrameBufferMgr::getInstance()->find("FB_World1");
 camera->setFrameBuffer(nullptr);
 ```
 
-或者是这样
-
-or like this
+- 创建一张贴图(Create a Texture)
 
 ```cpp
-    auto cube = TextureMgr::getInstance()->createCube(
-        cube_size, cube_size,
-        TextureInfo("CB_CubeMap"
-            , TextureType::TextureCube
-            , TextureAttachPosition::ColorComponent
-            , TextureFilter::Linear_Mipmap_Linear
-            , TextureFilter::Linear
-            , TextureWrap::Clamp_To_Edge
-            , TextureWrap::Clamp_To_Edge
-            , TextureWrap::Clamp_To_Edge
-            , TextureChannel::RGB16f
-            , TextureChannel::RGB
-            , DataType::Float32));
-
-    auto render2d = TextureMgr::getInstance()->createRender2D(
-        cube_size, cube_size,
-        TextureInfo("DB_CubeMap"
-            , TextureType::TextureRender2D
-            , TextureAttachPosition::DepthComponent
-            , TextureChannel::Depth24));
-
-
-    auto fb = FrameBufferMgr::getInstance()->create("FB_Cube");
-    fb->beginBuild();
-    fb->attachCube(cube, 0, 0);
-    fb->attach(render2d);
-    fb->endBuild();
+//create a texture named "Shadow" and save in manager
+mShadwowTexutre = TextureMgr::getInstance()->create2D("Shadow");
+mShadwowTexutre->setData(width, height
+    , TextureInfo(TextureType::Texture2D
+        , TextureAttachPosition::DepthComponent
+        , TextureFilter::Nearest
+        , TextureFilter::Nearest
+        , TextureWrap::Clamp_To_Border
+        , TextureWrap::Clamp_To_Border
+        , TextureChannel::Depth
+        , TextureChannel::Depth
+        , DataType::Float32));
+mShadwowTexutre->generate();
 ```
 
 **具体使用方法请看Example.**
@@ -253,10 +262,10 @@ Attention! The .exe file must be in the same directory as the resource folder
    Inherit and implement the `ResourceLoader` class
 
     ```cpp
-    class MyResourceLoader : public ResourceLoader
+    class MyEngineIniter : public EngineIniter
     {
     public:
-        MyResourceLoader();
+        MyEngineIniter();
 
         void prepareEngine(Engine* engine) override; 
         void prepareResource(Engine* engine) override;
@@ -274,18 +283,19 @@ Attention! The .exe file must be in the same directory as the resource folder
    Set your **ResourceFolder Name, ProgramName, ScreenSize**
 
     ```cpp
-    void MyResourceLoader::prepareEngine(Engine* engine)
+    void MyEngineIniter::prepareEngine(Engine* engine)
     {
-        ResourceLoader::prepareEngine(engine);
+        EngineIniter::prepareEngine(engine);
         MyEvent::get()->init(MyEventID::Count);
 
-        static_cast<WindowsEditor*>(engine)->setGLVersion(3, 3);
+        engine->setEnableMultiThread();
 
         mResourceFolderName = "Resource";
         mGameName = u8"YesIndeed,玩上老头环了!!!!!";
         mWindowWidth = 1920;
         mWindowHeight = 1080;
         mEnableVsync = true;
+        this->setGLVersion(3, 3);
     }
     ```
 
@@ -294,9 +304,9 @@ Attention! The .exe file must be in the same directory as the resource folder
    Load resource files
 
     ```cpp
-    void MyResourceLoader::prepareResource(Engine* engine)
+    void MyEngineIniter::prepareResource(Engine* engine)
     {
-        ResourceLoader::prepareResource(engine);
+        EngineIniter::prepareResource(engine);
         //设置图片文件夹名称自动加载所有图片文件
         //注意,不同文件夹下面的图片文件也不能重名
         //Set ImageFolder to auto load all images
@@ -310,18 +320,16 @@ Attention! The .exe file must be in the same directory as the resource folder
    Load first Scene
 
     ```cpp
-    void MyResourceLoader::prepareGame(Engine* engine)
+    void MyEngineIniter::prepareGame(Engine* engine)
     {
-        ResourceLoader::prepareGame(engine);
+        EngineIniter::prepareGame(engine);
         ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
 
-        auto gui_host = static_cast<WindowsEditor*>(engine)->getGUI();
         auto main_window = new MyMainWindow();
-        main_window->open(gui_host);
+        main_window->open(Graphics::getInstance()->mGUI);
         main_window->init();
 
         SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
-        SceneMgr::getInstance()->prepareScene(MySeconedScene::create("SecondScene"));
         SceneMgr::getInstance()->prepareScene(Tutorial01::create("Tutorial01"));
     }
     ```
@@ -422,13 +430,11 @@ mr->setMaterial(plane_material);
 ShaderBuilder now combine header files to automatically generate a shader file
 
 ```cpp
-void ResourceLoader::prepareResource(Engine* engine)
+void EngineIniter::prepareResource(Engine* engine)
 {
-    ShaderMgr::getInstance()->loadIncludeFiles(FileTool::getRootRelativeResDir() + "/Shaders/Include");
     ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
     ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
     ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
-    ShaderMgr::getInstance()->clearIncludeFiles();
 
     this->createSomeMode();
 }
@@ -438,29 +444,29 @@ void ResourceLoader::prepareResource(Engine* engine)
 
 You can create generic header files in the `Include` folder to avoid duplicating each shader file
 
-头文件虽然支持重复包含,但请不要这样做
+头文件支持重复包含
 
-Header files support repetitive inclusion, but do not do so
+Header files support repetitive inclusion
 
 着色器文件支持//和/**/两种注释
 
 The shader file supports both // and /**/
 
 ```glsl
-file tiny_vs_base.tysl 
+file tiny_vs_base.tyin 
 uniform mat4 TINY_MatrixP;
 uniform mat4 TINY_MatrixV;
 uniform mat4 TINY_MatrixM;
 uniform mat3 TINY_MatrixN;
 
-file tiny_vs_shadow.tysl
+file tiny_vs_shadow.tyin
 uniform mat4 TINY_MatrixLit;
 
 file any shader you need
 #TINY_VS_BEGIN
 {
-    #include "tiny_vs_base"
-    #include "tiny_vs_shadow"
+    #include "../Include/tiny_vs_base.tyin"
+    #include "../Include/tiny_vs_shadow.tyin"
     ..........
 }
 ```
@@ -595,25 +601,26 @@ The[`int Version`] should be setted.The other params You can set as your wish.
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Std1;
+        str Name = Standard/Std1;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;
         str DepthTest = Less;
         bool ZWrite = true;
         str CullFace = Back;
+        str LightMode = Forward;
     }
     #TINY_CFG_END
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
-        #include "tiny_vs_shadow"
+        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs_shadow.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
-        layout (location = 2) in vec4 aColor;
-        layout (location = 3) in vec2 aUV;
+        layout (location = 2) in vec2 aUV;
+        layout (location = 3) in vec4 aColor;
 
         out vec4 myColor;
         out vec2 myUV;
@@ -637,9 +644,11 @@ The[`int Version`] should be setted.The other params You can set as your wish.
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_struct"
-        #include "tiny_fs_camera"
-        #include "tiny_fs_texture"
+        #include "../Include/tiny_fs_std_mat.tyin"
+        #include "../Include/tiny_fs_light.tyin"
+        #include "../Include/tiny_fs_camera.tyin"
+        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs_function.tyin"
 
         in vec4 myColor;
         in vec2 myUV;
@@ -664,60 +673,23 @@ The[`int Version`] should be setted.The other params You can set as your wish.
             return vec4(texture(TINY_TexCube, R).rgb, 1.0);
         }
 
-        float calcShadow(vec4 lightPosition, vec3 normal, vec3 lightDir)
-        {
-            // 执行透视除法
-            vec3 projCoords = lightPosition.xyz / lightPosition.w;
-            // 变换到[0,1]的范围
-            projCoords = projCoords * 0.5 + 0.5;
-
-            //超出投影的远平面范围
-            if(projCoords.z > 1.0)
-            {
-                return 0.0;
-            }
-
-            // 取得最近点的深度(使用[0,1]范围下的lightPosition当坐标)
-            float closestDepth = texture(TINY_TexDepth, projCoords.xy).r; 
-            // 取得当前片段在光源视角下的深度
-            float currentDepth = projCoords.z;
-
-            float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-
-            // 检查当前片段是否在阴影中
-            //float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
-
-            // PCF
-            float shadow = 0.0;
-            vec2 texelSize = 1.0 / textureSize(TINY_TexDepth, 0);
-            for(int x = -1; x <= 1; ++x)
-            {
-                for(int y = -1; y <= 1; ++y)
-                {
-                    float pcfDepth = texture(TINY_TexDepth, projCoords.xy + vec2(x, y) * texelSize).r; 
-                    shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
-                }    
-            }
-            shadow /= 9.0;
-
-            return shadow;
-        }
-
         vec3 calcDirectionLight(LightDirection lit, vec3 viewDir, vec3 normal)
         {
             vec3 light_dir = normalize(-lit.direction);
+            vec3 half_dir = normalize(viewDir + light_dir); 
 
-            float diff = max(dot(normal, light_dir), 0.0);
+            float NdL = dot(normal, light_dir);
+            float NdH = dot(normal, half_dir);
 
-            vec3 halfwayDir = normalize(light_dir + viewDir); 
-            float spec = pow(max(dot(normal, halfwayDir), 0.0), TINY_MatStd.shininess);
+            float diff = max(NdL, 0.0);
+            float spec = pow(max(NdH, 0.0), TINY_MatStd.shininess);
 
             vec3 ambient = lit.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
             vec3 diffuse = lit.diffuse * diff * texture(TINY_MatStd.diffuse, myUV).rgb;
             vec3 specular = lit.specular * spec * texture(TINY_MatStd.specular, myUV).rrr;
 
             // shadow
-            float shadow = calcShadow(myLightPosition, normal, light_dir);
+            float shadow = calcShadow(myLightPosition, normal, light_dir, TINY_TexDepth);
             vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
 
             return lighting;
@@ -727,8 +699,7 @@ The[`int Version`] should be setted.The other params You can set as your wish.
         {
             vec3 normal = normalize(myNormal);
             vec3 view_dir = normalize(TINY_ViewPosition - myWorldPosition);
-
-            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
+            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);          
         }
     }
     #TINY_FS_END

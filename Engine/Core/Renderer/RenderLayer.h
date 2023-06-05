@@ -10,6 +10,7 @@ namespace tezcat::Tiny
 	class IRenderObserver;
 	class RenderAgent;
 	class RenderQueue;
+	class BaseGraphics;
 
 	/*
 	* RenderLayer
@@ -30,7 +31,7 @@ namespace tezcat::Tiny
 		RenderLayer();
 		~RenderLayer();
 	public:
-		void culling(IRenderObserver* renderObserver, RenderQueue* queue);
+		void culling(BaseGraphics* graphics, IRenderObserver* renderObserver, RenderQueue* queue);
 		void addRenderAgent(RenderAgent* renderAgent);
 
 	private:

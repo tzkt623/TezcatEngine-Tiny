@@ -20,24 +20,7 @@ namespace tezcat::Tiny
 		mVertexUMap.clear();
 	}
 
-	Vertex* VertexBufferManager::getVertex(const std::string& name)
-	{
-		return mVertexUMap[name];
-	}
-
-	Vertex* VertexBufferManager::getVertex(MeshData* meshData)
-	{
-		auto vertex = this->findVertex(meshData->getName());
-
-		if (vertex == nullptr)
-		{
-			vertex = this->createVertexAndCached(meshData);
-		}
-
-		return vertex;
-	}
-
-	void VertexBufferManager::addMeshData(MeshData* meshData)
+	void VertexBufferManager::add(MeshData* meshData)
 	{
 		if (meshData->getName().empty())
 		{
@@ -47,14 +30,8 @@ namespace tezcat::Tiny
 		auto result = mMeshDataUMap.try_emplace(meshData->getName(), nullptr);
 		if (result.second)
 		{
+			meshData->addRef();
 			result.first->second = meshData;
-		}
-		else
-		{
-			if (result.first->second != meshData)
-			{
-				delete meshData;
-			}
 		}
 	}
 
@@ -80,102 +57,40 @@ namespace tezcat::Tiny
 		return nullptr;
 	}
 
-	VertexBuffer* VertexBufferManager::createVertexBuffer(const void* data, const size_t& length)
+	void VertexBufferManager::add(Vertex* vertex)
 	{
-		auto buffer = mCreator->createVertexBuffer();
-		buffer->bind();
-		buffer->init(data, length);
-		return buffer;
+		auto result = mVertexUMap.try_emplace(vertex->getName(), vertex);
+		if (!result.second)
+		{
+			result.first->second->subRef();
+			result.first->second = vertex;
+		}
+		vertex->addRef();
 	}
 
-	VertexBuffer* VertexBufferManager::createVertexBuffer(const size_t& length)
+	Vertex* VertexBufferManager::create(const std::string& name)
 	{
-		auto buffer = mCreator->createVertexBuffer();
-		buffer->bind();
-		buffer->init(length);
-		return buffer;
-	}
+		if (name.empty())
+		{
+			return nullptr;
+		}
 
-	IndexBuffer* VertexBufferManager::createIndexBuffer(const void* data, const size_t& length)
-	{
-		auto buffer = mCreator->createIndexBuffer();
-		buffer->bind();
-		buffer->init(data, length);
-		return buffer;
-	}
+		if (!mMeshDataUMap.contains(name))
+		{
+			return nullptr;
+		}
 
-	Vertex* VertexBufferManager::createVertexAndCached(MeshData* meshData)
-	{
-		auto result = mVertexUMap.try_emplace(meshData->getName(), nullptr);
+		auto result = mVertexUMap.try_emplace(name, nullptr);
 		if (result.second)
 		{
-			auto vertex = mCreator->createVertex();
-			this->buildVertex(vertex, meshData);
-			this->buildChild(vertex, meshData);
-
+			auto vertex = Vertex::create();
+			vertex->init(mMeshDataUMap[name]);
+			vertex->generate();
 			vertex->addRef();
 			result.first->second = vertex;
 		}
 
 		return result.first->second;
-	}
-
-	Vertex* VertexBufferManager::createVertex(MeshData* meshData)
-	{
-		auto vertex = mCreator->createVertex();
-		this->buildVertex(vertex, meshData);
-		this->buildChild(vertex, meshData);
-		return vertex;
-	}
-
-	void VertexBufferManager::buildChild(Vertex* vertexParent, MeshData* meshParent)
-	{
-		if (meshParent->hasChildren())
-		{
-			for (auto cmesh : meshParent->getChildren())
-			{
-				auto cvertex = mCreator->createVertex();
-				this->buildVertex(cvertex, cmesh);
-				vertexParent->addChild(cvertex);
-				this->buildChild(cvertex, cmesh);
-			}
-		}
-	}
-
-	void VertexBufferManager::buildVertex(Vertex* vertex, MeshData* meshData)
-	{
-		vertex->bind();
-
-		vertex->init(meshData->getName(), meshData->mVertices.size(), meshData->mDrawMode);
-		for (auto p : meshData->mLayoutPositions)
-		{
-			auto [length, data] = meshData->getVertexData(p);
-			auto vbuffer = this->createVertexBuffer(data, length);
-			vbuffer->setLayoutData(p, VertexLayout::getLayoutType(p));
-			vertex->setVertexBuffer(vbuffer);
-		}
-
-		vertex->setVertexCount(meshData->mVertices.size());
-
-		if (!meshData->mIndices.empty())
-		{
-			auto ibuffer = this->createIndexBuffer(meshData->mIndices.data(), meshData->indexSize());
-			vertex->setIndexBuffer(ibuffer);
-			vertex->setIndexCount(meshData->mIndices.size());
-		}
-
-		vertex->unbind();
-	}
-
-	uint32_t VertexBufferManager::loadMeshData(MeshData* meshData)
-	{
-		auto size = mVertexAry.size();
-
-		auto vertex = mCreator->createVertex();
-		this->buildVertex(vertex, meshData);
-		mVertexAry.push_back(vertex);
-
-		return size;
 	}
 
 }

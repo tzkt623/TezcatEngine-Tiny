@@ -4,6 +4,12 @@
 
 namespace tezcat::Tiny
 {
+	/*
+	* TinyRefObject
+	* @brief 引用对象,靠引用计数来管理自身生命周期
+	* @brief addRef增加引用
+	* @brief subRef减少引用
+	*/
 	class TINY_API TinyRefObject
 	{
 		friend class TinyBaseWeakRef;
@@ -11,15 +17,23 @@ namespace tezcat::Tiny
 		TinyRefObject();
 		virtual ~TinyRefObject();
 
-		void manageThis();
-
 		int getRefCount() { return mGCInfo->strongRef; }
 
 		void addRef() { ++mGCInfo->strongRef; }
 		void subRef();
+		int refCount() { return mGCInfo->strongRef; }
 
 		virtual const std::string& getClassName() const { return Empty; }
 		const TinyGCInfoID& getTinyID() const { return mGCInfo->index; }
+
+	protected:
+		void manageThis();
+
+	protected:
+		virtual void onClose()
+		{
+
+		}
 
 	private:
 		TinyGCInfo* mGCInfo;
@@ -183,13 +197,13 @@ namespace tezcat::Tiny
 		template<class To>
 		TinyWeakRef<ToType<To>> staticCast()
 		{
-			return std::move(new TinyWeakRef(static_cast<Type*>(mGCInfo->pointer)));
+			return std::move(TinyWeakRef(static_cast<Type*>(mGCInfo->pointer)));
 		}
 
 		template<class To>
 		TinyWeakRef<ToType<To>> dynamicCast()
 		{
-			return std::move(new TinyWeakRef(dynamic_cast<Type*>(mGCInfo->pointer)));
+			return std::move(TinyWeakRef(dynamic_cast<Type*>(mGCInfo->pointer)));
 		}
 
 	public:

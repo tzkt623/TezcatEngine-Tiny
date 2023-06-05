@@ -20,6 +20,8 @@ namespace tezcat::Tiny
 	class Shader;
 	class FrameBuffer;
 	class RenderQueue;
+	class BaseGraphics;
+
 
 
 	/*
@@ -55,7 +57,7 @@ namespace tezcat::Tiny
 		* @Info: 2023|5|15
 		*
 		*/
-		virtual void sendToQueue(const RenderPhase& phase, RenderQueue* queue) {}
+		virtual void sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue) {}
 
 		/*
 		* Info:		HCL|2023|4|8
@@ -65,7 +67,7 @@ namespace tezcat::Tiny
 		* Parameter:	Shader * shader
 		* Comment: 向shader提交数据
 		*/
-		virtual void submit(Shader* shader) = 0;
+		virtual void submit(BaseGraphics* graphics, Shader* shader) = 0;
 	};
 
 	/*
@@ -114,7 +116,7 @@ namespace tezcat::Tiny
 		void setMesh(const std::string& meshName);
 		void setMesh(MeshData* meshData);
 
-		void submit(Shader* shader) override;
+		void submit(BaseGraphics* graphics, Shader* shader) override;
 
 		void setShadowReciever(bool value)
 		{
@@ -163,7 +165,7 @@ namespace tezcat::Tiny
 
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::Observer; }
 
-		virtual void submitViewMatrix(Shader* shader) {}
+		virtual void submitViewMatrix(BaseGraphics* graphics, Shader* shader) {}
 
 		virtual bool culling(GameObject* gameObject) { return true; }
 

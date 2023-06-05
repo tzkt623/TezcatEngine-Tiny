@@ -3,43 +3,19 @@
 
 namespace tezcat::Tiny
 {
+	TINY_RTTI_CPP(MeshData);
 	MeshData::MeshData()
-		: MeshData("", -1)
+		: MeshData("")
 	{
 
 	}
 
 	MeshData::MeshData(const std::string& name)
-		: MeshData(name, -1)
-	{
-
-	}
-
-	MeshData::MeshData(const std::string& name, const int& index)
 		: mName(name)
 		, mDrawMode(DrawMode::Triangles)
-		, mChildrenData(nullptr)
-		, mIndex(index)
 	{
 
 	}
-
-	MeshData::MeshData(MeshData&& other) noexcept
-		: mName(std::move(other.mName))
-		, mDrawMode(DrawMode::Triangles)
-		, mVertices(std::move(other.mVertices))
-		, mNormals(std::move(other.mNormals))
-		, mColors(std::move(other.mColors))
-		, mUVs(std::move(other.mUVs))
-		, mIndices(std::move(other.mIndices))
-		, mChildrenData(other.mChildrenData)
-		, mIndex(other.mIndex)
-	{
-		other.mIndex = -1;
-		other.mChildrenData = nullptr;
-	}
-
-
 
 	MeshData::~MeshData()
 	{
@@ -89,23 +65,6 @@ namespace tezcat::Tiny
 		}
 
 		return count;
-	}
-
-	MeshData& MeshData::operator=(MeshData&& other) noexcept
-	{
-		this->mName = std::move(other.mName);
-		this->mVertices = std::move(other.mVertices);
-		this->mNormals = std::move(other.mNormals);
-		this->mColors = std::move(other.mColors);
-		this->mUVs = std::move(other.mUVs);
-		this->mIndices = std::move(other.mIndices);
-		this->mChildrenData = other.mChildrenData;
-		this->mIndex = other.mIndex;
-
-		other.mChildrenData = nullptr;
-		other.mIndex = -1;
-
-		return *this;
 	}
 
 	void MeshData::addChild(MeshData* meshData)

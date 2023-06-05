@@ -34,7 +34,7 @@ namespace tezcat::Tiny
 		mRenderObjectList.clear();
 	}
 
-	void RenderLayer::culling(IRenderObserver* renderObserver, RenderQueue* queue)
+	void RenderLayer::culling(BaseGraphics* graphics, IRenderObserver* renderObserver, RenderQueue* queue)
 	{
 		if (mRenderObjectList.empty())
 		{
@@ -54,7 +54,7 @@ namespace tezcat::Tiny
 				{
 					if (renderObserver->culling(com->getGameObject()))
 					{
-						agent->sendToQueue(phase, queue);
+						agent->sendToQueue(graphics, phase, queue);
 					}
 				}
 

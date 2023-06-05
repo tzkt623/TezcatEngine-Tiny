@@ -21,7 +21,7 @@ namespace tezcat::Tiny
 		virtual ~MeshRenderer();
 		Vertex* getVertex() const { return mVertex; }
 
-		void sendToQueue(const RenderPhase& phase, RenderQueue* queue) override;
+		void sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue) override;
 		void setCastShadow(bool val) { mIsCastShadow = val; }
 
 	protected:

@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = EnvMakeBRDFLut;
+        str Name = Unlit/EnvMakeBRDFLut;
         int Version = 330;
         int OrderID = 50;
         str Queue = Prepare;
@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
+        #include "../Include/tiny_vs_base.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec2 aUV;
@@ -37,8 +37,8 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_texture"
-        #include "tiny_fs_pbr_func"
+        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs_pbr_func.tyin"
         
         in vec2 myUV;
         out vec2 myFinalColor;

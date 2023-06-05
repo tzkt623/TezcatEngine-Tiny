@@ -1,4 +1,9 @@
 #include "EnvironmentLightManager.h"
+#include "FrameBufferManager.h"
+#include "TextureManager.h"
+#include "VertexBufferManager.h"
+#include "ShaderManager.h"
+
 #include "../Renderer/BaseGraphics.h"
 #include "../Renderer/RenderPass.h"
 #include "../Renderer/Texture.h"
@@ -9,16 +14,10 @@
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
 
-#include "FrameBufferManager.h"
-#include "TextureManager.h"
-#include "VertexBufferManager.h"
-#include "ShaderManager.h"
-
 #include "../Event/EngineEvent.h"
-
 #include "../Component/Skybox.h"
-
 #include "../Data/Material.h"
+#include "../Data/Image.h"
 
 namespace tezcat::Tiny
 {
@@ -34,14 +33,14 @@ namespace tezcat::Tiny
 
 	}
 
-	void EnvObserver::submitViewMatrix(Shader* shader)
+	void EnvObserver::submitViewMatrix(BaseGraphics* graphics, Shader* shader)
 	{
 		this->updateObserverMatrix();
-		shader->setProjectionMatrix(mProjectionMatrix);
+		graphics->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
 		//这里不需要传viewmatrix
 	}
 
-	void EnvObserver::submit(Shader* shader)
+	void EnvObserver::submit(BaseGraphics* graphics, Shader* shader)
 	{
 
 	}
@@ -82,12 +81,26 @@ namespace tezcat::Tiny
 				mSkybox->getMaterial()->addUniform<UniformF1>("Lod", 0.0f);
 			});
 
-		EngineEvent::get()->addListener(EngineEventID::EE_RenderEnv
+		EngineEvent::get()->addListener(EngineEventID::EE_ChangeEnvLightingImage
 			, this
 			, [this](const EventData& data)
 			{
 				mDirty = true;
-				mHDRTexName = *static_cast<std::string*>(data.userData);
+				this->setHDRImage(static_cast<Image*>(data.userData));
+			});
+
+		EngineEvent::get()->addListener(EngineEventID::EE_ChangeEnvLightingTexture
+			, this
+			, [this](const EventData& data)
+			{
+				mDirty = true;
+				if (mTexHDR)
+				{
+					mTexHDR->subRef();
+				}
+
+				mTexHDR = static_cast<Texture2D*>(data.userData);
+				mTexHDR->addRef();
 			});
 	}
 
@@ -106,46 +119,36 @@ namespace tezcat::Tiny
 			mSkybox->getMaterial()->setUniform<UniformI1>(ShaderParam::IsHDR, true);
 
 			//---------------------------------
-			auto cube_vertex = VertexBufMgr::getInstance()->getVertex("Cube");
-			auto shader = ShaderMgr::getInstance()->findPackage("Unlit/EnvMakeCube")->getShaders()[0];
-			auto hdr = (Texture2D*)TextureMgr::getInstance()->findTexture(mHDRTexName);
+			auto cube_vertex = VertexBufMgr::getInstance()->create("Cube");
+			auto shader = ShaderMgr::getInstance()->find("Unlit/EnvMakeCube");
 
-			RenderCommand* cmd = new RenderCMD_HDRToCube(cube_vertex
-													   , hdr
-													   , mCubeMap
-													   , shader
-													   , mCubeFB);
+			auto cmd = graphics->createDrawHDRToCubeCMD(shader, cube_vertex, mTexHDR, mCubeMap);
 			mCubeObserver->getRenderQueue()->addRenderCommand(cmd);
 			graphics->addPreRenderPassQueue(mCubeObserver->getRenderQueue<ExtraQueue>());
 
 			//---------------------------------
-			shader = ShaderMgr::getInstance()->findPackage("Unlit/EnvMakeIrradiance")->getShaders()[0];
-			cmd = new RenderCMD_EnvMakeIrradiance(cube_vertex
-												, mCubeMap
-												, mIrradianceMap
-												, shader
-												, mIrradianceFB);
+			shader = ShaderMgr::getInstance()->find("Unlit/EnvMakeIrradiance");
+			cmd = graphics->createDrawEnvMakeIrradiance(shader, cube_vertex, mCubeMap, mIrradianceMap);
 			mIrradianceObserver->getRenderQueue()->addRenderCommand(cmd);
 			graphics->addPreRenderPassQueue(mIrradianceObserver->getRenderQueue<ExtraQueue>());
 
 			//---------------------------------
-			shader = ShaderMgr::getInstance()->findPackage("Unlit/EnvMakePrefilter")->getShaders()[0];
-			cmd = new RenderCMD_EnvMakePrefilter(cube_vertex
-											   , mCubeMap
-											   , mPrefilterMap
-											   , shader
-											   , mPrefilterFB
-											   , 5
-											   , 128
-											   , 128
-											   , mCubeSize);
+			shader = ShaderMgr::getInstance()->find("Unlit/EnvMakePrefilter");
+			cmd = graphics->createDrawEnvMakePrefilter(shader
+													 , cube_vertex
+													 , mCubeMap
+													 , mPrefilterMap
+													 , 5
+													 , 128
+													 , 128
+													 , mCubeSize);
 			mPrefilterObserver->getRenderQueue()->addRenderCommand(cmd);
 			graphics->addPreRenderPassQueue(mPrefilterObserver->getRenderQueue<ExtraQueue>());
 
 			//---------------------------------
-			auto rect_vertex = VertexBufMgr::getInstance()->getVertex("Rect");
-			shader = ShaderMgr::getInstance()->findPackage("Unlit/EnvMakeBRDFLut")->getShaders()[0];
-			cmd = new RenderCMD_Vertex(rect_vertex, shader);
+			auto rect_vertex = VertexBufMgr::getInstance()->create("Rect");
+			shader = ShaderMgr::getInstance()->find("Unlit/EnvMakeBRDFLut");
+			cmd = graphics->createDrawVertexCMD(shader, rect_vertex);
 			mBRDFLUTObserver->getRenderQueue()->addRenderCommand(cmd);
 			graphics->addPreRenderPassQueue(mBRDFLUTObserver->getRenderQueue<ExtraQueue>());
 		}
@@ -159,11 +162,11 @@ namespace tezcat::Tiny
 		this->createBRDF_LUT();
 	}
 
-	void EnvironmentLightManager::submit(Shader* shader)
+	void EnvironmentLightManager::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		shader->setGlobalTextureCube(ShaderParam::TexIrradiance, mIrradianceMap);
-		shader->setGlobalTextureCube(ShaderParam::TexPrefilter, mPrefilterMap);
-		shader->setGlobalTexture2D(ShaderParam::TexBRDFLUT, mBRDFLUTMap);
+		graphics->setGlobalTextureCube(shader, ShaderParam::TexIrradiance, mIrradianceMap);
+		graphics->setGlobalTextureCube(shader, ShaderParam::TexPrefilter, mPrefilterMap);
+		graphics->setGlobalTexture2D(shader, ShaderParam::TexBRDFLUT, mBRDFLUTMap);
 	}
 
 	void EnvironmentLightManager::createCube()
@@ -175,8 +178,9 @@ namespace tezcat::Tiny
 		mCubeObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 		mCubeObserver->addRef();
 
-		mCubeMap = TextureMgr::getInstance()->createCube(
-			cube_size, cube_size,
+		mCubeFB = FrameBufferMgr::getInstance()->create("FB_Cube");
+		mCubeMap = TextureMgr::getInstance()->createCube("CB_CubeMap");
+		mCubeMap->setData(cube_size, cube_size,
 			TextureInfo("CB_CubeMap"
 				, TextureType::TextureCube
 				, TextureAttachPosition::ColorComponent
@@ -187,20 +191,9 @@ namespace tezcat::Tiny
 				, TextureWrap::Clamp_To_Edge
 				, TextureChannel::RGB16f
 				, TextureChannel::RGB
-				, DataType::Float32));
+				, DataType::Float32));		mCubeFB->addAttachment(mCubeMap);
+		mCubeFB->generate();
 
-// 		auto render2d = TextureMgr::getInstance()->createRender2D(
-// 			cube_size, cube_size,
-// 			TextureInfo("DB_CubeMap"
-// 				, TextureType::TextureRender2D
-// 				, TextureAttachPosition::DepthComponent
-// 				, TextureChannel::Depth24));
-
-		mCubeFB = FrameBufferMgr::getInstance()->create("FB_Cube");
-		mCubeFB->beginBuild();
-		mCubeFB->attachCube(mCubeMap, 0, 0);
-		//mCubeFB->attach(render2d);
-		mCubeFB->endBuild();
 		mCubeObserver->setFrameBuffer(mCubeFB);
 	}
 
@@ -213,8 +206,10 @@ namespace tezcat::Tiny
 		mIrradianceObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 		mIrradianceObserver->addRef();
 
-		mIrradianceMap = TextureMgr::getInstance()->createCube(
-			irr_size, irr_size,
+
+		mIrradianceFB = FrameBufferMgr::getInstance()->create("FB_Irradiance");
+		mIrradianceMap = TextureMgr::getInstance()->createCube("CB_IrradianceMap");
+		mIrradianceMap->setData(irr_size, irr_size,
 			TextureInfo("CB_IrradianceMap"
 				, TextureType::TextureCube
 				, TextureAttachPosition::ColorComponent
@@ -227,18 +222,10 @@ namespace tezcat::Tiny
 				, TextureChannel::RGB
 				, DataType::Float32));
 
-// 		auto render2d = TextureMgr::getInstance()->createRender2D(
-// 			irr_size, irr_size,
-// 			TextureInfo("DB_IrradianceMap"
-// 				, TextureType::TextureRender2D
-// 				, TextureAttachPosition::DepthComponent
-// 				, TextureChannel::Depth24));
+		mIrradianceFB->addAttachment(mIrradianceMap);
+		mIrradianceFB->generate();
 
-		mIrradianceFB = FrameBufferMgr::getInstance()->create("FB_Irradiance");
-		mIrradianceFB->beginBuild();
-		mIrradianceFB->attachCube(mIrradianceMap, 0, 0);
-		//mIrradianceFB->attach(render2d);
-		mIrradianceFB->endBuild();
+
 		mIrradianceObserver->setFrameBuffer(mIrradianceFB);
 	}
 
@@ -251,8 +238,9 @@ namespace tezcat::Tiny
 		mPrefilterObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 		mPrefilterObserver->addRef();
 
-		mPrefilterMap = TextureMgr::getInstance()->createCube(
-			prefilter_size, prefilter_size,
+		mPrefilterFB = FrameBufferMgr::getInstance()->create("FB_Prefilter");
+		mPrefilterMap = TextureMgr::getInstance()->createCube("CB_PrefilterMap");
+		mPrefilterMap->setData(prefilter_size, prefilter_size,
 			TextureInfo("CB_PrefilterMap"
 				, TextureType::TextureCube
 				, TextureAttachPosition::ColorComponent
@@ -265,18 +253,8 @@ namespace tezcat::Tiny
 				, TextureChannel::RGB
 				, DataType::Float32));
 
-// 		mRender2D = TextureMgr::getInstance()->createRender2D(
-// 			prefilter_size, prefilter_size,
-// 			TextureInfo("DB_PrefilterMap"
-// 				, TextureType::TextureRender2D
-// 				, TextureAttachPosition::DepthComponent
-// 				, TextureChannel::Depth24));
-
-		mPrefilterFB = FrameBufferMgr::getInstance()->create("FB_Prefilter");
-		mPrefilterFB->beginBuild();
-		mPrefilterFB->attachCube(mPrefilterMap, 0, 0);
-		//mPrefilterFB->attach(mRender2D);
-		mPrefilterFB->endBuild();
+		mPrefilterFB->addAttachment(mPrefilterMap);
+		mPrefilterFB->generate();
 
 		mPrefilterObserver->setFrameBuffer(mPrefilterFB);
 	}
@@ -289,27 +267,24 @@ namespace tezcat::Tiny
 		mBRDFLUTObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 		mBRDFLUTObserver->addRef();
 
-		auto fb = FrameBufferMgr::getInstance()->create("FB_BRDF_LUT",
-			mCubeSize, mCubeSize,
-			{
-				TextureInfo("CB_BRDF_LUT"
-					, TextureType::Texture2D
-					, TextureAttachPosition::ColorComponent
-					, TextureFilter::Linear
-					, TextureFilter::Linear
-					, TextureWrap::Clamp_To_Edge
-					, TextureWrap::Clamp_To_Edge
-					, TextureChannel::RG16f
-					, TextureChannel::RG
-					, DataType::Float32),
 
-// 				TextureInfo("DB_BRDF_LUT"
-// 					, TextureType::TextureRender2D
-// 					, TextureAttachPosition::DepthComponent
-// 					, TextureChannel::Depth24)
-			});
+		auto fb = FrameBuffer::create("FB_BRDF_LUT");
+		mBRDFLUTMap = TextureMgr::getInstance()->create2D("CB_BRDF_LUT");
+		mBRDFLUTMap->setData(mCubeSize, mCubeSize,
+			TextureInfo("CB_BRDF_LUT"
+				, TextureType::Texture2D
+				, TextureAttachPosition::ColorComponent
+				, TextureFilter::Linear
+				, TextureFilter::Linear
+				, TextureWrap::Clamp_To_Edge
+				, TextureWrap::Clamp_To_Edge
+				, TextureChannel::RG16f
+				, TextureChannel::RG
+				, DataType::Float32));
 
-		mBRDFLUTMap = (Texture2D*)TextureMgr::getInstance()->findTexture("CB_BRDF_LUT");
+		fb->addAttachment(mBRDFLUTMap);
+		fb->generate();
+
 		mBRDFLUTObserver->setFrameBuffer(fb);
 	}
 	void EnvironmentLightManager::showIrradianceMap()
@@ -331,4 +306,21 @@ namespace tezcat::Tiny
 	{
 		mSkybox->getMaterial()->setUniformByName<UniformF1>("Lod", skyboxLod);
 	}
+
+	void EnvironmentLightManager::setHDRImage(Image* image)
+	{
+		if (mTexHDR)
+		{
+			mTexHDR->updateData(image);
+			mTexHDR->update();
+		}
+		else
+		{
+			mTexHDR = Texture2D::create();
+			mTexHDR->setData(image);
+			mTexHDR->generate();
+			mTexHDR->addRef();
+		}
+	}
+
 }

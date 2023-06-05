@@ -18,9 +18,17 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 		if (ImGui::CollapsingHeader("坐标(Transform)"))
 		{
 			auto transform = static_cast<Transform*>(com);
-			ImGui::DragFloat3("Position", glm::value_ptr(transform->getPosition()), 0.03f);
-			ImGui::DragFloat3("Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
-			ImGui::DragFloat3("Scale", glm::value_ptr(transform->getScale()), 0.03f);
+			ImGui::Text("Position");
+			ImGui::SameLine();
+			ImGui::DragFloat3("##Position", glm::value_ptr(transform->getPosition()), 0.03f);
+
+			ImGui::Text("Rotation");
+			ImGui::SameLine();
+			ImGui::DragFloat3("##Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
+
+			ImGui::Text("Scale");
+			ImGui::SameLine();
+			ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.03f);
 			transform->markDirty();
 		}
 	});
@@ -45,7 +53,9 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 				{
 					auto f1 = (UniformF1*)uniform;
 					auto config = MyGUIContext::getInstance().getValueConfig(f1->ID);
-					ImGui::DragFloat(UniformID::getStringStatic(f1->ID).data()
+
+					ImGui::Text(UniformID::getStringStatic(f1->ID).data());
+					ImGui::DragFloat("##0"
 									, &f1->value
 									, config->speed
 									, config->min
@@ -60,12 +70,14 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 					auto config = MyGUIContext::getInstance().getValueConfig(f3->ID);
 					if (config->isColor)
 					{
-						ImGui::ColorEdit3(UniformID::getStringStatic(f3->ID).data()
+						ImGui::Text(UniformID::getStringStatic(f3->ID).data());
+						ImGui::ColorEdit3("##1"
 										 , glm::value_ptr(f3->value));
 					}
 					else
 					{
-						ImGui::DragFloat3(UniformID::getStringStatic(f3->ID).data()
+						ImGui::Text(UniformID::getStringStatic(f3->ID).data());
+						ImGui::DragFloat3("##2"
 										 , glm::value_ptr(f3->value)
 										 , config->speed
 										 , config->min
@@ -100,19 +112,18 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			auto lit = static_cast<DirectionalLight*>(com);
 
 			auto config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Ambient);
-			ImGui::ColorEdit3(UniformID::getStringStatic(ShaderParam::LightDirection::Ambient).data()
-				, glm::value_ptr(lit->getAmbient()));
+			ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Ambient).data());
+			ImGui::ColorEdit3("##0", glm::value_ptr(lit->getAmbient()));
 			ImGui::Spacing();
 
 			config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Diffuse);
-			ImGui::ColorEdit3(UniformID::getStringStatic(ShaderParam::LightDirection::Diffuse).data()
-				, glm::value_ptr(lit->getDiffuse()));
+			ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Diffuse).data());
+			ImGui::ColorEdit3("##1", glm::value_ptr(lit->getDiffuse()));
 			ImGui::Spacing();
 
 			config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Specular);
-			ImGui::ColorEdit3(UniformID::getStringStatic(ShaderParam::LightDirection::Specular).data()
-				, glm::value_ptr(lit->getSpecular()));
-			ImGui::Spacing();
+			ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Specular).data());
+			ImGui::ColorEdit3("##2", glm::value_ptr(lit->getSpecular()));
 		}
 	});
 
@@ -124,17 +135,34 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			auto transform = camera->getTransform();
 
 			ImGui::Text("操作<CTRL> [W A S D] [R:Up] [F:Down]");
-			ImGui::InputFloat3("位置(Position)", glm::value_ptr(transform->getPosition()));
-			ImGui::InputFloat3("旋转(Rotation)", glm::value_ptr(transform->getRotation()));
-			ImGui::InputFloat3("缩放(Scale)", glm::value_ptr(transform->getScale()));
+			ImGui::Text("位置(Position)");
+			ImGui::SameLine();
+			ImGui::InputFloat3("##位置", glm::value_ptr(transform->getPosition()));
+
+			ImGui::Text("旋转(Rotation)");
+			ImGui::SameLine();
+			ImGui::InputFloat3("##旋转(Rotation)", glm::value_ptr(transform->getRotation()));
+
+			ImGui::Text("缩放(Scale)");
+			ImGui::SameLine();
+			ImGui::InputFloat3("##缩放(Scale)", glm::value_ptr(transform->getScale()));
 			ImGui::Spacing();
 
 			auto up = transform->getUp();
 			auto forward = transform->getForward();
 			auto right = transform->getRight();
-			ImGui::InputFloat3("上(Up)", glm::value_ptr(up));
-			ImGui::InputFloat3("前(Forward)", glm::value_ptr(forward));
-			ImGui::InputFloat3("右(Right)", glm::value_ptr(right));
+
+			ImGui::Text("上(Up)");
+			ImGui::SameLine();
+			ImGui::InputFloat3("##上(Up)", glm::value_ptr(up));
+
+			ImGui::Text("前(Forward)");
+			ImGui::SameLine();
+			ImGui::InputFloat3("##前(Forward)", glm::value_ptr(forward));
+
+			ImGui::Text("右(Right)");
+			ImGui::SameLine();
+			ImGui::InputFloat3("##右(Right)", glm::value_ptr(right));
 			ImGui::Spacing();
 
 			ImGui::Text("视图矩阵(ViewMatrix)");

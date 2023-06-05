@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Std1;
+        str Name = Standard/Std1;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;
@@ -21,8 +21,8 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
-        #include "tiny_vs_shadow"
+        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs_shadow.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
@@ -51,11 +51,11 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_std_mat"
-        #include "tiny_fs_light"
-        #include "tiny_fs_camera"
-        #include "tiny_fs_texture"
-        #include "tiny_fs_function"
+        #include "../Include/tiny_fs_std_mat.tyin"
+        #include "../Include/tiny_fs_light.tyin"
+        #include "../Include/tiny_fs_camera.tyin"
+        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs_function.tyin"
 
         in vec4 myColor;
         in vec2 myUV;

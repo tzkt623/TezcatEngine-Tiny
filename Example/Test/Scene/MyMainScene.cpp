@@ -41,23 +41,30 @@ void MyMainScene::onEnter()
 		//go->getTransform()->setParent(mController->getTransform());
 		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 
-		auto frame = FrameBufferMgr::getInstance()->create(
-			"FB_Viewport",
-			Engine::getScreenWidth(), Engine::getScreenHeight(),
-			{
-				TextureInfo("RB_Viewport"
-						  , TextureAttachPosition::ColorComponent
-						  , TextureChannel::RGBA
-						  , TextureChannel::RGBA
-						  , DataType::UByte),
 
-				TextureInfo("DS_Viewport"
-						  , TextureAttachPosition::DepthComponent
-						  , TextureChannel::Depth
-						  , TextureChannel::Depth
-						  , DataType::UByte)
-			});
-		camera->setFrameBuffer(frame);
+		auto frame_buffer = FrameBufferMgr::getInstance()->create("FB_Viewport");
+
+		Texture2D* tex2d = TextureMgr::getInstance()->create2D("RB_Viewport");
+		tex2d->setData(Engine::getScreenWidth()
+			, Engine::getScreenHeight()
+			, TextureInfo(TextureAttachPosition::ColorComponent
+				, TextureChannel::RGBA
+				, TextureChannel::RGBA
+				, DataType::UByte));
+
+		TextureRender2D* render2d = TextureMgr::getInstance()->createRender2D("DS_Viewport");
+		render2d->setData(Engine::getScreenWidth()
+			, Engine::getScreenHeight()
+			, TextureInfo(TextureAttachPosition::DepthComponent
+				, TextureChannel::Depth
+				, TextureChannel::Depth
+				, DataType::UByte));
+
+		frame_buffer->addAttachment(tex2d);
+		frame_buffer->addAttachment(render2d);
+		frame_buffer->generate();
+
+		camera->setFrameBuffer(frame_buffer);
 	}
 
 	this->createSkybox();
@@ -65,13 +72,14 @@ void MyMainScene::onEnter()
 	this->createDirectionLight();
 	this->createPaintings();
 	this->createPlane();
-	//this->createTransparentObject();
+	this->createTransparentObject();
 	this->createPBR();
 	this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
-	std::string hdr("blue_photo_studio_2k");
-	EngineEvent::get()->dispatch({ EngineEventID::EE_RenderEnv, &hdr });
+	auto img = Resource::load<Image>("Image/blue_photo_studio_2k.hdr");
+	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvLightingImage, img });
+	Resource::unload(img);
 }
 
 void MyMainScene::createSkybox()
@@ -281,7 +289,7 @@ void MyMainScene::createDirectionLight()
 	// 	dir_light->startLogic([=]()
 	// 	{
 	// 		go->getTransform()->rotate(glm::vec3(0.0f, 10.0f * Engine::getDeltaTime(), 0.0f));
-	// 	});
+	// 	});
 }
 
 void MyMainScene::createPBR()
@@ -293,7 +301,7 @@ void MyMainScene::createPBR()
 
 	int number = 6;
 	float rate = 1.0f / (float)number;
-	for (int y = 0; y < number; y++)
+	for (int y = 0; y <= number; y++)
 	{
 		for (int x = 0; x <= number; x++)
 		{
@@ -308,7 +316,7 @@ void MyMainScene::createPBR()
 			auto material = Material::create("Standard/PBRTest1");
 			material->addUniform<UniformF3>(ShaderParam::MatPBR_Test::Albedo, glm::vec3(1.0f, 1.0f, 1.0f));
 			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Metallic, x * rate);
-			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, y * rate + rate);
+			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, y * rate);
 			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::AO, 1.0f);
 			mr->setMaterial(material);
 			mr->setMesh("Sphere");

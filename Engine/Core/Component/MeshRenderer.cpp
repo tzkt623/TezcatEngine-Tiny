@@ -16,6 +16,7 @@
 #include "../Renderer/RenderAgent.h"
 #include "../Renderer/RenderLayer.h"
 #include "../Renderer/RenderCommand.h"
+#include "../Renderer/BaseGraphics.h"
 
 #include "../Manager/ShadowCasterManager.h"
 #include "../Manager/VertexBufferManager.h"
@@ -51,7 +52,7 @@ namespace tezcat::Tiny
 		RenderLayer::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
 	}
 
-	void MeshRenderer::sendToQueue(const RenderPhase& phase, RenderQueue* queue)
+	void MeshRenderer::sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue)
 	{
 		switch (phase)
 		{
@@ -62,12 +63,14 @@ namespace tezcat::Tiny
 				break;
 			}
 
-			queue->addRenderCommand(new RenderCMD_Shadow(mVertex, this->getTransform()));
+			auto cmd = graphics->createDrawShadowCMD(mVertex, this->getTransform());
+			queue->addRenderCommand(cmd);
 			break;
 		}
 		case RenderPhase::Forward:
 		{
-			queue->addRenderCommand(new RenderCMD_Mesh(mVertex, this->getTransform(), mMaterial));
+			auto cmd = graphics->createDrawMeshCMD(mVertex, this->getTransform(), mMaterial);
+			queue->addRenderCommand(cmd);
 			break;
 		}
 		default:

@@ -57,10 +57,6 @@ namespace tezcat::Tiny::GL
 	/// </summary>
 	class TINY_API WindowsEditor : public Engine
 	{
-	public:
-		void setGLVersion(int major, int minor);
-		GUI* getGUI();
-
 	protected:
 		bool preInit() override;
 		bool onInit() override;
@@ -70,18 +66,15 @@ namespace tezcat::Tiny::GL
 		void preUpdate() override;
 		void postUpdate() override;
 		void onUpdate() override;
-		BaseGraphics* createGraphics() override;
 
+		void notifyRender() override;
+
+		BaseGraphics* createGraphics() override;
 
 	private:
 		GLFWwindow* mWindow;
 
 		double mTimeOld;
 		double mTimeNow;
-
-		int mGLMajor;
-		int mGLMinor;
-
-		GUI* mGUI;
 	};
 }

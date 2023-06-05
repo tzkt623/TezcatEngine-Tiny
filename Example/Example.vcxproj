@@ -184,7 +184,7 @@
     <ClCompile Include="Test\MyGUI\Window\MyTextureViewerWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyViewPortWindow.cpp" />
     <ClCompile Include="Test\MyInputer.cpp" />
-    <ClCompile Include="Test\MyResourceLoader.cpp" />
+    <ClCompile Include="Test\MyEngineIniter.cpp" />
     <ClCompile Include="Test\Scene\MyMainScene.cpp" />
     <ClCompile Include="Test\MyObserver.cpp" />
     <ClCompile Include="Test\Scene\MySecondScene.cpp" />
@@ -207,7 +207,7 @@
     <ClInclude Include="Test\MyGUI\Window\MyTextureViewerWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyViewPortWindow.h" />
     <ClInclude Include="Test\MyInputer.h" />
-    <ClInclude Include="Test\MyResourceLoader.h" />
+    <ClInclude Include="Test\MyEngineIniter.h" />
     <ClInclude Include="Test\Scene\MyMainScene.h" />
     <ClInclude Include="Test\MyObserver.h" />
     <ClInclude Include="Test\Scene\MySecondScene.h" />

@@ -9,6 +9,8 @@
 
 #include "../Renderer/RenderLayer.h"
 #include "../Renderer/RenderPass.h"
+#include "../Renderer/BuildCommand.h"
+#include "../Renderer/FrameBuffer.h"
 
 #include "../Component/Camera.h"
 #include "../Component/GameObject.h"
@@ -19,6 +21,7 @@
 #include "../Data/MeshData.h"
 
 #include "../Profiler.h"
+#include "../Engine.h"
 
 
 
@@ -46,6 +49,7 @@ namespace tezcat::Tiny
 	void BaseGraphics::init(Engine* engine)
 	{
 		mEnvLitManager->init();
+		FrameBuffer::setDefaultBuffer(FrameBuffer::getDefaultBuffer());
 	}
 
 	void BaseGraphics::setPipeline(RenderPhase type, const std::string& name, Pipeline* pl)
@@ -71,6 +75,13 @@ namespace tezcat::Tiny
 		Profiler_ResetDrawCall();
 		Profiler_ResetPassCount();
 
+		for (auto cmd : mBuildCmdAry)
+		{
+			cmd->execute(this);
+			delete cmd;
+		}
+		mBuildCmdAry.clear();
+
 		mShadowCasterManager->calculate(this);
 		mEnvLitManager->calculate(this);
 		mCameraManager->calculate(this);
@@ -78,6 +89,13 @@ namespace tezcat::Tiny
 
 	void BaseGraphics::onRender()
 	{
+		for (auto cmd : mBuildCmdAry)
+		{
+			cmd->execute(this);
+			delete cmd;
+		}
+		mBuildCmdAry.clear();
+
 		for (auto queue : mPreQueue)
 		{
 			queue->render(this);
@@ -110,5 +128,4 @@ namespace tezcat::Tiny
 	{
 
 	}
-
 }

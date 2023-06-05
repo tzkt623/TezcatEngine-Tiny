@@ -77,12 +77,12 @@ namespace tezcat::Tiny
 
 	}
 
-	void Camera::submit(Shader* shader)
+	void Camera::submit(BaseGraphics* graphics, Shader* shader)
 	{
 
 	}
 
-	void Camera::submitViewMatrix(Shader* shader)
+	void Camera::submitViewMatrix(BaseGraphics* graphics, Shader* shader)
 	{
 		this->updateObserverMatrix();
 		auto transform = this->getTransform();
@@ -91,10 +91,10 @@ namespace tezcat::Tiny
 								, transform->getWorldPosition() + transform->getForward()
 								, transform->getUp());
 
-		shader->setProjectionMatrix(mProjectionMatrix);
-		shader->setViewMatrix(mViewMatrix);
-		shader->setViewPosition(this->getTransform()->getWorldPosition());
-		shader->setMat4(ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
-		shader->setFloat2(ShaderParam::ViewNearFar, glm::vec2(mNearFace, mFarFace));
+		graphics->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
+		graphics->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
+		graphics->setFloat3(shader, ShaderParam::ViewPosition, this->getTransform()->getWorldPosition());
+		graphics->setMat4(shader, ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
+		graphics->setFloat2(shader, ShaderParam::ViewNearFar, glm::vec2(mNearFace, mFarFace));
 	}
 }

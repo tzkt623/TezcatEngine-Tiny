@@ -7,6 +7,7 @@
 
 #include "RenderCommand.h"
 #include "RenderPass.h"
+#include "BaseGraphics.h"
 
 namespace tezcat::Tiny
 {
@@ -26,22 +27,14 @@ namespace tezcat::Tiny
 		mComponent = nullptr;
 	}
 
-	void RenderAgent::submitModelMatrix(Shader* shader)
-	{
-		auto& model_mat4 = mComponent->getTransform()->getModelMatrix();
-		shader->setMat4(ShaderParam::MatrixM, model_mat4);
-		glm::mat3 normal_matrix(model_mat4);
-		shader->setMat3(ShaderParam::MatrixN, glm::transpose(glm::inverse(normal_matrix)));
-	}
-
 	void RenderAgent::setVertex(Vertex* vertex)
 	{
 		mVertex = vertex;
 	}
 
-	void RenderAgent::sendToQueue(const RenderPhase& phase, RenderQueue* queue)
+	void RenderAgent::sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue)
 	{
-		mRenderObject->sendToQueue(phase, queue);
+		mRenderObject->sendToQueue(graphics, phase, queue);
 	}
 
 	void RenderAgent::setComponent(Component* component)

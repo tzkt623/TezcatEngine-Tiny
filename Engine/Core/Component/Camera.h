@@ -34,8 +34,8 @@ namespace tezcat::Tiny
 		uint32_t getID() const { return mUID; }
 
 		void render(BaseGraphics* graphics);
-		void submit(Shader* shader) override;
-		void submitViewMatrix(Shader* shader) override;
+		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submitViewMatrix(BaseGraphics* graphics, Shader* shader) override;
 
 	public:
 		bool isMain() const { return mIsMain; }

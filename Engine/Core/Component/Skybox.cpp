@@ -43,14 +43,15 @@ namespace tezcat::Tiny
 		this->setMesh("Skybox");
 	}
 
-	void Skybox::sendToQueue(const RenderPhase& phase, RenderQueue* queue)
+	void Skybox::sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue)
 	{
 		switch (phase)
 		{
 		case RenderPhase::Forward:
 		case RenderPhase::Deferred:
 		{
-			queue->addRenderCommand(new RenderCMD_Skybox(mVertex, this->getTransform(), mMaterial));
+			auto cmd = graphics->createDrawSkyboxCMD(mVertex, this->getTransform(), mMaterial);
+			queue->addRenderCommand(cmd);
 			break;
 		}
 		default:

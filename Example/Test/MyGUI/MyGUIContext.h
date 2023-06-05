@@ -30,6 +30,20 @@ public:
 		return instance;
 	}
 	ValueConfig* getValueConfig(const UniformID& ID);
+	static bool isDragResource()
+	{
+		return sIsDragResource;
+	}
+
+	static void beginDragResource()
+	{
+		sIsDragResource = true;
+	}
+
+	static void endDragResource()
+	{
+		sIsDragResource = false;
+	}
 
 private:
 	MyGUIContext();
@@ -39,11 +53,11 @@ private:
 private:
 
 	std::vector<ValueConfig*> mValueConfigAry;
+	static bool sIsDragResource;
 
 public:
 	static void matrix4(glm::mat4& mat4);
 	static void transform(glm::vec3& position, glm::vec3& rotation, glm::vec3& scale);
-
 };
 
 class MyWindow : public GUIWindow

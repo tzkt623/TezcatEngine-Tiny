@@ -27,9 +27,7 @@ namespace tezcat::Tiny
 	{
 		if (mShader == nullptr)
 		{
-			mShader = ShaderMgr::getInstance()
-				->findPackage("Unlit/ShadowMap")
-				->getShaders()[0];
+			mShader = ShaderMgr::getInstance()->find("Unlit/ShadowMap");
 		}
 
 		return mShader;
@@ -42,67 +40,52 @@ namespace tezcat::Tiny
 		* 1.渲染阴影贴图
 		*  a.每一个可以产生阴影的灯都要渲染一张
 		*/
-		for (auto caster : mCasterAry)
+		auto it = mCasterAry.begin();
+		auto end = mCasterAry.end();
+		while (it != end)
 		{
-			if (caster == nullptr)
+			if (auto prt = (*it).lock())
 			{
-				continue;
-			}
+				//先剔除
+				auto& cull_list = prt->getCullLayerList();
+				for (auto& index : cull_list)
+				{
+					auto queue = prt->getRenderQueue();
+					graphics->addPreRenderPassQueue((ExtraQueue*)queue);
+					//把能看见的对象全部剔除到阴影通道
+					RenderLayer::getRenderLayer(index)->culling(graphics, prt, queue);
+				}
 
-			//先剔除
-			auto& cull_list = caster->getCullLayerList();
-			for (auto& index : cull_list)
+				++it;
+			}
+			else
 			{
-				auto queue = caster->getRenderQueue();
-				graphics->addPreRenderPassQueue((ExtraQueue*)queue);
-				//把能看见的对象全部剔除到阴影通道
-				RenderLayer::getRenderLayer(index)->culling(caster, queue);
+				it = mCasterAry.erase(it);
 			}
 		}
 	}
 
-	void ShadowCasterManager::removeCaster(ShadowCaster* caster)
-	{
-		mFreeIDs.push_back(caster->getCasterID());
-		mCasterAry[caster->getCasterID()] = nullptr;
-	}
 
 	uint32_t ShadowCasterManager::addCaster(ShadowCaster* caster)
 	{
-		if (mFreeIDs.empty())
-		{
-			uint32_t index = (uint32_t)mCasterAry.size();
-			mCasterAry.push_back(caster);
-			return index;
-		}
-		else
-		{
-			uint32_t index = (uint32_t)mFreeIDs.front();
-			mFreeIDs.pop_front();
-			mCasterAry[index] = caster;
-			return index;
-		}
+		mCasterAry.push_back(caster);
+		return mCasterAry.size() - 1;
 	}
 
-	void ShadowCasterManager::submit(Shader* shader)
+	void ShadowCasterManager::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		if (!mShadowTexture)
+		if (mCasterAry.empty())
 		{
-			mShadowTexture = (Texture2D*)TextureMgr::getInstance()->findTexture("Shadow");
+			return;
 		}
 
 		//这里可以用于处理所有带阴影的灯光
 		//目前这里暂时这么写
-		for (auto caster : mCasterAry)
+		for (auto& caster : mCasterAry)
 		{
-			if (caster != nullptr)
-			{
-				caster->submitViewMatrix(shader);
-				shader->setGlobalTexture2D(ShaderParam::TexDepth, mShadowTexture);
-				break;
-			}
+			caster->submitViewMatrix(graphics, shader);
+			graphics->setGlobalTexture2D(shader, ShaderParam::TexDepth, caster->getShadwowTexutre());
 		}
 	}
-
 }
 

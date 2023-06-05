@@ -3,8 +3,8 @@
 #include "../Head/RenderConfig.h"
 
 #include "../Manager/ShaderManager.h"
-#include "../Shader/ShaderPackage.h"
 #include "../Shader/Shader.h"
+#include "../Renderer/BaseGraphics.h"
 
 namespace tezcat::Tiny
 {
@@ -12,7 +12,8 @@ namespace tezcat::Tiny
 	Material::Material(const std::string& name)
 		: mName(name)
 	{
-		mShaderPackage = ShaderMgr::getInstance()->findPackage(name);
+		mShader = ShaderMgr::getInstance()->find(name);
+		mShader->addRef();
 	}
 
 	Material::~Material()
@@ -22,20 +23,20 @@ namespace tezcat::Tiny
 			delete p;
 		}
 		mUniforms.clear();
-		mShaderPackage = nullptr;
+		mShader->subRef();
 	}
 
 	int Material::getUID() const
 	{
-		return mShaderPackage->getUID();
+		return mShader->getUID();
 	}
 
-	void Material::submit(Shader* shader)
+	void Material::submit(BaseGraphics* graphics, Shader* shader)
 	{
 		shader->resetLocalState();
 		for (auto uniform : mUniforms)
 		{
-			uniform->submit(shader);
+			uniform->submit(graphics, shader);
 		}
 	}
 }

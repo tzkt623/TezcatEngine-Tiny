@@ -11,6 +11,7 @@ namespace tezcat::Tiny
 	class TextureCube;
 	class TextureRender2D;
 	class Texture2D;
+	class Image;
 	class FrameBuffer;
 	class TINY_API EnvObserver : public TinyObject, public IRenderObserver
 	{
@@ -20,8 +21,8 @@ namespace tezcat::Tiny
 	public:
 		virtual ~EnvObserver();
 
-		void submit(Shader* shader) override;
-		void submitViewMatrix(Shader* shader) override;
+		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submitViewMatrix(BaseGraphics* graphics, Shader* shader) override;
 	};
 
 	/*
@@ -38,7 +39,10 @@ namespace tezcat::Tiny
 		void init();
 
 		void calculate(BaseGraphics* graphics);
-		void submit(Shader* shader);
+		void submit(BaseGraphics* graphics, Shader* shader);
+		void setHDRImage(Image* image);
+
+		Texture2D* getHDRTexture() { return mTexHDR; }
 
 	public:
 		void showIrradianceMap();
@@ -74,7 +78,7 @@ namespace tezcat::Tiny
 		EnvObserver* mBRDFLUTObserver;
 
 		Skybox* mSkybox;
-	public:
+		Texture2D* mTexHDR;
 	};
 
 	using EnvLitMgr = SG<EnvironmentLightManager>;

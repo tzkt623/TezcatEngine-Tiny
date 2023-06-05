@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = ShadowMap;
+        str Name = Unlit/ShadowMap;
         int Version = 330;
         int OrderID = 0;
         str Queue = None;
@@ -20,8 +20,8 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
-        #include "tiny_vs_shadow"
+        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs_shadow.tyin"
 
         layout (location = 0) in vec3 aPos;
         

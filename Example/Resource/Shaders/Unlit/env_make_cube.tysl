@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = EnvMakeCube;
+        str Name = Unlit/EnvMakeCube;
         int Version = 330;
         int OrderID = 50;
         str Queue = Prepare;
@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
+        #include "../Include/tiny_vs_base.tyin"
 
         layout (location = 0) in vec3 aPos;
         out vec3 myWorldPosition;
@@ -35,7 +35,7 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_texture"
+        #include "../Include/tiny_fs_texture.tyin"
         
         in vec3 myWorldPosition;
         out vec4 myFinalColor;

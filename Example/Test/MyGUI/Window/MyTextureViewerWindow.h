@@ -9,15 +9,14 @@ public:
 	virtual ~MyTextureViewerWindow();
 
 	void setTexture(Texture* tex);
+	void loadTexture(const std::filesystem::path& path);
 
 	bool begin() override;
-
-private:
-	Texture* mTex;
-
 protected:
 
 	void onRender() override;
-
+private:
+	Texture* mTex;
+	ImVec2 mSize;
 };
 

@@ -4,25 +4,17 @@
 
 #include "../Manager/ShaderManager.h"
 #include "../Renderer/RenderPass.h"
+#include "../Renderer/BaseGraphics.h"
 
 namespace tezcat::Tiny
 {
-	Shader::Shader()
-		: Shader("##ErrorShader", 0)
-	{
-
-	}
-
-	Shader::Shader(const std::string& name, int orderID)
+	TINY_RTTI_CPP(Shader);
+	Shader::Shader(const std::string& filePath)
 		: mProgramID(-1)
-		, mName(name)
+		, mName()
+		, mPath(filePath)
 		, mUID(IDGenerator<Shader, uint32_t>::generate())
-		, mOrderID(orderID)
-// 		, mViewMatrixID(0)
-// 		, mModelMatrixID(0)
-// 		, mProjectionMatrixID(0)
-// 		, mNormalMatrixID(0)
-// 		, mViewPositionID(0)
+		, mOrderID(0)
 		, mEnableBlend(false)
 		, mDepthTest(DepthTest::Less, 0)
 		, mEnableZWrite(true)
@@ -41,21 +33,20 @@ namespace tezcat::Tiny
 		IDGenerator<Shader, uint32_t>::recycle(mUID);
 	}
 
-	void Shader::apply()
+	void Shader::apply(uint32_t pid)
 	{
-		ShaderMgr::getInstance()->addShader(this);
-		RenderPass::create(this);
+		mProgramID = pid;
+		ShaderMgr::getInstance()->registerShader(this);
 	}
 
-	void Shader::begin()
+	void Shader::resizeUniformList(uint64_t size, int value)
 	{
-		this->setStateOptions();
-		this->bind();
+		mTinyUniformList.resize(size, value);
 	}
 
-	void Shader::end()
+	void Shader::generate()
 	{
-
+		Graphics::getInstance()->cmdCreateShader(this);
 	}
 }
 

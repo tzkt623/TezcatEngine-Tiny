@@ -1,10 +1,12 @@
 #include "GLShaderBuilder.h"
-#include "GLShader.h"
 #include "GLHead.h"
+
+#include "Core/Shader/Shader.h"
 #include "Core/Head/RenderConfig.h"
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Shader/ShaderPackage.h"
 #include "Core/Tool/Log.h"
+#include "ThirdParty/Hash/city.h"
 
 
 namespace tezcat::Tiny::GL
@@ -16,7 +18,7 @@ namespace tezcat::Tiny::GL
 		if (std::regex_search(content, result, reg))
 		{
 			config = result[1];
-			suffix = result.suffix();
+			suffix = std::move(result.suffix());
 			//			std::cout << result[1] << std::endl;
 			return true;
 		}
@@ -84,18 +86,12 @@ namespace tezcat::Tiny::GL
 	//
 	GLShaderBuilder::GLShaderBuilder()
 	{
-		mShaderIDs.reserve(4);
+
 	}
 
 	GLShaderBuilder::~GLShaderBuilder()
 	{
-		for (auto id : mShaderIDs)
-		{
-			std::cout << "ShaderBuilder : " << id << "Deleted" << std::endl;
-			Log_Engine(StringTool::stringFormat("ShaderBuilder : %d", id));
-			glDeleteShader(id);
-		}
-		mShaderIDs.clear();
+
 	}
 
 	GLShader* GLShaderBuilder::loadFromFile(const char* filePath)
@@ -113,28 +109,6 @@ namespace tezcat::Tiny::GL
 		}
 		io.close();
 		return shader;
-	}
-
-	void GLShaderBuilder::splitPackage(ShaderPackage* packge, std::string& content)
-	{
-		std::string head, passes;
-		if (splitConfig(content, head, passes, R"(#TINY_HEAD_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_HEAD_END)"))
-		{
-			this->parsePackageHead(packge, head);
-			this->splitPasses(passes);
-		}
-		else
-		{
-			Log_Error("Build Shader Error!");
-			//throw std::logic_error("Build Shader Error!");
-		}
-	}
-
-	void GLShaderBuilder::parsePackageHead(ShaderPackage* packge, std::string& content)
-	{
-		std::unordered_map<std::string, Any> map;
-		splitValue(content, map);
-		packge->setConfig(map);
 	}
 
 	void GLShaderBuilder::splitPasses(std::string& content)
@@ -155,80 +129,10 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLShaderBuilder::splitPasses(GLShader* shader, std::string& content)
-	{
-		std::regex pattern(R"(#TINY_PASS_BEGIN\s*\{\s*([\s\S]*?)\}\s*#TINY_PASS_END)");
-		std::sregex_iterator end;
-		for (auto i = std::sregex_iterator(content.begin(), content.end(), pattern); i != end; i++)
-		{
-			UniformID::USet set;
 
-			std::string temp((*i)[1]);
-			this->parseShaders(shader, temp, set);
-			shader->buildWithUniforms(set);
-			shader->apply();
-		}
-	}
-
-	void GLShaderBuilder::parseShaders(GLShader* shader, std::string& content, UniformID::USet& uniformArray)
+	void GLShaderBuilder::updateShaderConfig(Shader* shader)
 	{
-		std::string config, shader_content;
-		if (splitConfig(content, config, shader_content, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
-		{
-			this->parseShaderConfig(shader, config);
-			this->parseShader(shader
-				, shader_content
-				, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
-				, GL_VERTEX_SHADER
-				, uniformArray);
-			this->parseShader(shader
-				, shader_content
-				, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
-				, GL_FRAGMENT_SHADER
-				, uniformArray);
-		}
-		else
-		{
-			throw std::logic_error("GLShader: Pass Format Error");
-		}
-	}
-
-	Shader* GLShaderBuilder::parseShaders(ShaderPackage* package, std::string& inContent, std::string& outShaderContent)
-	{
-		std::string config;
-		if (splitConfig(inContent, config, outShaderContent, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
-		{
-			std::unordered_map<std::string, Any> map;
-			if (splitValue(config, map))
-			{
-				auto shader = package->findShader(map["Name"].cast<std::string>());
-				this->setShaderConfig((GLShader*)shader, map);
-				return shader;
-			}
-		}
-		else
-		{
-			throw std::logic_error("GLShader: Pass Format Error");
-		}
-	}
-
-	//rebuild
-	void GLShaderBuilder::reparseShader(Shader* shader, std::string& content, UniformID::USet& uniformArray)
-	{
-		this->parseShader((GLShader*)shader
-			, content
-			, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
-			, GL_VERTEX_SHADER
-			, uniformArray);
-		this->parseShader((GLShader*)shader
-			, content
-			, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
-			, GL_FRAGMENT_SHADER
-			, uniformArray);
-	}
-
-	void GLShaderBuilder::setShaderConfig(Shader* shader, std::unordered_map<std::string, Any>& map)
-	{
+		auto& map = mConfigUMap;
 		shader->setVersion(map["Version"].cast<int>());
 		shader->setName(map["Name"].cast<std::string>());
 
@@ -308,21 +212,46 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLShaderBuilder::parseShaderConfig(GLShader* shader, std::string& content)
+	void GLShaderBuilder::parseHeader(std::string& content)
 	{
-		std::unordered_map<std::string, Any> map;
-		if (splitValue(content, map))
+		std::regex regex(R"(#TINY_HEAD_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_HEAD_END)");
+		std::smatch result;
+		if (std::regex_search(content, result, regex))
 		{
-			this->setShaderConfig(shader, map);
-		}
-		else
-		{
-			throw std::logic_error("GLShader: Shader CFG Error");
+			std::string temp = result[1];
+			content = result.suffix();
+			splitValue(temp, mHeadUMap);
 		}
 	}
 
+	void GLShaderBuilder::parseShaders(std::string& content, std::string& rootPath)
+	{
+		std::string config, shader_content;
+		if (splitConfig(content, config, shader_content, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
+		{
+			splitValue(config, mConfigUMap);
+			this->parseShader(shader_content
+				, rootPath
+				, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
+				, mUniformSet
+				, mVertexShader);
+			this->parseShader(shader_content
+				, rootPath
+				, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
+				, mUniformSet
+				, mFragShader);
+		}
+		else
+		{
+			throw std::logic_error("GLShader: Pass Format Error");
+		}
+	}
 
-	void GLShaderBuilder::parseShader(GLShader* shader, std::string& content, const char* regex, uint32_t shaderType, UniformID::USet& uniformArray)
+	void GLShaderBuilder::parseShader(std::string& content
+		, std::string& rootPath
+		, const char* regex
+		, UniformID::USet& uniformArray
+		, std::string& outContent)
 	{
 		std::regex regex_shader(regex);
 		std::smatch result;
@@ -342,10 +271,49 @@ namespace tezcat::Tiny::GL
 			//------------------------------------------------------------
 			//
 			//	分析Include
+			//	1.分离出所有include
+			//	2.删除所有include
+			//	3.保存剩下的部分
 			//
-			//
-			std::vector<std::string> include_ary;
 			std::regex regex_include(R"(#include\s*\"(\S+)\"\s*)");
+
+			std::function<void(uint64_t, std::string&, std::unordered_map<uint64_t, std::string>&)> parse =
+				[&parse, &regex_include, &end, &rootPath](uint64_t hashID
+					, std::string& include_content
+					, std::unordered_map<uint64_t, std::string>& all_includes)
+			{
+				//找出所有include
+				std::vector<std::string> include_ary;
+				for (auto struct_i = std::sregex_iterator(include_content.begin(), include_content.end(), regex_include); struct_i != end; struct_i++)
+				{
+					std::string include_name = (*struct_i)[1];
+					include_ary.emplace_back(include_name);
+				}
+
+				all_includes.emplace(hashID, std::regex_replace(include_content, regex_include, ""));
+
+				//如果有include
+				if (!include_ary.empty())
+				{
+					//遍历所有include 加载数据
+					for (auto& file_path : include_ary)
+					{
+						auto content = FileTool::loadText(rootPath + "/" + file_path);
+						if (!content.empty())
+						{
+							auto hash_id = CityHash64(content.c_str(), content.size());
+							if (!all_includes.contains(hash_id))
+							{
+								parse(hash_id, content, all_includes);
+							}
+						}
+					}
+				}
+			};
+
+
+			std::vector<std::string> include_ary;
+			std::unordered_map<uint64_t, std::string> all_includes;
 			for (auto struct_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_include); struct_i != end; struct_i++)
 			{
 				std::string include_name = (*struct_i)[1];
@@ -354,17 +322,36 @@ namespace tezcat::Tiny::GL
 
 			if (!include_ary.empty())
 			{
-				//组合shader
+				//删除所有include
 				shader_content = std::regex_replace(shader_content, regex_include, "");
 
-				std::string inlcude_data;
-				for (auto& s : include_ary)
+				//遍历所有include 加载数据
+				for (auto& file_path : include_ary)
 				{
-					inlcude_data += ShaderMgr::getInstance()->getIncludeContent(s);
+					auto content = FileTool::loadText(rootPath + "/" + file_path);
+					if (!content.empty())
+					{
+						auto hash_id = CityHash64(content.c_str(), content.size());
+						if (!all_includes.contains(hash_id))
+						{
+							parse(hash_id, content, all_includes);
+						}
+					}
+				}
+			}
+
+			if (!all_includes.empty())
+			{
+				std::string data;
+				for (auto& pair : all_includes)
+				{
+					data += pair.second;
 				}
 
-				shader_content = inlcude_data + shader_content;
+				shader_content = data + shader_content;
 			}
+
+
 
 			//------------------------------------------------------------
 			//
@@ -436,23 +423,15 @@ namespace tezcat::Tiny::GL
 				delete pair.second;
 			}
 
+			shader_content.insert(0, " core\n\r");
+			shader_content.insert(0, std::to_string(mConfigUMap["Version"].cast<int>()));
+			shader_content.insert(0, "#version ");
+
 			//------------------------------------------------------
 			//
 			//	写入shader头
 			//
-			//
-			shader_content = "#version " + std::to_string(shader->getVersion()) + " core\n\r" + shader_content;
-			switch (shaderType)
-			{
-			case GL_VERTEX_SHADER:
-				this->loadFromData(shader, shader_content.c_str(), GL_VERTEX_SHADER);
-				break;
-			case GL_FRAGMENT_SHADER:
-				this->loadFromData(shader, shader_content.c_str(), GL_FRAGMENT_SHADER);
-				break;
-			default:
-				break;
-			}
+			outContent = std::move(shader_content);
 		}
 		else
 		{
@@ -461,86 +440,4 @@ namespace tezcat::Tiny::GL
 			Log_Error("GLShader: Shader Format Error");
 		}
 	}
-
-	void GLShaderBuilder::loadFromData(GLShader* shader, const char* data, uint32_t shaderType)
-	{
-		auto shader_id = glCreateShader(shaderType);
-		glShaderSource(shader_id, 1, &data, nullptr);
-		glCompileShader(shader_id);
-
-		int success;
-		char infoLog[512];
-		glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(shader_id, 512, nullptr, infoLog);
-			switch (shaderType)
-			{
-			case GL_VERTEX_SHADER:
-				//std::cout << "GLShader [" + shader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log_Error(StringTool::stringFormat("GLShader[%s]: [VERTEX] COMPILATION_FAILED > %s)", shader->getName().c_str(), infoLog));
-				break;
-			case GL_FRAGMENT_SHADER:
-				//std::cout << "GLShader [" + shader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log_Error(StringTool::stringFormat("GLShader[%s]: [FRAGMENT] COMPILATION_FAILED > %s)", shader->getName().c_str(), infoLog));
-				break;
-			default:
-				break;
-			}
-		}
-
-		mShaderIDs.push_back(shader_id);
-		shader->linkShader(shader_id);
-	}
-
-	//
-	ShaderPackage* GLShaderCreator::create(const std::string& filePath)
-	{
-		auto data = FileTool::loadText(filePath);
-		ShaderPackage* package = new ShaderPackage();
-
-		GLShaderBuilder builder;
-		//分离出所有的pass和配置数据
-		builder.splitPackage(package, data);
-
-		//针对每一个pass生成shader
-		for (auto& data : builder.mPassData)
-		{
-			UniformID::USet uniform_ary;
-			auto shader = new GLShader();
-			shader->createID();
-			builder.parseShaders(shader, data, uniform_ary);
-			shader->buildWithUniforms(uniform_ary);
-			shader->apply();
-			package->addShader(shader);
-		}
-
-		package->apply();
-
-		mShaderPath.emplace(package->getName(), filePath);
-		return package;
-	}
-
-	//
-	void GLShaderCreator::rebuild(ShaderPackage* package, std::string& data)
-	{
-		GLShaderBuilder builder;
-		builder.splitPackage(package, data);
-		Log_Engine(StringTool::stringFormat("Rebuild ShaderPackage>>> %s", package->getName().c_str()));
-
-		int index = 0;
-		//针对每一个pass生成shader
-		for (auto& data : builder.mPassData)
-		{
-			UniformID::USet uniform_ary;
-			std::string shader_content;
-			auto shader = builder.parseShaders(package, data, shader_content);
-			shader->createID();
-			builder.reparseShader(shader, shader_content, uniform_ary);
-			shader->buildWithUniforms(uniform_ary);
-
-			Log_Engine(StringTool::stringFormat("Rebuild Shader %s", shader->getName().c_str()));
-		}
-	}
-
 }

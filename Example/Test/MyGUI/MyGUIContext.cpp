@@ -37,6 +37,8 @@ void MyGUIContext::initValueConfig()
 }
 
 
+bool MyGUIContext::sIsDragResource = false;
+
 //-------------------------------------------------------------
 //
 //
@@ -44,17 +46,36 @@ void MyGUIContext::initValueConfig()
 //
 void MyGUIContext::matrix4(glm::mat4& mat4)
 {
-	ImGui::InputFloat4("x", glm::value_ptr(mat4[0]));
-	ImGui::InputFloat4("y", glm::value_ptr(mat4[1]));
-	ImGui::InputFloat4("z", glm::value_ptr(mat4[2]));
-	ImGui::InputFloat4("w", glm::value_ptr(mat4[3]));
+	ImGui::Text("x");
+	ImGui::SameLine();
+	ImGui::InputFloat4("##x", glm::value_ptr(mat4[0]));
+
+	ImGui::Text("y");
+	ImGui::SameLine();
+	ImGui::InputFloat4("##y", glm::value_ptr(mat4[1]));
+
+	ImGui::Text("z");
+	ImGui::SameLine();
+	ImGui::InputFloat4("##z", glm::value_ptr(mat4[2]));
+
+	ImGui::Text("w");
+	ImGui::SameLine();
+	ImGui::InputFloat4("##w", glm::value_ptr(mat4[3]));
 }
 
 void MyGUIContext::transform(glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
 {
-	ImGui::DragFloat3("Position", &position.x);
-	ImGui::DragFloat3("Rotation", &rotation.x);
-	ImGui::DragFloat3("Scale", &scale.x);
+	ImGui::Text("Position");
+	ImGui::SameLine();
+	ImGui::DragFloat3("##Position", &position.x);
+
+	ImGui::Text("Rotation");
+	ImGui::SameLine();
+	ImGui::DragFloat3("##Rotation", &rotation.x);
+
+	ImGui::Text("Scale");
+	ImGui::SameLine();
+	ImGui::DragFloat3("##Scale", &scale.x);
 }
 
 

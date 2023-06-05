@@ -36,7 +36,7 @@ namespace tezcat::Tiny
 		virtual void onResume();
 
 	public:
-		void update(BaseGraphics* graphics);
+		void update();
 		void addCamera(Camera* camera);
 
 	public:

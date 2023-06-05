@@ -12,7 +12,7 @@ MyObserver::~MyObserver()
 }
 
 
-void MyObserver::submit(Shader* shader)
+void MyObserver::submit(BaseGraphics* graphics, Shader* shader)
 {
 
 }

@@ -9,39 +9,35 @@ namespace tezcat::Tiny
 	struct TextureInfo;
 	class Texture;
 	class Texture2D;
-	class TextureRender2D;
 	class TextureCube;
+	class TextureRender2D;
+	class BaseGraphics;
 
 	class TINY_API FrameBuffer : public TinyObject
 	{
-		TINY_RTTI_H(FrameBuffer);
-	public:
 		FrameBuffer();
-		virtual ~FrameBuffer();
-
-		virtual void beginBuild() = 0;
-		virtual void endBuild() = 0;
-		virtual void attach(Texture* buffer) = 0;
-
+		FrameBuffer(const std::string& name);
+		TINY_RTTI_H(FrameBuffer);
+		TINY_Factory(FrameBuffer);
 	public:
-		virtual void attach2D(Texture2D* tex) = 0;
-		virtual void attachRender(TextureRender2D* tex) = 0;
-		virtual void attachCube(TextureCube* tex) = 0;
-		virtual void attachCube(TextureCube* tex, int colorIndex, int faceIndex, int level = 0) = 0;
+		virtual ~FrameBuffer();
+		void generate();
 
+
+		void apply(uint32_t id) { mBufferID = id; }
+		uint32_t getFrameBufferID() { return mBufferID; }
+		TinyVector<Texture*>& getAttachmentes() { return mComponents; }
+		void addAttachment(Texture* tex);
 		Texture* getBuffer(const int& index);
 
 	protected:
-		virtual void bind() = 0;
-		virtual void unbind() = 0;
-
-	protected:
+		std::string mName;
 		uint32_t mBufferID;
-		TinyVector<Texture*> mBuffers;
+		TinyVector<Texture*> mComponents;
 
 	public:
-		static void bind(FrameBuffer* buffer);
-		static void unbind(FrameBuffer* buffer);
+		static void bind(BaseGraphics* graphics, FrameBuffer* buffer);
+		static void unbind(BaseGraphics* graphics, FrameBuffer* buffer);
 		static FrameBuffer* getDefaultBuffer() { return sDefaultBuffer; }
 		static void setDefaultBuffer(FrameBuffer* buffer)
 		{

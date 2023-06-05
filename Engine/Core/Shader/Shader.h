@@ -2,34 +2,35 @@
 #include "ShaderParam.h"
 #include "Uniform.h"
 
-#include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
 #include "../Head/RenderConfig.h"
+#include "../Base/TinyObject.h"
 
 
 namespace tezcat::Tiny
 {
-	class Texture;
-	class TexttureCube;
-	class PipelineQueue;
-
 	/*
 	* Shader
 	* @brief 含有一个唯一UID,使用这个ID去创建对应的RenderPass,
 	*/
-	class TINY_API Shader
+	class TINY_API Shader : public TinyObject
 	{
-	public:
-		Shader();
-		Shader(const std::string& name, int orderID);
-		~Shader();
+		friend class BaseGraphics;
+		Shader(const std::string& filePath);
 
-		virtual void createID() {}
-		virtual void clear() {}
-		void apply();
+		TINY_RTTI_H(Shader);
+		TINY_Factory(Shader);
+	public:
+
+		virtual ~Shader();
+
+		void generate();
+		void apply(uint32_t pid);
 
 		const std::string& getName() const { return mName; }
+		const std::string& getFilePath() const { return mPath; }
+
 		Queue getRenderQueue() const { return mRenderQueue; }
 		void setRenderQueue(Queue val) { mRenderQueue = val; }
 		void setName(const std::string& name) { mName = name; }
@@ -44,21 +45,55 @@ namespace tezcat::Tiny
 		bool isShadowReceiver() { return mIsShadowReceiver; }
 
 	public:
-		virtual void buildWithUniforms(const UniformID::USet& uniforms) = 0;
+		bool checkUniform(const UniformID& id)
+		{
+			return mTinyUniformList[id.getUID()] > -1;
+		}
+
+		int getUniformID(const UniformID& id)
+		{
+			return mTinyUniformList[id.getUID()];
+		}
+
+		uint32_t getTextureIndex()
+		{
+			return mGlobalTexture + mLocalTexure;
+		}
+
+		void addGlobalTextureIndex()
+		{
+			++mGlobalTexture;
+		}
+
+		void addLocalTextureIndex()
+		{
+			++mLocalTexure;
+		}
+
+		void resetGlobalState()
+		{
+			mGlobalTexture = 0;
+			mLocalTexure = 0;
+		}
+
+		void resetLocalState()
+		{
+			mLocalTexure = 0;
+		}
+
+		void resizeUniformList(uint64_t size, int value);
+
+		auto getUniformListSize()
+		{
+			return mTinyUniformList.size();
+		}
+
+		void setUniformID(uint32_t index, uint32_t value)
+		{
+			mTinyUniformList[index] = value;
+		}
 
 	public:
-		void begin();
-		void end();
-		virtual void bind() = 0;
-		virtual void unbind() = 0;
-		virtual void resetGlobalState() = 0;
-		virtual void resetLocalState() = 0;
-
-	public:
-		/// <summary>
-		/// 设置当前pass的状态参数
-		/// </summary>
-		virtual void setStateOptions() = 0;
 		void setZWrite(bool val) { mEnableZWrite = val; }
 
 		void setCullFace(const CullFace& value)
@@ -95,60 +130,26 @@ namespace tezcat::Tiny
 			mDepthTest = ContextMap::DepthTestArray[(uint32_t)value];
 		}
 
-	public://特化传参
-		virtual void setProjectionMatrix(const glm::mat4x4& matrix) = 0;
+	public:
+		CullFaceWrapper& getCullFaceWrapper() { return mCullFace; }
 
-		virtual void setViewMatrix(const glm::mat4x4& matrix) = 0;
-		virtual void setModelMatrix(const glm::mat4x4& matrix) = 0;
-		virtual void setViewPosition(const glm::vec3& position) = 0;
+		bool isEnableBlend() { return mEnableBlend; }
+		BlendWrapper& getBlendSourceWrapper() { return mBlendSource; }
+		BlendWrapper& getBlendTargetWrapper() { return mBlendTarget; }
 
-	public://慢速传参
-		virtual void setFloat1(const char* name, float* data) = 0;
-		virtual void setFloat2(const char* name, float* data) = 0;
-		virtual void setFloat3(const char* name, float* data) = 0;
-		virtual void setFloat4(const char* name, float* data) = 0;
-
-		virtual void setInt1(const char* name, int* data) = 0;
-		virtual void setInt2(const char* name, int* data) = 0;
-		virtual void setInt3(const char* name, int* data) = 0;
-		virtual void setInt4(const char* name, int* data) = 0;
-
-		virtual void setMat3(const char* name, float* data) = 0;
-		virtual void setMat4(const char* name, const float* data) = 0;
-
-	public://快速传参
-		virtual void setFloat1(UniformID& uniform, float* data) = 0;
-		virtual void setFloat2(UniformID& uniform, float* data) = 0;
-		virtual void setFloat2(UniformID& uniform, const glm::vec2& data) = 0;
-		virtual void setFloat3(UniformID& uniform, float* data) = 0;
-		virtual void setFloat4(UniformID& uniform, float* data) = 0;
-
-		virtual void setInt1(UniformID& uniform, const int& data) = 0;
-		virtual void setInt1(UniformID& uniform, int* data) = 0;
-		virtual void setInt2(UniformID& uniform, int* data) = 0;
-		virtual void setInt3(UniformID& uniform, int* data) = 0;
-		virtual void setInt4(UniformID& uniform, int* data) = 0;
-
-		virtual void setMat3(UniformID& uniform, float* data) = 0;
-		virtual void setMat3(UniformID& uniform, const glm::mat3& mat3) = 0;
-		virtual void setMat4(UniformID& uniform, const float* data) = 0;
-		virtual void setMat4(UniformID& uniform, const glm::mat4& mat4) = 0;
-		virtual void setMat4(UniformID& uniform, glm::mat4 data[], int count) = 0;
-
-		virtual void setGlobalTexture2D(UniformID& uniform, Texture2D* data) = 0;
-		virtual void setTexture2D(UniformID& uniform, Texture2D* data) = 0;
-
-		virtual void setGlobalTextureCube(UniformID& uniform, TextureCube* data) = 0;
-		virtual void setTextureCube(UniformID& uniform, TextureCube* data) = 0;
+		bool isEnableZWrite() { return mEnableZWrite; }
+		DepthTestWrapper& getDepthTestWrapper() { return mDepthTest; }
 
 	protected:
 		std::string mName;
+		std::string mPath;
 		int mUID;
 		int mOrderID;
 		int mVersion;
 		int mProgramID;
 		Queue mRenderQueue;
-
+		uint8_t mLocalTexure;
+		uint8_t mGlobalTexture;
 	protected:
 
 		bool mIsShadowReceiver;

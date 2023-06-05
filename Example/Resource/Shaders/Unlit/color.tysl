@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Color;
+        str Name = Unlit/Color;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;
@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
+        #include "../Include/tiny_vs_base.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 3) in vec4 aColor;

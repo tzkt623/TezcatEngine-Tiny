@@ -69,7 +69,7 @@ namespace tezcat::Tiny
 
 	MeshData* ModelManager::createMesh(aiMesh* aimesh)
 	{
-		MeshData* meshData = new MeshData(aimesh->mName.C_Str(), mMeshDataAry.size());
+		MeshData* meshData = MeshData::create(aimesh->mName.C_Str());
 		mMeshDataAry.push_back(meshData);
 
 		meshData->mVertices.reserve(aimesh->mNumVertices);

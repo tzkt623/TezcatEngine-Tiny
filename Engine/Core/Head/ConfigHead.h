@@ -27,7 +27,7 @@ namespace tezcat::Tiny
 
 	class TINY_API EngineConfig
 	{
-		friend class ResourceLoader;
+		friend class EngineIniter;
 	public:
 		static RenderAPI getRenderAPI() { return sRenderAPI; }
 

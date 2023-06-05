@@ -7,8 +7,8 @@
 
 namespace tezcat::Tiny
 {
-	class ShaderPackage;
 	class Shader;
+	class BaseGraphics;
 	class TINY_API Material : public TinyObject
 	{
 		Material(const std::string& name);
@@ -20,8 +20,8 @@ namespace tezcat::Tiny
 
 	public:
 		int getUID() const;
-		ShaderPackage* getShaderPackage() const { return mShaderPackage; }
 		std::vector<Uniform*>& getUniforms() { return mUniforms; }
+		Shader* getShader() { return mShader; }
 
 	public:
 		template<typename UniformType, typename... Args>
@@ -67,13 +67,13 @@ namespace tezcat::Tiny
 			}
 		}
 
-		void submit(Shader* shader);
+		void submit(BaseGraphics* graphics, Shader* shader);
 
 	private:
 		std::string mName;
 		std::vector<Uniform*> mUniforms;
 
 	private:
-		ShaderPackage* mShaderPackage;
+		Shader* mShader;
 	};
 }

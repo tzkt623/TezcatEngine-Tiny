@@ -165,6 +165,8 @@
     <ClCompile Include="Core\Component\Camera.cpp" />
     <ClCompile Include="Core\Component\FlyController.cpp" />
     <ClCompile Include="Core\Component\ShadowCaster.cpp" />
+    <ClCompile Include="Core\Data\Resource.cpp" />
+    <ClCompile Include="Core\Data\Text.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\RenderConfig.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
@@ -177,6 +179,7 @@
     <ClCompile Include="Core\Manager\ShadowCasterManager.cpp" />
     <ClCompile Include="Core\Manager\TextureManager.cpp" />
     <ClCompile Include="Core\Manager\EnvironmentLightManager.cpp" />
+    <ClCompile Include="Core\Renderer\BuildCommand.cpp" />
     <ClCompile Include="Core\Renderer\RenderAgent.cpp" />
     <ClCompile Include="Core\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
@@ -196,7 +199,7 @@
     <ClCompile Include="Core\Renderer\RenderPass.cpp" />
     <ClCompile Include="Core\Renderer\RenderCommand.cpp" />
     <ClCompile Include="Core\Renderer\RenderObject.cpp" />
-    <ClCompile Include="Core\Data\ResourceLoader.cpp" />
+    <ClCompile Include="Core\EngineIniter.cpp" />
     <ClCompile Include="Core\Renderer\VertexConfig.cpp" />
     <ClCompile Include="Core\Scene\Scene.cpp" />
     <ClCompile Include="Core\Manager\SceneManager.cpp" />
@@ -214,7 +217,8 @@
     <ClCompile Include="Core\Tool\Octree\OctreeAgentList.cpp" />
     <ClCompile Include="Core\Tool\Octree\OctreeConfig.cpp" />
     <ClCompile Include="Core\Tool\Octree\OctreeNode.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLFrameBuffer.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLBuildCommand.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLRenderCommand.cpp" />
     <ClCompile Include="Platform\OpenGL\GLShaderBuilder.cpp" />
     <ClCompile Include="Core\Shader\ShaderParam.cpp" />
     <ClCompile Include="Core\Manager\ShaderManager.cpp" />
@@ -227,11 +231,10 @@
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
     <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLShader.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLTexture.cpp" />
     <ClCompile Include="Core\Component\Skybox.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp" />
+    <ClCompile Include="ThirdParty\Hash\city.cc" />
     <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
     <ClCompile Include="ThirdParty\imgui\imgui_impl_glfw.cpp" />
@@ -240,12 +243,13 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Core\Tool\StringTool.cpp" />
     <ClCompile Include="Platform\OpenGL\WindowsEngine.cpp" />
-    <ClCompile Include="Platform\OpenGL\GLBuffer.cpp" />
     <ClCompile Include="ThirdParty\imgui\TextEditor\TextEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Base\TinyGCInfo.h" />
     <ClInclude Include="Core\Component\ShadowCaster.h" />
+    <ClInclude Include="Core\Data\Resource.h" />
+    <ClInclude Include="Core\Data\Text.h" />
     <ClInclude Include="Core\Head\TinyCpp.h" />
     <ClInclude Include="Core\Base\TinyGC.h" />
     <ClInclude Include="Core\Base\TinyRefObject.h" />
@@ -257,6 +261,7 @@
     <ClInclude Include="Core\Manager\ModelManager.h" />
     <ClInclude Include="Core\Manager\ShadowCasterManager.h" />
     <ClInclude Include="Core\Manager\EnvironmentLightManager.h" />
+    <ClInclude Include="Core\Renderer\BuildCommand.h" />
     <ClInclude Include="Core\Renderer\RenderAgent.h" />
     <ClInclude Include="Core\Manager\CameraManager.h" />
     <ClInclude Include="Core\Component\Component.h" />
@@ -284,7 +289,7 @@
     <ClInclude Include="Core\Tool\Octree\OctreeAgentList.h" />
     <ClInclude Include="Core\Tool\Octree\OctreeConfig.h" />
     <ClInclude Include="Core\Tool\Octree\OctreeNode.h" />
-    <ClInclude Include="Platform\OpenGL\GLFrameBuffer.h" />
+    <ClInclude Include="Platform\OpenGL\GLBuildCommand.h" />
     <ClInclude Include="Platform\OpenGL\GLHead.h" />
     <ClInclude Include="Core\Head\GLMHead.h" />
     <ClInclude Include="Core\GUI\GUI.h" />
@@ -303,10 +308,11 @@
     <ClInclude Include="Core\Renderer\RenderPass.h" />
     <ClInclude Include="Core\Renderer\RenderCommand.h" />
     <ClInclude Include="Core\Renderer\RenderObject.h" />
-    <ClInclude Include="Core\Data\ResourceLoader.h" />
+    <ClInclude Include="Core\EngineIniter.h" />
     <ClInclude Include="Core\Scene\Scene.h" />
     <ClInclude Include="Core\Manager\SceneManager.h" />
     <ClInclude Include="Core\Shader\Shader.h" />
+    <ClInclude Include="Platform\OpenGL\GLRenderCommand.h" />
     <ClInclude Include="Platform\OpenGL\GLShaderBuilder.h" />
     <ClInclude Include="Core\Shader\ShaderParam.h" />
     <ClInclude Include="Core\Manager\ShaderManager.h" />
@@ -319,8 +325,6 @@
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
     <ClInclude Include="Core\Renderer\RenderLayer.h" />
-    <ClInclude Include="Platform\OpenGL\GLShader.h" />
-    <ClInclude Include="Platform\OpenGL\GLTexture.h" />
     <ClInclude Include="Core\Component\Skybox.h" />
     <ClInclude Include="Core\Tool\Any.h" />
     <ClInclude Include="Core\Tool\Event.h" />
@@ -698,6 +702,7 @@
     <ClInclude Include="ThirdParty\glm\vec3.hpp" />
     <ClInclude Include="ThirdParty\glm\vec4.hpp" />
     <ClInclude Include="ThirdParty\glm\vector_relational.hpp" />
+    <ClInclude Include="ThirdParty\Hash\city.h" />
     <ClInclude Include="ThirdParty\imgui\imconfig.h" />
     <ClInclude Include="ThirdParty\imgui\imgui.h" />
     <ClInclude Include="ThirdParty\imgui\imgui_impl_glfw.h" />
@@ -715,7 +720,6 @@
     <ClInclude Include="Core\Tool\StringTool.h" />
     <ClInclude Include="Core\Tool\Tool.h" />
     <ClInclude Include="Platform\OpenGL\WindowsEngine.h" />
-    <ClInclude Include="Platform\OpenGL\GLBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\assimp\color4.inl" />

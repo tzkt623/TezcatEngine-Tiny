@@ -31,7 +31,7 @@ namespace tezcat::Tiny
 
 	void ShaderPackage::apply()
 	{
-		mUID = ShaderMgr::getInstance()->giveUID();
+		//mUID = ShaderMgr::getInstance()->giveUID();
 		this->sort();
 	}
 
@@ -49,7 +49,7 @@ namespace tezcat::Tiny
 
 	void ShaderPackage::rebuild()
 	{
-		ShaderMgr::getInstance()->rebuild(this);
+		//ShaderMgr::getInstance()->rebuild(this);
 	}
 
 	Shader* ShaderPackage::findShader(const std::string& name)

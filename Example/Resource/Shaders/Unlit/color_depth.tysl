@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = ColorDepth;
+        str Name = Unlit/ColorDepth;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;
@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
+        #include "../Include/tiny_vs_base.tyin"
 
         layout (location = 0) in vec3 aPos;
 
@@ -33,8 +33,8 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_function"
-        #include "tiny_fs_camera"
+        #include "../Include/tiny_fs_function.tyin"
+        #include "../Include/tiny_fs_camera.tyin"
 
         out vec4 myFinalColor;
         

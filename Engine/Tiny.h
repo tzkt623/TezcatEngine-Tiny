@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Engine.h"
+#include "Core/EngineIniter.h"
 #include "Core/Profiler.h"
 
 #include "Core/GUI/GUIWidget.h"
@@ -21,6 +22,7 @@
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Manager/VertexBufferManager.h"
 #include "Core/Manager/ModelManager.h"
+#include "Core/Manager/ShadowCasterManager.h"
 
 #include "Core/Scene/Scene.h"
 
@@ -36,7 +38,7 @@
 #include "Core/Data/Image.h"
 #include "Core/Data/MeshData.h"
 #include "Core/Data/Material.h"
-#include "Core/Data/ResourceLoader.h"
+#include "Core/Data/Resource.h"
 
 #include "Core/Input/Inputer.h"
 #include "Core/Input/InputSystem.h"

@@ -51,6 +51,7 @@ namespace tezcat::Tiny
 	private:
 		bool mDirty;
 		Shader* mShader;
+		
 		std::vector<RenderCommand*> mCommandList;
 	};
 

@@ -112,7 +112,7 @@ namespace tezcat::Tiny
 		mNewObjectList.emplace_back(gameObject);
 	}
 
-	void Scene::update(BaseGraphics* graphics)
+	void Scene::update()
 	{
 		//#InitNewObjects
 		if (!mNewTransformList.empty())

@@ -4,6 +4,7 @@
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
 #include "../Renderer/VertexConfig.h"
+#include "../Base/TinyObject.h"
 
 namespace tezcat::Tiny
 {
@@ -13,14 +14,15 @@ namespace tezcat::Tiny
 	/// 子节点数据一般都是用来组成整个mesh
 	/// 所以并不需要单独存储使用
 	/// </summary>
-	class TINY_API MeshData
+	class TINY_API MeshData : public TinyObject
 	{
-	public:
 		MeshData();
 		MeshData(const std::string& name);
-		MeshData(const std::string& name, const int& index);
-		MeshData(MeshData&& other) noexcept;
-		~MeshData();
+		TINY_Factory(MeshData);
+		TINY_RTTI_H(MeshData);
+	public:
+
+		virtual ~MeshData();
 
 		const std::string& getName() { return mName; }
 
@@ -61,8 +63,6 @@ namespace tezcat::Tiny
 		void addChild(MeshData* meshData);
 		const std::vector<MeshData*>& getChildren() { return *mChildrenData; }
 
-	public:
-		MeshData& operator=(MeshData&& other) noexcept;
 
 	public:
 		int mIndex;

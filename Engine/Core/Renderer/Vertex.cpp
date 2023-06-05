@@ -16,8 +16,16 @@ namespace tezcat::Tiny
 
 	}
 
+	Vertex::Vertex(const std::string& name)
+		: mName(name)
+	{
+
+	}
+
 	Vertex::~Vertex()
 	{
+		mVertexBuffers.clear();
+
 		if (mIndexBuffer)
 		{
 			mIndexBuffer->subRef();
@@ -28,7 +36,26 @@ namespace tezcat::Tiny
 	void Vertex::init(MeshData* meshData)
 	{
 		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->mDrawMode];
+		mVertexCount = meshData->mVertices.size();
 		mName = meshData->getName();
+
+		for (auto& position : meshData->mLayoutPositions)
+		{
+			auto [size, data] = meshData->getVertexData(position);
+			auto buffer = VertexBuffer::create();
+			buffer->init(size, data);
+			buffer->setLayoutData(position, VertexLayout::getLayoutType(position));
+			this->setVertexBuffer(buffer);
+		}
+
+		auto [size, data] = meshData->getIndexData();
+		if (size > 0)
+		{
+			mIndexCount = meshData->mIndices.size();
+			auto index = IndexBuffer::create();
+			index->init(size, data);
+			this->setIndexBuffer(index);
+		}
 	}
 
 	void Vertex::init(const std::string& name, const size_t& vertexCount, const DrawMode& drawMode)
@@ -58,5 +85,11 @@ namespace tezcat::Tiny
 		mIndexBuffer = buffer;
 		mIndexBuffer->addRef();
 	}
+
+	void Vertex::generate()
+	{
+		Graphics::getInstance()->cmdCreateVertex(this);
+	}
+
 }
 

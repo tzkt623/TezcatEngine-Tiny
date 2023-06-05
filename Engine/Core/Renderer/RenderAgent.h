@@ -11,6 +11,7 @@ namespace tezcat::Tiny
 	class Shader;
 	class Material;
 	class RenderQueue;
+	class BaseGraphics;
 
 	/*
 	* RenderAgent用于协助pipeline对渲染信息进行收集
@@ -32,8 +33,7 @@ namespace tezcat::Tiny
 
 		void setVertex(Vertex* mVertex);
 		Vertex* getVertex() { return mVertex; }
-		void submitModelMatrix(Shader* shader);
-		void sendToQueue(const RenderPhase& phase, RenderQueue* queue);
+		void sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue);
 
 	private:
 		Vertex* mVertex;

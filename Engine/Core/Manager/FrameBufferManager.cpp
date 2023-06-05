@@ -7,45 +7,6 @@ namespace tezcat::Tiny
 {
 	//-------------------------------------------------
 	//
-	//	Creator
-	//
-	FrameBuffer* FrameBufferCreator::create(const int& width, const int& height
-		, const std::initializer_list<TextureInfo>& infos)
-	{
-		FrameBuffer* buffer = this->createFrameBuffer();
-		buffer->beginBuild();
-		for (auto& info : infos)
-		{
-			Texture* tex = nullptr;
-			switch (info.type)
-			{
-			case TextureType::Texture2D:
-				tex = TextureMgr::getInstance()->create2D(width, height, info);
-				break;
-			case TextureType::TextureCube:
-				tex = TextureMgr::getInstance()->createCube(width, height, info);
-				break;
-			case TextureType::TextureRender2D:
-				tex = TextureMgr::getInstance()->createRender2D(width, height, info);
-				break;
-			default:
-				break;
-			}
-
-			buffer->attach(tex);
-		}
-		buffer->endBuild();
-
-		return buffer;
-	}
-
-	FrameBuffer* FrameBufferCreator::create()
-	{
-		return this->createFrameBuffer();
-	}
-
-	//-------------------------------------------------
-	//
 	//	Manager
 	//
 	FrameBufferManager::FrameBufferManager()
@@ -58,34 +19,15 @@ namespace tezcat::Tiny
 
 	}
 
-	FrameBuffer* FrameBufferManager::create(const std::string& name
-		, const int& width, const int& height
-		, const std::initializer_list<TextureInfo>& infos)
+	void FrameBufferManager::add(const std::string& name, FrameBuffer* frameBuffer)
 	{
-		auto result = mBufferUMap.tryEmplace(name, [&]()
+		frameBuffer->addRef();
+		auto result = mBufferUMap.try_emplace(name, frameBuffer);
+		if (!result.second)
 		{
-			return mCreator->create(width, height, infos);
-		});
-		return result.first->second;
-	}
-
-	FrameBuffer* FrameBufferManager::create(const std::string& name)
-	{
-		auto result = mBufferUMap.tryEmplace(name, [&]()
-		{
-			return mCreator->create();
-		});
-		return result.first->second;
-	}
-
-	FrameBuffer* FrameBufferManager::create()
-	{
-		return mCreator->create();
-	}
-
-	void FrameBufferManager::addFrameBuffer(const std::string& name, FrameBuffer* frameBuffer)
-	{
-		mBufferUMap.try_emplace(name, frameBuffer);
+			result.first->second->subRef();
+			result.first->second = frameBuffer;
+		}
 	}
 
 	FrameBuffer* FrameBufferManager::find(const std::string& name)
@@ -98,5 +40,19 @@ namespace tezcat::Tiny
 
 		return nullptr;
 	}
+
+	FrameBuffer* FrameBufferManager::create(const std::string& name)
+	{
+		auto result = mBufferUMap.try_emplace(name, nullptr);
+		if (result.second)
+		{
+			auto fb = FrameBuffer::create(name);
+			fb->addRef();
+			result.first->second = fb;
+		}
+
+		return result.first->second;
+	}
+
 }
 

@@ -8,7 +8,7 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = InfiniteGrid;
+        str Name = Utility/InfiniteGrid;
         int Version = 330;
         int OrderID = 600;
         str Queue = Transparent;
@@ -23,7 +23,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "tiny_vs_base"
+        #include "../Include/tiny_vs_base.tyin"
 
         layout (location = 0) in vec3 aPos;
 
@@ -55,7 +55,7 @@
 
     #TINY_FS_BEGIN
     {
-        #include "tiny_fs_camera"
+        #include "../Include/tiny_fs_camera.tyin"
 
         in vec3 nearPoint;
         in vec3 farPoint;
@@ -113,6 +113,9 @@
     #TINY_FS_END
 }
 #TINY_PASS_END
+
+
+
 
 
 
