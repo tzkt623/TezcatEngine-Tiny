@@ -309,6 +309,8 @@ namespace tezcat::Tiny
 
 	void EnvironmentLightManager::setHDRImage(Image* image)
 	{
+		TinyAssert(image != nullptr);
+
 		if (mTexHDR)
 		{
 			mTexHDR->updateData(image);

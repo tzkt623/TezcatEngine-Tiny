@@ -257,9 +257,9 @@ mShadwowTexutre->generate();
 
 Attention! The .exe file must be in the same directory as the resource folder
 
-1. 继承并实现`ResourceLoader`类
+1. 继承并实现`MyEngineIniter`类
 
-   Inherit and implement the `ResourceLoader` class
+   Inherit and implement the `MyEngineIniter` class
 
     ```cpp
     class MyEngineIniter : public EngineIniter
@@ -267,7 +267,7 @@ Attention! The .exe file must be in the same directory as the resource folder
     public:
         MyEngineIniter();
 
-        void prepareEngine(Engine* engine) override; 
+        void prepareEngine(Engine* engine) override;
         void prepareResource(Engine* engine) override;
         void prepareGame(Engine* engine) override;
         void initYourShaderParam() override;

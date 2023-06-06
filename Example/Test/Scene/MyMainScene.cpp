@@ -77,7 +77,7 @@ void MyMainScene::onEnter()
 	this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
-	auto img = Resource::load<Image>("Image/blue_photo_studio_2k.hdr");
+	auto img = Resource::load<Image>("Image/blocky_photo_studio_2k.hdr");
 	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvLightingImage, img });
 	Resource::unload(img);
 }

@@ -26,7 +26,7 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			ImGui::SameLine();
 			ImGui::DragFloat3("##Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
 
-			ImGui::Text("Scale");
+			ImGui::Text("Scale   ");
 			ImGui::SameLine();
 			ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.03f);
 			transform->markDirty();
@@ -143,7 +143,7 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			ImGui::SameLine();
 			ImGui::InputFloat3("##旋转(Rotation)", glm::value_ptr(transform->getRotation()));
 
-			ImGui::Text("缩放(Scale)");
+			ImGui::Text("缩放(Scale)   ");
 			ImGui::SameLine();
 			ImGui::InputFloat3("##缩放(Scale)", glm::value_ptr(transform->getScale()));
 			ImGui::Spacing();
@@ -186,7 +186,12 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 	{
 		if (ImGui::CollapsingHeader("阴影投射器(ShadowCaster)"))
 		{
+			auto caster = static_cast<ShadowCaster*>(com);
 
+			ImGui::Image((ImTextureID)caster->getShadwowTexutre()->getTextureID()
+				, ImVec2(256, 256)
+				, ImVec2(1, 0)
+				, ImVec2(0, 1));
 		}
 	});
 }

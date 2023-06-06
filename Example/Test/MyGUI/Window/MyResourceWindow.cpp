@@ -127,13 +127,16 @@ void MyResourceWindow::drawFolder()
 	if (ImGui::BeginTable("##asdasd", item_count))
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 0.0f));
+		//ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(1.0f, 1.0f, 1.0f, 0.0f));
 
 		mDirectoryEntry.assign(mCurrentPath);
 		std::filesystem::directory_iterator list(mDirectoryEntry);
 		for (auto& it : list)
 		{
 			ImGui::TableNextColumn();
-			if (it.is_directory())
+			switch (it.status().type())
+			{
+			case std::filesystem::file_type::directory:
 			{
 				ImGui::ImageButton((ImTextureID)mIconAry[Icon_Folder]->getTextureID(), ImVec2(mFileItemSize, mFileItemSize));
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
@@ -142,10 +145,11 @@ void MyResourceWindow::drawFolder()
 				}
 				ImGui::SetNextItemWidth(mFileItemSize);
 				ImGui::TextWrapped(it.path().filename().string().c_str());
+				break;
 			}
-			else if (it.is_regular_file())
-			{
+			case std::filesystem::file_type::regular:
 				this->drawFile(it.path());
+				break;
 			}
 		}
 

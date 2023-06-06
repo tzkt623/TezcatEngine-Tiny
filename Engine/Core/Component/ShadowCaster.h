@@ -23,7 +23,6 @@ namespace tezcat::Tiny
 		void setShadowMap(int width, int height, const std::string& shaderName);
 
 		uint32_t getCasterID() { return mCasterID; }
-
 		Texture2D* getShadwowTexutre() { return mShadwowTexutre; }
 
 

@@ -15,18 +15,8 @@ namespace tezcat::Tiny
 	class TinyObject;
 	class Texture2D;
 
-	struct ResourcePackage
-	{
-
-	};
-
 	class Resource
 	{
-		struct Wrapper
-		{
-
-		};
-
 		Resource() = delete;
 		~Resource() = delete;
 	public:
@@ -44,25 +34,6 @@ namespace tezcat::Tiny
 			TinyThrow_Logic("");
 			return nullptr;
 		}
-
-		/*
-		template<>
-		static Texture2D* load<>(const std::string& path)
-		{
-			auto id = CityHash64(path.c_str(), path.size());
-			auto result = mDataUSet.try_emplace(id, nullptr);
-			if (result.second)
-			{
-				Image img;
-				img.openFile(path);
-				auto tex = TextureMgr::getInstance()->create2D("", img);
-				tex->addRef();
-				result.first->second = tex;
-			}
-
-			return (Texture2D*)result.first->second;
-		}
-		*/
 
 		template<>
 		static Texture2D* load<>(const std::string& path)
@@ -105,6 +76,14 @@ namespace tezcat::Tiny
 		}
 
 		template<>
+		static Shader* loadOnly<>(const std::string& path)
+		{
+			Shader* shader = Shader::create(FileTool::getRootRelativeResDir() + "/" + path);
+			shader->generate();
+			return shader;
+		}
+
+		template<>
 		static Image* load<>(const std::string& path)
 		{
 			Image* image = Image::create();
@@ -112,6 +91,18 @@ namespace tezcat::Tiny
 			{
 				image->addRef();
 				mDataUSet.emplace(image);
+				return image;
+			}
+
+			return nullptr;
+		}
+
+		template<>
+		static Image* loadOnly<>(const std::string& path)
+		{
+			Image* image = Image::create();
+			if (image->openFile(FileTool::getRootRelativeResDir() + "/" + path, true))
+			{
 				return image;
 			}
 

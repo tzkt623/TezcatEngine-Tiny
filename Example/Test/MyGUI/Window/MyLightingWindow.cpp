@@ -87,6 +87,7 @@ void MyLightingWindow::onRender()
 
 	ImGui::Separator();
 
+	/*
 	ImGui::Text("Textures");
 	ImGui::PushID(0);
 	if (ImGui::BeginListBox(""))
@@ -106,6 +107,7 @@ void MyLightingWindow::onRender()
 		ImGui::EndListBox();
 	}
 	ImGui::PopID();
+	*/
 
 	if (ImGui::Button("BRDF LUT"))
 	{
