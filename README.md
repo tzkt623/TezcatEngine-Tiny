@@ -149,21 +149,9 @@ go->getTransform()->setParent(controller_go->getTransform());
 - 创建天空盒
   Create a Skybox
 
-```cpp
-auto go = GameObject::create("Skybox1");
-//set layer, a camera just render objects with thesame layer id
-go->setLayerMaskIndex(1);
-go->addComponent<Transform>();
+  把资源管理器里面的一张方形天空盒直接拖到光照管理器中,记得把相机的ClearOption勾上Skybox
 
-//attach a Skybox component
-auto skybox = go->addComponent<Skybox>();
-//load Material with ShaderName(Buildin Shader)
-auto material = Material::create("Unlit/Skybox");
-//add a UniformValue to auto update value in shader
-//note that [skybox_2] is a [SkyboxName] auto loaded in [TextureManager], not the imagefile(.jpg.png....) name
-material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
-skybox->setMaterial(material);
-```
+  Drag a png/jpg/hdr image in resource browser to lighting manager window And check camera`s clear option to render skybox
 
 - 创建一个游戏物体(传送门)
   Create a GameObject(JumpGate)

@@ -51,7 +51,8 @@ void MyMainWindow::init()
 	MyViewPortWindow::create(this->getHost());
 	MyResourceWindow::create(this->getHost());
 	MyLogWindow::create(this->getHost());
-	MyGCInfoWindow::create(this->getHost());
+	MyLightingWindow::create(this->getHost());
+	//MyGCInfoWindow::create(this->getHost());
 }
 
 bool MyMainWindow::begin()

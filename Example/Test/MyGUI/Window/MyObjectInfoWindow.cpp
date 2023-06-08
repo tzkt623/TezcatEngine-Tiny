@@ -95,6 +95,7 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 								, ImVec2(100, 100)
 								, ImVec2(0, 1)
 								, ImVec2(1, 0));
+
 					ImGui::Spacing();
 					break;
 				}
@@ -133,9 +134,6 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 		{
 			auto camera = static_cast<Camera*>(com);
 			auto transform = camera->getTransform();
-			ImGui::Text("操作<CTRL> [W A S D] [R:Up] [F:Down]");
-			ImGui::Separator();
-
 			ImGui::Text("投影(Projection)");
 			static const char* projection_name = "error";
 			IRenderObserver::ViewType view_type = camera->getViewType();
@@ -223,8 +221,9 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			*/
 
 			int order = camera->getOrder();
-			ImGui::Text("Order");
+			ImGui::Text("Order  ");
 			ImGui::SameLine();
+			ImGui::SetNextItemWidth(120);
 			ImGui::InputInt("##order", &order);
 			camera->setOrder(order);
 
@@ -236,12 +235,12 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			static bool clear_stencil = (clear_options & ClearOption::CO_Stencil) == ClearOption::CO_Stencil;
 			static bool clear_skybox = (clear_options & ClearOption::CO_Skybox) == ClearOption::CO_Skybox;
 
-			ImGui::Checkbox("Color", &clear_color);
+			ImGui::Checkbox("Color  ", &clear_color);
 			ImGui::SameLine(0, 20);
-			ImGui::Checkbox("Depth", &clear_depth);
+			ImGui::Checkbox("Depth  ", &clear_depth);
 			ImGui::Checkbox("Stencil", &clear_stencil);
 			ImGui::SameLine(0, 20);
-			ImGui::Checkbox("Skybox", &clear_skybox);
+			ImGui::Checkbox("Skybox ", &clear_skybox);
 
 			ClearOptionID co_id = 0;
 			if (clear_color)

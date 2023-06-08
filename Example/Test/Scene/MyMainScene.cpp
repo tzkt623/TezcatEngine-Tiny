@@ -44,7 +44,6 @@ void MyMainScene::onEnter()
 
 
 		auto frame_buffer = FrameBufferMgr::getInstance()->create("FB_Viewport");
-
 		Texture2D* tex2d = TextureMgr::getInstance()->create2D("RB_Viewport");
 		tex2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
 			, TextureInfo(TextureAttachPosition::ColorComponent
@@ -75,22 +74,21 @@ void MyMainScene::onEnter()
 	//this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
-	auto img = Resource::load<Image>("Image/blocky_photo_studio_2k.hdr");
+	auto img = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
 	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvLightingImage, img });
-	Resource::unload(img);
 
-	int radius = 5;
-	int length;
-	auto vs = GaussianMatrix::calculate(radius, length);
-	for (int x = 0; x < length; ++x)
-	{
-		for (int y = 0; y < length; ++y)
-		{
-			std::cout << vs[x + y * length] << "," << std::endl;
-		}
-	}
-
-	std::cout << vs.size();
+// 	int radius = 5;
+// 	int length;
+// 	auto vs = GaussianMatrix::calculate(radius, length);
+// 	for (int x = 0; x < length; ++x)
+// 	{
+// 		for (int y = 0; y < length; ++y)
+// 		{
+// 			std::cout << vs[x + y * length] << "," << std::endl;
+// 		}
+// 	}
+// 
+// 	std::cout << vs.size();
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
