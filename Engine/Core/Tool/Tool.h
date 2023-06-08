@@ -8,5 +8,6 @@
 #include "FileTool.h"
 #include "Event.h"
 #include "Log.h"
+#include "GaussianMatrix.h"
 
 using namespace tezcat::Tiny;

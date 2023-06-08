@@ -26,6 +26,7 @@
 namespace tezcat::Tiny::GL
 {
 	GLGraphics::GLGraphics()
+		: mWindow(nullptr)
 	{
 		Graphics::attach(this);
 	}
@@ -44,8 +45,7 @@ namespace tezcat::Tiny::GL
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, min);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		mWindow = glfwCreateWindow(engine->getScreenWidth()
-			, engine->getScreenHeight()
+		mWindow = glfwCreateWindow(engine->getScreenWidth(), engine->getScreenHeight()
 			, engine->getResourceLoader()->getName().c_str(), nullptr, nullptr);
 		if (mWindow == nullptr)
 		{
@@ -125,13 +125,13 @@ namespace tezcat::Tiny::GL
 		get_default_color_buffer(max);
 		glGetIntegerv(GL_READ_BUFFER, &max);
 		get_default_color_buffer(max);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		mGUI = new GUI();
 		mGUI->init(mWindow);
 
 		this->initContext();
 		BaseGraphics::init(engine);
-		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
 	void GLGraphics::initContext()
@@ -325,6 +325,7 @@ namespace tezcat::Tiny::GL
 		BaseGraphics::postRender();
 
 		mGUI->render();
+
 		if (Engine::sMultiThread)
 		{
 			glfwSwapBuffers(mWindow);
@@ -805,9 +806,9 @@ namespace tezcat::Tiny::GL
 		return new GLRenderCMD_Mesh(vertex, transform, material);
 	}
 
-	RenderCommand* GLGraphics::createDrawSkyboxCMD(Vertex* vertex, Transform* transform, Material* material)
+	RenderCommand* GLGraphics::createDrawSkyboxCMD(Shader* shader, Vertex* vertex, TextureCube* cube, float lod, bool isHdr)
 	{
-		return new GLRenderCMD_Skybox(vertex, transform, material);
+		return new GLRenderCMD_Skybox(shader, vertex, cube, lod, isHdr);
 	}
 
 	RenderCommand* GLGraphics::createDrawHDRToCubeCMD(Shader* shader, Vertex* vertex, Texture2D* hdr, TextureCube* cube)

@@ -48,6 +48,10 @@ namespace tezcat::Tiny
 
 		UniformT()
 		{}
+		UniformT(const UniformID& id, ValueType& value)
+			: Uniform(id)
+			, value(value)
+		{}
 		UniformT(const UniformID& id, ValueType&& value)
 			: Uniform(id)
 			, value(std::forward<ValueType>(value))
@@ -152,6 +156,7 @@ namespace tezcat::Tiny
 	{
 		using UniformT<Texture2D*>::UniformT;
 		UniformTex2D(const UniformID& id, const std::string& name);
+		UniformTex2D(const UniformID& id, Texture2D*& tex);
 		virtual ~UniformTex2D();
 
 

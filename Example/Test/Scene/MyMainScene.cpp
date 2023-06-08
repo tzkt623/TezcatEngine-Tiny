@@ -34,6 +34,7 @@ void MyMainScene::onEnter()
 		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
 		camera->setCullLayer(0);
+		camera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth);
 
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -45,16 +46,14 @@ void MyMainScene::onEnter()
 		auto frame_buffer = FrameBufferMgr::getInstance()->create("FB_Viewport");
 
 		Texture2D* tex2d = TextureMgr::getInstance()->create2D("RB_Viewport");
-		tex2d->setData(Engine::getScreenWidth()
-			, Engine::getScreenHeight()
+		tex2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
 			, TextureInfo(TextureAttachPosition::ColorComponent
 				, TextureChannel::RGBA
 				, TextureChannel::RGBA
 				, DataType::UByte));
 
 		TextureRender2D* render2d = TextureMgr::getInstance()->createRender2D("DS_Viewport");
-		render2d->setData(Engine::getScreenWidth()
-			, Engine::getScreenHeight()
+		render2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
 			, TextureInfo(TextureAttachPosition::DepthComponent
 				, TextureChannel::Depth
 				, TextureChannel::Depth
@@ -67,32 +66,31 @@ void MyMainScene::onEnter()
 		camera->setFrameBuffer(frame_buffer);
 	}
 
-	this->createSkybox();
 	//this->createInfinitePlane();
 	this->createDirectionLight();
 	this->createPaintings();
 	this->createPlane();
-	this->createTransparentObject();
+	//this->createTransparentObject();
 	this->createPBR();
-	this->createCubes0();
+	//this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
 	auto img = Resource::load<Image>("Image/blocky_photo_studio_2k.hdr");
 	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvLightingImage, img });
 	Resource::unload(img);
-}
 
-void MyMainScene::createSkybox()
-{
-	auto go = GameObject::create("Skybox");
-	go->setLayerMaskIndex(0);
-	go->addComponent<Transform>();
+	int radius = 5;
+	int length;
+	auto vs = GaussianMatrix::calculate(radius, length);
+	for (int x = 0; x < length; ++x)
+	{
+		for (int y = 0; y < length; ++y)
+		{
+			std::cout << vs[x + y * length] << "," << std::endl;
+		}
+	}
 
-	auto skybox = go->addComponent<Skybox>();
-	auto material = Material::create("Unlit/Skybox");
-	material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
-	material->addUniform<UniformI1>(ShaderParam::IsHDR, false);
-	skybox->setMaterial(material);
+	std::cout << vs.size();
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
@@ -173,6 +171,25 @@ void MyMainScene::createPaintings()
 	elden_ring2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "eldenring2");
 	mre2->setMaterial(elden_ring2_material);
 	mre2->setMesh("Square");
+
+
+	auto img = Resource::loadOnly<Image>("Image/solitude_night_2k.hdr");
+	auto hdr = Texture2D::create();
+	hdr->setData(img);
+	hdr->setMinFilter(TextureFilter::Linear_Mipmap_Linear);
+	hdr->generate();
+	auto gaussian = GameObject::create("Gaussian");
+	gaussian->addComponent<Transform>();
+	gaussian->getTransform()->setPosition(glm::vec3(960.0f, 0.0f, 0.0f));
+	gaussian->getTransform()->setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
+	gaussian->getTransform()->setScale(glm::vec3(hdr->getWidth() / 2, hdr->getHeight() / 2, 1.0f));
+	gaussian->getTransform()->setParent(transform);
+
+	auto mg = gaussian->addComponent<MeshRenderer>();
+	auto gaussian_material = Material::create("Unlit/GaussianBlur");
+	gaussian_material->addUniform<UniformTex2D>(ShaderParam::TexColor, hdr);
+	mg->setMaterial(gaussian_material);
+	mg->setMesh("Square");
 }
 
 void MyMainScene::createPlane()

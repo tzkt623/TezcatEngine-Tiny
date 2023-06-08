@@ -188,6 +188,7 @@ namespace tezcat::Tiny
 	{
 		Texture::apply(id);
 		free(mData);
+		mData = nullptr;
 	}
 
 	//--------------------------------------------------------
@@ -326,9 +327,10 @@ namespace tezcat::Tiny
 	void TextureCube::apply(uint32_t id)
 	{
 		Texture::apply(id);
-		for (auto d : mDatas)
+		for (auto& d : mDatas)
 		{
 			free(d);
+			d = nullptr;
 		}
 	}
 

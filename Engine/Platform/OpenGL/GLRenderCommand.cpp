@@ -97,21 +97,25 @@ namespace tezcat::Tiny::GL
 
 	}
 
-	GLRenderCMD_Skybox::GLRenderCMD_Skybox(Vertex* vertex, Transform* transform, Material* material)
-		: RenderCommand(material->getShader())
+	GLRenderCMD_Skybox::GLRenderCMD_Skybox(Shader* shader
+		, Vertex* vertex
+		, TextureCube* cube
+		, float lod
+		, bool isHdr)
+		: RenderCommand(shader)
 		, mVertex(vertex)
-		, mTransform(transform)
-		, mMaterial(material)
+		, mCube(cube)
+		, mLod(lod)
+		, mIsHdr(isHdr)
 	{
 
 	}
 
 	void GLRenderCMD_Skybox::run(BaseGraphics* graphics, Shader* shader)
 	{
-		auto& model_mat4 = mTransform->getModelMatrix();
-		graphics->setMat4(shader, ShaderParam::MatrixM, model_mat4);
-
-		mMaterial->submit(graphics, shader);
+		graphics->setTextureCube(mShader, ShaderParam::TexCube, mCube);
+		graphics->setFloat1(shader, "Lod", &mLod);
+		graphics->setInt1(shader, ShaderParam::IsHDR, mIsHdr);
 		graphics->draw(mVertex);
 	}
 
@@ -167,6 +171,7 @@ namespace tezcat::Tiny::GL
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 5);
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
 	}
 
 	//-------------------------------------------------------
@@ -189,6 +194,7 @@ namespace tezcat::Tiny::GL
 
 	void GLRenderCMD_EnvMakeIrradiance::run(BaseGraphics* graphics, Shader* shader)
 	{
+
 		glm::mat4 captureViews[] =
 		{
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
@@ -217,6 +223,7 @@ namespace tezcat::Tiny::GL
 			graphics->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 			graphics->draw(mVertex);
 		}
+
 	}
 
 	//-------------------------------------------------------
@@ -289,6 +296,8 @@ namespace tezcat::Tiny::GL
 				graphics->draw(mVertex);
 			}
 		}
+
+		//glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 }
 

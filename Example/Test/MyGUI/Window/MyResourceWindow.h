@@ -34,6 +34,9 @@ private:
 
 	int mFileItemSize;
 	bool mIsDraging;
+
+	ImVec2 mUVx;
+	ImVec2 mUVy;
 };
 
 

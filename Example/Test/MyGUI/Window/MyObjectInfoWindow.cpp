@@ -133,21 +133,142 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 		{
 			auto camera = static_cast<Camera*>(com);
 			auto transform = camera->getTransform();
-
 			ImGui::Text("操作<CTRL> [W A S D] [R:Up] [F:Down]");
-			ImGui::Text("位置(Position)");
-			ImGui::SameLine();
-			ImGui::InputFloat3("##位置", glm::value_ptr(transform->getPosition()));
+			ImGui::Separator();
 
-			ImGui::Text("旋转(Rotation)");
-			ImGui::SameLine();
-			ImGui::InputFloat3("##旋转(Rotation)", glm::value_ptr(transform->getRotation()));
+			ImGui::Text("投影(Projection)");
+			static const char* projection_name = "error";
+			IRenderObserver::ViewType view_type = camera->getViewType();
+			switch (view_type)
+			{
+			case IRenderObserver::ViewType::Screen:
+				break;
+			case IRenderObserver::ViewType::Ortho:
+			{
+				projection_name = "正交(Ortho)";
+				break;
+			}
+			case IRenderObserver::ViewType::Perspective:
+			{
+				projection_name = "透视(Perspective)";
+				break;
+			}
+			default:
+				break;
+			}
 
-			ImGui::Text("缩放(Scale)   ");
-			ImGui::SameLine();
-			ImGui::InputFloat3("##缩放(Scale)", glm::value_ptr(transform->getScale()));
-			ImGui::Spacing();
+			if (ImGui::BeginCombo("##Projection", projection_name))
+			{
+				ImGui::Selectable("正交(Ortho)");
+				if (ImGui::IsItemClicked())
+				{
+					view_type = IRenderObserver::ViewType::Ortho;
+				}
 
+				ImGui::Selectable("透视(Perspective)");
+				if (ImGui::IsItemClicked())
+				{
+					view_type = IRenderObserver::ViewType::Perspective;
+				}
+
+				ImGui::EndCombo();
+			}
+
+			switch (view_type)
+			{
+			case IRenderObserver::ViewType::Screen:
+				break;
+			case IRenderObserver::ViewType::Ortho:
+			{
+				float near_far[2] = { camera->getNear(),camera->getFar() };
+				ImGui::Text("NearFar");
+				ImGui::SameLine();
+				ImGui::InputFloat2("##NearFar", near_far);
+
+				camera->setOrtho(near_far[0], near_far[1]);
+				break;
+			}
+			case IRenderObserver::ViewType::Perspective:
+			{
+				float fov = camera->getFOV();
+				ImGui::Text("Fov    ");
+				ImGui::SameLine();
+				ImGui::DragFloat("##Fov", &fov, 1, 1, 180);
+
+				float near_far[2] = { camera->getNear(),camera->getFar() };
+				ImGui::Text("NearFar");
+				ImGui::SameLine();
+				ImGui::InputFloat2("##NearFar", near_far);
+
+				camera->setPerspective(fov, near_far[0], near_far[1]);
+
+				break;
+			}
+			default:
+				break;
+			}
+
+			/*
+			auto vinfo = camera->getViewportInfo();
+			int oxoy[2] = { vinfo.OX, vinfo.OY };
+			ImGui::Text("原点(Origin)");
+			ImGui::SameLine();
+			ImGui::InputInt2("##oxoy", oxoy);
+
+			int wh[2] = { vinfo.Width, vinfo.Height };
+			ImGui::Text("长宽(Width&Height)");
+			ImGui::SameLine();
+			ImGui::InputInt2("##wh", wh);
+			camera->setViewRect(oxoy[0], oxoy[1], wh[0], wh[1]);
+			*/
+
+			int order = camera->getOrder();
+			ImGui::Text("Order");
+			ImGui::SameLine();
+			ImGui::InputInt("##order", &order);
+			camera->setOrder(order);
+
+			ImGui::Separator();
+			ImGui::Text("ClearOptions");
+			auto clear_options = camera->getClearOption();
+			static bool clear_color = (clear_options & ClearOption::CO_Color) == ClearOption::CO_Color;
+			static bool clear_depth = (clear_options & ClearOption::CO_Depth) == ClearOption::CO_Depth;
+			static bool clear_stencil = (clear_options & ClearOption::CO_Stencil) == ClearOption::CO_Stencil;
+			static bool clear_skybox = (clear_options & ClearOption::CO_Skybox) == ClearOption::CO_Skybox;
+
+			ImGui::Checkbox("Color", &clear_color);
+			ImGui::SameLine(0, 20);
+			ImGui::Checkbox("Depth", &clear_depth);
+			ImGui::Checkbox("Stencil", &clear_stencil);
+			ImGui::SameLine(0, 20);
+			ImGui::Checkbox("Skybox", &clear_skybox);
+
+			ClearOptionID co_id = 0;
+			if (clear_color)
+			{
+				co_id |= ClearOption::CO_Color;
+			}
+
+			if (clear_depth)
+			{
+				co_id |= ClearOption::CO_Depth;
+			}
+
+			if (clear_stencil)
+			{
+				co_id |= ClearOption::CO_Stencil;
+			}
+
+			if (clear_skybox)
+			{
+				co_id |= ClearOption::CO_Skybox;
+			}
+			camera->setClearOption(co_id);
+
+
+			/*
+			ImGui::Separator();
+			ImGui::Text("朝向");
 			auto up = transform->getUp();
 			auto forward = transform->getForward();
 			auto right = transform->getRight();
@@ -171,14 +292,7 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 
 			ImGui::Text("模型矩阵(ModelMatrix)");
 			MyGUIContext::matrix4(camera->getTransform()->getModelMatrix());
-		}
-	});
-
-	this->drawComponent<Skybox>([](Component* com)
-	{
-		if (ImGui::CollapsingHeader("天空盒(Skybox)"))
-		{
-
+			*/
 		}
 	});
 

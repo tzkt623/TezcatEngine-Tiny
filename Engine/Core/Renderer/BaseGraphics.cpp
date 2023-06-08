@@ -19,6 +19,7 @@
 #include "../Component/ShadowCaster.h"
 
 #include "../Data/MeshData.h"
+#include "../Event/EngineEvent.h"
 
 #include "../Profiler.h"
 #include "../Engine.h"
@@ -35,6 +36,12 @@ namespace tezcat::Tiny
 
 	{
 		RenderLayer::init();
+
+		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene, this,
+			[](const EventData& data)
+			{
+
+			});
 	}
 
 	BaseGraphics::~BaseGraphics()
@@ -50,6 +57,16 @@ namespace tezcat::Tiny
 	{
 		mEnvLitManager->init();
 		FrameBuffer::setDefaultBuffer(FrameBuffer::getDefaultBuffer());
+	}
+
+	void BaseGraphics::buildCMD()
+	{
+		for (auto cmd : mBuildCmdAry)
+		{
+			cmd->execute(this);
+			delete cmd;
+		}
+		mBuildCmdAry.clear();
 	}
 
 	void BaseGraphics::setPipeline(RenderPhase type, const std::string& name, Pipeline* pl)
@@ -75,27 +92,17 @@ namespace tezcat::Tiny
 		Profiler_ResetDrawCall();
 		Profiler_ResetPassCount();
 
-		for (auto cmd : mBuildCmdAry)
-		{
-			cmd->execute(this);
-			delete cmd;
-		}
-		mBuildCmdAry.clear();
+		this->buildCMD();
 
 		mShadowCasterManager->calculate(this);
 		mEnvLitManager->calculate(this);
 		mCameraManager->calculate(this);
+
+		this->buildCMD();
 	}
 
 	void BaseGraphics::onRender()
 	{
-		for (auto cmd : mBuildCmdAry)
-		{
-			cmd->execute(this);
-			delete cmd;
-		}
-		mBuildCmdAry.clear();
-
 		for (auto queue : mPreQueue)
 		{
 			queue->render(this);
@@ -128,4 +135,5 @@ namespace tezcat::Tiny
 	{
 
 	}
+
 }

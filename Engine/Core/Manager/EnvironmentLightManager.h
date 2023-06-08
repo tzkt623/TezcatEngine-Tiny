@@ -13,6 +13,7 @@ namespace tezcat::Tiny
 	class Texture2D;
 	class Image;
 	class FrameBuffer;
+	class RenderCommand;
 	class TINY_API EnvObserver : public TinyObject, public IRenderObserver
 	{
 		EnvObserver();
@@ -44,6 +45,8 @@ namespace tezcat::Tiny
 
 		Texture2D* getHDRTexture() { return mTexHDR; }
 
+		RenderCommand* createSkyboxCMD(BaseGraphics* graphics);
+
 	public:
 		void showIrradianceMap();
 		void showPrefilterMap();
@@ -58,10 +61,10 @@ namespace tezcat::Tiny
 
 	private:
 		bool mDirty;
-		std::string mHDRTexName;
 
 		uint32_t mCubeSize;
 		uint32_t mIrrSize;
+		uint32_t mPrefilterSize;
 
 		TextureCube* mCubeMap;
 		TextureCube* mIrradianceMap;
@@ -77,8 +80,14 @@ namespace tezcat::Tiny
 		EnvObserver* mPrefilterObserver;
 		EnvObserver* mBRDFLUTObserver;
 
-		Skybox* mSkybox;
 		Texture2D* mTexHDR;
+		Texture2D* mCubeTextures[6];
+
+		Shader* mSkyboxShader;
+		Vertex* mSkyboxVertex;
+		float mSkyboxLod;
+
+		TextureCube* mCurrentCubeMap;
 	};
 
 	using EnvLitMgr = SG<EnvironmentLightManager>;

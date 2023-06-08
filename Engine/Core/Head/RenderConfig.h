@@ -188,13 +188,16 @@ namespace tezcat::Tiny
 		Post
 	};
 
-	enum TINY_API ClearOption : unsigned int
+	using ClearOptionID = uint32_t;
+	enum TINY_API ClearOption : ClearOptionID
 	{
 		CO_None = 0,
 		CO_Color = 1 << 0,
 		CO_Depth = 1 << 1,
-		CO_Stencil = 1 << 2
+		CO_Stencil = 1 << 2,
+		CO_Skybox = 1 << 3
 	};
+
 
 	enum class TINY_API RenderPhase : int
 	{

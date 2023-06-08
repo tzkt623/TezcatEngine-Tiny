@@ -210,7 +210,7 @@ namespace tezcat::Tiny
 		const RenderPhase& getPipelinePhase() const { return mRenderPhase; }
 		void setPipelineType(RenderPhase type) { mRenderPhase = type; }
 
-		void setClearOption(ClearOption option) { mClearOption = option; }
+		void setClearOption(ClearOptionID option) { mClearOption = (ClearOption)option; }
 		const ClearOption& getClearOption() const { return mClearOption; }
 
 		void updateObserverMatrix();
@@ -219,13 +219,32 @@ namespace tezcat::Tiny
 		void setOrder(int val) { mOrder = val; }
 
 		float getFOV() { return mFOV; }
+		void setFOV(float fov)
+		{
+			mFOV = fov;
+			mDirty = true;
+		}
+
 		float getAspect() { return (float)mViewInfo.Width / (float)mViewInfo.Height; }
+
+		void setNear(float near)
+		{
+			mNearFace = near;
+			mDirty = true;
+		}
 		float getNear() { return mNearFace; }
+		void setFar(float far)
+		{
+			mFarFace = far;
+			mDirty = true;
+		}
 		float getFar() { return mFarFace; }
 
 		RenderQueue* getRenderQueue() { return mRenderQueue; }
 		template<class QueueType>
 		QueueType* getRenderQueue() { return static_cast<QueueType*>(mRenderQueue); }
+
+		ViewType getViewType() { return mViewType; }
 
 	protected:
 		FrameBuffer* mFrameBuffer;
@@ -241,7 +260,7 @@ namespace tezcat::Tiny
 
 		glm::mat4 mProjectionMatrix;
 		glm::mat4 mViewMatrix;
-		bool mPMatDirty;
+		bool mDirty;
 
 	protected:
 		uint32_t mCullMask;

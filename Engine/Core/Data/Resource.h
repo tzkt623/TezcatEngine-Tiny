@@ -56,7 +56,7 @@ namespace tezcat::Tiny
 		{
 			std::filesystem::path file_path(FileTool::getRootRelativeResDir() + "/" + path);
 			Image* img = Image::create();
-			img->openFile(file_path.string());
+			img->openFile(file_path.string(), true);
 
 			Texture2D* t2d = Texture2D::create(file_path.filename().string());
 			t2d->setData(img);

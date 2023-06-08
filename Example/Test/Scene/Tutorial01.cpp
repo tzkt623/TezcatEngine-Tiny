@@ -27,9 +27,8 @@ void Tutorial01::onEnter()
 			, TextureChannel::RGBA
 			, DataType::UByte));
 
-	auto ds = TextureMgr::getInstance()->create2D("DS_Viewport");
-	ds->setData(Engine::getScreenWidth()
-		, Engine::getScreenHeight()
+	auto ds = TextureMgr::getInstance()->createRender2D("DS_Viewport");
+	ds->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
 		, TextureInfo(TextureAttachPosition::DepthComponent
 			, TextureChannel::Depth
 			, TextureChannel::Depth

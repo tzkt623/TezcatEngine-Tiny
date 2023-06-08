@@ -9,7 +9,7 @@
     #TINY_CFG_BEGIN
     {
         str Name = Unlit/EnvMakePrefilter;
-        int Version = 330;
+        int Version = 400;
         int OrderID = 50;
         str Queue = Prepare;
         str DepthTest = Off;
@@ -37,6 +37,7 @@
     {
         #include "../Include/tiny_fs_texture.tyin"
         #include "../Include/tiny_fs_pbr_func.tyin"
+        #include "../Include/tiny_noise2d.tyin"
         
         in vec3 myWorldPosition;
         out vec4 myFinalColor;
@@ -50,7 +51,7 @@
             vec3 R = N;
             vec3 V = R;
 
-            const uint SAMPLE_COUNT = 1024u;
+            const uint SAMPLE_COUNT = 256u;
             float totalWeight = 0.0;
             vec3 prefilteredColor = vec3(0.0);
 
@@ -60,34 +61,45 @@
                 vec2 Xi = hammersley(i, SAMPLE_COUNT);
                 vec3 H = importanceSampleGGX(Xi, N, roughness);
                 vec3 L = normalize(2.0 * dot(V, H) * H - V);
-
+                //vec3 L = reflect(-V, H);
                 float NdotL = max(dot(N, L), 0.0);
+                
                 if(NdotL > 0.0)
                 {
-                    // sample from the environment's mip level based on roughness/pdf
-                    float NdotH = max(dot(N, H), 0.0);
+                	float NdotH = max(dot(N, H), 0.0);
                     float HdotV = max(dot(H, V), 0.0);
-
                     float D = distributionGGX(NdotH, roughness);
+                    // sample from the environment's mip level based on roughness/pdf
                     float pdf = D * NdotH / (4.0 * HdotV + 0.0001f);
-
+                    
+                    
                     //float resolution = 1024.0; // resolution of source cubemap (per face)
                     float saTexel = 4.0 * PI / (6.0 * resolution * resolution);
-                    float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001f);
+                    float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.001f);
                     float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
                     
                     prefilteredColor += textureLod(TINY_TexCube, L, mipLevel).rgb * NdotL;
                     totalWeight += NdotL;
                 }
             }
-
-            prefilteredColor = prefilteredColor / max(totalWeight, 0.001f);
-
+            
+            prefilteredColor /= totalWeight;
             myFinalColor = vec4(prefilteredColor, 1.0);
         } 
     }
     #TINY_FS_END
 }
 #TINY_PASS_END
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -9,6 +9,20 @@ namespace tezcat::Tiny
 	class BaseGraphics;
 	class TINY_API SceneManager
 	{
+		const int CMD_Pop = 0;
+		const int CMD_Push = 1;
+
+		enum class CMD
+		{
+			Pop,
+			Push,
+		};
+
+		struct CMDData
+		{
+			CMD cmd;
+			Scene* scene;
+		};
 	public:
 		SceneManager();
 		~SceneManager();
@@ -35,6 +49,13 @@ namespace tezcat::Tiny
 
 		TinyStack<Scene*> mScenes;
 		TinyUMap<std::string, Scene*> mSceneWithName;
+
+		bool mNeedSwith;
+		Scene* mPopScene;
+		Scene* mPushScene;
+		Scene* mPauseScene;
+
+		std::deque<CMDData> mCDMs;
 	};
 
 	using SceneMgr = SG<SceneManager>;

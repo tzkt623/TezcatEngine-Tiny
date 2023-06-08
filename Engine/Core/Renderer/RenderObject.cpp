@@ -80,7 +80,7 @@ namespace tezcat::Tiny
 		, mProjectionMatrix(1.0f)
 		, mViewType(ViewType::Screen)
 		, mOrder(0)
-		, mPMatDirty(true)
+		, mDirty(true)
 		, mRenderPhase(RenderPhase::Forward)
 		, mRenderQueue(queue)
 	{
@@ -104,7 +104,7 @@ namespace tezcat::Tiny
 		mViewType = ViewType::Ortho;
 		mNearFace = near;
 		mFarFace = far;
-		mPMatDirty = true;
+		mDirty = true;
 	}
 
 	void IRenderObserver::setPerspective(float fov, float near, float far)
@@ -113,7 +113,7 @@ namespace tezcat::Tiny
 		mFOV = fov;
 		mNearFace = near;
 		mFarFace = far;
-		mPMatDirty = true;
+		mDirty = true;
 	}
 
 	void IRenderObserver::setViewRect(int x, int y, int width, int height)
@@ -122,14 +122,14 @@ namespace tezcat::Tiny
 		mViewInfo.OY = y;
 		mViewInfo.Width = width;
 		mViewInfo.Height = height;
-		mPMatDirty = true;
+		mDirty = true;
 	}
 
 	void IRenderObserver::updateObserverMatrix()
 	{
-		if (mPMatDirty)
+		if (mDirty)
 		{
-			mPMatDirty = false;
+			mDirty = false;
 			switch (mViewType)
 			{
 			case ViewType::Ortho:

@@ -32,7 +32,6 @@
 #include "Core/Component/FlyController.h"
 #include "Core/Component/MeshRenderer.h"
 #include "Core/Component/Light.h"
-#include "Core/Component/Skybox.h"
 #include "Core/Component/ShadowCaster.h"
 
 #include "Core/Data/Image.h"

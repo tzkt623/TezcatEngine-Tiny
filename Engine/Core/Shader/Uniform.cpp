@@ -67,6 +67,12 @@ namespace tezcat::Tiny
 		this->value->addRef();
 	}
 
+	UniformTex2D::UniformTex2D(const UniformID& id, Texture2D*& tex)
+		: UniformT(id, tex)
+	{
+		this->value->addRef();
+	}
+
 	UniformTex2D::~UniformTex2D()
 	{
 		this->value->subRef();

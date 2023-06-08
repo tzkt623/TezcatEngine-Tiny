@@ -57,15 +57,6 @@ void MySeconedScene::onEnter()
 		frame->generate();
 
 		camera->setFrameBuffer(frame);
-
-		go = GameObject::create("Skybox");
-		go->addComponent<Transform>();
-		go->setLayerMaskIndex(0);
-
-		auto skybox = go->addComponent<Skybox>();
-		auto material = Material::create("Unlit/Skybox");
-		material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_1");
-		skybox->setMaterial(material);
 	}
 
 	//----------------------------------------

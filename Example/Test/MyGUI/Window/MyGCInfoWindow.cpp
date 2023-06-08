@@ -18,24 +18,30 @@ void MyGCInfoWindow::onRender()
 	GUIWindow::onRender();
 
 	auto& infos = TinyGC::getGCInfos();
-
-	for (auto i : infos)
+	ImGuiListClipper clipper;
+	clipper.Begin(infos.size(), ImGui::GetTextLineHeightWithSpacing());
+	while (clipper.Step())
 	{
-		if (i->strongRef > 0)
+		for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
 		{
-			ImGui::Text("[%d]: <%d, %d> %s"
-				, i->index
-				, i->strongRef
-				, i->weakRef
-				, i->pointer->getClassName().c_str());
-		}
-		else
-		{
-			ImGui::Text("[%d]: <%d, %d> %s"
-				, i->index
-				, i->strongRef
-				, i->weakRef
-				, "FreeSlot");
+			auto i = infos[line_no];
+			if (i->strongRef > 0)
+			{
+				ImGui::Text("[%d]: <%d, %d> %s"
+					, i->index
+					, i->strongRef
+					, i->weakRef
+					, i->pointer->getClassName().c_str());
+			}
+			else
+			{
+				ImGui::Text("[%d]: <%d, %d> %s"
+					, i->index
+					, i->strongRef
+					, i->weakRef
+					, "FreeSlot");
+			}
 		}
 	}
+	clipper.End();
 }

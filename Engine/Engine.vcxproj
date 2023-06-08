@@ -231,7 +231,6 @@
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
     <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
-    <ClCompile Include="Core\Component\Skybox.cpp" />
     <ClCompile Include="ThirdParty\glad\glad.c" />
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp" />
     <ClCompile Include="ThirdParty\Hash\city.cc" />
@@ -279,6 +278,7 @@
     <ClInclude Include="Core\Shader\Uniform.h" />
     <ClInclude Include="Core\Tool\Collision\BoundingBox.h" />
     <ClInclude Include="Core\Tool\Collision\OBB.h" />
+    <ClInclude Include="Core\Tool\GaussianMatrix.h" />
     <ClInclude Include="Core\Tool\Log.h" />
     <ClInclude Include="Core\Event\EngineEvent.h" />
     <ClInclude Include="Core\Tool\DelegateCreator.h" />
@@ -325,7 +325,6 @@
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
     <ClInclude Include="Core\Renderer\RenderLayer.h" />
-    <ClInclude Include="Core\Component\Skybox.h" />
     <ClInclude Include="Core\Tool\Any.h" />
     <ClInclude Include="Core\Tool\Event.h" />
     <ClInclude Include="Core\Tool\IDGenerator.h" />

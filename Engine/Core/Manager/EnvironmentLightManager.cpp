@@ -15,7 +15,6 @@
 #include "../Shader/ShaderPackage.h"
 
 #include "../Event/EngineEvent.h"
-#include "../Component/Skybox.h"
 #include "../Data/Material.h"
 #include "../Data/Image.h"
 
@@ -55,8 +54,7 @@ namespace tezcat::Tiny
 		, mPrefilterObserver(nullptr)
 		, mBRDFLUTObserver(nullptr)
 		, mDirty(false)
-		, mSkybox(nullptr)
-		, mHDRTexName()
+		, mTexHDR(nullptr)
 		, mCubeFB(nullptr)
 		, mIrradianceFB(nullptr)
 		, mPrefilterFB(nullptr)
@@ -66,20 +64,12 @@ namespace tezcat::Tiny
 		, mBRDFLUTMap(nullptr)
 		, mCubeSize(1024)
 		, mIrrSize(32)
+		, mPrefilterSize(128)
+		, mSkyboxLod(0)
+		, mSkyboxShader(nullptr)
+		, mSkyboxVertex(nullptr)
 	{
 		EnvLitMgr::attach(this);
-
-		EngineEvent::get()->addListener(EngineEventID::EE_ActiveSkybox
-			, this
-			, [this](const EventData& data)
-			{
-				if (mSkybox)
-				{
-					return;
-				}
-				mSkybox = static_cast<Skybox*>(data.userData);
-				mSkybox->getMaterial()->addUniform<UniformF1>("Lod", 0.0f);
-			});
 
 		EngineEvent::get()->addListener(EngineEventID::EE_ChangeEnvLightingImage
 			, this
@@ -102,6 +92,30 @@ namespace tezcat::Tiny
 				mTexHDR = static_cast<Texture2D*>(data.userData);
 				mTexHDR->addRef();
 			});
+
+		EngineEvent::get()->addListener(EngineEventID::EE_OnPushScene
+			, this
+			, [this](const EventData& data)
+			{
+				mDirty = false;
+				if (mTexHDR)
+				{
+					mTexHDR->subRef();
+					mTexHDR = nullptr;
+				}
+			});
+
+		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene
+			, this
+			, [this](const EventData& data)
+			{
+				mDirty = false;
+				if (mTexHDR)
+				{
+					mTexHDR->subRef();
+					mTexHDR = nullptr;
+				}
+			});
 	}
 
 	EnvironmentLightManager::~EnvironmentLightManager()
@@ -115,9 +129,7 @@ namespace tezcat::Tiny
 		if (mDirty)
 		{
 			mDirty = false;
-			mSkybox->getMaterial()->setUniform<UniformTexCube>(ShaderParam::TexCube, mCubeMap);
-			mSkybox->getMaterial()->setUniform<UniformI1>(ShaderParam::IsHDR, true);
-
+			mCurrentCubeMap = mCubeMap;
 			//---------------------------------
 			auto cube_vertex = VertexBufMgr::getInstance()->create("Cube");
 			auto shader = ShaderMgr::getInstance()->find("Unlit/EnvMakeCube");
@@ -139,8 +151,8 @@ namespace tezcat::Tiny
 													 , mCubeMap
 													 , mPrefilterMap
 													 , 5
-													 , 128
-													 , 128
+													 , mPrefilterSize
+													 , mPrefilterSize
 													 , mCubeSize);
 			mPrefilterObserver->getRenderQueue()->addRenderCommand(cmd);
 			graphics->addPreRenderPassQueue(mPrefilterObserver->getRenderQueue<ExtraQueue>());
@@ -231,7 +243,7 @@ namespace tezcat::Tiny
 
 	void EnvironmentLightManager::createPrefilter()
 	{
-		const int prefilter_size = 128;
+		const int prefilter_size = mPrefilterSize;
 		mPrefilterObserver = EnvObserver::create();
 		mPrefilterObserver->setPerspective(90.0f, 0.1f, 10.0f);
 		mPrefilterObserver->setViewRect(0, 0, prefilter_size, prefilter_size);
@@ -289,22 +301,22 @@ namespace tezcat::Tiny
 	}
 	void EnvironmentLightManager::showIrradianceMap()
 	{
-		mSkybox->getMaterial()->setUniform<UniformTexCube>(ShaderParam::TexCube, mIrradianceMap);
+		mCurrentCubeMap = mIrradianceMap;
 	}
 
 	void EnvironmentLightManager::showPrefilterMap()
 	{
-		mSkybox->getMaterial()->setUniform<UniformTexCube>(ShaderParam::TexCube, mPrefilterMap);
+		mCurrentCubeMap = mPrefilterMap;
 	}
 
 	void EnvironmentLightManager::showSkybox()
 	{
-		mSkybox->getMaterial()->setUniform<UniformTexCube>(ShaderParam::TexCube, mCubeMap);
+		mCurrentCubeMap = mCubeMap;
 	}
 
 	void EnvironmentLightManager::setSkyboxLod(float skyboxLod)
 	{
-		mSkybox->getMaterial()->setUniformByName<UniformF1>("Lod", skyboxLod);
+		mSkyboxLod = skyboxLod;
 	}
 
 	void EnvironmentLightManager::setHDRImage(Image* image)
@@ -322,6 +334,24 @@ namespace tezcat::Tiny
 			mTexHDR->setData(image);
 			mTexHDR->generate();
 			mTexHDR->addRef();
+		}
+	}
+
+	RenderCommand* EnvironmentLightManager::createSkyboxCMD(BaseGraphics* graphics)
+	{
+		if (mSkyboxShader == nullptr)
+		{
+			mSkyboxVertex = VertexBufMgr::getInstance()->create("Skybox");
+			mSkyboxShader = ShaderMgr::getInstance()->find("Unlit/Skybox");
+		}
+
+		if (mTexHDR)
+		{
+			return graphics->createDrawSkyboxCMD(mSkyboxShader, mSkyboxVertex, mCurrentCubeMap, mSkyboxLod, true);
+		}
+		else
+		{
+			return graphics->createDrawSkyboxCMD(mSkyboxShader, mSkyboxVertex, mCurrentCubeMap, mSkyboxLod, false);
 		}
 	}
 

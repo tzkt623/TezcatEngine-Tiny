@@ -285,6 +285,16 @@ namespace tezcat::Tiny
 		const TexFilterWrapper& getMinFilter() const { return mMinFilter; }
 		const TexFilterWrapper& getMagFilter() const { return mMagFilter; }
 
+		void setMinFilter(TextureFilter filter)
+		{
+			mMinFilter = ContextMap::TextureFilterArray[(uint32_t)filter];
+		}
+
+		void setMagFilter(TextureFilter filter)
+		{
+			mMagFilter = ContextMap::TextureFilterArray[(uint32_t)filter];
+		}
+
 	public:
 		static TexChannelWrapper getTextureChannels(const Image& image);
 

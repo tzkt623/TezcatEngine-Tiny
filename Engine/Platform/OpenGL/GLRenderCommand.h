@@ -43,14 +43,15 @@ namespace tezcat::Tiny::GL
 	class GLRenderCMD_Skybox : public RenderCommand
 	{
 	public:
-		GLRenderCMD_Skybox(Vertex* vertex, Transform* transform, Material* material);
+		GLRenderCMD_Skybox(Shader* shader, Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false);
 		virtual ~GLRenderCMD_Skybox();
 
 		void run(BaseGraphics* graphics, Shader* shader) override;
 	private:
 		Vertex* mVertex;
-		Transform* mTransform;
-		Material* mMaterial;
+		TextureCube* mCube;
+		float mLod;
+		bool mIsHdr;
 	};
 
 	class GLRenderCMD_Mesh : public RenderCommand

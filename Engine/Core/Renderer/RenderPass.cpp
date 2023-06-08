@@ -227,6 +227,12 @@ namespace tezcat::Tiny
 		graphics->setViewport(mObserver->getViewportInfo());
 		graphics->clear(mObserver->getClearOption());
 
+		if ((mObserver->getClearOption() & ClearOption::CO_Skybox) == ClearOption::CO_Skybox)
+		{
+			auto cmd = EnvLitMgr::getInstance()->createSkyboxCMD(graphics);
+			this->addRenderCommand(cmd);
+		}
+
 		this->render(graphics, mBackground);
 		this->render(graphics, mOpaque);
 		this->render(graphics, mAlpha);
@@ -235,7 +241,6 @@ namespace tezcat::Tiny
 		this->render(graphics, mOverlay);
 
 		FrameBuffer::unbind(graphics, mObserver->getFrameBuffer());
-
 	}
 
 	void BaseQueue::render(BaseGraphics* graphics, std::vector<RenderPass*>& passes)

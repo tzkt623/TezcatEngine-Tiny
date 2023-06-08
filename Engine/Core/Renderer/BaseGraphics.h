@@ -64,6 +64,9 @@ namespace tezcat::Tiny
 
 		virtual void preRender();
 		virtual void onRender();
+
+		void buildCMD();
+
 		virtual void postRender();
 
 		void setPipeline(RenderPhase type, const std::string& name, Pipeline* pl);
@@ -119,7 +122,11 @@ namespace tezcat::Tiny
 		virtual RenderCommand* createDrawVertexCMD(Shader* shader, Vertex* vertex) = 0;
 		virtual RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform) = 0;
 		virtual RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material) = 0;
-		virtual RenderCommand* createDrawSkyboxCMD(Vertex* vertex, Transform* transform, Material* material) = 0;
+		virtual RenderCommand* createDrawSkyboxCMD(Shader* shader
+												 , Vertex* vertex
+												 , TextureCube* cube
+												 , float lod = 0
+												 , bool isHdr = false) = 0;
 		virtual RenderCommand* createDrawHDRToCubeCMD(Shader* shader
 													, Vertex* vertex
 													, Texture2D* hdr

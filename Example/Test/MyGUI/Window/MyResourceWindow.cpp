@@ -12,6 +12,8 @@ CreateInstanceCPP(MyResourceWindow);
 MyResourceWindow::MyResourceWindow()
 	: GUIWindow("资源(Resource)")
 	, mFileItemSize(64)
+	, mUVx(0, 1)
+	, mUVy(1, 0)
 {
 	mRootPath = "./Resource";
 	mCurrentPath = "./Resource";
@@ -138,7 +140,10 @@ void MyResourceWindow::drawFolder()
 			{
 			case std::filesystem::file_type::directory:
 			{
-				ImGui::ImageButton((ImTextureID)mIconAry[Icon_Folder]->getTextureID(), ImVec2(mFileItemSize, mFileItemSize));
+				ImGui::ImageButton((ImTextureID)mIconAry[Icon_Folder]->getTextureID()
+					, ImVec2(mFileItemSize, mFileItemSize)
+					, mUVx
+					, mUVy);
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
 					mCurrentPath = it.path();
@@ -161,7 +166,10 @@ void MyResourceWindow::drawFolder()
 
 void MyResourceWindow::drawFile(const std::filesystem::path& path)
 {
-	ImGui::ImageButton((ImTextureID)mIconAry[Icon_DefaultFile]->getTextureID(), ImVec2(mFileItemSize, mFileItemSize));
+	ImGui::ImageButton((ImTextureID)mIconAry[Icon_DefaultFile]->getTextureID()
+		, ImVec2(mFileItemSize, mFileItemSize)
+		, mUVx
+		, mUVy);
 	if (ImGui::IsItemHovered())
 	{
 		if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
