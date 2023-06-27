@@ -23,7 +23,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec2 aUV;
@@ -40,14 +40,15 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs.tyin"
 
         in vec2 myUV;
         out vec4 myFinalColor;
+        uniform sampler2D myTexColor2D;
 
         void main()
         {
-            vec4 fcolor = texture(TINY_TexColor, myUV);
+            vec4 fcolor = texture(myTexColor2D, myUV);
 //            if(fcolor.a < 0.1)
 //            {
 //                discard;

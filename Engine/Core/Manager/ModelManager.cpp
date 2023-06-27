@@ -1,18 +1,24 @@
 #include "ModelManager.h"
+#include "SceneManager.h"
 #include "VertexBufferManager.h"
 
 #include "../Data/MeshData.h"
 
+#include "../Component/Transform.h"
+#include "../Component/MeshRenderer.h"
+#include "../Component/GameObject.h"
+
 #include "ThirdParty/assimp/Importer.hpp"
 #include "ThirdParty/assimp/scene.h"
 #include "ThirdParty/assimp/postprocess.h"
+#include "ThirdParty/Hash/city.h"
 
 
 namespace tezcat::Tiny
 {
 	ModelManager::ModelManager()
 	{
-
+		ModelMgr::attach(this);
 	}
 
 	ModelManager::~ModelManager()
@@ -22,55 +28,100 @@ namespace tezcat::Tiny
 
 	void ModelManager::loadModel(const std::string& path)
 	{
-		Assimp::Importer importer;
-		const aiScene* ai_scene = importer.ReadFile(path
-												  , aiProcess_CalcTangentSpace
-												  | aiProcess_Triangulate
-												  | aiProcess_JoinIdenticalVertices
-												  | aiProcess_SortByPType);
-
-		if (ai_scene == nullptr)
+		if (SceneMgr::getInstance()->empty())
 		{
 			return;
 		}
 
-		for (uint32_t i = 0; i < ai_scene->mNumMeshes; i++)
+		auto hash_id = CityHash64(path.data(), path.size());
+		auto result = mModelUMap.find(hash_id);
+		if (result == mModelUMap.end())
 		{
-			auto ai_mesh = ai_scene->mMeshes[i];
+			auto current_scene = SceneMgr::getInstance()->getCurrentScene();
 
-			ai_scene->mRootNode->FindNode(ai_mesh->mName);
+			uint32_t load_flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate
+				| aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
+				| aiProcess_GenSmoothNormals | aiProcess_FlipUVs
+				| aiProcess_RemoveComponent | aiProcess_OptimizeGraph;
 
-			this->createMesh(ai_mesh);
-		}
+			uint32_t remove_flag = aiComponent_LIGHTS | aiComponent_CAMERAS | aiComponent_MATERIALS;
 
-		auto ai_root = ai_scene->mRootNode;
-		if (ai_root->mNumChildren > 0)
-		{
-			for (uint32_t i = 0; i < ai_root->mNumChildren; i++)
+			Assimp::Importer importer;
+
+			importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, remove_flag);
+			importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+
+			const aiScene* ai_scene = importer.ReadFile(path, load_flag);
+
+			if (ai_scene == nullptr)
 			{
-				auto child = ai_root->mChildren[i];
-				auto ai_meshes = child->mMeshes;
-				//加载场景中的Mesh
-				if (child->mNumMeshes > 0)
-				{
-					auto mRoot = new ModelNode();
-					ModelNode* mesh_node = new ModelNode();
-					mRoot->addChild(mesh_node);
+				return;
+			}
 
-					for (uint32_t mesh_i = 0; mesh_i < child->mNumMeshes; mesh_i++)
+			std::function<void(const aiScene*, aiNode*, ModelNode*, uint32_t index)> func =
+				[this, func](const aiScene* aiscene, aiNode* ainode, ModelNode* parent, uint32_t index)
+			{
+				auto mnode = this->createModelNode(aiscene, ainode);
+				if (parent != nullptr)
+				{
+					parent->addChild(mnode);
+				}
+
+				if (ainode->mNumChildren > 0)
+				{
+					for (uint32_t i = 0; i < ainode->mNumChildren; i++)
 					{
-						auto ai_mesh = ai_scene->mMeshes[ai_meshes[mesh_i]];
-						this->createMesh(ai_mesh);
+						func(aiscene, ainode->mChildren[i], mnode, i);
 					}
+				}
+			};
+
+			auto ai_node = ai_scene->mRootNode;
+			auto mnode = this->createModelNode(ai_scene, ai_node);
+			mModelUMap.emplace(hash_id, mnode);
+			if (ai_node->mNumChildren > 0)
+			{
+				for (uint32_t i = 0; i < ai_node->mNumChildren; i++)
+				{
+					func(ai_scene, ai_node->mChildren[i], mnode, i);
 				}
 			}
 		}
+
+		auto node = result->second;
+	}
+
+	ModelNode* ModelManager::createModelNode(const aiScene* aiscene, aiNode* ainode)
+	{
+		ModelNode* mnode = new ModelNode();
+		mnode->mName = ainode->mName.C_Str();
+		if (ainode->mNumMeshes > 0)
+		{
+			auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[0]];
+			auto mesh_data = this->createMesh(ai_mesh);
+			VertexBufMgr::getInstance()->create(mesh_data);
+		}
+
+		return mnode;
+	}
+
+	Transform* ModelManager::createModel(const aiScene* aiscene, aiNode* ainode)
+	{
+		auto go = GameObject::create(ainode->mName.C_Str());
+		auto transform = go->addComponent<Transform>();
+		if (ainode->mNumMeshes > 0)
+		{
+			auto mr = go->addComponent<MeshRenderer>();
+			auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[0]];
+			mr->setMesh(this->createMesh(ai_mesh));
+		}
+
+		return transform;
 	}
 
 	MeshData* ModelManager::createMesh(aiMesh* aimesh)
 	{
 		MeshData* meshData = MeshData::create(aimesh->mName.C_Str());
-		mMeshDataAry.push_back(meshData);
 
 		meshData->mVertices.reserve(aimesh->mNumVertices);
 		meshData->mNormals.reserve(aimesh->mNumVertices);

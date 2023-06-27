@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         out vec3 myWorldPosition;
@@ -35,8 +35,7 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_texture.tyin"
-        #include "../Include/tiny_fs_pbr_func.tyin"
+        #include "../Include/tiny_fs.tyin"
         
         in vec3 myWorldPosition;
         out vec4 myFinalColor;
@@ -69,7 +68,7 @@
                     // tangent space to world
                     vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N; 
 
-                    irradiance += texture(TINY_TexCube, sampleVec).rgb * cos(theta) * sin(theta);
+                    irradiance += texture(TINY_TexSkybox, sampleVec).rgb * cos(theta) * sin(theta);
                     nrSamples++;
                 }
             }

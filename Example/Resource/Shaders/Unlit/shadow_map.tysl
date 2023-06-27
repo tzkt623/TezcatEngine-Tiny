@@ -20,14 +20,13 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
-        #include "../Include/tiny_vs_shadow.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         
         void main()
         {
-            gl_Position = TINY_MatrixLit * TINY_MatrixM * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixVP * TINY_MatrixM * vec4(aPos, 1.0);
         }
     }
     #TINY_VS_END

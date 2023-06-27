@@ -8,15 +8,17 @@
 #include "Manager/VertexBufferManager.h"
 #include "Manager/FrameBufferManager.h"
 #include "Manager/TextureManager.h"
+#include "Manager/ModelManager.h"
 
-#include "Input/InputSystem.h"
 #include "Renderer/BaseGraphics.h"
 #include "Renderer/LayerMask.h"
 #include "Component/GameObject.h"
 #include "Shader/ShaderParam.h"
+#include "Data/Resource.h"
 
 #include "Tool/Tool.h"
 #include "Event/EngineEvent.h"
+#include "Input/InputSystem.h"
 
 #include "Base/TinyGC.h"
 
@@ -45,6 +47,7 @@ namespace tezcat::Tiny
 		, mFrameBufferManager(nullptr)
 		, mTextureManager(nullptr)
 		, mVertexManager(nullptr)
+		, mModelManager(nullptr)
 		, mInputSystem(nullptr)
 		, mGraphics(nullptr)
 		, mIsRunning(true)
@@ -71,6 +74,7 @@ namespace tezcat::Tiny
 		mFrameBufferManager = new FrameBufferManager();
 		mTextureManager = new TextureManager();
 		mVertexManager = new VertexBufferManager();
+		mModelManager = new ModelManager();
 		mInputSystem = new InputSystem();
 
 		if (!this->preInit())
@@ -101,6 +105,7 @@ namespace tezcat::Tiny
 		ShaderParam::initAllParam(std::bind(&EngineIniter::initYourShaderParam, mResourceLoader));
 
 		LayerMask::init();
+		Resource::init(mResourceLoader->getResourceFolderName());
 		FileTool::init(mResourceLoader->getResourceFolderName());
 		return true;
 	}

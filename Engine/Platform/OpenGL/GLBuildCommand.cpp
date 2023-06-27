@@ -215,19 +215,21 @@ namespace tezcat::Tiny::GL
 	{
 		GLuint tex_id;
 		glGenTextures(1, &tex_id);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
+		TINY_GL_Check(glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id));
+
+		auto width = mTex->getWidth();
+		auto height = mTex->getHeight();
 
 		for (unsigned int i = 0; i < 6; i++)
 		{
-			auto image = mTex->getData(i);
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
+			TINY_GL_Check(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
 						, 0
 						, mTex->getInternalChannel().platform
-						, mTex->getWidth(), mTex->getHeight()
+						, width, height
 						, 0
 						, mTex->getChannel().platform
 						, mTex->getDataType().platform
-						, image);
+						, mTex->getData(i)));
 		}
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mTex->getWrapS().platform);
@@ -358,10 +360,7 @@ namespace tezcat::Tiny::GL
 			delete[] colors;
 		}
 
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		{
-			Log_Error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-		}
+		TinyThrow_Runtime(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE, "ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -551,17 +550,23 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
-		mShader->resizeUniformList(UniformID::allStringCount(), -1);
-		for (auto& uniform_id : builder.mUniformSet)
+		mShader->resizeTinyUniformAry(UniformID::allStringCount());
+		for (auto& pair : builder.mTinyUMap)
 		{
-			if (uniform_id.getUID() < mShader->getUniformListSize())
+			auto uid = UniformID::getUIDStatic(pair.first);
+			if (uid < mShader->getTinyUniformCount())
 			{
-				mShader->setUniformID(uniform_id.getUID(), glGetUniformLocation(pid, uniform_id.getStringData()));
+				mShader->setupTinyUniform(pair.second, pair.first, uid, glGetUniformLocation(pid, pair.first.c_str()));
 			}
 			else
 			{
-				Log_Error(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", uniform_id.getStringData()));
+				Log_Error(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", pair.first.c_str()));
 			}
+		}
+
+		for (auto& pair : builder.mUserUMap)
+		{
+			mShader->setupUserUniformID(pair.second, pair.first, glGetUniformLocation(pid, pair.first.c_str()));
 		}
 
 		mShader->apply(pid);

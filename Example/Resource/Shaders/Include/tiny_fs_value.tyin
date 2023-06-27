@@ -1,3 +1,0 @@
-#include "tiny_fs_camera.tyin"
-
-uniform vec2 TINY_ScreenLength;

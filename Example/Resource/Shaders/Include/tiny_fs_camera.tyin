@@ -1,2 +1,3 @@
-uniform vec3 TINY_ViewPosition;
-uniform vec2 TINY_ViewNearFar;
+uniform vec3 TINY_CameraWorldPosition;
+uniform vec2 TINY_CameraNearFar;
+uniform vec2 TINY_Resolution;

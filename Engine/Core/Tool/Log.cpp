@@ -88,5 +88,4 @@ namespace tezcat::Tiny
 
 		mLogQueue.clear();
 	}
-
 }

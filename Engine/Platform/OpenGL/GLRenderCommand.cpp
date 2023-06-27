@@ -99,12 +99,12 @@ namespace tezcat::Tiny::GL
 
 	GLRenderCMD_Skybox::GLRenderCMD_Skybox(Shader* shader
 		, Vertex* vertex
-		, TextureCube* cube
+		, TextureCube* skybox
 		, float lod
 		, bool isHdr)
 		: RenderCommand(shader)
 		, mVertex(vertex)
-		, mCube(cube)
+		, mSkybox(skybox)
 		, mLod(lod)
 		, mIsHdr(isHdr)
 	{
@@ -113,9 +113,9 @@ namespace tezcat::Tiny::GL
 
 	void GLRenderCMD_Skybox::run(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setTextureCube(mShader, ShaderParam::TexCube, mCube);
-		graphics->setFloat1(shader, "Lod", &mLod);
-		graphics->setInt1(shader, ShaderParam::IsHDR, mIsHdr);
+		graphics->setTextureCube(mShader, ShaderParam::TexSkybox, mSkybox);
+		graphics->setFloat1(shader, "myLod", mLod);
+		graphics->setBool(shader, "myIsHDR", mIsHdr);
 		graphics->draw(mVertex);
 	}
 
@@ -124,11 +124,16 @@ namespace tezcat::Tiny::GL
 	//
 	//	RenderCMD_HDRToCube
 	//
-	GLRenderCMD_HDRToCube::GLRenderCMD_HDRToCube(Shader* shader, Vertex* vertex, Texture2D* hdr, TextureCube* cube)
+	GLRenderCMD_HDRToCube::GLRenderCMD_HDRToCube(Shader* shader
+		, Vertex* vertex
+		, int* uniformIDHDR
+		, Texture2D* texHDR
+		, TextureCube* skybox)
 		: RenderCommand(shader)
 		, mVertex(vertex)
-		, mHDR(hdr)
-		, mCube(cube)
+		, mUniformIDHDR(uniformIDHDR)
+		, mTexHDR(texHDR)
+		, mSkybox(skybox)
 	{
 
 	}
@@ -151,14 +156,14 @@ namespace tezcat::Tiny::GL
 		};
 
 		shader->resetLocalState();
-		graphics->setTexture2D(shader, ShaderParam::TexColor, mHDR);
+		graphics->setTexture2D(shader, *mUniformIDHDR, mTexHDR);
 
 		for (uint32_t i = 0; i < 6; i++)
 		{
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 								 , GL_COLOR_ATTACHMENT0
 								 , GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
-								 , mCube->getTextureID()
+								 , mSkybox->getTextureID()
 								 , 0);
 
 			graphics->setMat4(shader, ShaderParam::MatrixV, captureViews[i]);
@@ -166,7 +171,7 @@ namespace tezcat::Tiny::GL
 			graphics->draw(mVertex);
 		}
 
-		glBindTexture(GL_TEXTURE_CUBE_MAP, mCube->getTextureID());
+		glBindTexture(GL_TEXTURE_CUBE_MAP, mSkybox->getTextureID());
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 5);
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -178,10 +183,10 @@ namespace tezcat::Tiny::GL
 	//
 	//	GLRenderCMD_EnvMakeIrradiance
 	//
-	GLRenderCMD_EnvMakeIrradiance::GLRenderCMD_EnvMakeIrradiance(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* irradiance)
+	GLRenderCMD_EnvMakeIrradiance::GLRenderCMD_EnvMakeIrradiance(Shader* shader, Vertex* vertex, TextureCube* skybox, TextureCube* irradiance)
 		: RenderCommand(shader)
 		, mVertex(vertex)
-		, mCubeMap(cube)
+		, mSkyboxMap(skybox)
 		, mIrradianceMap(irradiance)
 	{
 
@@ -194,7 +199,6 @@ namespace tezcat::Tiny::GL
 
 	void GLRenderCMD_EnvMakeIrradiance::run(BaseGraphics* graphics, Shader* shader)
 	{
-
 		glm::mat4 captureViews[] =
 		{
 		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
@@ -206,7 +210,7 @@ namespace tezcat::Tiny::GL
 		};
 
 		shader->resetLocalState();
-		graphics->setTextureCube(shader, ShaderParam::TexCube, mCubeMap);
+		graphics->setTextureCube(shader, ShaderParam::TexSkybox, mSkyboxMap);
 
 		for (uint32_t i = 0; i < 6; i++)
 		{
@@ -223,7 +227,6 @@ namespace tezcat::Tiny::GL
 			graphics->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 			graphics->draw(mVertex);
 		}
-
 	}
 
 	//-------------------------------------------------------
@@ -232,7 +235,7 @@ namespace tezcat::Tiny::GL
 	//
 	GLRenderCMD_EnvMakePrefilter::GLRenderCMD_EnvMakePrefilter(Shader* shader
 		, Vertex* vertex
-		, TextureCube* cube
+		, TextureCube* skybox
 		, TextureCube* prefitler
 		, uint32_t mipMaxLevel
 		, uint32_t mipWidth
@@ -240,13 +243,12 @@ namespace tezcat::Tiny::GL
 		, float resolution)
 		: RenderCommand(shader)
 		, mVertex(vertex)
-		, mCubeMap(cube)
+		, mSkyboxMap(skybox)
 		, mPrefilterMap(prefitler)
 		, mMipMaxLevel(mipMaxLevel)
 		, mMipWidth(mipWidth)
 		, mMipHeight(mipHeight)
 		, mResolution(resolution)
-
 	{
 
 	}
@@ -269,7 +271,7 @@ namespace tezcat::Tiny::GL
 		};
 
 		shader->resetLocalState();
-		graphics->setTextureCube(shader, ShaderParam::TexCube, mCubeMap);
+		graphics->setTextureCube(shader, ShaderParam::TexSkybox, mSkyboxMap);
 
 		for (uint32_t mip = 0; mip < mMipMaxLevel; ++mip)
 		{
@@ -300,5 +302,3 @@ namespace tezcat::Tiny::GL
 		//glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 }
-
-

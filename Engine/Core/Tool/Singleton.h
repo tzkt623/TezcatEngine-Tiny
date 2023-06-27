@@ -24,7 +24,7 @@ namespace tezcat::Tiny
 		{
 			if (mIsAttached)
 			{
-				throw std::logic_error(StringTool::stringFormat("SG<>: This Instance is an AttachedType [%s]",
+				throw std::logic_error(fmt::format("SG<>: This Instance is an AttachedType [{}]",
 					typeid(T).name()));
 			}
 

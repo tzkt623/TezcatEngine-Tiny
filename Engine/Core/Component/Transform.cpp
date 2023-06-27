@@ -56,7 +56,6 @@ namespace tezcat::Tiny
 
 	}
 
-
 	void Transform::setParent(Transform* parent)
 	{
 		if (parent == mParent)
@@ -64,13 +63,23 @@ namespace tezcat::Tiny
 			return;
 		}
 
-		bool inited = mGameObject->getScene();
+		bool inited = mGameObject->getScene() != nullptr;
 
 		//如果父节点不为空
 		if (mParent != nullptr)
 		{
 			//从父节点中删除自己
 			mParent->removeChild(this);
+		}
+		else
+		{
+			if (inited)
+			{
+				mGameObject->getScene()->getTransformList().remove_if([this](TinyWeakRef<Transform>& ptr)
+				{
+					return ptr.get() == this;
+				});
+			}
 		}
 
 		if (parent == nullptr)
@@ -94,6 +103,7 @@ namespace tezcat::Tiny
 			mParent->addChild(this);
 		}
 	}
+
 	void Transform::clampRotation()
 	{
 		if (mLocalRotation.x > 360.0f)
@@ -227,7 +237,7 @@ namespace tezcat::Tiny
 	{
 		if (mChildren == nullptr)
 		{
-			mChildren = new std::vector<TinyWeakRef<Transform>>();
+			mChildren = new std::list<TinyWeakRef<Transform>>();
 		}
 
 
@@ -289,6 +299,7 @@ namespace tezcat::Tiny
 	{
 		localVector = glm::inverse(mModelMatrix) * glm::vec4(worldVector, 0.0f);
 	}
+
 	//-------------------------------------------------
 	//
 	//	TransformList

@@ -12,12 +12,13 @@ namespace tezcat::Tiny
 
 	std::unordered_map<std::string, FileType> FileTool::sFileTypeUMap =
 	{
-		{ ".text", FileType::FT_Text },
-		{ ".tysl", FileType::FT_Tysl },
-		{ ".tyin", FileType::FT_Tyin },
-		{ ".jpg", FileType::FT_Jpg },
-		{ ".png", FileType::FT_Png },
-		{ ".hdr", FileType::FT_Hdr }
+		{ ".text",	FileType::FT_Text },
+		{ ".tysl",	FileType::FT_Tysl },
+		{ ".tyin",	FileType::FT_Tyin },
+		{ ".jpg",	FileType::FT_Jpg },
+		{ ".png",	FileType::FT_Png },
+		{ ".hdr",	FileType::FT_Hdr },
+		{ ".fbx",	FileType::FT_Fbx }
 	};
 
 	void FileTool::init(const std::string & resourceFolder)

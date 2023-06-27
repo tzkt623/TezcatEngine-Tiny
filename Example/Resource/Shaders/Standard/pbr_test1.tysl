@@ -22,8 +22,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
-        #include "../Include/tiny_vs_shadow.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
@@ -34,7 +33,7 @@
         out vec2 myUV;
         out vec3 myNormal;
         out vec3 myWorldPosition;
-        out vec4 myLightPosition;
+        out vec4 myLightSpacePosition;
 
         void main()
         {
@@ -44,7 +43,7 @@
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
             myWorldPosition = vec3(position);
-            myLightPosition = TINY_MatrixLit * vec4(myWorldPosition, 1.0f);
+            myLightSpacePosition = TINY_MatrixLightVP * vec4(myWorldPosition, 1.0f);
 
             gl_Position = TINY_MatrixP * TINY_MatrixV * position;
         }
@@ -53,30 +52,27 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_pbr_mat.tyin"
-        #include "../Include/tiny_fs_pbr_func.tyin"
-        #include "../Include/tiny_fs_function.tyin"
-        #include "../Include/tiny_fs_camera.tyin"
-        #include "../Include/tiny_fs_texture.tyin"
-        #include "../Include/tiny_fs_light.tyin"
+        #include "../Include/tiny_fs.tyin"
 
         in vec4 myColor;
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
-        in vec4 myLightPosition;
+        in vec4 myLightSpacePosition;
         
         out vec4 myFinalColor;
 
+        uniform MatPBR_Test myPBR;
+
         void main()
         {
-            vec3 albedo = TINY_MatPBR_Test.albedo;
-            float metallic = TINY_MatPBR_Test.metallic;
-            float roughness = TINY_MatPBR_Test.roughness;
-            float ao = TINY_MatPBR_Test.ao;
+            vec3 albedo = myPBR.albedo;
+            float metallic = myPBR.metallic;
+            float roughness = myPBR.roughness;
+            float ao = myPBR.ao;
 
             vec3 N = normalize(myNormal);
-            vec3 V = normalize(TINY_ViewPosition - myWorldPosition);
+            vec3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
             vec3 R = reflect(-V, N); 
 
             vec3 F0 = vec3(0.04); 
@@ -125,7 +121,7 @@
             vec3 ambient = (kD * diffuse + specular) * ao;
 
             //vec3 ambient = (kD * diffuse) * ao;
-            //float shadow = calcShadow(myLightPosition, N, normalize(-TINY_LitDir.direction), TINY_TexDepth);
+            //float shadow = calcShadow(myLightSpacePosition, N, normalize(-TINY_LitDir.direction), TINY_TexDepth);
 
             vec3 color = ambient + Lo;
 

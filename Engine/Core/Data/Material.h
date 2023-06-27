@@ -3,6 +3,7 @@
 #include "../Head/ConfigHead.h"
 #include "../Shader/ShaderParam.h"
 #include "../Shader/Uniform.h"
+#include "../Shader/Shader.h"
 #include "../Base/TinyObject.h"
 
 namespace tezcat::Tiny
@@ -12,6 +13,7 @@ namespace tezcat::Tiny
 	class TINY_API Material : public TinyObject
 	{
 		Material(const std::string& name);
+		Material(Shader* shader);
 		TINY_Factory(Material);
 		TINY_RTTI_H(Material);
 
@@ -21,27 +23,22 @@ namespace tezcat::Tiny
 	public:
 		int getUID() const;
 		std::vector<Uniform*>& getUniforms() { return mUniforms; }
-		Shader* getShader() { return mShader; }
+		Shader* getShader() const { return mShader; }
 
 	public:
-		template<typename UniformType, typename... Args>
-		UniformType* addUniform(const UniformID& uniformID, Args&&... value)
-		{
-			return (UniformType*)mUniforms.emplace_back(new UniformType(uniformID, std::forward<Args>(value)...));
-			//return (UniformType*)mUniforUMap.emplace_back(uniformID.getString(), new UniformType(uniformID, std::forward<Args>(value)...));
-		}
-
 		template<typename UniformType, typename Args>
-		void setUniform(const UniformID& uniformID, Args&& value)
+		void setTinyUniform(const UniformID& uniformID, Args&& value)
 		{
+			auto shader_id = mShader->getTinyUniformShaderID(uniformID);
+
 			auto result = std::ranges::find_if(mUniforms, [&](Uniform* uniform)
 			{
-				return uniform->ID == uniformID;
+				return *uniform->mShaderID == shader_id;
 			});
 
 			if (result != mUniforms.end())
 			{
-				static_cast<UniformType*>(*result)->value = std::forward<Args>(value);
+				static_cast<UniformType*>(*result)->set(std::forward<Args>(value));
 			}
 			else
 			{
@@ -50,21 +47,29 @@ namespace tezcat::Tiny
 		}
 
 		template<typename UniformType, typename ValueType>
-		void setUniformByName(const std::string& name, ValueType&& value)
+		void setUniform(const std::string& name, ValueType&& value)
 		{
-			auto result = std::ranges::find_if(mUniforms, [&](Uniform* uniform)
+			auto id = mShader->getUniformIndex(name);
+			if (id != -1)
 			{
-				return uniform->ID.getString() == name;
-			});
-
-			if (result != mUniforms.end())
-			{
-				static_cast<UniformType*>(*result)->value = std::forward<ValueType>(value);
+				static_cast<UniformType*>(mUniforms[id])->set(std::forward<ValueType>(value));
 			}
 			else
 			{
 				TinyThrow_Logic(StringTool::stringFormat("Material : This uniform [%s] not found!", name.c_str()));
 			}
+		}
+
+		template<typename UniformType, typename ValueType>
+		void setUniform(const uint32_t& id, ValueType&& value)
+		{
+			static_cast<UniformType*>(mUniforms[id])->set(std::forward<ValueType>(value));
+		}
+
+		template<typename UniformType, typename ValueType>
+		void setUniform(const uint32_t& id, ValueType& value)
+		{
+			static_cast<UniformType*>(mUniforms[id])->set(value);
 		}
 
 		void submit(BaseGraphics* graphics, Shader* shader);

@@ -27,29 +27,22 @@ namespace tezcat::Tiny
 		static UniformID MatrixP;
 		static UniformID MatrixV;
 		static UniformID MatrixM;
+		static UniformID MatrixMV;
+		static UniformID MatrixMVP;
+		static UniformID MatrixVP;
 		static UniformID MatrixN;
-		static UniformID MatrixSBV;
-		static UniformID MatrixLit;
-		static UniformID MatrixEnv;
+		static UniformID MatrixLightVP;
 
-		static UniformID ViewPosition;
-		static UniformID ViewNearFar;
-		static UniformID ScreenLength;
-		static UniformID IsHDR;
+		static UniformID CameraWorldPosition;
+		static UniformID CameraNearFar;
+		static UniformID Resolution;
+		static UniformID LightWorldPosition;
 
-		static UniformID VertexColor;
-		static UniformID TexColor;
-		static UniformID TexCube;
 		static UniformID TexDepth;
+		static UniformID TexSkybox;
 		static UniformID TexIrradiance;
 		static UniformID TexPrefilter;
 		static UniformID TexBRDFLUT;
-
-// 		static UniformID LightPosition;
-// 		static UniformID LightColor;
-//		static UniformID AmbientStrength;
-// 		static UniformID ModeSpecular;
-//		static UniformID EnableShadow;
 
 		struct LightDirection
 		{
@@ -68,30 +61,6 @@ namespace tezcat::Tiny
 			static UniformID Specular;
 
 			static UniformID Config;
-		};
-
-		struct StdMaterial
-		{
-			static UniformID Diffuse;
-			static UniformID Normal;
-			static UniformID Specular;
-			static UniformID Shininess;
-		};
-
-		struct MatPBR_Test
-		{
-			static UniformID Albedo;
-			static UniformID Metallic;
-			static UniformID Roughness;
-			static UniformID AO;
-		};
-
-		struct MatPBR_Std1
-		{
-			static UniformID Albedo2D;
-			static UniformID Metallic2D;
-			static UniformID Roughness2D;
-			static UniformID AO2D;
 		};
 	};
 }

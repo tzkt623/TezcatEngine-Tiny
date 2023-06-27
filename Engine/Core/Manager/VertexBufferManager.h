@@ -21,6 +21,7 @@ namespace tezcat::Tiny
 
 	public:
 		Vertex* create(const std::string& name);
+		Vertex* create(MeshData* mesh);
 
 		void add(MeshData* meshData);
 		void add(Vertex* vertex);
@@ -31,7 +32,6 @@ namespace tezcat::Tiny
 	private:
 		std::unordered_map<std::string, Vertex*> mVertexUMap;
 		std::unordered_map<std::string, MeshData*> mMeshDataUMap;
-
 		std::vector<Vertex*> mVertexAry;
 	};
 

@@ -18,6 +18,8 @@ namespace tezcat::Tiny::GL
 		GLGraphics();
 		virtual ~GLGraphics();
 
+
+
 	public:
 		void init(Engine* engine) override;
 		void preRender() override;
@@ -46,16 +48,20 @@ namespace tezcat::Tiny::GL
 		RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform) override;
 		RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material) override;
 		RenderCommand* createDrawSkyboxCMD(Shader* shader, Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false) override;
-		RenderCommand* createDrawHDRToCubeCMD(Shader* shader, Vertex* vertex, Texture2D* hdr, TextureCube* cube) override;
+		RenderCommand* createDrawHDRToCubeCMD(Shader* shader, Vertex* vertex, int* unifromIDHDR, Texture2D* hdr, TextureCube* cube) override;
 		RenderCommand* createDrawEnvMakeIrradiance(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* irradiance) override;
 		RenderCommand* createDrawEnvMakePrefilter(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* prefitler, uint32_t mipMaxLevel, uint32_t mipWidth, uint32_t mipHeight, float resolution) override;
 
 	public:
+		void setBool(Shader* shader, const char* name, const bool& data) override;
+
+		void setFloat1(Shader* shader, const char* name, const float& data) override;
 		void setFloat1(Shader* shader, const char* name, float* data) override;
 		void setFloat2(Shader* shader, const char* name, float* data) override;
 		void setFloat3(Shader* shader, const char* name, float* data) override;
 		void setFloat4(Shader* shader, const char* name, float* data) override;
 
+		void setInt1(Shader* shader, const char* name, const int& data) override;
 		void setInt1(Shader* shader, const char* name, int* data) override;
 		void setInt2(Shader* shader, const char* name, int* data) override;
 		void setInt3(Shader* shader, const char* name, int* data) override;
@@ -87,6 +93,31 @@ namespace tezcat::Tiny::GL
 		void setTexture2D(Shader* shader, UniformID& uniform, Texture2D* data) override;
 		void setGlobalTextureCube(Shader* shader, UniformID& uniform, TextureCube* data) override;
 		void setTextureCube(Shader* shader, UniformID& uniform, TextureCube* data) override;
+
+
+	public:
+		void setFloat1(Shader* shader, const int& shaderID, const float& data) override;
+		void setFloat1(Shader* shader, const int& shaderID, const float* data) override;
+		void setFloat2(Shader* shader, const int& shaderID, const float* data) override;
+		void setFloat3(Shader* shader, const int& shaderID, const float* data) override;
+		void setFloat4(Shader* shader, const int& shaderID, const float* data) override;
+
+		void setInt1(Shader* shader, const int& shaderID, const int& data) override;
+		void setInt1(Shader* shader, const int& shaderID, int* data) override;
+		void setInt2(Shader* shader, const int& shaderID, int* data) override;
+		void setInt3(Shader* shader, const int& shaderID, int* data) override;
+		void setInt4(Shader* shader, const int& shaderID, int* data) override;
+
+		void setMat3(Shader* shader, const int& shaderID, const float* data) override;
+		void setMat3(Shader* shader, const int& shaderID, const glm::mat3& mat3) override;
+		void setMat4(Shader* shader, const int& shaderID, const float* data) override;
+		void setMat4(Shader* shader, const int& shaderID, const glm::mat4& mat4) override;
+		void setMat4(Shader* shader, const int& shaderID, glm::mat4 data[], int count) override;
+
+		void setGlobalTexture2D(Shader* shader, const int& shaderID, Texture2D* data) override;
+		void setTexture2D(Shader* shader, const int& shaderID, Texture2D* data) override;
+		void setGlobalTextureCube(Shader* shader, const int& shaderID, TextureCube* data) override;
+		void setTextureCube(Shader* shader, const int& shaderID, TextureCube* data) override;
 
 	public:
 		void cmdCreateVertex(Vertex* vertex) override;

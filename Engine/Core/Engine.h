@@ -14,6 +14,7 @@ namespace tezcat::Tiny
 	class BaseGraphics;
 	class FrameBufferManager;
 	class VertexBufferManager;
+	class ModelManager;
 	class TextureManager;
 
 	class TINY_API Engine
@@ -55,6 +56,7 @@ namespace tezcat::Tiny
 		FrameBufferManager* mFrameBufferManager;
 		TextureManager* mTextureManager;
 		VertexBufferManager* mVertexManager;
+		ModelManager* mModelManager;
 		InputSystem* mInputSystem;
 		EngineIniter* mResourceLoader;
 		BaseGraphics* mGraphics;

@@ -81,7 +81,6 @@ namespace tezcat::Tiny
 		IRenderMesh();
 		virtual ~IRenderMesh();
 
-
 		RenderObjectType getRenderObjectType() final { return RenderObjectType::MeshRenderer; }
 
 		/*
@@ -102,7 +101,6 @@ namespace tezcat::Tiny
 			return mVertex->getVertexCount();
 		}
 
-
 		/*
 		* @Author:	HCL
 		* @Info:	2023|4|9
@@ -115,6 +113,8 @@ namespace tezcat::Tiny
 
 		void setMesh(const std::string& meshName);
 		void setMesh(MeshData* meshData);
+		void setMesh(Vertex* vertex);
+		Vertex* getVertex() const { return mVertex; }
 
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 

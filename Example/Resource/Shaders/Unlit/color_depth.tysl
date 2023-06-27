@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
 
@@ -33,14 +33,13 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_function.tyin"
-        #include "../Include/tiny_fs_camera.tyin"
+        #include "../Include/tiny_fs.tyin"
 
         out vec4 myFinalColor;
         
         void main()
         {
-            myFinalColor = vec4(vec3(linearizeDepth(gl_FragCoord.z, TINY_ViewNearFar.x, TINY_ViewNearFar.y) / TINY_ViewNearFar.y), 1.0);
+            myFinalColor = vec4(vec3(linearizeDepth(gl_FragCoord.z, TINY_CameraNearFar.x, TINY_CameraNearFar.y) / TINY_CameraNearFar.y), 1.0);
         }
     }
     #TINY_FS_END

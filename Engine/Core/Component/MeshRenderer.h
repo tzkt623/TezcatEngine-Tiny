@@ -19,7 +19,6 @@ namespace tezcat::Tiny
 		TINY_RTTI_H(MeshRenderer);
 	public:
 		virtual ~MeshRenderer();
-		Vertex* getVertex() const { return mVertex; }
 
 		void sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue) override;
 		void setCastShadow(bool val) { mIsCastShadow = val; }

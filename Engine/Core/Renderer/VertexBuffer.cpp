@@ -1,4 +1,5 @@
 #include "VertexBuffer.h"
+#include "BaseGraphics.h"
 #include "../Data/MeshData.h"
 
 namespace tezcat::Tiny
@@ -15,7 +16,7 @@ namespace tezcat::Tiny
 
 	VertexBuffer::~VertexBuffer()
 	{
-
+		Graphics::getInstance()->cmdDeleteVertexBuffer(mBufferID);
 	}
 
 	void VertexBuffer::setLayoutData(VertexPosition position, VertexLayoutType type)
@@ -37,6 +38,6 @@ namespace tezcat::Tiny
 
 	IndexBuffer::~IndexBuffer()
 	{
-
+		Graphics::getInstance()->cmdDeleteIndexBuffer(mBufferID);
 	}
 }

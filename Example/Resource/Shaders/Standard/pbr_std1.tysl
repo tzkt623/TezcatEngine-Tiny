@@ -22,8 +22,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
-        #include "../Include/tiny_vs_shadow.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
@@ -52,11 +51,7 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_pbr_mat.tyin"
-        #include "../Include/tiny_fs_pbr_func.tyin"
-        #include "../Include/tiny_fs_camera.tyin"
-        #include "../Include/tiny_fs_texture.tyin"
-        #include "../Include/tiny_fs_light.tyin"
+        #include "../Include/tiny_fs.tyin"
 
         in vec4 myColor;
         in vec2 myUV;
@@ -64,19 +59,20 @@
         in vec3 myWorldPosition;
         
         out vec4 myFinalColor;
+        uniform MatPBR_Std1 myPBR;
 
         void main()
         {
-            vec3 albedo = pow(texture(TINY_MatPBR_Std1.albedo2D, myUV).rgb, vec3(2.2));
-            float metallic = texture(TINY_MatPBR_Std1.metallic2D, myUV).r;
-            float roughness = texture(TINY_MatPBR_Std1.roughness2D, myUV).r;
-            float ao = texture(TINY_MatPBR_Std1.ao2D, myUV).r;
+            vec3 albedo = pow(texture(myPBR.albedo2D, myUV).rgb, vec3(2.2));
+            float metallic = texture(myPBR.metallic2D, myUV).r;
+            float roughness = texture(myPBR.roughness2D, myUV).r;
+            float ao = texture(myPBR.ao2D, myUV).r;
 
             vec3 F0 = vec3(0.04); 
             F0 = mix(F0, albedo, metallic);
 
             vec3 N = normalize(myNormal);
-            vec3 V = normalize(TINY_ViewPosition - myWorldPosition);
+            vec3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
             vec3 R = reflect(-V, N); 
 
             //计算一个灯的光照

@@ -99,10 +99,10 @@ namespace tezcat::Tiny
 
 	std::array<CullFaceWrapper, (std::size_t)CullFace::Count> ContextMap::CullFaceArray
 	{
-		CullFaceWrapper(CullFace::Off,		0),
-		CullFaceWrapper(CullFace::Front,	0),
-		CullFaceWrapper(CullFace::Back,		0),
-		CullFaceWrapper(CullFace::All,		0)
+		CullFaceWrapper(CullFace::Off, 0),
+			CullFaceWrapper(CullFace::Front, 0),
+			CullFaceWrapper(CullFace::Back, 0),
+			CullFaceWrapper(CullFace::All, 0)
 	};
 
 	std::unordered_map<std::string, BlendWrapper> ContextMap::BlendMap =
@@ -189,4 +189,21 @@ namespace tezcat::Tiny
 		{"Post",		Queue::Post}
 	};
 
+	std::unordered_map<std::string, UniformType> ContextMap::UniformTypeUMap
+	{
+		{ "bool",			UniformType::Bool },
+		{ "int",			UniformType::Int },
+		{ "ivec2",			UniformType::Int2 },
+		{ "ivec3",			UniformType::Int3 },
+		{ "ivec4",			UniformType::Int4 },
+		{ "float",			UniformType::Float },
+		{ "vec2",			UniformType::Float2 },
+		{ "vec3",			UniformType::Float3 },
+		{ "vec4",			UniformType::Float4 },
+		{ "mat4",			UniformType::Mat3 },
+		{ "mat3",			UniformType::Mat4 },
+		{ "sampler2D",		UniformType::Tex2D },
+		{ "sampler3D",		UniformType::Tex3D },
+		{ "samplerCube",	UniformType::TexCube }
+	};
 }

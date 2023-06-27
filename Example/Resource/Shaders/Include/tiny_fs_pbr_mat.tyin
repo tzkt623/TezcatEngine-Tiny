@@ -6,8 +6,6 @@ struct MatPBR_Test
     float ao;
 };
 
-uniform MatPBR_Test TINY_MatPBR_Test;
-
 struct MatPBR_Std1
 {
     sampler2D albedo2D;
@@ -15,5 +13,3 @@ struct MatPBR_Std1
     sampler2D roughness2D;
     sampler2D ao2D;
 };
-
-uniform MatPBR_Std1 TINY_MatPBR_Std1;

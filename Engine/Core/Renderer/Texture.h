@@ -396,7 +396,10 @@ namespace tezcat::Tiny
 		const TexWrapWrapper& getWrapS() const { return mWrapS; }
 		const TexWrapWrapper& getWrapT() const { return mWrapT; }
 		const TexWrapWrapper& getWrapR() const { return mWrapR; }
-		uint32_t getWidth() const { return mWidth; }
+		uint32_t getWidth() const
+		{
+			return mWidth;
+		}
 		uint32_t getHeight() const { return mHeight; }
 
 		void setSize(const int& width, const int& height)

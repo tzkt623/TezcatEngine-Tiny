@@ -32,6 +32,10 @@
 
 #include "ConfigHead.h"
 
+#define FMT_HEADER_ONLY
+#include "ThirdParty/fmt/format.h"
+#include "ThirdParty/fmt/printf.h"
+
 namespace tezcat::Tiny
 {
 	inline namespace v1
@@ -65,10 +69,12 @@ namespace tezcat::Tiny
 #ifndef TINY_Release
 #define TinyThrow(x) throw x
 #define TinyThrow_Logic(x) throw std::logic_error(x)
+#define TinyThrow_Runtime(condition, message) if(condition) { fmt::print("=======RuntimeError=======\nFile:{1}\nLine:{2}\n{0}\n==========================\n", message, __FILE__, __LINE__); abort(); }
 #define TinyAssert(x) assert(x)
 #else
 #define TinyThrow(x)
 #define TinyThrow_Logic(x)
+#define TinyThrow_Runtime(condition, info)
 #define TinyAssert(x)
 #endif
 	}

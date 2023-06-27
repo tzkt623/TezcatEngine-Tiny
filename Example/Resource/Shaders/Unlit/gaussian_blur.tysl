@@ -21,7 +21,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec2 aUV;
@@ -38,10 +38,11 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs.tyin"
 
         in vec2 myUV;
         out vec4 myFinalColor;
+        uniform sampler2D myTexColor2D;
 
         const vec2 texSize = vec2(2048, 1024);
         const int radius = 5;
@@ -185,7 +186,7 @@
             
         	for (int i = 0; i < 9; i++)
             {
-                sum += texture(TINY_TexColor, uv + Offset[i]);
+                sum += texture(myTexColor2D, uv + Offset[i]);
             }
             
             return sum / 9.0f;
@@ -210,7 +211,7 @@
 
             for (int i = 0; i < kernelCount; i++)
             {
-                sum += textureLod(TINY_TexColor, uv + myOffset[i], 4.0) * myFactor[i];
+                sum += textureLod(myTexColor2D, uv + myOffset[i], 4.0) * myFactor[i];
             }
 
             return sum;
