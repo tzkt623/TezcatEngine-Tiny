@@ -83,7 +83,6 @@ void MyMainScene::onEnter()
 // 	model = Resource::load<Model>("Model/School.fbx");
 // 	model->generate();
 
-
 	// 	int radius = 5;
 	// 	int length;
 	// 	auto vs = GaussianMatrix::calculate(radius, length);
