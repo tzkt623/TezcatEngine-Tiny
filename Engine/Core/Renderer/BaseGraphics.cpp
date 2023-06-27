@@ -33,15 +33,10 @@ namespace tezcat::Tiny
 		, mEnvLitManager(new EnvironmentLightManager())
 		, mCameraManager(new CameraManager())
 		, mLightManager(new LightManager())
+		, mGUI(nullptr)
 
 	{
 		RenderLayer::init();
-
-		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene, this,
-			[](const EventData& data)
-			{
-
-			});
 	}
 
 	BaseGraphics::~BaseGraphics()

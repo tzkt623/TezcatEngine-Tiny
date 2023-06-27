@@ -1,0 +1,7 @@
+#include "tiny_fs_camera.tyin"
+#include "tiny_fs_texture.tyin"
+#include "tiny_fs_light.tyin"
+#include "tiny_fs_pbr_func.tyin"
+#include "tiny_fs_pbr_mat.tyin"
+#include "tiny_fs_std_mat.tyin"
+#include "tiny_fs_function.tyin"

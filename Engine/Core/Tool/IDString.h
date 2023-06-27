@@ -51,11 +51,11 @@ namespace tezcat::Tiny
 			this->init(string);
 		}
 
-		IDString(std::string&& string)
-			: mID(-1)
-		{
-			this->init(std::forward<std::string>(string));
-		}
+// 		IDString(std::string&& string)
+// 			: mID(-1)
+// 		{
+// 			this->init(std::forward<std::string>(string));
+// 		}
 
 		IDString(const std::string& string)
 			: mID(-1)
@@ -92,11 +92,11 @@ namespace tezcat::Tiny
 			return *this;
 		}
 
-		IDString& operator = (std::string&& data)
-		{
-			this->init(std::forward<std::string>(data));
-			return *this;
-		}
+// 		IDString& operator = (std::string&& data)
+// 		{
+// 			this->init(std::forward<std::string>(data));
+// 			return *this;
+// 		}
 
 		IDString& operator = (IDString&& other) noexcept
 		{
@@ -121,17 +121,17 @@ namespace tezcat::Tiny
 			return mID != other.mID;
 		}
 
-		operator int()
-		{
-			return mID;
-		}
-
 		operator const char* ()
 		{
 			return sStringArray[mID].data();
 		}
 
-		inline const int getUID() const
+		operator int()
+		{
+			return mID;
+		}
+
+		const int getUID() const
 		{
 			return mID;
 		}
@@ -162,20 +162,20 @@ namespace tezcat::Tiny
 			}
 		}
 
-		void init(std::string&& data)
-		{
-			auto pair = sStringMap.try_emplace(std::move(data), mID);
-			if (pair.second)
-			{
-				mID = static_cast<int>(sStringArray.size());
-				pair.first->second = mID;
-				sStringArray.emplace_back(pair.first->first);
-			}
-			else
-			{
-				mID = pair.first->second;
-			}
-		}
+// 		void init(std::string&& data)
+// 		{
+// 			auto pair = sStringMap.try_emplace(std::move(data), mID);
+// 			if (pair.second)
+// 			{
+// 				mID = static_cast<int>(sStringArray.size());
+// 				pair.first->second = mID;
+// 				sStringArray.emplace_back(pair.first->first);
+// 			}
+// 			else
+// 			{
+// 				mID = pair.first->second;
+// 			}
+// 		}
 
 		void init(const char* data)
 		{
@@ -220,6 +220,12 @@ namespace tezcat::Tiny
 		static const std::string_view& getStringStatic(const int& id)
 		{
 			return sStringArray[id];
+		}
+
+		static const int getUIDStatic(const std::string& name)
+		{
+			TinyThrow_Runtime(!sStringMap.contains(name), name);
+			return sStringMap[name];
 		}
 
 	private:

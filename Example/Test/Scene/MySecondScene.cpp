@@ -69,6 +69,16 @@ void MySeconedScene::onEnter()
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> dis(-1000, 1000);
 
+		auto shader = ShaderMgr::getInstance()->find("Standard/Std1");
+
+		auto index_diffuse = shader->getUniformIndex("myTex2DDiffuse");
+		auto index_specular = shader->getUniformIndex("myTex2DSpecular");
+		auto index_shininess = shader->getUniformIndex("myShininess");
+
+		auto tex_diff = Resource::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
+		auto tex_spec = Resource::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");
+
+
 		for (int i = 0; i < 1000; i++)
 		{
 			auto go = GameObject::create();
@@ -78,13 +88,15 @@ void MySeconedScene::onEnter()
 			go->getTransform()->setScale(glm::vec3(10.0f));
 
 			auto mr = go->addComponent<MeshRenderer>();
-			auto material = Material::create("Standard/Std1");
-			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "metal_plate_diff");
-			material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "metal_plate_spec");
-			material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 16.0f);
-			//material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
-			mr->setMaterial(material);
 			mr->setMesh("Sphere");
+
+			auto material = Material::create(shader);
+			mr->setMaterial(material);
+
+ 			material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
+ 			material->setUniform<UniformTex2D>(index_specular, tex_spec);
+ 			material->setUniform<UniformF1>(index_shininess, 16.0f);
+			//material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
 		}
 	}
 }

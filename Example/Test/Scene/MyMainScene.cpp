@@ -2,7 +2,6 @@
 #include "../MyInputer.h"
 #include "../MyController.h"
 
-
 TINY_RTTI_CPP(MyMainScene);
 
 MyMainScene::MyMainScene(const std::string& name)
@@ -74,21 +73,29 @@ void MyMainScene::onEnter()
 	//this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
-	auto img = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
+	auto img = Resource::load<Image>("Image/blocky_photo_studio_2k.hdr");
 	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvLightingImage, img });
+	Resource::unload(img);
 
-// 	int radius = 5;
-// 	int length;
-// 	auto vs = GaussianMatrix::calculate(radius, length);
-// 	for (int x = 0; x < length; ++x)
-// 	{
-// 		for (int y = 0; y < length; ++y)
-// 		{
-// 			std::cout << vs[x + y * length] << "," << std::endl;
-// 		}
-// 	}
-// 
-// 	std::cout << vs.size();
+ 	auto model = Resource::load<Model>("Model/Cerberus_LP.fbx");
+ 	model->generate();
+
+	model = Resource::load<Model>("Model/School.fbx");
+	model->generate();
+
+
+	// 	int radius = 5;
+	// 	int length;
+	// 	auto vs = GaussianMatrix::calculate(radius, length);
+	// 	for (int x = 0; x < length; ++x)
+	// 	{
+	// 		for (int y = 0; y < length; ++y)
+	// 		{
+	// 			std::cout << vs[x + y * length] << "," << std::endl;
+	// 		}
+	// 	}
+	// 
+	// 	std::cout << vs.size();
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
@@ -102,10 +109,15 @@ void MyMainScene::createGates(float gateWidth, float gateHigh)
 	tran1->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
 
 	auto mr1 = world1->addComponent<MeshRenderer>();
-	auto world1_material = Material::create("Unlit/Texture");
-	world1_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World1");
-	mr1->setMaterial(world1_material);
 	mr1->setMesh("Square");
+
+	auto world1_material = Material::create("Unlit/Texture");
+	mr1->setMaterial(world1_material);
+
+	auto shader = world1_material->getShader();
+	auto tex = (Texture2D*)TextureMgr::getInstance()->find("RB_World1");
+	auto index = shader->getUniformIndex("myTexColor2D");
+	world1_material->setUniform<UniformTex2D>(index, tex);
 
 
 	auto world2 = GameObject::create("World2_Gate");
@@ -115,10 +127,14 @@ void MyMainScene::createGates(float gateWidth, float gateHigh)
 	tran2->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
 
 	auto mr2 = world2->addComponent<MeshRenderer>();
-	auto world2_material = Material::create("Unlit/Texture");
-	world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
-	mr2->setMaterial(world2_material);
 	mr2->setMesh("Square");
+
+	auto world2_material = Material::create("Unlit/Texture");
+	mr2->setMaterial(world2_material);
+
+	tex = (Texture2D*)TextureMgr::getInstance()->find("RB_World2");
+	index = shader->getUniformIndex("myTexColor2D");
+	world2_material->setUniform<UniformTex2D>(index, tex);
 }
 
 void MyMainScene::createPaintings()
@@ -137,9 +153,14 @@ void MyMainScene::createPaintings()
 
 	auto mr2 = wife->addComponent<MeshRenderer>();
 	auto wife_material2 = Material::create("Unlit/Texture");
-	wife_material2->addUniform<UniformTex2D>(ShaderParam::TexColor, "wife");
 	mr2->setMaterial(wife_material2);
 	mr2->setMesh("Square");
+
+	auto shader = wife_material2->getShader();
+
+	auto my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
+	auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
+	wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 
 
 	//--------------------------------------
@@ -152,9 +173,11 @@ void MyMainScene::createPaintings()
 
 	auto mre1 = elden_ring1->addComponent<MeshRenderer>();
 	auto elden_ring1_material = Material::create("Unlit/Texture");
-	elden_ring1_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "eldenring1");
 	mre1->setMaterial(elden_ring1_material);
 	mre1->setMesh("Square");
+
+	tex = Resource::loadOnly<Texture2D>("Image/eldenring1.jpg");
+	elden_ring1_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 
 
 	auto elden_ring2 = GameObject::create("ED2");
@@ -166,9 +189,11 @@ void MyMainScene::createPaintings()
 
 	auto mre2 = elden_ring2->addComponent<MeshRenderer>();
 	auto elden_ring2_material = Material::create("Unlit/Texture");
-	elden_ring2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "eldenring2");
 	mre2->setMaterial(elden_ring2_material);
 	mre2->setMesh("Square");
+
+	tex = Resource::loadOnly<Texture2D>("Image/eldenring2.jpg");
+	elden_ring2_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 
 
 	auto img = Resource::loadOnly<Image>("Image/solitude_night_2k.hdr");
@@ -185,9 +210,12 @@ void MyMainScene::createPaintings()
 
 	auto mg = gaussian->addComponent<MeshRenderer>();
 	auto gaussian_material = Material::create("Unlit/GaussianBlur");
-	gaussian_material->addUniform<UniformTex2D>(ShaderParam::TexColor, hdr);
 	mg->setMaterial(gaussian_material);
 	mg->setMesh("Square");
+
+	shader = gaussian_material->getShader();
+	my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
+	gaussian_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 }
 
 void MyMainScene::createPlane()
@@ -199,13 +227,26 @@ void MyMainScene::createPlane()
 	plane->getTransform()->setScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	auto mr = plane->addComponent<MeshRenderer>();
-	auto plane_material = Material::create("Standard/Std1");
-	plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
-	plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
-	plane_material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
-	//plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
-	mr->setMaterial(plane_material);
 	mr->setMesh("Plane");
+
+	auto plane_material = Material::create("Standard/Std1");
+	mr->setMaterial(plane_material);
+
+	auto shader = plane_material->getShader();
+	auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
+	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
+	auto index_shininess = shader->getUniformIndex("myShininess");
+
+	auto tex_diff = Resource::loadOnly<Texture2D>("Image/stone_wall_diff.jpg");
+	auto tex_spec = Resource::loadOnly<Texture2D>("Image/stone_wall_ao.jpg");
+
+	plane_material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
+	plane_material->setUniform<UniformTex2D>(index_specular, tex_spec);
+	plane_material->setUniform<UniformF1>(index_shininess, 64.0f);
+
+
+	//plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
+
 }
 
 void MyMainScene::createCubes0()
@@ -215,6 +256,15 @@ void MyMainScene::createCubes0()
 	std::uniform_int_distribution<> dis(-520, 520);
 	std::uniform_int_distribution<> dis_ro(0, 359);
 
+	auto shader = ShaderMgr::getInstance()->find("Standard/Std1");
+
+	auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
+	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
+	auto index_shininess = shader->getUniformIndex("myShininess");
+
+	auto tex_diff = Resource::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
+	auto tex_spec = Resource::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");
+
 	for (int i = 0; i < 1000; i++)
 	{
 		auto go = GameObject::create();
@@ -222,18 +272,16 @@ void MyMainScene::createCubes0()
 		go->getTransform()->setPosition(glm::vec3(dis(gen), dis(gen), dis(gen)));
 		go->getTransform()->setScale(glm::vec3(10.0f));
 		go->getTransform()->setRotation(glm::vec3(dis_ro(gen), dis_ro(gen), dis_ro(gen)));
-		//go->getTransform()->setParent(mController->getTransform());
 
 		auto mr = go->addComponent<MeshRenderer>();
-		auto material = Material::create("Standard/Std1");
-		material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "metal_plate_diff");
-		material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "metal_plate_spec");
-		material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
-		material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
-		//material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
-		mr->setMaterial(material);
 		mr->setMesh("Cube");
-		//mr->setMesh("Sphere");
+
+		auto material = Material::create(shader);
+		mr->setMaterial(material);
+
+		material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
+		material->setUniform<UniformTex2D>(index_specular, tex_spec);
+		material->setUniform<UniformF1>(index_shininess, 64.0f);
 	}
 }
 
@@ -256,10 +304,15 @@ void MyMainScene::createTransparentObject()
 		go->getTransform()->setParent(transform);
 
 		auto mr = go->addComponent<MeshRenderer>();
-		auto material = Material::create("Unlit/Transparent");
-		material->addUniform<UniformTex2D>(ShaderParam::TexColor, "transparent_window");
-		mr->setMaterial(material);
 		mr->setMesh("Square");
+
+		auto material = Material::create("Unlit/Transparent");
+		mr->setMaterial(material);
+
+		auto shader = material->getShader();
+		auto index_color = shader->getUniformIndex("myTexColor2D");
+		auto tex = Resource::loadOnly<Texture2D>("Image/transparent_window.png");
+		material->setUniform<UniformTex2D>(index_color, tex);
 	}
 }
 
@@ -285,10 +338,11 @@ void MyMainScene::createDirectionLight()
 	go->getTransform()->setRotation(-60.0f, 0.0f, 0.0f);
 
 	auto mr = go->addComponent<MeshRenderer>();
+	mr->setMesh("Sphere");
+
 	auto light_material = Material::create("Unlit/Color");
 	mr->setCastShadow(false);
 	mr->setMaterial(light_material);
-	mr->setMesh("Sphere");
 
 	auto dir_light = go->addComponent<DirectionalLight>();
 	dir_light->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -314,6 +368,12 @@ void MyMainScene::createPBR()
 	auto transform = go->addComponent<Transform>();
 	transform->setPosition(glm::vec3(0.0f, 0.0f, -20.0f));
 
+	auto shader = ShaderMgr::getInstance()->find("Standard/PBRTest1");
+	auto index_albedo = shader->getUniformIndex("myPBR.albedo");
+	auto index_metallic = shader->getUniformIndex("myPBR.metallic");
+	auto index_roughness = shader->getUniformIndex("myPBR.roughness");
+	auto index_ao = shader->getUniformIndex("myPBR.ao");
+
 	int number = 6;
 	float rate = 1.0f / (float)number;
 	for (int y = 0; y <= number; y++)
@@ -328,11 +388,11 @@ void MyMainScene::createPBR()
 			go->getTransform()->setParent(transform);
 
 			auto mr = go->addComponent<MeshRenderer>();
-			auto material = Material::create("Standard/PBRTest1");
-			material->addUniform<UniformF3>(ShaderParam::MatPBR_Test::Albedo, glm::vec3(1.0f, 1.0f, 1.0f));
-			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Metallic, x * rate);
-			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::Roughness, y * rate);
-			material->addUniform<UniformF1>(ShaderParam::MatPBR_Test::AO, 1.0f);
+			auto material = Material::create(shader);
+			material->setUniform<UniformF3>(index_albedo, glm::vec3(1.0f, 1.0f, 1.0f));
+			material->setUniform<UniformF1>(index_metallic, x * rate);
+			material->setUniform<UniformF1>(index_roughness, y * rate);
+			material->setUniform<UniformF1>(index_ao, 1.0f);
 			mr->setMaterial(material);
 			mr->setMesh("Sphere");
 		}

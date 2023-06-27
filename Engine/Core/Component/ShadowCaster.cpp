@@ -40,12 +40,20 @@ namespace tezcat::Tiny
 								, transform->getUp());
 
 		auto lpv = mProjectionMatrix * mViewMatrix;
-		graphcis->setMat4(shader, ShaderParam::MatrixLit, lpv);
+		//这里caster是观察者,所以传vp
+		graphcis->setMat4(shader, ShaderParam::MatrixVP, lpv);
 	}
 
 	void ShadowCaster::submit(BaseGraphics* graphcis, Shader* shader)
 	{
+		auto transform = this->getTransform();
+		mViewMatrix = glm::lookAt(transform->getWorldPosition()
+								, transform->getWorldPosition() + transform->getForward()
+								, transform->getUp());
 
+		auto lpv = mProjectionMatrix * mViewMatrix;
+		//这里caster是数据提供者,所以传lightvp
+		graphcis->setMat4(shader, ShaderParam::MatrixLightVP, lpv);
 	}
 
 	void ShadowCaster::onStart()

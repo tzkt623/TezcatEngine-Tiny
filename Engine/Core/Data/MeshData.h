@@ -6,6 +6,10 @@
 #include "../Renderer/VertexConfig.h"
 #include "../Base/TinyObject.h"
 
+struct aiMesh;
+struct aiNode;
+struct aiScene;
+
 namespace tezcat::Tiny
 {
 	/// <summary>
@@ -85,32 +89,51 @@ namespace tezcat::Tiny
 
 
 	class Texture;
-
+	class Vertex;
 	class ModelNode
 	{
 	public:
 		ModelNode();
 		~ModelNode();
 
-		bool hasChildren() { return mChildrenData != nullptr; }
-		bool hasMesh() { return mMeshData != nullptr; }
+		bool hasChildren() { return mChildrenCount != 0; }
+		bool hasMesh() { return mVertex != nullptr; }
+
+		void init(uint32_t meshCount, uint32_t childCount);
 		void addChild(ModelNode* node);
+		void setVertex(Vertex* vertex);
+
 
 		std::string mName;
-		MeshData* mMeshData;
-		std::vector<ModelNode*>* mChildrenData;
+		Vertex* mVertex;
+
+		bool mInited;
+		uint32_t mIndex;
+		ModelNode** mChildren;
+		uint32_t mChildrenCount;
 	};
 
-	class Model : public ModelNode
+
+	class Transform;
+	class Model : public TinyObject
 	{
-	public:
 		Model();
+		TINY_RTTI_H(Model);
+		TINY_Factory(Model);
+	public:
 		virtual ~Model();
 
+		void load(const std::string& path);
+		void generate();
+		void foreachNode(const std::function<Transform*(ModelNode*)>& func);
+
+	private:
+		void foreachNode(const std::function<Transform*(ModelNode*)>& func, ModelNode* node, Transform* parent);
+		ModelNode* createModelNode(const aiScene* aiscene, aiNode* ainode);
+		MeshData* createMesh(aiMesh* aimesh, const aiNode* node);
 	private:
 		std::string mName;
+		ModelNode* mRoot;
 	};
-
-
 }
 

@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 2) in vec2 aUV;
@@ -37,16 +37,15 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_texture.tyin"
-        #include "../Include/tiny_fs_camera.tyin"
-        #include "../Include/tiny_fs_function.tyin"
+        #include "../Include/tiny_fs.tyin"
 
         out vec4 myFinalColor;
         in vec2 myUV;
+        uniform sampler2D myTexDepth2D;
 
         void main()
         {
-            float z = texture(TINY_TexColor, myUV).r;
+            float z = texture(myTexDepth2D, myUV).r;
             myFinalColor = vec4(z, z, z, 1.0f);
         }
     }

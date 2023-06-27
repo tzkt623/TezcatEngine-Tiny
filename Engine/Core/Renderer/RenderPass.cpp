@@ -7,7 +7,6 @@
 #include "FrameBuffer.h"
 
 #include "../Head/GLMHead.h"
-
 #include "../Shader/Shader.h"
 
 #include "../Manager/EnvironmentLightManager.h"

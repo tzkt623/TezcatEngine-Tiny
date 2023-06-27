@@ -5,6 +5,31 @@
 
 namespace tezcat::Tiny
 {
+	enum class TINY_API UniformType : int8_t
+	{
+		Error = -1,
+		Bool,
+		Int, Int2, Int3, Int4,
+		UInt, UInt2, UInt3, UInt4,
+		Float, Float2, Float3, Float4,
+		Double, Double2, Double3, Double4,
+		Mat3, Mat4,
+		Tex2D, Tex3D, TexCube,
+
+		Count
+	};
+
+	enum class TINY_API UniformBuildType : int8_t
+	{
+		Error = -1,
+		Struct,
+		Color,
+		Range,
+		Tex2D, Tex3D, TexCube,
+
+		Count
+	};
+
 	enum class TINY_API DataType : uint8_t
 	{
 		Byte = 0,
@@ -277,6 +302,9 @@ namespace tezcat::Tiny
 	using TexTypeWrapper = TinyValueConventor<TextureType, uint32_t>;
 	using TexWrapWrapper = TinyValueConventor<TextureWrap, uint32_t>;
 	using TexFilterWrapper = TinyValueConventor<TextureFilter, uint32_t>;
+	/*
+	* @brief format位置只能用大类R,RG,RGBA等,不能用RGB32f,R8这种具体类型
+	*/
 	using TexChannelWrapper = TinyValueConventor<TextureChannel, uint32_t>;
 	using ColorBufferWrapper = TinyValueConventor<ColorBuffer, uint32_t>;
 	using DrawModeWrapper = TinyValueConventor<DrawMode, uint32_t>;
@@ -346,6 +374,9 @@ namespace tezcat::Tiny
 		static std::unordered_map<std::string, LightMode> LightModeMap;
 
 		static std::unordered_map<std::string, Queue> QueueMap;
+
+
+		static std::unordered_map<std::string, UniformType> UniformTypeUMap;
 	};
 
 	enum class TINY_API PrimitiveDrawType

@@ -123,7 +123,6 @@ namespace tezcat::Tiny
 		glm::vec3 mDiffuse;
 		glm::vec3 mSpecular;
 		glm::vec3 mConfig;
-
 	};
 
 	class TINY_API SpotLight : public ComponentT<SpotLight>, public ILight

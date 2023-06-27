@@ -20,6 +20,11 @@ namespace tezcat::Tiny
 		FT_Hdr,
 		FT_Img_End,
 
+		FT_Model_Begin,
+		FT_Fbx,
+		FT_Obj,
+		FT_Model_End,
+
 		FT_Unknown
 	};
 

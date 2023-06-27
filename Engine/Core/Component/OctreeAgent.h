@@ -14,7 +14,7 @@ namespace tezcat::Tiny
 		TINY_RTTI_H(OctreeAgent);
 
 	public:
-		~OctreeAgent();
+		virtual ~OctreeAgent();
 
 		void update();
 		void removeSelf();

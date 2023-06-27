@@ -1386,6 +1386,19 @@
     <ClInclude Include="Platform\OpenGL\GLRenderCommand.h" />
     <ClInclude Include="Core\Data\Text.h" />
     <ClInclude Include="Core\Tool\GaussianMatrix.h" />
+    <ClInclude Include="ThirdParty\fmt\args.h" />
+    <ClInclude Include="ThirdParty\fmt\chrono.h" />
+    <ClInclude Include="ThirdParty\fmt\color.h" />
+    <ClInclude Include="ThirdParty\fmt\compile.h" />
+    <ClInclude Include="ThirdParty\fmt\core.h" />
+    <ClInclude Include="ThirdParty\fmt\format.h" />
+    <ClInclude Include="ThirdParty\fmt\format-inl.h" />
+    <ClInclude Include="ThirdParty\fmt\os.h" />
+    <ClInclude Include="ThirdParty\fmt\ostream.h" />
+    <ClInclude Include="ThirdParty\fmt\printf.h" />
+    <ClInclude Include="ThirdParty\fmt\ranges.h" />
+    <ClInclude Include="ThirdParty\fmt\std.h" />
+    <ClInclude Include="ThirdParty\fmt\xchar.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

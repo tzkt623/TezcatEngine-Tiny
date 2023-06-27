@@ -142,12 +142,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;TINY_Release;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\;$(SolutionDir)Engine\ThirdParty</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -411,6 +412,19 @@
     <ClInclude Include="ThirdParty\assimp\XmlParser.h" />
     <ClInclude Include="ThirdParty\assimp\XMLTools.h" />
     <ClInclude Include="ThirdParty\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="ThirdParty\fmt\args.h" />
+    <ClInclude Include="ThirdParty\fmt\chrono.h" />
+    <ClInclude Include="ThirdParty\fmt\color.h" />
+    <ClInclude Include="ThirdParty\fmt\compile.h" />
+    <ClInclude Include="ThirdParty\fmt\core.h" />
+    <ClInclude Include="ThirdParty\fmt\format-inl.h" />
+    <ClInclude Include="ThirdParty\fmt\format.h" />
+    <ClInclude Include="ThirdParty\fmt\os.h" />
+    <ClInclude Include="ThirdParty\fmt\ostream.h" />
+    <ClInclude Include="ThirdParty\fmt\printf.h" />
+    <ClInclude Include="ThirdParty\fmt\ranges.h" />
+    <ClInclude Include="ThirdParty\fmt\std.h" />
+    <ClInclude Include="ThirdParty\fmt\xchar.h" />
     <ClInclude Include="ThirdParty\glad\glad.h" />
     <ClInclude Include="ThirdParty\glad\khrplatform.h" />
     <ClInclude Include="ThirdParty\GLFW\glfw3.h" />

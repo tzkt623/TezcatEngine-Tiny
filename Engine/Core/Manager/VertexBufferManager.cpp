@@ -4,6 +4,8 @@
 #include "../Renderer/BaseGraphics.h"
 #include "../Data/MeshData.h"
 
+#include "ThirdParty/Hash/city.h"
+
 namespace tezcat::Tiny
 {
 	VertexBufferManager::VertexBufferManager()
@@ -75,6 +77,8 @@ namespace tezcat::Tiny
 			return nullptr;
 		}
 
+		auto hash_id = CityHash64(name.data(), name.size());
+
 		if (!mMeshDataUMap.contains(name))
 		{
 			return nullptr;
@@ -93,4 +97,8 @@ namespace tezcat::Tiny
 		return result.first->second;
 	}
 
+	Vertex* VertexBufferManager::create(MeshData* mesh)
+	{
+		return nullptr;
+	}
 }

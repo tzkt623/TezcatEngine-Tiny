@@ -18,9 +18,9 @@ namespace tezcat::Tiny
 	{
 		ShadowCasterMgr::attach(this);
 		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene, this, [this](const EventData& data)
-			{
-				mCasterAry.clear();
-			});
+		{
+			mCasterAry.clear();
+		});
 	}
 
 	Shader* ShadowCasterManager::getShader()
@@ -83,7 +83,7 @@ namespace tezcat::Tiny
 		//目前这里暂时这么写
 		for (auto& caster : mCasterAry)
 		{
-			caster->submitViewMatrix(graphics, shader);
+			caster->submit(graphics, shader);
 			graphics->setGlobalTexture2D(shader, ShaderParam::TexDepth, caster->getShadwowTexutre());
 		}
 	}

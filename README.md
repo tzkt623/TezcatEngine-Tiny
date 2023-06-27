@@ -6,10 +6,11 @@
 
 Update
 
-- [x] 重构了整个渲染逻辑以支持多线程(Refactor all rendering logic to support multi-thread)
-- [x] 基本的资源浏览器(Basic Resource Browse)
-- [x] 使用管理器创建的对象生命周期属于管理器,不使用管理器创建的对象生命周期手动管理(The life of objects created using the manager belongs to the manager. The life of objects created without the manager is managed manually)
-- [ ] 正在重构资源加载和管理方式(Refactor resoure loader and managers)
+- [x] 修改了整个shader体系的结构,现在不再有特殊内建变量,只有全局通用变量(The shader system has been modified so that there are no longer special built-in variables, only global common variables)
+- [x] 简化了shader头文件的包含,只需要包含一个通用的tiny头文件就行,如果不包含,可以自己写(Simplifies the inclusion of shader header files, only need to include a generic Tiny header file, if not, you can write your own)
+- [x] 可以自己缓存uniform变量的index来快速更新数据(You can cache the index of uniform variables yourself to quickly update the data)
+- [x] 基础模型加载(Basic Model load)
+- [ ] 正在重构资源加载和管理方式(Refactoring resoure loader and managers)
 
 ## **依赖库版本(Libs Version)**
 
@@ -28,9 +29,10 @@ Engine
 - [x] Basic ShadowMap
 - [x] Basic Memory Manager
 - [x] Basic Multi-Thread Engine
+- [x] Basic Resource Manager
 - [ ] Camera Culling
 - [ ] Multi-Light Support
-- [ ] Mode Load Support
+- [x] Model Load Support
 - [ ] Transparent Sort
 - [ ] Multi-Thread Rendering(Vulkan)
 
@@ -50,8 +52,6 @@ Editor
 现在可以在菜单里面切换两个场景
 
 Now you can switch scenes in the menu
-
-There is a bug in switching scenes!!!
 
 ### 着色器编辑器(Shader Editor)
 
@@ -93,40 +93,6 @@ Try Drag image file to envlighting map widget
 
 A simple reference counting based memory management, just still debugging......
 
-## **引擎(Engine)**
-
-```cpp
-auto go = GameObject::create("World1_Camera");
-auto camera = go->addComponent<Camera>(true);
-camera->setPerspective(60.0f, 0.1f, 2000.0f);
-camera->setCullLayer(0);
-
-go->addComponent<Transform>();
-go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-
-//-------------------------------------
-go = GameObject::create("Skybox1");
-go->addComponent<Transform>();
-
-auto skybox = go->addComponent<Skybox>();
-auto material = Material::create("Unlit/Skybox");
-material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
-skybox->setMaterial(material);
-
-//---------------------------------------------------------
-auto world2 = GameObject::create("World2_Gate");
-auto tran = world2->addComponent<Transform>();
-tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
-tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
-
-auto mr1 = world2->addComponent<MeshRenderer>();
-auto world2_material = Material::create("Unlit/Texture");
-world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
-mr1->setMaterial(world2_material);
-mr1->setMesh("Square");
-```
-
 ## **创建游戏对象(Create GameObjects)**
 
 - 创建相机
@@ -153,23 +119,36 @@ go->getTransform()->setParent(controller_go->getTransform());
 
   Drag a png/jpg/hdr image in resource browser to lighting manager window And check camera`s clear option to render skybox
 
-- 创建一个游戏物体(传送门)
-  Create a GameObject(JumpGate)
+- 创建一个游戏物体
+  Create a GameObject
 
 ```cpp
-//default layer is 0
-auto world2 = GameObject::create("World2_Gate");
-auto tran = world2->addComponent<Transform>();
-tran->setPosition(glm::vec3(-300.0f, 0.0f, 0.0f));
-tran->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-tran->setScale(glm::vec3(gateWidth, gateHigh, 1.0f));
+auto wife = GameObject::create("Wife");
+wife->addComponent<Transform>();
+wife->getTransform()->setPosition(glm::vec3(-960.0f, 0.0f, 0.0f));
+wife->getTransform()->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+wife->getTransform()->setScale(glm::vec3(1920.0f / 2, 1080.0f / 2, 1.0f));
+wife->getTransform()->setParent(transform);
 
-auto mr1 = world2->addComponent<MeshRenderer>();
-auto world2_material = Material::create("Unlit/Texture");
-//note that [RB_World2] is a [FrameBuffer] created in [TextureManager] by yourself
-world2_material->addUniform<UniformTex2D>(ShaderParam::TexColor, "RB_World2");
-mr1->setMaterial(world2_material);
-mr1->setMesh("Square");
+//add a MeshRenderer
+auto mr2 = wife->addComponent<MeshRenderer>();
+mr2->setMesh("Square");
+
+auto wife_material2 = Material::create("Unlit/Texture");
+mr2->setMaterial(wife_material2);
+
+auto shader = wife_material2->getShader();
+
+auto my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
+auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
+wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
+```
+
+- Load A Model
+
+```cpp
+auto model = Resource::load<Model>("Model/Cerberus_LP.fbx");
+model->generate();
 ```
 
 - 创建一个帧缓冲
@@ -303,9 +282,9 @@ Attention! The .exe file must be in the same directory as the resource folder
     }
     ```
 
-4. 加载第一个Scene
+4. 准备场景
 
-   Load first Scene
+   Prepare Scene
 
     ```cpp
     void MyEngineIniter::prepareGame(Engine* engine)
@@ -328,53 +307,36 @@ Attention! The .exe file must be in the same directory as the resource folder
 
 ShaderBuilder can auto scan all GLSL Uniform value except array type.
 
-目前Tiny的内建变量如下
+Tiny的全局变量如下
 
-Tiny Current Buildin Uniform Values
+Tiny Current Global Uniform Values
 
-独立型变量 individual variable
+|        ShaderName        | CommonType  |         Useage          |
+| :----------------------: | :---------: | :---------------------: |
+|       TINY_MatrixP       |    mat4     |            P            |
+|       TINY_MatrixV       |    mat4     |            V            |
+|       TINY_MatrixM       |    mat4     |            M            |
+|      TINY_MatrixVP       |    mat4     |           VP            |
+|      TINY_MatrixMVP      |    mat4     |           MVP           |
+|       TINY_MatrixN       |    mat3     |   Model Normal Matrix   |
+|    TINY_MatrixLightVP    |    mat4     |       Light`s VP        |
+| TINY_CameraWorldPosition |    vec3     | Camera`s World Position |
+|    TINY_CameraNearFar    |    vec2     |    Camera`s NearFar     |
+|     TINY_Resolution      |    vec2     |    Screen Resolution    |
+|      TINY_TexSkybox      | TextureCube |     Skybox Texture      |
+|      TINY_TexDepth       |  Texture2D  |      Depth Texture      |
+|    TINY_TexIrradiance    | TextureCube |   Irradiance Texture    |
+|    TINY_TexPrefilter     | TextureCube |    Prefilter Texture    |
+|     TINY_TexBRDFLUT      |  Texture2D  |     BRDFLUT Texture     |
 
-|      TinyName      | CommonType  |  ShaderParam  |
-| :----------------: | :---------: | :-----------: |
-|    TINY_MatrixP    |    mat4     |    MatrixP    |
-|    TINY_MatrixV    |    mat4     |    MatrixV    |
-|    TINY_MatrixM    |    mat4     |    MatrixM    |
-|    TINY_MatrixN    |    mat3     |    MatrixN    |
-|   TINY_MatrixSBV   |    mat4     |   MatrixSBV   |
-|   TINY_MatrixLit   |    mat4     |   MatrixLit   |
-| TINY_MatrixEnv[6]  |    mat4     |   MatrixEnv   |
-| TINY_ViewPosition  |    vec3     | ViewPosition  |
-|  TINY_ViewNearFar  |    vec2     |  ViewNearFar  |
-| TINY_ScreenLength  |    vec2     | ScreenLength  |
-|     TINY_IsHDR     |    bool     |     IsHDR     |
-|  TINY_VertexColor  |    vec4     |  VertexColor  |
-|   TINY_TexColor    |  Texture2D  |   TexColor    |
-|    TINY_TexCube    | TextureCube |    TexCube    |
-|   TINY_TexDepth    |  Texture2D  |   TexDepth    |
-| TINY_TexIrradiance | TextureCube | TexIrradiance |
-| TINY_TexPrefilter  | TextureCube | TexPrefilter  |
-|  TINY_TexBRDFLUT   |  Texture2D  |  TexBRDFLUT   |
-
-结构型变量 struct variable
-
-MatStd
-|       TinyName        | CommonType |       Useage        |
-| :-------------------: | :--------: | :-----------------: |
-|  TINY_MatStd.diffuse  | Texture2D  |  Diffuse`s Texture  |
-|  TINY_MatStd.normal   | Texture2D  |  Normal`s Texture   |
-| TINY_MatStd.specular  | Texture2D  | Specular`s Texture  |
-| TINY_MatStd.shininess |   float    | Specular  Shininess |
-
-DirLit
-|       TinyName        | CommonType | Useage |
+|      ShaderName       | CommonType | Useage |
 | :-------------------: | :--------: | :----: |
 | TINY_LitDir.direction |    vec3    |        |
 |  TINY_LitDir.ambient  |    vec3    |        |
 |  TINY_LitDir.diffuse  |    vec3    |        |
 | TINY_LitDir.specular  |    vec3    |        |
 
-PointLit
-|        TinyName        | CommonType | Useage |
+|       ShaderName       | CommonType | Useage |
 | :--------------------: | :--------: | :----: |
 | TINY_LitPoint.position |    vec3    |        |
 | TINY_LitPoint.ambient  |    vec3    |        |
@@ -400,15 +362,23 @@ notice! add uniform value to your material for the gameobject.
 
 ```cpp
 auto plane_material = Material::create("Standard/Std1");
-//texture is auto loaded by manager,so just put it`s name in function
-plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Diffuse, "stone_wall_diff");
-plane_material->addUniform<UniformTex2D>(ShaderParam::StdMaterial::Specular, "stone_wall_ao");
-plane_material->addUniform<UniformF1>(ShaderParam::StdMaterial::Shininess, 64.0f);
-//also texturebuffer is cached by manager, just put it`s name in here
-plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
-
-auto mr = plane->addComponent<MeshRenderer>();
 mr->setMaterial(plane_material);
+
+auto shader = plane_material->getShader();
+//use shader to find custom uniform`s index
+auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
+auto index_specular = shader->getUniformIndex("myTexSpecular2D");
+auto index_shininess = shader->getUniformIndex("myShininess");
+
+auto tex_diff = Resource::loadOnly<Texture2D>("Image/stone_wall_diff.jpg");
+auto tex_spec = Resource::loadOnly<Texture2D>("Image/stone_wall_ao.jpg");
+
+//set value by using uniform index
+plane_material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
+//or use your uniform`s name
+//plane_material->setUniform<UniformTex2D>("myTexDiffuse2D", tex_diff);
+plane_material->setUniform<UniformTex2D>(index_specular, tex_spec);
+plane_material->setUniform<UniformF1>(index_shininess, 64.0f);
 ```
 
 ## **着色器 Shader**
@@ -441,20 +411,23 @@ Header files support repetitive inclusion
 The shader file supports both // and /**/
 
 ```glsl
-file tiny_vs_base.tyin 
+file tiny_vs.tyin 
+//base
 uniform mat4 TINY_MatrixP;
 uniform mat4 TINY_MatrixV;
 uniform mat4 TINY_MatrixM;
+uniform mat4 TINY_MatrixMV;
+uniform mat4 TINY_MatrixVP;
+uniform mat4 TINY_MatrixMVP;
 uniform mat3 TINY_MatrixN;
 
-file tiny_vs_shadow.tyin
-uniform mat4 TINY_MatrixLit;
+//light
+uniform mat4 TINY_MatrixLightVP;
 
 file any shader you need
 #TINY_VS_BEGIN
 {
-    #include "../Include/tiny_vs_base.tyin"
-    #include "../Include/tiny_vs_shadow.tyin"
+    #include "../Include/tiny_vs.tyin"
     ..........
 }
 ```
@@ -600,10 +573,22 @@ The[`int Version`] should be setted.The other params You can set as your wish.
     }
     #TINY_CFG_END
 
+    #TINY_VA_BEGIN
+    {
+        inout TINY_VS2FS
+        {
+            vec4 color;
+            vec2 uv;
+            vec3 normal;
+            vec3 worldPosition;
+            vec4 lightPosition;
+        };
+    }
+    #TINY_VA_END
+
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
-        #include "../Include/tiny_vs_shadow.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
@@ -616,6 +601,15 @@ The[`int Version`] should be setted.The other params You can set as your wish.
         out vec3 myWorldPosition;
         out vec4 myLightPosition;
 
+        out VS2FS
+        {
+            vec4 color;
+            vec2 uv;
+            vec3 normal;
+            vec3 worldPosition;
+            vec4 lightPosition;
+        } TINY_VS2FS;
+
         void main()
         {
             vec4 position =  vec4(aPos, 1.0);
@@ -625,40 +619,49 @@ The[`int Version`] should be setted.The other params You can set as your wish.
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
             myWorldPosition = vec3(TINY_MatrixM * position);
-            myLightPosition = TINY_MatrixLit * vec4(myWorldPosition, 1.0f);
+            myLightPosition = TINY_MatrixLightVP * vec4(myWorldPosition, 1.0f);
         }
     }
     #TINY_VS_END
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_std_mat.tyin"
-        #include "../Include/tiny_fs_light.tyin"
-        #include "../Include/tiny_fs_camera.tyin"
-        #include "../Include/tiny_fs_texture.tyin"
-        #include "../Include/tiny_fs_function.tyin"
+        #include "../Include/tiny_fs.tyin"
 
         in vec4 myColor;
         in vec2 myUV;
         in vec3 myNormal;
         in vec3 myWorldPosition;
         in vec4 myLightPosition;
+
+        in VS2FS
+        {
+            vec4 color;
+            vec2 uv;
+            vec3 normal;
+            vec3 worldPosition;
+            vec4 lightPosition;
+        } TINY_VS2FS;
         
         out vec4 myFinalColor;
 
+        uniform sampler2D myTexDiffuse2D;
+        uniform sampler2D myTexSpecular2D;
+        uniform float myShininess;
+
         vec4 reflection(vec3 I)
         {
-            //vec3 I = normalize(myWorldPosition - TINY_ViewPosition);
+            //vec3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
             vec3 R = reflect(I, normalize(myNormal));
-            return vec4(texture(TINY_TexCube, R).rgb, 1.0);
+            return vec4(texture(TINY_TexSkybox, R).rgb, 1.0);
         }
 
         vec4 refraction(vec3 I)
         {
             float ratio = 1.00 / 1.52;
-            //vec3 I = normalize(myWorldPosition - TINY_ViewPosition);
+            //vec3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
             vec3 R = refract(I, normalize(myNormal), ratio);
-            return vec4(texture(TINY_TexCube, R).rgb, 1.0);
+            return vec4(texture(TINY_TexSkybox, R).rgb, 1.0);
         }
 
         vec3 calcDirectionLight(LightDirection lit, vec3 viewDir, vec3 normal)
@@ -670,11 +673,11 @@ The[`int Version`] should be setted.The other params You can set as your wish.
             float NdH = dot(normal, half_dir);
 
             float diff = max(NdL, 0.0);
-            float spec = pow(max(NdH, 0.0), TINY_MatStd.shininess);
+            float spec = pow(max(NdH, 0.0), myShininess);
 
-            vec3 ambient = lit.ambient * texture(TINY_MatStd.diffuse, myUV).rgb;
-            vec3 diffuse = lit.diffuse * diff * texture(TINY_MatStd.diffuse, myUV).rgb;
-            vec3 specular = lit.specular * spec * texture(TINY_MatStd.specular, myUV).rrr;
+            vec3 ambient = lit.ambient * texture(myTexDiffuse2D, myUV).rgb;
+            vec3 diffuse = lit.diffuse * diff * texture(myTexDiffuse2D, myUV).rgb;
+            vec3 specular = lit.specular * spec * texture(myTexSpecular2D, myUV).rrr;
 
             // shadow
             float shadow = calcShadow(myLightPosition, normal, light_dir, TINY_TexDepth);
@@ -686,8 +689,8 @@ The[`int Version`] should be setted.The other params You can set as your wish.
         void main()
         {
             vec3 normal = normalize(myNormal);
-            vec3 view_dir = normalize(TINY_ViewPosition - myWorldPosition);
-            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);          
+            vec3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
+            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
         }
     }
     #TINY_FS_END

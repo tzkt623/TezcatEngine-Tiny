@@ -18,17 +18,47 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 		if (ImGui::CollapsingHeader("坐标(Transform)"))
 		{
 			auto transform = static_cast<Transform*>(com);
-			ImGui::Text("Position");
-			ImGui::SameLine();
-			ImGui::DragFloat3("##Position", glm::value_ptr(transform->getPosition()), 0.03f);
+			if (ImGui::BeginTable("##tabel", 2, ImGuiTableFlags_SizingStretchProp))
+			{
+				ImGui::TableSetupColumn("##0", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("##1", ImGuiTableColumnFlags_WidthStretch);
 
-			ImGui::Text("Rotation");
-			ImGui::SameLine();
-			ImGui::DragFloat3("##Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
+				ImGui::TableNextRow(ImGuiTableRowFlags_None);
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("Position");
+				ImGui::TableSetColumnIndex(1);
+				ImGui::SetNextItemWidth(200);
+				ImGui::DragFloat3("##Position", glm::value_ptr(transform->getPosition()), 0.03f);
 
-			ImGui::Text("Scale   ");
-			ImGui::SameLine();
-			ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.03f);
+				ImGui::TableNextRow(ImGuiTableRowFlags_None);
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("Rotation");
+				ImGui::TableSetColumnIndex(1);
+				ImGui::SetNextItemWidth(200);
+				ImGui::DragFloat3("##Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
+
+				ImGui::TableNextRow(ImGuiTableRowFlags_None);
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("Scale");
+				ImGui::TableSetColumnIndex(1);
+				ImGui::SetNextItemWidth(200);
+				ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.03f);
+
+				ImGui::EndTable();
+			}
+
+
+			// 			ImGui::Text("Position");
+			// 			ImGui::SameLine();
+			// 			ImGui::DragFloat3("##Position", glm::value_ptr(transform->getPosition()), 0.03f);
+			// 
+			// 			ImGui::Text("Rotation");
+			// 			ImGui::SameLine();
+			// 			ImGui::DragFloat3("##Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
+			// 
+			// 			ImGui::Text("Scale   ");
+			// 			ImGui::SameLine();
+			// 			ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.03f);
 			transform->markDirty();
 		}
 	});
@@ -37,29 +67,33 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 	{
 		if (ImGui::CollapsingHeader("网格渲染器(MeshRenderer)"))
 		{
+			uint32_t widget_id = 0;
 			auto mr = static_cast<MeshRenderer*>(com);
 			ImGui::Text("Mesh");
 			auto vertex = mr->getVertex();
-			ImGui::Text(StringTool::stringFormat("Name: %s", vertex->getName().c_str()).c_str());
+			ImGui::Text("Name: %s", vertex->getName().c_str());
+			ImGui::Text("VertexID: %d", vertex->getVertexID());
+			ImGui::Text("VertexCount: %d", vertex->getVertexCount());
+			ImGui::Text("IndexCount: %d", vertex->getIndexCount());
 			ImGui::Separator();
+
 			ImGui::Text("Material");
 			auto mt = mr->getMaterial();
+			auto shader = mt->getShader();
 			auto& uniforms = mt->getUniforms();
-			for (auto uniform : uniforms)
+			for (uint32_t i = 0; i < uniforms.size(); i++)
 			{
+				auto uniform = uniforms[i];
+				auto info = shader->getUniformInfo(i);
 				switch (uniform->getType())
 				{
 				case UniformType::Float:
 				{
 					auto f1 = (UniformF1*)uniform;
-					auto config = MyGUIContext::getInstance().getValueConfig(f1->ID);
-
-					ImGui::Text(UniformID::getStringStatic(f1->ID).data());
-					ImGui::DragFloat("##0"
-									, &f1->value
-									, config->speed
-									, config->min
-									, config->max);
+					ImGui::Text(info->name.c_str());
+					ImGui::PushID(widget_id++);
+					ImGui::DragFloat("", &f1->value, 0.02f);
+					ImGui::PopID();
 
 					ImGui::Spacing();
 					break;
@@ -67,22 +101,23 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 				case UniformType::Float3:
 				{
 					auto f3 = (UniformF3*)uniform;
-					auto config = MyGUIContext::getInstance().getValueConfig(f3->ID);
+
+					ImGui::Text(info->name.c_str());
+					ImGui::PushID(widget_id++);
+					ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f);
+
+					/*
 					if (config->isColor)
 					{
-						ImGui::Text(UniformID::getStringStatic(f3->ID).data());
-						ImGui::ColorEdit3("##1"
-										 , glm::value_ptr(f3->value));
+						ImGui::ColorEdit3("", glm::value_ptr(f3->value));
 					}
 					else
 					{
-						ImGui::Text(UniformID::getStringStatic(f3->ID).data());
-						ImGui::DragFloat3("##2"
-										 , glm::value_ptr(f3->value)
-										 , config->speed
-										 , config->min
-										 , config->max);
+						ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f);
 					}
+					*/
+
+					ImGui::PopID();
 
 					ImGui::Spacing();
 					break;
@@ -90,7 +125,7 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 				case UniformType::Tex2D:
 				{
 					auto tex = (UniformTex2D*)uniform;
-					ImGui::Text(UniformID::getStringStatic(tex->ID).data());
+					ImGui::Text(info->name.c_str());
 					ImGui::Image((ImTextureID)tex->value->getTextureID()
 								, ImVec2(100, 100)
 								, ImVec2(0, 1)
@@ -110,21 +145,35 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 	{
 		if (ImGui::CollapsingHeader("区域光(DirectionalLight)"))
 		{
-			auto lit = static_cast<DirectionalLight*>(com);
+			if (ImGui::BeginTable("##table", 2, ImGuiTableFlags_SizingStretchProp))
+			{
+				auto lit = static_cast<DirectionalLight*>(com);
+				ImGui::TableSetupColumn("##0", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("##1", ImGuiTableColumnFlags_WidthStretch);
 
-			auto config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Ambient);
-			ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Ambient).data());
-			ImGui::ColorEdit3("##0", glm::value_ptr(lit->getAmbient()));
-			ImGui::Spacing();
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				auto config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Ambient);
+				ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Ambient).data());
+				ImGui::TableNextColumn();
+				ImGui::ColorEdit3("##0", glm::value_ptr(lit->getAmbient()));
 
-			config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Diffuse);
-			ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Diffuse).data());
-			ImGui::ColorEdit3("##1", glm::value_ptr(lit->getDiffuse()));
-			ImGui::Spacing();
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Diffuse);
+				ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Diffuse).data());
+				ImGui::TableNextColumn();
+				ImGui::ColorEdit3("##1", glm::value_ptr(lit->getDiffuse()));
 
-			config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Specular);
-			ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Specular).data());
-			ImGui::ColorEdit3("##2", glm::value_ptr(lit->getSpecular()));
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Specular);
+				ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Specular).data());
+				ImGui::TableNextColumn();
+				ImGui::ColorEdit3("##2", glm::value_ptr(lit->getSpecular()));
+
+				ImGui::EndTable();
+			}
 		}
 	});
 
@@ -132,138 +181,142 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 	{
 		if (ImGui::CollapsingHeader("相机(Camera)"))
 		{
-			auto camera = static_cast<Camera*>(com);
-			auto transform = camera->getTransform();
-			ImGui::Text("投影(Projection)");
-			static const char* projection_name = "error";
-			IRenderObserver::ViewType view_type = camera->getViewType();
-			switch (view_type)
+			if (ImGui::BeginTable("##table", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Borders))
 			{
-			case IRenderObserver::ViewType::Screen:
-				break;
-			case IRenderObserver::ViewType::Ortho:
-			{
-				projection_name = "正交(Ortho)";
-				break;
-			}
-			case IRenderObserver::ViewType::Perspective:
-			{
-				projection_name = "透视(Perspective)";
-				break;
-			}
-			default:
-				break;
-			}
+				auto camera = static_cast<Camera*>(com);
+				auto transform = camera->getTransform();
 
-			if (ImGui::BeginCombo("##Projection", projection_name))
-			{
-				ImGui::Selectable("正交(Ortho)");
-				if (ImGui::IsItemClicked())
+				ImGui::TableSetupColumn("##0", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("##1", ImGuiTableColumnFlags_WidthStretch);
+
+				static const char* projection_name = "error";
+				IRenderObserver::ViewType view_type = camera->getViewType();
+				switch (view_type)
 				{
-					view_type = IRenderObserver::ViewType::Ortho;
+				case IRenderObserver::ViewType::Screen:
+					break;
+				case IRenderObserver::ViewType::Ortho:
+				{
+					projection_name = "正交(Ortho)";
+					break;
+				}
+				case IRenderObserver::ViewType::Perspective:
+				{
+					projection_name = "透视(Perspective)";
+					break;
+				}
+				default:
+					break;
 				}
 
-				ImGui::Selectable("透视(Perspective)");
-				if (ImGui::IsItemClicked())
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("Projection");
+				ImGui::TableNextColumn();
+				if (ImGui::BeginCombo("##Projection", projection_name))
 				{
-					view_type = IRenderObserver::ViewType::Perspective;
+					ImGui::Selectable("正交(Ortho)");
+					if (ImGui::IsItemClicked())
+					{
+						view_type = IRenderObserver::ViewType::Ortho;
+					}
+
+					ImGui::Selectable("透视(Perspective)");
+					if (ImGui::IsItemClicked())
+					{
+						view_type = IRenderObserver::ViewType::Perspective;
+					}
+
+					ImGui::EndCombo();
 				}
 
-				ImGui::EndCombo();
-			}
+				switch (view_type)
+				{
+				case IRenderObserver::ViewType::Screen:
+					break;
+				case IRenderObserver::ViewType::Ortho:
+				{
+					float near_far[2] = { camera->getNear(),camera->getFar() };
 
-			switch (view_type)
-			{
-			case IRenderObserver::ViewType::Screen:
-				break;
-			case IRenderObserver::ViewType::Ortho:
-			{
-				float near_far[2] = { camera->getNear(),camera->getFar() };
-				ImGui::Text("NearFar");
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+					ImGui::Text("NearFar");
+					ImGui::TableNextColumn();
+					ImGui::InputFloat2("##NearFar", near_far);
+
+					camera->setOrtho(near_far[0], near_far[1]);
+					break;
+				}
+				case IRenderObserver::ViewType::Perspective:
+				{
+					float fov = camera->getFOV();
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+					ImGui::Text("Fov");
+					ImGui::TableNextColumn();
+					ImGui::DragFloat("##Fov", &fov, 1, 1, 180);
+
+					float near_far[2] = { camera->getNear(),camera->getFar() };
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+					ImGui::Text("NearFar");
+					ImGui::TableNextColumn();
+					ImGui::InputFloat2("##NearFar", near_far);
+
+					camera->setPerspective(fov, near_far[0], near_far[1]);
+
+					break;
+				}
+				default:
+					break;
+				}
+
+				/*
+				auto vinfo = camera->getViewportInfo();
+				int oxoy[2] = { vinfo.OX, vinfo.OY };
+				ImGui::Text("原点(Origin)");
 				ImGui::SameLine();
-				ImGui::InputFloat2("##NearFar", near_far);
+				ImGui::InputInt2("##oxoy", oxoy);
 
-				camera->setOrtho(near_far[0], near_far[1]);
-				break;
-			}
-			case IRenderObserver::ViewType::Perspective:
-			{
-				float fov = camera->getFOV();
-				ImGui::Text("Fov    ");
+				int wh[2] = { vinfo.Width, vinfo.Height };
+				ImGui::Text("长宽(Width&Height)");
 				ImGui::SameLine();
-				ImGui::DragFloat("##Fov", &fov, 1, 1, 180);
+				ImGui::InputInt2("##wh", wh);
+				camera->setViewRect(oxoy[0], oxoy[1], wh[0], wh[1]);
+				*/
 
-				float near_far[2] = { camera->getNear(),camera->getFar() };
-				ImGui::Text("NearFar");
-				ImGui::SameLine();
-				ImGui::InputFloat2("##NearFar", near_far);
+				int order = camera->getOrder();
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("Order");
+				ImGui::TableNextColumn();
+				ImGui::InputInt("##order", &order);
+				camera->setOrder(order);
 
-				camera->setPerspective(fov, near_far[0], near_far[1]);
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("ClearOptions");
+				ImGui::TableNextColumn();
 
-				break;
+				auto clear_options = (uint32_t)camera->getClearOption();
+				bool clear_color = (clear_options & ClearOption::CO_Color) == ClearOption::CO_Color;
+				bool clear_depth = (clear_options & ClearOption::CO_Depth) == ClearOption::CO_Depth;
+				bool clear_stencil = (clear_options & ClearOption::CO_Stencil) == ClearOption::CO_Stencil;
+				bool clear_skybox = (clear_options & ClearOption::CO_Skybox) == ClearOption::CO_Skybox;
+				if (ImGui::BeginCombo("##ClearOptions", "ClearOptions"))
+				{
+					ImGui::CheckboxFlags("Color", &clear_options, ClearOption::CO_Color);
+					ImGui::CheckboxFlags("Depth", &clear_options, ClearOption::CO_Depth);
+					ImGui::CheckboxFlags("Stencil", &clear_options, ClearOption::CO_Stencil);
+					ImGui::CheckboxFlags("Skybox ", &clear_options, ClearOption::CO_Skybox);
+
+					ImGui::EndCombo();
+				}
+
+				camera->setClearOption(clear_options);
+
+				ImGui::EndTable();
 			}
-			default:
-				break;
-			}
-
-			/*
-			auto vinfo = camera->getViewportInfo();
-			int oxoy[2] = { vinfo.OX, vinfo.OY };
-			ImGui::Text("原点(Origin)");
-			ImGui::SameLine();
-			ImGui::InputInt2("##oxoy", oxoy);
-
-			int wh[2] = { vinfo.Width, vinfo.Height };
-			ImGui::Text("长宽(Width&Height)");
-			ImGui::SameLine();
-			ImGui::InputInt2("##wh", wh);
-			camera->setViewRect(oxoy[0], oxoy[1], wh[0], wh[1]);
-			*/
-
-			int order = camera->getOrder();
-			ImGui::Text("Order  ");
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(120);
-			ImGui::InputInt("##order", &order);
-			camera->setOrder(order);
-
-			ImGui::Separator();
-			ImGui::Text("ClearOptions");
-			auto clear_options = camera->getClearOption();
-			static bool clear_color = (clear_options & ClearOption::CO_Color) == ClearOption::CO_Color;
-			static bool clear_depth = (clear_options & ClearOption::CO_Depth) == ClearOption::CO_Depth;
-			static bool clear_stencil = (clear_options & ClearOption::CO_Stencil) == ClearOption::CO_Stencil;
-			static bool clear_skybox = (clear_options & ClearOption::CO_Skybox) == ClearOption::CO_Skybox;
-
-			ImGui::Checkbox("Color  ", &clear_color);
-			ImGui::SameLine(0, 20);
-			ImGui::Checkbox("Depth  ", &clear_depth);
-			ImGui::Checkbox("Stencil", &clear_stencil);
-			ImGui::SameLine(0, 20);
-			ImGui::Checkbox("Skybox ", &clear_skybox);
-
-			ClearOptionID co_id = 0;
-			if (clear_color)
-			{
-				co_id |= ClearOption::CO_Color;
-			}
-
-			if (clear_depth)
-			{
-				co_id |= ClearOption::CO_Depth;
-			}
-
-			if (clear_stencil)
-			{
-				co_id |= ClearOption::CO_Stencil;
-			}
-
-			if (clear_skybox)
-			{
-				co_id |= ClearOption::CO_Skybox;
-			}
-			camera->setClearOption(co_id);
-
 
 			/*
 			ImGui::Separator();

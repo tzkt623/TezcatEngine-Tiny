@@ -23,17 +23,9 @@ ValueConfig* MyGUIContext::getValueConfig(const UniformID& ID)
 
 void MyGUIContext::initValueConfig()
 {
-	mValueConfigAry[ShaderParam::LightDirection::Ambient] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::LightDirection::Diffuse] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::LightDirection::Specular] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
-
-
-	mValueConfigAry[ShaderParam::StdMaterial::Shininess] = new ValueConfig{ false, 0.1f, 0.1f, 999.0f };
-
-	mValueConfigAry[ShaderParam::MatPBR_Test::Albedo] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::MatPBR_Test::Metallic] = new ValueConfig{ false, 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::MatPBR_Test::Roughness] = new ValueConfig{ false, 0.005f, 0.0f, 1.0f };
-	mValueConfigAry[ShaderParam::MatPBR_Test::AO] = new ValueConfig{ false, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::LightDirection::Ambient.getUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::LightDirection::Diffuse.getUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+	mValueConfigAry[ShaderParam::LightDirection::Specular.getUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
 }
 
 
@@ -77,5 +69,3 @@ void MyGUIContext::transform(glm::vec3& position, glm::vec3& rotation, glm::vec3
 	ImGui::SameLine();
 	ImGui::DragFloat3("##Scale", &scale.x);
 }
-
-

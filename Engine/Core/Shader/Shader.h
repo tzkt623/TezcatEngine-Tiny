@@ -10,9 +10,18 @@
 
 namespace tezcat::Tiny
 {
+	struct TINY_API UniformInfo
+	{
+		std::string name;
+		UniformType type;
+		int shaderID;
+		int index;
+	};
+
 	/*
 	* Shader
-	* @brief 含有一个唯一UID,使用这个ID去创建对应的RenderPass,
+	* @brief 含有一个唯一UID,使用这个ID去创建对应的RenderPass
+	* @brief 包含所有uniform的位置ID
 	*/
 	class TINY_API Shader : public TinyObject
 	{
@@ -44,15 +53,48 @@ namespace tezcat::Tiny
 		LightMode getLightMode() { return mLightMode; }
 		bool isShadowReceiver() { return mIsShadowReceiver; }
 
+		int32_t getPropertyID(const std::string& name)
+		{
+			auto it = mUserUniformUMap.find(name);
+			TinyAssert(it != mUserUniformUMap.end());
+			return it->second->index;
+		}
+
+
+		int getUniformIndex(const std::string& name)
+		{
+			auto it = mUserUniformUMap.find(name);
+			TinyThrow_Runtime(it == mUserUniformUMap.end(), name);
+			return it->second->index;
+		}
+
+		UniformInfo* getUniformInfo(const std::string& name) const
+		{
+			auto it = mUserUniformUMap.find(name);
+			TinyThrow_Runtime(it == mUserUniformUMap.end(), name);
+			return it->second;
+		}
+
+		UniformInfo* getUniformInfo(const uint32_t& index) const
+		{
+			return mUserUniformAry[index];
+		}
+
 	public:
 		bool checkUniform(const UniformID& id)
 		{
-			return mTinyUniformList[id.getUID()] > -1;
+			return mTinyUniformList[id.getUID()].shaderID > -1;
 		}
 
-		int getUniformID(const UniformID& id)
+		bool checkTinyUniform(const UniformID& id, int& outShaderID)
 		{
-			return mTinyUniformList[id.getUID()];
+			outShaderID = mTinyUniformList[id.getUID()].shaderID;
+			return outShaderID > -1;
+		}
+
+		int32_t getTinyUniformShaderID(const UniformID& id)
+		{
+			return mTinyUniformList[id.getUID()].shaderID;
 		}
 
 		uint32_t getTextureIndex()
@@ -81,17 +123,31 @@ namespace tezcat::Tiny
 			mLocalTexure = 0;
 		}
 
-		void resizeUniformList(uint64_t size, int value);
-
-		auto getUniformListSize()
+		auto getTinyUniformCount()
 		{
 			return mTinyUniformList.size();
 		}
 
-		void setUniformID(uint32_t index, uint32_t value)
+		const auto& getTinyUniforms() const
 		{
-			mTinyUniformList[index] = value;
+			return mTinyUniformList;
 		}
+
+		const auto& getUniformMap() const
+		{
+			return mUserUniformUMap;
+		}
+
+		const auto& getUniformAry() const
+		{
+			return mUserUniformAry;
+		}
+
+		void setupTinyUniform(UniformType& uniformType, const std::string& name, const uint32_t& index, const int& shaderID);
+		void resizeTinyUniformAry(uint64_t size);
+
+		void setupUserUniformID(UniformType& uniformType, const std::string& name, const int& shaderID);
+		void resizeUserUniformAry(uint64_t size);
 
 	public:
 		void setZWrite(bool val) { mEnableZWrite = val; }
@@ -170,8 +226,10 @@ namespace tezcat::Tiny
 		DepthTestWrapper mDepthTest;
 
 	protected:
-		std::unordered_map<std::string, uint32_t> mTextureID;
-		std::unordered_map<std::string, uint32_t> mUniformID;
-		std::vector<int> mTinyUniformList;
+
+		std::vector<UniformInfo> mTinyUniformList;
+
+		std::vector<UniformInfo*> mUserUniformAry;
+		std::unordered_map<std::string_view, UniformInfo*> mUserUniformUMap;
 	};
 }

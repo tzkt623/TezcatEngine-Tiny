@@ -8,16 +8,14 @@ struct LightDirection
 
 struct LightPoint
 {
-    vec3 position;  
+    vec3 position;
 
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
 
-    float constant;
-    float linear;
-    float quadratic;
+    vec3 config;
 };
 
 uniform LightDirection TINY_LitDir;
-uniform LightDirection TINY_LitPoint;
+uniform LightPoint TINY_LitPoint;

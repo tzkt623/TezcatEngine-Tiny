@@ -57,9 +57,20 @@ namespace tezcat::Tiny
 			mVertex->subRef();
 		}
 
-		mVertex = VertexBufMgr::getInstance()->create(meshData->mName);
+		mVertex = VertexBufMgr::getInstance()->create(meshData);
 		mVertex->addRef();
 		mRenderAgent->setVertex(mVertex);
+	}
+
+	void IRenderMesh::setMesh(Vertex* vertex)
+	{
+		if (mVertex)
+		{
+			mVertex->subRef();
+		}
+
+		mVertex = vertex;
+		mVertex->addRef();
 	}
 
 	void IRenderMesh::submit(BaseGraphics* graphics, Shader* shader)

@@ -129,7 +129,7 @@ namespace tezcat::Tiny
 		bool removeChild(Transform* val);
 
 		size_t getChildCount() { return mChildren->size(); }
-		std::vector<TinyWeakRef<Transform>>* getChildren() { return mChildren; }
+		std::list<TinyWeakRef<Transform>>* getChildren() { return mChildren; }
 
 		void manualUpdateMatrix();
 		void markDirty() { mIsDirty = true; }
@@ -166,7 +166,7 @@ namespace tezcat::Tiny
 	private:
 		uint32_t mIndex;
 		Transform* mParent;
-		std::vector<TinyWeakRef<Transform>>* mChildren;
+		std::list<TinyWeakRef<Transform>>* mChildren;
 
 	private:
 		bool mIsDirty;

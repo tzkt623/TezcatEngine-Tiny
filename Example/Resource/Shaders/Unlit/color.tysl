@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         layout (location = 3) in vec4 aColor;

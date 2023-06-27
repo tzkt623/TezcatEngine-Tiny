@@ -13,64 +13,52 @@ namespace tezcat::Tiny
 {
 	void UniformI1::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setInt1(shader, this->ID, &value);
+		graphics->setInt1(shader, *mShaderID, &value);
 	}
 
 	void UniformF1::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setFloat1(shader, this->ID, &value);
+		graphics->setFloat1(shader, *mShaderID, &value);
 	}
 
 	void UniformI2::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setInt2(shader, this->ID, glm::value_ptr(this->value));
+		graphics->setInt2(shader, *mShaderID, glm::value_ptr(this->value));
 	}
 
 	void UniformF2::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setFloat2(shader, this->ID, glm::value_ptr(value));
+		graphics->setFloat2(shader, *mShaderID, glm::value_ptr(value));
 	}
 
 	void UniformI3::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setInt3(shader, this->ID, glm::value_ptr(this->value));
+		graphics->setInt3(shader, *mShaderID, glm::value_ptr(this->value));
 	}
 
 	void UniformF3::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setFloat3(shader, this->ID, glm::value_ptr(value));
+		graphics->setFloat3(shader, *mShaderID, glm::value_ptr(value));
 	}
 
 	void UniformI4::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setInt4(shader, this->ID, glm::value_ptr(this->value));
+		graphics->setInt4(shader, *mShaderID, glm::value_ptr(this->value));
 	}
 
 	void UniformF4::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setFloat4(shader, this->ID, glm::value_ptr(value));
+		graphics->setFloat4(shader, *mShaderID, glm::value_ptr(value));
 	}
 
 	void UniformMat3::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setMat3(shader, this->ID, glm::value_ptr(value));
+		graphics->setMat3(shader, *mShaderID, glm::value_ptr(value));
 	}
 
 	void UniformMat4::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setMat4(shader, this->ID, glm::value_ptr(value));
-	}
-
-	UniformTex2D::UniformTex2D(const UniformID& id, const std::string& name)
-		: UniformT(id, (Texture2D*)TextureMgr::getInstance()->find(name))
-	{
-		this->value->addRef();
-	}
-
-	UniformTex2D::UniformTex2D(const UniformID& id, Texture2D*& tex)
-		: UniformT(id, tex)
-	{
-		this->value->addRef();
+		graphics->setMat4(shader, *mShaderID, glm::value_ptr(value));
 	}
 
 	UniformTex2D::~UniformTex2D()
@@ -80,7 +68,7 @@ namespace tezcat::Tiny
 
 	void UniformTex2D::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setTexture2D(shader, this->ID, this->value);
+		graphics->setTexture2D(shader, *mShaderID, this->value);
 	}
 
 	void UniformTex2D::beginSetValue()
@@ -96,12 +84,6 @@ namespace tezcat::Tiny
 		this->value->addRef();
 	}
 
-	UniformTexCube::UniformTexCube(const UniformID& id, const std::string& name)
-		: UniformT(id, (TextureCube*)TextureMgr::getInstance()->find(name))
-	{
-		this->value->addRef();
-	}
-
 	UniformTexCube::~UniformTexCube()
 	{
 		this->value->subRef();
@@ -109,7 +91,7 @@ namespace tezcat::Tiny
 
 	void UniformTexCube::submit(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setTextureCube(shader, this->ID, this->value);
+		graphics->setTextureCube(shader, *mShaderID, this->value);
 	}
 
 	void UniformTexCube::beginSetValue()

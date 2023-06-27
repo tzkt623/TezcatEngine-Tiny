@@ -133,8 +133,9 @@ namespace tezcat::Tiny
 			//---------------------------------
 			auto cube_vertex = VertexBufMgr::getInstance()->create("Cube");
 			auto shader = ShaderMgr::getInstance()->find("Unlit/EnvMakeCube");
+			auto uinfo = shader->getUniformInfo("myTexHDR2D");
 
-			auto cmd = graphics->createDrawHDRToCubeCMD(shader, cube_vertex, mTexHDR, mCubeMap);
+			auto cmd = graphics->createDrawHDRToCubeCMD(shader, cube_vertex, &uinfo->shaderID, mTexHDR, mCubeMap);
 			mCubeObserver->getRenderQueue()->addRenderCommand(cmd);
 			graphics->addPreRenderPassQueue(mCubeObserver->getRenderQueue<ExtraQueue>());
 
@@ -345,14 +346,7 @@ namespace tezcat::Tiny
 			mSkyboxShader = ShaderMgr::getInstance()->find("Unlit/Skybox");
 		}
 
-		if (mTexHDR)
-		{
-			return graphics->createDrawSkyboxCMD(mSkyboxShader, mSkyboxVertex, mCurrentCubeMap, mSkyboxLod, true);
-		}
-		else
-		{
-			return graphics->createDrawSkyboxCMD(mSkyboxShader, mSkyboxVertex, mCurrentCubeMap, mSkyboxLod, false);
-		}
+		return graphics->createDrawSkyboxCMD(mSkyboxShader, mSkyboxVertex, mCurrentCubeMap, mSkyboxLod, mTexHDR);
 	}
 
 }

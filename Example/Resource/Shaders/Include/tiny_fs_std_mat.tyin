@@ -5,5 +5,3 @@ struct StdMaterial
     sampler2D specular;
     float shininess;
 };
-
-uniform StdMaterial TINY_MatStd;

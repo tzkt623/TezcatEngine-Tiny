@@ -24,12 +24,15 @@ namespace tezcat::Tiny
 
 	Vertex::~Vertex()
 	{
+		Graphics::getInstance()->cmdDeleteVertex(mVertexID);
+
 		mVertexBuffers.clear();
 
 		if (mIndexBuffer)
 		{
 			mIndexBuffer->subRef();
 		}
+
 		delete mChildren;
 	}
 
@@ -90,6 +93,5 @@ namespace tezcat::Tiny
 	{
 		Graphics::getInstance()->cmdCreateVertex(this);
 	}
-
 }
 

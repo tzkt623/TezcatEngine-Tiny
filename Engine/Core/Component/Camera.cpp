@@ -3,7 +3,6 @@
 #include "Component.h"
 
 #include "../Engine.h"
-
 #include "../Scene/Scene.h"
 
 #include "../Manager/CameraManager.h"
@@ -13,7 +12,6 @@
 #include "../Component/MeshRenderer.h"
 #include "../Component/GameObject.h"
 #include "../Component/Light.h"
-
 
 #include "../Shader/ShaderPackage.h"
 #include "../Shader/Shader.h"
@@ -27,7 +25,6 @@
 #include "../Data/Material.h"
 
 #include "../Tool/Tool.h"
-
 
 namespace tezcat::Tiny
 {
@@ -54,6 +51,7 @@ namespace tezcat::Tiny
 
 	void Camera::onStart()
 	{
+
 	}
 
 	void Camera::onEnable()
@@ -91,10 +89,14 @@ namespace tezcat::Tiny
 								, transform->getWorldPosition() + transform->getForward()
 								, transform->getUp());
 
+		auto VP = mProjectionMatrix * mViewMatrix;
+
 		graphics->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
 		graphics->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
-		graphics->setFloat3(shader, ShaderParam::ViewPosition, this->getTransform()->getWorldPosition());
-		graphics->setMat4(shader, ShaderParam::MatrixSBV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
-		graphics->setFloat2(shader, ShaderParam::ViewNearFar, glm::vec2(mNearFace, mFarFace));
+		graphics->setMat4(shader, ShaderParam::MatrixVP, VP);
+		//graphics->setMat4(shader, ShaderParam::MatrixMV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
+
+		graphics->setFloat3(shader, ShaderParam::CameraWorldPosition, this->getTransform()->getWorldPosition());
+		graphics->setFloat2(shader, ShaderParam::CameraNearFar, glm::vec2(mNearFace, mFarFace));
 	}
 }

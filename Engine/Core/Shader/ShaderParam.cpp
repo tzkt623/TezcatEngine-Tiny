@@ -7,28 +7,21 @@ namespace tezcat::Tiny
 	UniformID ShaderParam::MatrixV;
 	UniformID ShaderParam::MatrixM;
 	UniformID ShaderParam::MatrixN;
-	UniformID ShaderParam::MatrixSBV;
-	UniformID ShaderParam::MatrixLit;
-	UniformID ShaderParam::MatrixEnv;
+	UniformID ShaderParam::MatrixVP;
+	UniformID ShaderParam::MatrixMV;
+	UniformID ShaderParam::MatrixMVP;
+	UniformID ShaderParam::MatrixLightVP;
 
-	UniformID ShaderParam::ScreenLength;
-	UniformID ShaderParam::ViewPosition;
-	UniformID ShaderParam::ViewNearFar;
-	UniformID ShaderParam::IsHDR;
+	UniformID ShaderParam::Resolution;
+	UniformID ShaderParam::CameraWorldPosition;
+	UniformID ShaderParam::CameraNearFar;
+	UniformID ShaderParam::LightWorldPosition;
 
-	UniformID ShaderParam::VertexColor;
-	UniformID ShaderParam::TexColor;
-	UniformID ShaderParam::TexCube;
 	UniformID ShaderParam::TexDepth;
+	UniformID ShaderParam::TexSkybox;
 	UniformID ShaderParam::TexIrradiance;
 	UniformID ShaderParam::TexPrefilter;
 	UniformID ShaderParam::TexBRDFLUT;
-
-// 	UniformID ShaderParam::LightPosition;
-// 	UniformID ShaderParam::LightColor;
-// 	UniformID ShaderParam::ModeSpecular;
-// 	UniformID ShaderParam::AmbientStrength;
-// 	UniformID ShaderParam::EnableShadow;
 
 	UniformID ShaderParam::LightDirection::Direction;
 	UniformID ShaderParam::LightDirection::Ambient;
@@ -40,21 +33,6 @@ namespace tezcat::Tiny
 	UniformID ShaderParam::LightPoint::Diffuse;
 	UniformID ShaderParam::LightPoint::Specular;
 	UniformID ShaderParam::LightPoint::Config;
-
-	UniformID ShaderParam::StdMaterial::Diffuse;
-	UniformID ShaderParam::StdMaterial::Normal;
-	UniformID ShaderParam::StdMaterial::Specular;
-	UniformID ShaderParam::StdMaterial::Shininess;
-
-	UniformID ShaderParam::MatPBR_Test::Albedo;
-	UniformID ShaderParam::MatPBR_Test::Metallic;
-	UniformID ShaderParam::MatPBR_Test::Roughness;
-	UniformID ShaderParam::MatPBR_Test::AO;
-
-	UniformID ShaderParam::MatPBR_Std1::Albedo2D;
-	UniformID ShaderParam::MatPBR_Std1::Metallic2D;
-	UniformID ShaderParam::MatPBR_Std1::Roughness2D;
-	UniformID ShaderParam::MatPBR_Std1::AO2D;
 
 	UniformID ShaderParam::create(const char* propertyName)
 	{
@@ -72,32 +50,24 @@ namespace tezcat::Tiny
 		ShaderParam::MatrixP = "TINY_MatrixP";
 		ShaderParam::MatrixV = "TINY_MatrixV";
 		ShaderParam::MatrixM = "TINY_MatrixM";
+		ShaderParam::MatrixMV = "TINY_MatrixMV";
+		ShaderParam::MatrixVP = "TINY_MatrixVP";
+		ShaderParam::MatrixMVP = "TINY_MatrixMVP";
 		ShaderParam::MatrixN = "TINY_MatrixN";
-		ShaderParam::MatrixSBV = "TINY_MatrixSBV";
-		ShaderParam::MatrixLit = "TINY_MatrixLit";
-		ShaderParam::MatrixEnv = "TINY_MatrixEnv[6]";
+		ShaderParam::MatrixLightVP = "TINY_MatrixLightVP";
 
-		ShaderParam::ScreenLength = "TINY_ScreenLength";
-		ShaderParam::ViewPosition = "TINY_ViewPosition";
-		ShaderParam::ViewNearFar = "TINY_ViewNearFar";
-		ShaderParam::IsHDR = "TINY_IsHDR";
+		ShaderParam::Resolution = "TINY_Resolution";
+		ShaderParam::CameraWorldPosition = "TINY_CameraWorldPosition";
+		ShaderParam::CameraNearFar = "TINY_CameraNearFar";
+		ShaderParam::LightWorldPosition = "TINY_LightWorldPosition";
 
 
 		//3
-		ShaderParam::VertexColor = "TINY_VertexColor";
-		ShaderParam::TexColor = "TINY_TexColor";
-		ShaderParam::TexCube = "TINY_TexCube";
 		ShaderParam::TexDepth = "TINY_TexDepth";
+		ShaderParam::TexSkybox = "TINY_TexSkybox";
 		ShaderParam::TexIrradiance = "TINY_TexIrradiance";
 		ShaderParam::TexPrefilter = "TINY_TexPrefilter";
 		ShaderParam::TexBRDFLUT = "TINY_TexBRDFLUT";
-
-		//5
-// 		ShaderParam::LightPosition = "TINY_LightPosition";
-// 		ShaderParam::LightColor = "TINY_LightColor";
-// 		ShaderParam::ModeSpecular = "TINY_ModeSpecular";
-// 		ShaderParam::AmbientStrength = "TINY_AmbientStrength";
-//		ShaderParam::EnableShadow = "TINY_EnableShadow";
 
 		//4
 		ShaderParam::LightDirection::Direction = "TINY_LitDir.direction";
@@ -106,32 +76,13 @@ namespace tezcat::Tiny
 		ShaderParam::LightDirection::Specular = "TINY_LitDir.specular";
 
 		//5
-		ShaderParam::LightPoint::Position = "TINY_LightPot.position";
-		ShaderParam::LightPoint::Ambient = "TINY_LightPot.ambient";
-		ShaderParam::LightPoint::Diffuse = "TINY_LightPot.diffuse";
-		ShaderParam::LightPoint::Specular = "TINY_LightPot.specular";
-		ShaderParam::LightPoint::Config = "TINY_LightPot.config";
-
-		//4
-		ShaderParam::StdMaterial::Diffuse = "TINY_MatStd.diffuse";
-		ShaderParam::StdMaterial::Normal = "TINY_MatStd.normal";
-		ShaderParam::StdMaterial::Specular = "TINY_MatStd.specular";
-		ShaderParam::StdMaterial::Shininess = "TINY_MatStd.shininess";
-
-		//
-		ShaderParam::MatPBR_Test::Albedo = "TINY_MatPBR_Test.albedo";
-		ShaderParam::MatPBR_Test::Metallic = "TINY_MatPBR_Test.metallic";
-		ShaderParam::MatPBR_Test::Roughness = "TINY_MatPBR_Test.roughness";
-		ShaderParam::MatPBR_Test::AO = "TINY_MatPBR_Test.ao";
-
-		//
-		ShaderParam::MatPBR_Std1::Albedo2D = "TINY_MatPBR_Std1.albedo2D";
-		ShaderParam::MatPBR_Std1::Metallic2D = "TINY_MatPBR_Std1.metallic2D";
-		ShaderParam::MatPBR_Std1::Roughness2D = "TINY_MatPBR_Std1.roughness2D";
-		ShaderParam::MatPBR_Std1::AO2D = "TINY_MatPBR_Std1.ao2D";
+		ShaderParam::LightPoint::Position = "TINY_LitPoint.position";
+		ShaderParam::LightPoint::Ambient = "TINY_LitPoint.ambient";
+		ShaderParam::LightPoint::Diffuse = "TINY_LitPoint.diffuse";
+		ShaderParam::LightPoint::Specular = "TINY_LitPoint.specular";
+		ShaderParam::LightPoint::Config = "TINY_LitPoint.config";
 
 		customIniter();
 	}
-
 
 }

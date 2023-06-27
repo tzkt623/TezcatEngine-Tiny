@@ -20,7 +20,7 @@
 
     #TINY_VS_BEGIN
     {
-        #include "../Include/tiny_vs_base.tyin"
+        #include "../Include/tiny_vs.tyin"
 
         layout (location = 0) in vec3 aPos;
         out vec3 myWorldPosition;
@@ -35,10 +35,11 @@
 
     #TINY_FS_BEGIN
     {
-        #include "../Include/tiny_fs_texture.tyin"
+        #include "../Include/tiny_fs.tyin"
         
         in vec3 myWorldPosition;
         out vec4 myFinalColor;
+        uniform sampler2D myTexHDR2D;
 
         const vec2 invAtan = vec2(0.1591, 0.3183);
         vec2 sampleSphericalMap(vec3 v)
@@ -93,14 +94,14 @@
             sampleUV *= 0.5;
             sampleUV += 0.5;
 
-            return texture(TINY_TexColor, sampleUV).rgb;
+            return texture(myTexHDR2D, sampleUV).rgb;
         }
 
         void main()
         {
             
             vec2 uv = sampleSphericalMap(normalize(myWorldPosition));
-            vec3 color = texture(TINY_TexColor, uv).rgb;
+            vec3 color = texture(myTexHDR2D, uv).rgb;
             myFinalColor = vec4(color, 1.0f);
             
 

@@ -5,6 +5,7 @@ CreateInstanceCPP(MyLightingWindow);
 MyLightingWindow::MyLightingWindow()
 	: GUIWindow("光照管理器(Lighting Manager)")
 {
+
 }
 
 MyLightingWindow::~MyLightingWindow()
@@ -30,10 +31,8 @@ void MyLightingWindow::onRender()
 		EnvLitMgr::getInstance()->setSkyboxLod(mSkyboxLod);
 	}
 
-	if (!mCurrentHDR)
-	{
-		mCurrentHDR = EnvLitMgr::getInstance()->getHDRTexture();
-	}
+
+	mCurrentHDR = EnvLitMgr::getInstance()->getHDRTexture();
 
 	if (mCurrentHDR)
 	{

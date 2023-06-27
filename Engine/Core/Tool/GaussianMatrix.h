@@ -9,7 +9,7 @@ namespace tezcat::Tiny
 		static float gaussian(float x, float mu, float sigma)
 		{
 			const float a = (x - mu) / sigma;
-			return std::exp(-0.5 * a * a);
+			return (float)std::exp(-0.5f * a * a);
 		}
 
 		static std::vector<float> calculate(int kernelRadius, int& length)
