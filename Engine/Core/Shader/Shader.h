@@ -83,18 +83,18 @@ namespace tezcat::Tiny
 	public:
 		bool checkUniform(const UniformID& id)
 		{
-			return mTinyUniformList[id.getUID()].shaderID > -1;
+			return mTinyUniformList[id.getUID()]->shaderID > -1;
 		}
 
 		bool checkTinyUniform(const UniformID& id, int& outShaderID)
 		{
-			outShaderID = mTinyUniformList[id.getUID()].shaderID;
+			outShaderID = mTinyUniformList[id.getUID()]->shaderID;
 			return outShaderID > -1;
 		}
 
 		int32_t getTinyUniformShaderID(const UniformID& id)
 		{
-			return mTinyUniformList[id.getUID()].shaderID;
+			return mTinyUniformList[id.getUID()]->shaderID;
 		}
 
 		uint32_t getTextureIndex()
@@ -226,8 +226,7 @@ namespace tezcat::Tiny
 		DepthTestWrapper mDepthTest;
 
 	protected:
-
-		std::vector<UniformInfo> mTinyUniformList;
+		std::vector<UniformInfo*> mTinyUniformList;
 
 		std::vector<UniformInfo*> mUserUniformAry;
 		std::unordered_map<std::string_view, UniformInfo*> mUserUniformUMap;

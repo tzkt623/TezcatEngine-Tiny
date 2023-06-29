@@ -10,7 +10,6 @@ namespace tezcat::Tiny
 
 	struct TINY_API TextureInfo
 	{
-		std::string name;
 		TextureType type;
 		TextureAttachPosition attachPosition;
 		TextureFilter minFilter;
@@ -25,30 +24,13 @@ namespace tezcat::Tiny
 		/*
 		* @author HCL
 		* @info 2023|5|17
-		* @brief name填空字符串表示不将此tex保存在manager中
 		*/
-		TextureInfo(const std::string& name
-				  , const TextureType& type
-				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& minFilter
-				  , const TextureFilter& magFilter				  , const TextureWrap& wrapS
-				  , const TextureWrap& wrapT
-				  , const TextureWrap& wrapR				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
-			: name(name)
-			, type(type)
-			, attachPosition(attachPosition)			, minFilter(minFilter)
-			, magFilter(magFilter)			, wrapS(wrapS)
-			, wrapT(wrapT)
-			, wrapR(wrapR)			, internalChannel(internalChannel)			, channel(channel)			, dataType(dataType)
-		{
-		}
-
 		TextureInfo(const TextureType& type
 				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& minFilter
 				  , const TextureFilter& magFilter				  , const TextureWrap& wrapS
 				  , const TextureWrap& wrapT
 				  , const TextureWrap& wrapR				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
-			: name()
-			, type(type)
+			: type(type)
 			, attachPosition(attachPosition)			, minFilter(minFilter)
 			, magFilter(magFilter)			, wrapS(wrapS)
 			, wrapT(wrapT)
@@ -61,27 +43,11 @@ namespace tezcat::Tiny
 		* @info 2023|5|18
 		* @brief 创建2D专用
 		*/
-		TextureInfo(const std::string& name
-				  , const TextureType& type
-				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& minFilter
-				  , const TextureFilter& magFilter				  , const TextureWrap& wrapS
-				  , const TextureWrap& wrapT				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
-			: name(name)
-			, type(type)
-			, attachPosition(attachPosition)			, minFilter(minFilter)
-			, magFilter(magFilter)			, wrapS(wrapS)
-			, wrapT(wrapT)
-			, wrapR(TextureWrap::Repeat)			, internalChannel(internalChannel)			, channel(channel)			, dataType(dataType)
-		{
-
-		}
-
 		TextureInfo(const TextureType& type
 				  , const TextureAttachPosition& attachPosition				  , const TextureFilter& minFilter
 				  , const TextureFilter& magFilter				  , const TextureWrap& wrapS
 				  , const TextureWrap& wrapT				  , const TextureChannel& internalChannel				  , const TextureChannel& channel				  , const DataType& dataType)
-			: name()
-			, type(type)
+			: type(type)
 			, attachPosition(attachPosition)			, minFilter(minFilter)
 			, magFilter(magFilter)			, wrapS(wrapS)
 			, wrapT(wrapT)
@@ -95,11 +61,10 @@ namespace tezcat::Tiny
 		* @info 2023|5|18
 		* @brief image创建2D专用
 		*/
-		TextureInfo(const std::string& name				  , const TextureFilter& minFilter
+		TextureInfo(const TextureFilter& minFilter
 				  , const TextureFilter& magFilter				  , const TextureWrap& wrapS
 				  , const TextureWrap& wrapT)
-			: name(name)
-			, type(TextureType::Texture2D)
+			: type(TextureType::Texture2D)
 			, attachPosition(TextureAttachPosition::ColorComponent)			, minFilter(minFilter)
 			, magFilter(magFilter)			, wrapS(wrapS)
 			, wrapT(wrapT)
@@ -112,12 +77,10 @@ namespace tezcat::Tiny
 		/*
 		* @author HCL
 		* @info 2023|5|17
-		* @brief name填空字符串表示不将此tex保存在manager中
 		* @brief 创建Skybox
 		*/
-		TextureInfo(const std::string& name)
-			: TextureInfo(name
-						, TextureType::TextureCube
+		TextureInfo()
+			: TextureInfo(TextureType::TextureCube
 						, TextureAttachPosition::ColorComponent
 						, TextureFilter::Linear
 						, TextureFilter::Linear
@@ -134,14 +97,11 @@ namespace tezcat::Tiny
 		/*
 		* @author HCL
 		* @info 2023|5|17
-		* @brief name填空字符串表示不将此tex保存在manager中
 		*/
-		TextureInfo(const std::string& name
-				  , const TextureChannel& internalChannel
+		TextureInfo(const TextureChannel& internalChannel
 				  , const TextureWrap& wrap = TextureWrap::Repeat
 				  , const TextureFilter& filter = TextureFilter::Linear)
-			: TextureInfo(name
-						, TextureType::Texture2D
+			: TextureInfo(TextureType::Texture2D
 						, TextureAttachPosition::ColorComponent
 						, filter
 						, filter
@@ -158,15 +118,12 @@ namespace tezcat::Tiny
 		/*
 		* @author HCL
 		* @info 2023|5|17
-		* @brief name填空字符串表示不将此tex保存在manager中
 		* @brief 创建RenderBuffer
 		*/
-		TextureInfo(const std::string& name
-				  , const TextureType& type
+		TextureInfo(const TextureType& type
 				  , const TextureAttachPosition& attachPosition
 				  , const TextureChannel& internalChannel)
-			: TextureInfo(name
-						, type
+			: TextureInfo(type
 						, attachPosition
 						, TextureFilter::Linear
 						, TextureFilter::Linear
@@ -183,35 +140,13 @@ namespace tezcat::Tiny
 		/*
 		* @author HCL
 		* @info 2023|5|17
-		* @brief name填空字符串表示不将此tex保存在manager中
 		* @brief 创建ColorBuffer
 		*/
-		TextureInfo(const std::string& name
-				  , const TextureAttachPosition& attachPosition
+		TextureInfo(const TextureAttachPosition& attachPosition
 				  , const TextureChannel& internalChannel
 				  , const TextureChannel& channel
 				  , const DataType& dataType)
-			: TextureInfo(name
-						, TextureType::Texture2D
-						, attachPosition
-						, TextureFilter::Linear
-						, TextureFilter::Linear
-						, TextureWrap::Repeat
-						, TextureWrap::Repeat
-						, TextureWrap::Repeat
-						, internalChannel
-						, channel
-						, dataType)
-		{
-
-		}
-
-		TextureInfo(const TextureAttachPosition& attachPosition
-		  , const TextureChannel& internalChannel
-		  , const TextureChannel& channel
-		  , const DataType& dataType)
-			: TextureInfo(""
-						, TextureType::Texture2D
+			: TextureInfo(TextureType::Texture2D
 						, attachPosition
 						, TextureFilter::Linear
 						, TextureFilter::Linear
@@ -230,14 +165,12 @@ namespace tezcat::Tiny
 		* @info 2023|5|17
 		* @brief name填空字符串表示不将此tex保存在manager中
 		*/
-		TextureInfo(const std::string& name
-				  , const TextureType type
+		TextureInfo(const TextureType type
 				  , const TextureAttachPosition& attachPosition
 				  , const TextureChannel& internalChannel
 				  , const TextureChannel& channel
 				  , const DataType& dataType)
-			: TextureInfo(name
-						, TextureType::Texture2D
+			: TextureInfo(TextureType::Texture2D
 						, attachPosition
 						, TextureFilter::Linear
 						, TextureFilter::Linear

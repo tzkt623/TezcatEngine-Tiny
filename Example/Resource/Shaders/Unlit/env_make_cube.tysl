@@ -22,13 +22,13 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        out vec3 myWorldPosition;
+        layout (location = 0) in float3 aPos;
+        out float3 myWorldPosition;
 
         void main()
         {
             myWorldPosition = aPos;
-            gl_Position = TINY_MatrixP * TINY_MatrixV * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * float4(aPos, 1.0);
         }
     }
     #TINY_VS_END
@@ -37,77 +37,33 @@
     {
         #include "../Include/tiny_fs.tyin"
         
-        in vec3 myWorldPosition;
-        out vec4 myFinalColor;
-        uniform sampler2D myTexHDR2D;
+        in float3 myWorldPosition;
+        out float4 myFinalColor;
+        uniform tex2D myTexHDR2D;
 
-        const vec2 invAtan = vec2(0.1591, 0.3183);
-        vec2 sampleSphericalMap(vec3 v)
+        const float2 invAtan = float2(0.1591, 0.3183);
+        float2 sampleSphericalMap(float3 v)
         {
-            vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
+            float2 uv = float2(atan(v.z, v.x), asin(v.y));
             uv *= invAtan;
             uv += 0.5;
             return uv;
         }
 
-        mat3 TBN(vec3 N, vec3 V)
-        {
-            vec3 tangent, bitangent;
-            tangent = normalize(cross(N, vec3(0.0, 1.0, 0.0)));
-            bitangent = cross(N, tangent);
-            mat3 TBN = mat3(tangent, bitangent, N);
-            return TBN;
-        }
-
-        vec3 newSample()
-        {
-            vec3 N = normalize(myWorldPosition);
-            vec3 V = normalize(myWorldPosition);
-            vec3 R = reflect(V, N);
-            mat3 T = TBN(N, V);
-            vec3 r = T * R;
-
-            vec2 sampleUV;
-            float majorAxis = max(abs(r.x), max(abs(r.y), abs(r.z)));
-            if (majorAxis == abs(r.x))
-            {
-                if (r.x > 0.0)
-                    sampleUV = vec2(-r.z, -r.y) / r.x;
-                else
-                    sampleUV = vec2(r.z, -r.y) / -r.x;
-            }
-            else if (majorAxis == abs(r.y))
-            {
-                if (r.y > 0.0)
-                    sampleUV = vec2(r.x, r.z) / r.y;
-                else
-                    sampleUV = vec2(r.x, -r.z) / -r.y;
-            }
-            else
-            {
-                if (r.z > 0.0)
-                    sampleUV = vec2(r.x, -r.y) / r.z;
-                else
-                    sampleUV = vec2(-r.x, -r.y) / -r.z;
-            }
-
-            sampleUV *= 0.5;
-            sampleUV += 0.5;
-
-            return texture(myTexHDR2D, sampleUV).rgb;
-        }
-
         void main()
         {
-            
-            vec2 uv = sampleSphericalMap(normalize(myWorldPosition));
-            vec3 color = texture(myTexHDR2D, uv).rgb;
-            myFinalColor = vec4(color, 1.0f);
-            
-
-            //myFinalColor = vec4(newSample(), 1.0f);
+            float2 uv = sampleSphericalMap(normalize(myWorldPosition));
+            float3 color = texture(myTexHDR2D, uv).rgb;
+            myFinalColor = float4(color, 1.0f);
         }
     }
     #TINY_FS_END
 }
 #TINY_PASS_END
+
+
+
+
+
+
+

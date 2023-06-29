@@ -77,24 +77,30 @@ void MyMainScene::onEnter()
 	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvLightingImage, img });
 	Resource::unload(img);
 
- 	auto model = Resource::load<Model>("Model/Cerberus_LP.fbx");
- 	model->generate();
+	//  	auto model = Resource::load<Model>("Model/Cerberus_LP.fbx");
+	//  	model->generate();
 
-// 	model = Resource::load<Model>("Model/School.fbx");
-// 	model->generate();
+	// 	model = Resource::load<Model>("Model/School.fbx");
+	// 	model->generate();
 
-	// 	int radius = 5;
-	// 	int length;
-	// 	auto vs = GaussianMatrix::calculate(radius, length);
-	// 	for (int x = 0; x < length; ++x)
-	// 	{
-	// 		for (int y = 0; y < length; ++y)
-	// 		{
-	// 			std::cout << vs[x + y * length] << "," << std::endl;
-	// 		}
-	// 	}
-	// 
-	// 	std::cout << vs.size();
+	int radius = 3;
+	int length;
+	auto vs = GaussianMatrix::calculate(radius, length);
+	for (int x = 0; x < length; ++x)
+	{
+		for (int y = 0; y < length; ++y)
+		{
+			fmt::print("{},", vs[x + y * length]);
+		}
+
+		fmt::print("\n");
+	}
+
+	auto vs2 = GaussianMatrix::calculateHalf(radius, length);
+	for (auto& s : vs2)
+	{
+		fmt::print("{},", s);
+	}
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
@@ -214,7 +220,7 @@ void MyMainScene::createPaintings()
 
 	shader = gaussian_material->getShader();
 	my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
-	gaussian_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
+	gaussian_material->setUniform<UniformTex2D>(my_tex2d_color_index, hdr);
 }
 
 void MyMainScene::createPlane()

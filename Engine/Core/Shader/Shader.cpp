@@ -23,13 +23,26 @@ namespace tezcat::Tiny
 		, mBlendSource(Blend::One, 0)
 		, mBlendTarget(Blend::One, 0)
 		, mCullFace(CullFace::Back, 0)
-		, mTinyUniformList(UniformID::allStringCount(), UniformInfo{ "", UniformType::Error, -1, -1 })
+		, mTinyUniformList(UniformID::allStringCount(), nullptr)
 	{
-
+		for (uint32_t i = 0; i < mTinyUniformList.size(); i++)
+		{
+			mTinyUniformList[i] = new UniformInfo{ "", UniformType::Error, -1, -1 };
+		}
 	}
 
 	Shader::~Shader()
 	{
+		for (auto u : mTinyUniformList)
+		{
+			delete u;
+		}
+
+		for (auto u : mUserUniformAry)
+		{
+			delete u;
+		}
+
 		IDGenerator<Shader, uint32_t>::recycle(mUID);
 	}
 
@@ -48,7 +61,8 @@ namespace tezcat::Tiny
 	{
 		if (shaderID < 0)
 		{
-			return;
+			Log_Warning(fmt::format("{}--{} ID is -1"
+				, mPath, name));
 		}
 
 		auto info = new UniformInfo{ name, uniformType, shaderID, (int)mUserUniformAry.size() };
@@ -59,15 +73,15 @@ namespace tezcat::Tiny
 
 	void Shader::setupTinyUniform(UniformType& uniformType, const std::string& name, const uint32_t& index, const int& shaderID)
 	{
-		mTinyUniformList[index].name = name;
-		mTinyUniformList[index].type = uniformType;
-		mTinyUniformList[index].shaderID = shaderID;
-		mTinyUniformList[index].index = index;
+		mTinyUniformList[index]->name = name;
+		mTinyUniformList[index]->type = uniformType;
+		mTinyUniformList[index]->shaderID = shaderID;
+		mTinyUniformList[index]->index = index;
 	}
 
 	void Shader::resizeTinyUniformAry(uint64_t size)
 	{
-		mTinyUniformList.resize(size, UniformInfo{ "", UniformType::Error, -1 , -1 });
+		//mTinyUniformList.resize(size, new UniformInfo{ "", UniformType::Error, -1 , -1 });
 	}
 
 	void Shader::resizeUserUniformAry(uint64_t size)

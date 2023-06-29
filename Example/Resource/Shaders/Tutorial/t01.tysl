@@ -21,22 +21,26 @@
 
     #TINY_VS_BEGIN
     {
-        layout (location = 0) in vec3 aPos;
+        #include "../Include/tiny_vs.tyin"
+
+        layout (location = 0) in float3 aPos;
 
         void main()
         {
-            gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+            gl_Position = float4(aPos.x, aPos.y, aPos.z, 1.0);
         }
     }
     #TINY_VS_END
 
     #TINY_FS_BEGIN
     {
-        out vec4 myFinalColor;
+        #include "../Include/tiny_fs.tyin"
+
+        out float4 myFinalColor;
 
         void main()
         {
-            myFinalColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+            myFinalColor = float4(1.0f, 0.5f, 0.2f, 1.0f);
         } 
     }
     #TINY_FS_END

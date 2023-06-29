@@ -23,11 +23,11 @@
     {
         inout TINY_VS2FS
         {
-            vec4 color;
-            vec2 uv;
-            vec3 normal;
-            vec3 worldPosition;
-            vec4 lightPosition;
+            float4 color;
+            float2 uv;
+            float3 normal;
+            float3 worldPosition;
+            float4 lightPosition;
         };
     }
     #TINY_VA_END
@@ -36,36 +36,36 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        layout (location = 1) in vec3 aNormal;
-        layout (location = 2) in vec2 aUV;
-        layout (location = 3) in vec4 aColor;
+        layout (location = 0) in float3 aPos;
+        layout (location = 1) in float3 aNormal;
+        layout (location = 2) in float2 aUV;
+        layout (location = 3) in float4 aColor;
 
-        out vec4 myColor;
-        out vec2 myUV;
-        out vec3 myNormal;
-        out vec3 myWorldPosition;
-        out vec4 myLightPosition;
+        out float4 myColor;
+        out float2 myUV;
+        out float3 myNormal;
+        out float3 myWorldPosition;
+        out float4 myLightPosition;
 
         out VS2FS
         {
-            vec4 color;
-            vec2 uv;
-            vec3 normal;
-            vec3 worldPosition;
-            vec4 lightPosition;
+            float4 color;
+            float2 uv;
+            float3 normal;
+            float3 worldPosition;
+            float4 lightPosition;
         } TINY_VS2FS;
 
         void main()
         {
-            vec4 position =  vec4(aPos, 1.0);
+            float4 position =  float4(aPos, 1.0);
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
 
             myColor = aColor;
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
-            myWorldPosition = vec3(TINY_MatrixM * position);
-            myLightPosition = TINY_MatrixLightVP * vec4(myWorldPosition, 1.0f);
+            myWorldPosition = float3(TINY_MatrixM * position);
+            myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
         }
     }
     #TINY_VS_END
@@ -74,46 +74,46 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        in vec4 myColor;
-        in vec2 myUV;
-        in vec3 myNormal;
-        in vec3 myWorldPosition;
-        in vec4 myLightPosition;
+        in float4 myColor;
+        in float2 myUV;
+        in float3 myNormal;
+        in float3 myWorldPosition;
+        in float4 myLightPosition;
 
         in VS2FS
         {
-            vec4 color;
-            vec2 uv;
-            vec3 normal;
-            vec3 worldPosition;
-            vec4 lightPosition;
+            float4 color;
+            float2 uv;
+            float3 normal;
+            float3 worldPosition;
+            float4 lightPosition;
         } TINY_VS2FS;
         
-        out vec4 myFinalColor;
+        out float4 myFinalColor;
 
-        uniform sampler2D myTexDiffuse2D;
-        uniform sampler2D myTexSpecular2D;
+        uniform tex2D myTexDiffuse2D;
+        uniform tex2D myTexSpecular2D;
         uniform float myShininess;
 
-        vec4 reflection(vec3 I)
+        float4 reflection(float3 I)
         {
-            //vec3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
-            vec3 R = reflect(I, normalize(myNormal));
-            return vec4(texture(TINY_TexSkybox, R).rgb, 1.0);
+            //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
+            float3 R = reflect(I, normalize(myNormal));
+            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
         }
 
-        vec4 refraction(vec3 I)
+        float4 refraction(float3 I)
         {
             float ratio = 1.00 / 1.52;
-            //vec3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
-            vec3 R = refract(I, normalize(myNormal), ratio);
-            return vec4(texture(TINY_TexSkybox, R).rgb, 1.0);
+            //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
+            float3 R = refract(I, normalize(myNormal), ratio);
+            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
         }
 
-        vec3 calcDirectionLight(LightDirection lit, vec3 viewDir, vec3 normal)
+        float3 calcDirectionLight(LightDirection lit, float3 viewDir, float3 normal)
         {
-            vec3 light_dir = normalize(-lit.direction);
-            vec3 half_dir = normalize(viewDir + light_dir); 
+            float3 light_dir = normalize(-lit.direction);
+            float3 half_dir = normalize(viewDir + light_dir); 
 
             float NdL = dot(normal, light_dir);
             float NdH = dot(normal, half_dir);
@@ -121,22 +121,22 @@
             float diff = max(NdL, 0.0);
             float spec = pow(max(NdH, 0.0), myShininess);
 
-            vec3 ambient = lit.ambient * texture(myTexDiffuse2D, myUV).rgb;
-            vec3 diffuse = lit.diffuse * diff * texture(myTexDiffuse2D, myUV).rgb;
-            vec3 specular = lit.specular * spec * texture(myTexSpecular2D, myUV).rrr;
+            float3 ambient = lit.ambient * texture(myTexDiffuse2D, myUV).rgb;
+            float3 diffuse = lit.diffuse * diff * texture(myTexDiffuse2D, myUV).rgb;
+            float3 specular = lit.specular * spec * texture(myTexSpecular2D, myUV).rrr;
 
             // shadow
             float shadow = calcShadow(myLightPosition, normal, light_dir, TINY_TexDepth);
-            vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
+            float3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
 
             return lighting;
         }
 
         void main()
         {
-            vec3 normal = normalize(myNormal);
-            vec3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
-            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
+            float3 normal = normalize(myNormal);
+            float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
+            myFinalColor = float4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
         }
     }
     #TINY_FS_END

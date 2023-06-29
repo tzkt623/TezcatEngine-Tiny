@@ -1,3 +1,5 @@
+#include "tiny_config.tyin"
+
 #include "tiny_fs_camera.tyin"
 #include "tiny_fs_texture.tyin"
 #include "tiny_fs_light.tyin"

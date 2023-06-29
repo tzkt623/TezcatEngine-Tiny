@@ -95,7 +95,7 @@ namespace tezcat::Tiny
 				, TextureFilter::Nearest
 				, TextureWrap::Clamp_To_Border
 				, TextureWrap::Clamp_To_Border
-				, TextureChannel::Depth
+				, TextureChannel::Depth32f
 				, TextureChannel::Depth
 				, DataType::Float32));
 

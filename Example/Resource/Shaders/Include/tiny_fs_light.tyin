@@ -1,20 +1,20 @@
 struct LightDirection
 {
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float3 direction;
+    float3 ambient;
+    float3 diffuse;
+    float3 specular;
 };
 
 struct LightPoint
 {
-    vec3 position;
+    float3 position;
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    float3 ambient;
+    float3 diffuse;
+    float3 specular;
 
-    vec3 config;
+    float3 config;
 };
 
 uniform LightDirection TINY_LitDir;

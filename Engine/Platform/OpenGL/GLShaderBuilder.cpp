@@ -11,10 +11,6 @@
 
 namespace tezcat::Tiny::GL
 {
-	//----------------------------------------------------------------------
-	//
-	//	ShaderBuilder
-	//
 	GLShaderBuilder::GLShaderBuilder()
 	{
 
@@ -271,67 +267,71 @@ namespace tezcat::Tiny::GL
 			//
 			std::regex regex_include(R"(#include\s*\"(\S+)\"\s*)");
 
-			std::function<void(uint64_t, std::string&, std::unordered_map<uint64_t, std::string>&, const std::filesystem::path&)> parse =
-				[&parse, &regex_include, &end](uint64_t hashID
-					, std::string& include_content
-					, std::unordered_map<uint64_t, std::string>& all_includes
+			std::function<void(std::string&, std::unordered_set<uint64_t>&, std::vector<std::string>&, const std::filesystem::path&)> parse =
+				[&parse, &regex_comment, &regex_include, &end](std::string& include_content
+					, std::unordered_set<uint64_t>& check_includes
+					, std::vector<std::string>& all_includes
 					, const std::filesystem::path& rootPath)
 			{
+				include_content = std::regex_replace(include_content, regex_comment, "");
+
 				//找出所有include
-				std::vector<std::string> include_ary;
+				std::vector<std::string> include_heads;
 				for (auto struct_i = std::sregex_iterator(include_content.begin(), include_content.end(), regex_include); struct_i != end; struct_i++)
 				{
 					std::string include_name = (*struct_i)[1];
-					include_ary.emplace_back(include_name);
+					include_heads.emplace_back(std::move(include_name));
 				}
 
-				all_includes.emplace(hashID, std::regex_replace(include_content, regex_include, ""));
-
 				//如果有include
-				if (!include_ary.empty())
+				if (!include_heads.empty())
 				{
 					//遍历所有include 加载数据
-					for (auto& file_path : include_ary)
+					for (auto& file_path : include_heads)
 					{
 						std::filesystem::path sys_path(rootPath.string() + "/" + file_path);
 						auto content = FileTool::loadText(sys_path.string());
 						if (!content.empty())
 						{
 							auto hash_id = CityHash64(content.c_str(), content.size());
-							if (!all_includes.contains(hash_id))
+							if (!check_includes.contains(hash_id))
 							{
-								parse(hash_id, content, all_includes, sys_path.parent_path());
+								check_includes.emplace(hash_id);
+								parse(content, check_includes, all_includes, sys_path.parent_path());
 							}
 						}
 					}
 				}
+
+				all_includes.emplace_back(std::regex_replace(include_content, regex_include, ""));
 			};
 
-
-			std::unordered_map<uint64_t, std::string> all_includes;
-			std::vector<std::string> include_ary;
+			std::unordered_set<uint64_t> check_includes;
+			std::vector<std::string> all_includes;
+			std::vector<std::string> include_heads;
 			for (auto struct_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_include); struct_i != end; struct_i++)
 			{
 				std::string include_name = (*struct_i)[1];
-				include_ary.emplace_back(include_name);
+				include_heads.emplace_back(std::move(include_name));
 			}
 
-			if (!include_ary.empty())
+			if (!include_heads.empty())
 			{
 				//删除所有include
 				shader_content = std::regex_replace(shader_content, regex_include, "");
 
 				//遍历所有include 加载数据
-				for (auto& file_path : include_ary)
+				for (auto& file_path : include_heads)
 				{
 					std::filesystem::path sys_path(rootPath + "/" + file_path);
 					auto content = FileTool::loadText(sys_path.string());
 					if (!content.empty())
 					{
 						auto hash_id = CityHash64(content.c_str(), content.size());
-						if (!all_includes.contains(hash_id))
+						if (!check_includes.contains(hash_id))
 						{
-							parse(hash_id, content, all_includes, sys_path.parent_path());
+							check_includes.emplace(hash_id);
+							parse(content, check_includes, all_includes, sys_path.parent_path());
 						}
 					}
 				}
@@ -340,15 +340,14 @@ namespace tezcat::Tiny::GL
 			if (!all_includes.empty())
 			{
 				std::string data;
-				for (auto& pair : all_includes)
+				for (auto& s : all_includes)
 				{
-					data += pair.second;
+					data += s;
+					data += "\n";
 				}
 
-				shader_content = data + shader_content;
+				shader_content.insert(0, data);
 			}
-
-
 
 			//------------------------------------------------------------
 			//

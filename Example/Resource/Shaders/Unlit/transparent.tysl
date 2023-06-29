@@ -25,14 +25,14 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        layout (location = 2) in vec2 aUV;
+        layout (location = 0) in float3 aPos;
+        layout (location = 2) in float2 aUV;
 
-        out vec2 myUV;
+        out float2 myUV;
 
         void main()
         {
-            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * float4(aPos, 1.0);
             myUV = aUV;
         }
     }
@@ -42,19 +42,19 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        in vec2 myUV;
-        out vec4 myFinalColor;
-        uniform sampler2D myTexColor2D;
+        in float2 myUV;
+        out float4 myFinalColor;
+        uniform tex2D myTexColor2D;
 
         void main()
         {
-            vec4 fcolor = texture(myTexColor2D, myUV);
+            float4 fcolor = texture(myTexColor2D, myUV);
 //            if(fcolor.a < 0.1)
 //            {
 //                discard;
 //            }
             myFinalColor = fcolor;
-            //myFinalColor = vec4(vec3(linearizeDepth(gl_FragCoord.z) / far), 1.0);
+            //myFinalColor = float4(float3(linearizeDepth(gl_FragCoord.z) / far), 1.0);
         }
     }
     #TINY_FS_END

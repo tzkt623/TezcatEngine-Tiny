@@ -560,7 +560,7 @@ namespace tezcat::Tiny::GL
 			}
 			else
 			{
-				Log_Error(StringTool::stringFormat("Your Shader`s buildin value name[%s] write error!!!", pair.first.c_str()));
+				Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", pair.first));
 			}
 		}
 
@@ -571,10 +571,10 @@ namespace tezcat::Tiny::GL
 
 		mShader->apply(pid);
 
-		Log_Engine(StringTool::stringFormat("Shader{%s} Build Complete[%d] (%s)"
-			, mShader->getName().c_str()
+		Log_Engine(fmt::format("Shader[{}] Build Complete[{}] ({})"
+			, mShader->getName()
 			, mShader->getProgramID()
-			, mShader->getFilePath().c_str()));
+			, mShader->getFilePath()));
 	}
 
 	void GLBuildCMD_CreateShader::build(uint32_t pid, const char* data, uint32_t shaderType)
@@ -593,11 +593,11 @@ namespace tezcat::Tiny::GL
 			{
 			case GL_VERTEX_SHADER:
 				std::cout << "GLShader [" + mShader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log_Error(StringTool::stringFormat("GLShader[%s]: [VERTEX] COMPILATION_FAILED > %s)", mShader->getName().c_str(), infoLog));
+				Log_Error(fmt::format("GLShader[{}]: [VERTEX] COMPILATION_FAILED > {})", mShader->getName(), infoLog));
 				break;
 			case GL_FRAGMENT_SHADER:
 				std::cout << "GLShader [" + mShader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log_Error(StringTool::stringFormat("GLShader[%s]: [FRAGMENT] COMPILATION_FAILED > %s)", mShader->getName().c_str(), infoLog));
+				Log_Error(fmt::format("GLShader[{}]: [FRAGMENT] COMPILATION_FAILED > {})", mShader->getName(), infoLog));
 				break;
 			default:
 				break;

@@ -1,6 +1,6 @@
-const float PI = 3.14159265359;
+#include "tiny_config.tyin"
 
-float D_GGX_TR(vec3 N, vec3 H, float a)
+float D_GGX_TR(float3 N, float3 H, float a)
 {
     float a2 = a * a;
     float NdotH = max(dot(N, H), 0.0);
@@ -8,7 +8,7 @@ float D_GGX_TR(vec3 N, vec3 H, float a)
 
     float nom = a2;
     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
+    denom = TINY_PI * denom * denom;
 
     return nom / denom;
 }
@@ -22,7 +22,7 @@ float distributionGGX(float NdotH, float roughness)
 
     float nom = a2;
     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
+    denom = TINY_PI * denom * denom;
 
     return nom / denom;
 }
@@ -49,7 +49,7 @@ float geometrySchlickGGX_IBL(float NdotV, float roughness)
     return nom / denom;
 }
 
-float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+float geometrySmith(float3 N, float3 V, float3 L, float roughness)
 {
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
@@ -59,7 +59,7 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 
-float geometrySmith_IBL(vec3 N, vec3 V, vec3 L, float roughness)
+float geometrySmith_IBL(float3 N, float3 V, float3 L, float roughness)
 {
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
@@ -69,14 +69,14 @@ float geometrySmith_IBL(vec3 N, vec3 V, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
+float3 fresnelSchlick(float cosTheta, float3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+float3 fresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    return F0 + (max(float3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 } 
 
 float remapADirect(float a)
@@ -99,53 +99,53 @@ float radicalInverse_VdC(uint bits)
     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
 }
 
-vec2 hammersley(uint i, uint N)
+float2 hammersley(uint i, uint N)
 {
-    return vec2(float(i) / float(N), radicalInverse_VdC(i));
+    return float2(float(i) / float(N), radicalInverse_VdC(i));
 }
 
- vec3 hemisphereSample_uniform(float u, float v)
+ float3 hemisphereSample_uniform(float u, float v)
  {
-     float phi = v * 2.0 * PI;
+     float phi = v * 2.0 * TINY_PI;
      float cosTheta = 1.0 - u;
      float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
-     return vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+     return float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
  }
     
- vec3 hemisphereSample_cos(float u, float v)
+ float3 hemisphereSample_cos(float u, float v)
  {
-     float phi = v * 2.0 * PI;
+     float phi = v * 2.0 * TINY_PI;
      float cosTheta = sqrt(1.0 - u);
      float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
-     return vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+     return float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
  }
 
-vec3 importanceSampleGGX(vec2 Xi, vec3 N, float roughness)
+float3 importanceSampleGGX(float2 Xi, float3 N, float roughness)
 {
     float a = roughness * roughness;
 
-    float phi = 2.0 * PI * Xi.x;
+    float phi = 2.0 * TINY_PI * Xi.x;
     float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y));
     float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
 
     // from spherical coordinates to cartesian coordinates
-    vec3 H;
+    float3 H;
     H.x = cos(phi) * sinTheta;
     H.y = sin(phi) * sinTheta;
     H.z = cosTheta;
 
-    // from tangent-space vector to world-space sample vector
-    vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-    vec3 tangent = normalize(cross(up, N));
-    vec3 bitangent = cross(N, tangent);
+    // from tangent-space floattor to world-space sample floattor
+    float3 up = abs(N.z) < 0.999 ? float3(0.0, 0.0, 1.0) : float3(1.0, 0.0, 0.0);
+    float3 tangent = normalize(cross(up, N));
+    float3 bitangent = cross(N, tangent);
 
-    vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;
-    return normalize(sampleVec);
+    float3 samplefloat = tangent * H.x + bitangent * H.y + N * H.z;
+    return normalize(samplefloat);
 }
 
-vec2 integrateBRDF(float NdotV, float roughness)
+float2 integrateBRDF(float NdotV, float roughness)
 {
-    vec3 V;
+    float3 V;
     V.x = sqrt(1.0 - NdotV*NdotV);
     V.y = 0.0;
     V.z = NdotV;
@@ -153,14 +153,14 @@ vec2 integrateBRDF(float NdotV, float roughness)
     float A = 0.0;
     float B = 0.0;
 
-    vec3 N = vec3(0.0, 0.0, 1.0);
+    float3 N = float3(0.0, 0.0, 1.0);
 
     const uint SAMPLE_COUNT = 1024u;
     for(uint i = 0u; i < SAMPLE_COUNT; ++i)
     {
-        vec2 Xi = hammersley(i, SAMPLE_COUNT);
-        vec3 H = importanceSampleGGX(Xi, N, roughness);
-        vec3 L = normalize(2.0 * dot(V, H) * H - V);
+        float2 Xi = hammersley(i, SAMPLE_COUNT);
+        float3 H = importanceSampleGGX(Xi, N, roughness);
+        float3 L = normalize(2.0 * dot(V, H) * H - V);
 
         float NdotL = max(L.z, 0.0);
         float NdotH = max(H.z, 0.0);
@@ -180,5 +180,5 @@ vec2 integrateBRDF(float NdotV, float roughness)
     A /= float(SAMPLE_COUNT);
     B /= float(SAMPLE_COUNT);
 
-    return vec2(A, B);
+    return float2(A, B);
 }

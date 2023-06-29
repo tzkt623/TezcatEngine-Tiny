@@ -22,13 +22,13 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        out vec3 myUV;
+        layout (location = 0) in float3 aPos;
+        out float3 myUV;
 
         void main()
         {
             myUV = aPos;
-            gl_Position = TINY_MatrixP * mat4(mat3(TINY_MatrixV)) * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * mat4(mat3(TINY_MatrixV)) * float4(aPos, 1.0);
         }
     }
     #TINY_VS_END
@@ -37,22 +37,22 @@
     {
         #include "../Include/tiny_fs.tyin"
         
-        in vec3 myUV;
+        in float3 myUV;
         uniform bool myIsHDR;
         uniform float myLod = 0.0f;
-        out vec4 myFinalColor;
+        out float4 myFinalColor;
 
         void main()
         {
-            //vec3 color = texture(TINY_TexCube, myUV).rgb;
-            vec3 color = textureLod(TINY_TexSkybox, myUV, myLod).rgb;
+            //float3 color = texture(TINY_TexCube, myUV).rgb;
+            float3 color = textureLod(TINY_TexSkybox, myUV, myLod).rgb;
             if(myIsHDR)
             {
-                color = color / (color + vec3(1.0));
-                color = pow(color, vec3(1.0/2.2)); 
+                color = color / (color + float3(1.0));
+                color = pow(color, float3(1.0/2.2)); 
             }
-            myFinalColor = vec4(color, 1.0);
-            //myFinalColor = vec4(1.0);
+            myFinalColor = float4(color, 1.0);
+            //myFinalColor = float4(1.0);
         }
     }
     #TINY_FS_END

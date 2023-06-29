@@ -22,15 +22,15 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        layout (location = 3) in vec4 aColor;
+        layout (location = 0) in float3 aPos;
+        layout (location = 3) in float4 aColor;
 
-        out vec4 myColor;
-        out vec4 myWorldPosition;
+        out float4 myColor;
+        out float4 myWorldPosition;
 
         void main()
         {
-            vec4 position =  vec4(aPos, 1.0);
+            float4 position =  float4(aPos, 1.0);
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
             
             myColor = aColor;
@@ -41,15 +41,17 @@
 
     #TINY_FS_BEGIN
     {
-        in vec4 myColor;
-        in vec4 myWorldPosition;
-        out vec4 myFinalColor;
+        #include "../Include/tiny_fs.tyin"
+
+        in float4 myColor;
+        in float4 myWorldPosition;
+        out float4 myFinalColor;
 
         void main()
         {
-            //myFinalColor = myColor;
-            myFinalColor = vec4(vec3(242,141,0)/255.0, 1.0);
-            //myFinalColor = vec4(myWorldPosition.xyz / myWorldPosition.w, 1.0f);
+            myFinalColor = myColor;
+            //myFinalColor = float4(float3(242,141,0)/255.0, 1.0);
+            //myFinalColor = float4(myWorldPosition.xyz / myWorldPosition.w, 1.0f);
         } 
     }
     #TINY_FS_END

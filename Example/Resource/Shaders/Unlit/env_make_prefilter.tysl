@@ -22,13 +22,13 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        out vec3 myWorldPosition;
+        layout (location = 0) in float3 aPos;
+        out float3 myWorldPosition;
 
         void main()
         {
             myWorldPosition = aPos;
-            gl_Position = TINY_MatrixP * TINY_MatrixV * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * float4(aPos, 1.0);
         }
     }
     #TINY_VS_END
@@ -37,44 +37,44 @@
     {
         #include "../Include/tiny_fs.tyin"
         
-        in vec3 myWorldPosition;
-        out vec4 myFinalColor;
+        in float3 myWorldPosition;
+        out float4 myFinalColor;
 
-        uniform float roughness;
-        uniform float resolution;
+        uniform float myRoughness;
+        uniform float myResolution;
 
         void main()
         {       
-            vec3 N = normalize(myWorldPosition);
-            vec3 R = N;
-            vec3 V = R;
+            float3 N = normalize(myWorldPosition);
+            float3 R = N;
+            float3 V = R;
 
             const uint SAMPLE_COUNT = 256u;
             float totalWeight = 0.0;
-            vec3 prefilteredColor = vec3(0.0);
+            float3 prefilteredColor = float3(0.0);
 
             for(uint i = 0u; i < SAMPLE_COUNT; ++i)
             {
-                // generates a sample vector that's biased towards the preferred alignment direction (importance sampling).
-                vec2 Xi = hammersley(i, SAMPLE_COUNT);
-                vec3 H = importanceSampleGGX(Xi, N, roughness);
-                vec3 L = normalize(2.0 * dot(V, H) * H - V);
-                //vec3 L = reflect(-V, H);
+                // generates a sample floattor that's biased towards the preferred alignment direction (importance sampling).
+                float2 Xi = hammersley(i, SAMPLE_COUNT);
+                float3 H = importanceSampleGGX(Xi, N, myRoughness);
+                float3 L = normalize(2.0 * dot(V, H) * H - V);
+                //float3 L = reflect(-V, H);
                 float NdotL = max(dot(N, L), 0.0);
                 
                 if(NdotL > 0.0)
                 {
                 	float NdotH = max(dot(N, H), 0.0);
                     float HdotV = max(dot(H, V), 0.0);
-                    float D = distributionGGX(NdotH, roughness);
-                    // sample from the environment's mip level based on roughness/pdf
+                    float D = distributionGGX(NdotH, myRoughness);
+                    // sample from the environment's mip level based on myRoughness/pdf
                     float pdf = D * NdotH / (4.0 * HdotV + 0.0001f);
                     
                     
-                    //float resolution = 1024.0; // resolution of source cubemap (per face)
-                    float saTexel = 4.0 * PI / (6.0 * resolution * resolution);
+                    //float myResolution = 1024.0; // myResolution of source cubemap (per face)
+                    float saTexel = 4.0 * TINY_PI / (6.0 * myResolution * myResolution);
                     float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.001f);
-                    float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
+                    float mipLevel = myRoughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
                     
                     prefilteredColor += textureLod(TINY_TexSkybox, L, mipLevel).rgb * NdotL;
                     totalWeight += NdotL;
@@ -82,7 +82,7 @@
             }
             
             prefilteredColor /= totalWeight;
-            myFinalColor = vec4(prefilteredColor, 1.0);
+            myFinalColor = float4(prefilteredColor, 1.0);
         } 
     }
     #TINY_FS_END

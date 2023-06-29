@@ -39,5 +39,39 @@ namespace tezcat::Tiny
 
 			return kernel_matrix;
 		}
+
+		static std::vector<float> calculateHalf(int kernelRadius, int& length)
+		{
+			const float PI = 3.14159265357;
+			length = 2 * kernelRadius + 1;
+			std::vector<float> kernel_matrix(length);
+
+			float sigma = kernelRadius / 2.0f;
+			float sum = 0.0; // For accumulating the kernel values
+
+			float x_sum = 0;
+
+			for (int y = 0; y < length; ++y)
+			{
+				for (int x = 0; x < length; ++x)
+				{
+					float value = gaussian(x, kernelRadius, sigma) * gaussian(y, kernelRadius, sigma);
+					x_sum += value;
+
+					sum += value;
+				}
+
+				kernel_matrix[y] = x_sum;
+				x_sum = 0;
+			}
+
+			// Normalize the kernel
+			for (auto& v : kernel_matrix)
+			{
+				v /= sum;
+			}
+
+			return kernel_matrix;
+		}
 	};
 }

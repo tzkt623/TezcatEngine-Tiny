@@ -23,14 +23,14 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        layout (location = 2) in vec2 aUV;
+        layout (location = 0) in float3 aPos;
+        layout (location = 2) in float2 aUV;
 
-        out vec2 myUV;
+        out float2 myUV;
 
         void main()
         {
-            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * float4(aPos, 1.0);
             myUV = aUV;
         }
     }
@@ -40,14 +40,16 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        in vec2 myUV;
-        out vec4 myFinalColor;
-        uniform sampler2D myTexColor2D;
+        in float2 myUV;
+        out float4 myFinalColor;
+        uniform tex2D myTexColor2D;
+        uniform int myKernelSize;
+        uniform float myKernel[256];
 
-        const vec2 texSize = vec2(2048, 1024);
+        const float2 texSize = float2(2048, 1024);
         const int radius = 5;
         const int kernelCount = (2 * radius + 1) * (2 * radius + 1);
-        vec2 myOffset[kernelCount];
+        float2 myOffset[kernelCount];
         float myFactor[kernelCount] = float[kernelCount]
         (
             0.00049242,
@@ -173,16 +175,16 @@
             0.00049242
         );
 
-        vec4 blur3(vec2 uv)
+        float4 blur3(float2 uv)
         {
-        	vec4 sum = vec4(0.0);
+        	float4 sum = float4(0.0);
         	float fStepX = 1 / texSize.x * float(6);
             float fStepY = 1 / texSize.y * float(6);
-        	vec2 Offset[9];
+        	float2 Offset[9];
         	
-        	Offset[0] = vec2(-fStepX, -fStepY); Offset[1] = vec2(0.0, -fStepY); Offset[2] = vec2(fStepX, -fStepY);
-            Offset[3] = vec2(-fStepX, 0.0);     Offset[4] = vec2(0.0, 0.0);     Offset[5] = vec2(fStepX, 0.0);
-            Offset[6] = vec2(-fStepX, fStepY);  Offset[7] = vec2(0.0, fStepY);  Offset[8] = vec2(fStepX, fStepY);
+        	Offset[0] = float2(-fStepX, -fStepY); Offset[1] = float2(0.0, -fStepY); Offset[2] = float2(fStepX, -fStepY);
+            Offset[3] = float2(-fStepX, 0.0);     Offset[4] = float2(0.0, 0.0);     Offset[5] = float2(fStepX, 0.0);
+            Offset[6] = float2(-fStepX, fStepY);  Offset[7] = float2(0.0, fStepY);  Offset[8] = float2(fStepX, fStepY);
             
         	for (int i = 0; i < 9; i++)
             {
@@ -192,9 +194,9 @@
             return sum / 9.0f;
         }
 
-        vec4 blur4(vec2 uv)
+        float4 blur4(float2 uv)
         {
-        	vec4 sum = vec4(0.0);
+        	float4 sum = float4(0.0);
 
             float fStepX = 1 / texSize.x;
             float fStepY = 1 / texSize.y;
@@ -205,14 +207,21 @@
             {
                 for(int x = -radius; x <= radius; x++)
                 {
-                    myOffset[(x + radius) + (y + radius) * length] = vec2(fStepX * x, fStepY * y);
+                    myOffset[(x + radius) + (y + radius) * length] = float2(fStepX * x, fStepY * y);
                 }
             }
 
             for (int i = 0; i < kernelCount; i++)
             {
-                sum += textureLod(myTexColor2D, uv + myOffset[i], 4.0) * myFactor[i];
+                sum += textureLod(myTexColor2D, uv + myOffset[i], 0.0) * myFactor[i];
             }
+
+            return sum;
+        }
+
+        float4 blurV()
+        {
+            float4 sum = float4(0.0);
 
             return sum;
         }
@@ -224,7 +233,7 @@
             
             myFinalColor = blur4(myUV);
             //myFinalColor = texture(TINY_TexColor, myUV, 4.0);
-            //myFinalColor = vec4(0.0, 1.0, 0.0, 1.0);
+            //myFinalColor = float4(0.0, 1.0, 0.0, 1.0);
         }
     }
     #TINY_FS_END

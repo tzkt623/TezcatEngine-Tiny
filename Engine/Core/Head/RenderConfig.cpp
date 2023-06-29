@@ -178,32 +178,40 @@ namespace tezcat::Tiny
 
 	std::unordered_map<std::string, Queue> ContextMap::QueueMap =
 	{
-		{"None",		Queue::None},
-		{"Prepare",		Queue::Prepare},
-		{"Background",	Queue::Background},
-		{"Opaque",		Queue::Opaque},
-		{"AlphaTest",	Queue::AlphaTest},
-		{"OpaqueLast",	Queue::OpaqueLast},
-		{"Transparent", Queue::Transparent},
-		{"Overlay",		Queue::Overlay},
-		{"Post",		Queue::Post}
+		{"None",		Queue::None },
+		{"Prepare",		Queue::Prepare },
+		{"Background",	Queue::Background },
+		{"Opaque",		Queue::Opaque },
+		{"AlphaTest",	Queue::AlphaTest },
+		{"OpaqueLast",	Queue::OpaqueLast },
+		{"Transparent", Queue::Transparent },
+		{"Overlay",		Queue::Overlay },
+		{"Post",		Queue::Post }
 	};
 
 	std::unordered_map<std::string, UniformType> ContextMap::UniformTypeUMap
 	{
-		{ "bool",			UniformType::Bool },
-		{ "int",			UniformType::Int },
-		{ "ivec2",			UniformType::Int2 },
-		{ "ivec3",			UniformType::Int3 },
-		{ "ivec4",			UniformType::Int4 },
-		{ "float",			UniformType::Float },
-		{ "vec2",			UniformType::Float2 },
-		{ "vec3",			UniformType::Float3 },
-		{ "vec4",			UniformType::Float4 },
-		{ "mat4",			UniformType::Mat3 },
-		{ "mat3",			UniformType::Mat4 },
-		{ "sampler2D",		UniformType::Tex2D },
-		{ "sampler3D",		UniformType::Tex3D },
-		{ "samplerCube",	UniformType::TexCube }
+		{ "bool",		UniformType::Bool },
+		{ "int",		UniformType::Int },
+		{ "int2",		UniformType::Int2 },
+		{ "int3",		UniformType::Int3 },
+		{ "int4",		UniformType::Int4 },
+		{ "uint",		UniformType::UInt },
+		{ "uint2",		UniformType::UInt2 },
+		{ "uint3",		UniformType::UInt3 },
+		{ "uint4",		UniformType::UInt4 },
+		{ "float",		UniformType::Float },
+		{ "float2",		UniformType::Float2 },
+		{ "float3",		UniformType::Float3 },
+		{ "float4",		UniformType::Float4 },
+		{ "double",		UniformType::Double },
+		{ "double2",	UniformType::Double2 },
+		{ "double3",	UniformType::Double3 },
+		{ "double4",	UniformType::Double4 },
+		{ "float3x3",	UniformType::Mat3 },
+		{ "float4x4",	UniformType::Mat4 },
+		{ "tex2D",		UniformType::Tex2D },
+		{ "tex3D",		UniformType::Tex3D },
+		{ "texCube",	UniformType::TexCube }
 	};
 }

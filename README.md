@@ -7,9 +7,10 @@
 Update
 
 - [x] 修改了整个shader体系的结构,现在不再有特殊内建变量,只有全局通用变量(The shader system has been modified so that there are no longer special built-in variables, only global common variables)
-- [x] 简化了shader头文件的包含,只需要包含一个通用的tiny头文件就行,如果不包含,可以自己写(Simplifies the inclusion of shader header files, only need to include a generic Tiny header file, if not, you can write your own)
-- [x] 可以自己缓存uniform变量的index来快速更新数据(You can cache the index of uniform variables yourself to quickly update the data)
+- [x] 简化了shader头文件的包含,只需要包含一个通用的tiny头文件(Simplifies the inclusion of shader header files, only need to include a generic Tiny header file)
+- [x] 可以自己缓存uniform变量的index来快速更新数据(You can cache the index of uniform variables to quickly update the data)
 - [x] 基础模型加载(Basic Model load)
+- [x] 重定义了shader中的基本类型(float instead of vec)
 - [ ] 正在重构资源加载和管理方式(Refactoring resoure loader and managers)
 
 ## **依赖库版本(Libs Version)**
@@ -311,38 +312,38 @@ Tiny的全局变量如下
 
 Tiny Current Global Uniform Values
 
-|        ShaderName        | CommonType  |         Useage          |
-| :----------------------: | :---------: | :---------------------: |
-|       TINY_MatrixP       |    mat4     |            P            |
-|       TINY_MatrixV       |    mat4     |            V            |
-|       TINY_MatrixM       |    mat4     |            M            |
-|      TINY_MatrixVP       |    mat4     |           VP            |
-|      TINY_MatrixMVP      |    mat4     |           MVP           |
-|       TINY_MatrixN       |    mat3     |   Model Normal Matrix   |
-|    TINY_MatrixLightVP    |    mat4     |       Light`s VP        |
-| TINY_CameraWorldPosition |    vec3     | Camera`s World Position |
-|    TINY_CameraNearFar    |    vec2     |    Camera`s NearFar     |
-|     TINY_Resolution      |    vec2     |    Screen Resolution    |
-|      TINY_TexSkybox      | TextureCube |     Skybox Texture      |
-|      TINY_TexDepth       |  Texture2D  |      Depth Texture      |
-|    TINY_TexIrradiance    | TextureCube |   Irradiance Texture    |
-|    TINY_TexPrefilter     | TextureCube |    Prefilter Texture    |
-|     TINY_TexBRDFLUT      |  Texture2D  |     BRDFLUT Texture     |
+|        ShaderName        |   Type   |        Useage         |
+| :----------------------: | :------: | :-------------------: |
+|       TINY_MatrixP       | float4x4 |           P           |
+|       TINY_MatrixV       | float4x4 |           V           |
+|       TINY_MatrixM       | float4x4 |           M           |
+|      TINY_MatrixVP       | float4x4 |          VP           |
+|      TINY_MatrixMVP      | float4x4 |          MVP          |
+|       TINY_MatrixN       | float3x3 |  Model Normal Matrix  |
+|    TINY_MatrixLightVP    | float4x4 |    Light VP Matrix    |
+| TINY_CameraWorldPosition |  float3  | Camera World Position |
+|    TINY_CameraNearFar    |  float2  |    Camera NearFar     |
+|     TINY_Resolution      |  float2  |   Screen Resolution   |
+|      TINY_TexSkybox      | texCube  |    Skybox Texture     |
+|      TINY_TexDepth       |  tex2D   |     Depth Texture     |
+|    TINY_TexIrradiance    | texCube  |  Irradiance Texture   |
+|    TINY_TexPrefilter     | texCube  |   Prefilter Texture   |
+|     TINY_TexBRDFLUT      |  tex2D   |    BRDFLUT Texture    |
 
-|      ShaderName       | CommonType | Useage |
-| :-------------------: | :--------: | :----: |
-| TINY_LitDir.direction |    vec3    |        |
-|  TINY_LitDir.ambient  |    vec3    |        |
-|  TINY_LitDir.diffuse  |    vec3    |        |
-| TINY_LitDir.specular  |    vec3    |        |
+|      ShaderName       |  Type  | Useage |
+| :-------------------: | :----: | :----: |
+| TINY_LitDir.direction | float3 |        |
+|  TINY_LitDir.ambient  | float3 |        |
+|  TINY_LitDir.diffuse  | float3 |        |
+| TINY_LitDir.specular  | float3 |        |
 
-|       ShaderName       | CommonType | Useage |
-| :--------------------: | :--------: | :----: |
-| TINY_LitPoint.position |    vec3    |        |
-| TINY_LitPoint.ambient  |    vec3    |        |
-| TINY_LitPoint.diffuse  |    vec3    |        |
-| TINY_LitPoint.specular |    vec3    |        |
-|  TINY_LitPoint.config  |    vec3    |        |
+|       ShaderName       |  Type  | Useage |
+| :--------------------: | :----: | :----: |
+| TINY_LitPoint.position | float3 |        |
+| TINY_LitPoint.ambient  | float3 |        |
+| TINY_LitPoint.diffuse  | float3 |        |
+| TINY_LitPoint.specular | float3 |        |
+|  TINY_LitPoint.config  | float3 |        |
 
 **目前内建材质变量类型有**(后续会慢慢添加)
 
@@ -413,16 +414,16 @@ The shader file supports both // and /**/
 ```glsl
 file tiny_vs.tyin 
 //base
-uniform mat4 TINY_MatrixP;
-uniform mat4 TINY_MatrixV;
-uniform mat4 TINY_MatrixM;
-uniform mat4 TINY_MatrixMV;
-uniform mat4 TINY_MatrixVP;
-uniform mat4 TINY_MatrixMVP;
-uniform mat3 TINY_MatrixN;
+uniform float4x4 TINY_MatrixP;
+uniform float4x4 TINY_MatrixV;
+uniform float4x4 TINY_MatrixM;
+uniform float4x4 TINY_MatrixMV;
+uniform float4x4 TINY_MatrixVP;
+uniform float4x4 TINY_MatrixMVP;
+uniform float3x3 TINY_MatrixN;
 
 //light
-uniform mat4 TINY_MatrixLightVP;
+uniform float4x4 TINY_MatrixLightVP;
 
 file any shader you need
 #TINY_VS_BEGIN
@@ -577,11 +578,11 @@ The[`int Version`] should be setted.The other params You can set as your wish.
     {
         inout TINY_VS2FS
         {
-            vec4 color;
-            vec2 uv;
-            vec3 normal;
-            vec3 worldPosition;
-            vec4 lightPosition;
+            float4 color;
+            float2 uv;
+            float3 normal;
+            float3 worldPosition;
+            float4 lightPosition;
         };
     }
     #TINY_VA_END
@@ -590,36 +591,36 @@ The[`int Version`] should be setted.The other params You can set as your wish.
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        layout (location = 1) in vec3 aNormal;
-        layout (location = 2) in vec2 aUV;
-        layout (location = 3) in vec4 aColor;
+        layout (location = 0) in float3 aPos;
+        layout (location = 1) in float3 aNormal;
+        layout (location = 2) in float2 aUV;
+        layout (location = 3) in float4 aColor;
 
-        out vec4 myColor;
-        out vec2 myUV;
-        out vec3 myNormal;
-        out vec3 myWorldPosition;
-        out vec4 myLightPosition;
+        out float4 myColor;
+        out float2 myUV;
+        out float3 myNormal;
+        out float3 myWorldPosition;
+        out float4 myLightPosition;
 
         out VS2FS
         {
-            vec4 color;
-            vec2 uv;
-            vec3 normal;
-            vec3 worldPosition;
-            vec4 lightPosition;
+            float4 color;
+            float2 uv;
+            float3 normal;
+            float3 worldPosition;
+            float4 lightPosition;
         } TINY_VS2FS;
 
         void main()
         {
-            vec4 position =  vec4(aPos, 1.0);
+            float4 position =  float4(aPos, 1.0);
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
 
             myColor = aColor;
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
-            myWorldPosition = vec3(TINY_MatrixM * position);
-            myLightPosition = TINY_MatrixLightVP * vec4(myWorldPosition, 1.0f);
+            myWorldPosition = float3(TINY_MatrixM * position);
+            myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
         }
     }
     #TINY_VS_END
@@ -628,46 +629,46 @@ The[`int Version`] should be setted.The other params You can set as your wish.
     {
         #include "../Include/tiny_fs.tyin"
 
-        in vec4 myColor;
-        in vec2 myUV;
-        in vec3 myNormal;
-        in vec3 myWorldPosition;
-        in vec4 myLightPosition;
+        in float4 myColor;
+        in float2 myUV;
+        in float3 myNormal;
+        in float3 myWorldPosition;
+        in float4 myLightPosition;
 
         in VS2FS
         {
-            vec4 color;
-            vec2 uv;
-            vec3 normal;
-            vec3 worldPosition;
-            vec4 lightPosition;
+            float4 color;
+            float2 uv;
+            float3 normal;
+            float3 worldPosition;
+            float4 lightPosition;
         } TINY_VS2FS;
         
-        out vec4 myFinalColor;
+        out float4 myFinalColor;
 
-        uniform sampler2D myTexDiffuse2D;
-        uniform sampler2D myTexSpecular2D;
+        uniform tex2D myTexDiffuse2D;
+        uniform tex2D myTexSpecular2D;
         uniform float myShininess;
 
-        vec4 reflection(vec3 I)
+        float4 reflection(float3 I)
         {
-            //vec3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
-            vec3 R = reflect(I, normalize(myNormal));
-            return vec4(texture(TINY_TexSkybox, R).rgb, 1.0);
+            //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
+            float3 R = reflect(I, normalize(myNormal));
+            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
         }
 
-        vec4 refraction(vec3 I)
+        float4 refraction(float3 I)
         {
             float ratio = 1.00 / 1.52;
-            //vec3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
-            vec3 R = refract(I, normalize(myNormal), ratio);
-            return vec4(texture(TINY_TexSkybox, R).rgb, 1.0);
+            //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
+            float3 R = refract(I, normalize(myNormal), ratio);
+            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
         }
 
-        vec3 calcDirectionLight(LightDirection lit, vec3 viewDir, vec3 normal)
+        float3 calcDirectionLight(LightDirection lit, float3 viewDir, float3 normal)
         {
-            vec3 light_dir = normalize(-lit.direction);
-            vec3 half_dir = normalize(viewDir + light_dir); 
+            float3 light_dir = normalize(-lit.direction);
+            float3 half_dir = normalize(viewDir + light_dir); 
 
             float NdL = dot(normal, light_dir);
             float NdH = dot(normal, half_dir);
@@ -675,22 +676,22 @@ The[`int Version`] should be setted.The other params You can set as your wish.
             float diff = max(NdL, 0.0);
             float spec = pow(max(NdH, 0.0), myShininess);
 
-            vec3 ambient = lit.ambient * texture(myTexDiffuse2D, myUV).rgb;
-            vec3 diffuse = lit.diffuse * diff * texture(myTexDiffuse2D, myUV).rgb;
-            vec3 specular = lit.specular * spec * texture(myTexSpecular2D, myUV).rrr;
+            float3 ambient = lit.ambient * texture(myTexDiffuse2D, myUV).rgb;
+            float3 diffuse = lit.diffuse * diff * texture(myTexDiffuse2D, myUV).rgb;
+            float3 specular = lit.specular * spec * texture(myTexSpecular2D, myUV).rrr;
 
             // shadow
             float shadow = calcShadow(myLightPosition, normal, light_dir, TINY_TexDepth);
-            vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
+            float3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
 
             return lighting;
         }
 
         void main()
         {
-            vec3 normal = normalize(myNormal);
-            vec3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
-            myFinalColor = vec4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
+            float3 normal = normalize(myNormal);
+            float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
+            myFinalColor = float4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
         }
     }
     #TINY_FS_END

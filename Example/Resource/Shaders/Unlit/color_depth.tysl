@@ -22,11 +22,11 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
+        layout (location = 0) in float3 aPos;
 
         void main()
         {
-            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * float4(aPos, 1.0);
         }
     }
     #TINY_VS_END
@@ -35,11 +35,11 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        out vec4 myFinalColor;
+        out float4 myFinalColor;
         
         void main()
         {
-            myFinalColor = vec4(vec3(linearizeDepth(gl_FragCoord.z, TINY_CameraNearFar.x, TINY_CameraNearFar.y) / TINY_CameraNearFar.y), 1.0);
+            myFinalColor = float4(float3(linearizeDepth(gl_FragCoord.z, TINY_CameraNearFar.x, TINY_CameraNearFar.y) / TINY_CameraNearFar.y), 1.0);
         }
     }
     #TINY_FS_END

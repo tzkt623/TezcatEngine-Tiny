@@ -25,19 +25,19 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
+        layout (location = 0) in float3 aPos;
 
-        out vec3 nearPoint;
-        out vec3 farPoint;
+        out float3 nearPoint;
+        out float3 farPoint;
 
-        out mat4 fragView;
-        out mat4 fragProj;
+        out float4x4 fragView;
+        out float4x4 fragProj;
 
-        vec3 unprojectPoint(float x, float y, float z, mat4 view, mat4 projection)
+        float3 unprojectPoint(float x, float y, float z, float4x4 view, float4x4 projection)
         {
-            mat4 viewInv = inverse(view);
-            mat4 projInv = inverse(projection);
-            vec4 unprojectedPoint =  viewInv * projInv * vec4(x, y, z, 1.0);
+            float4x4 viewInv = inverse(view);
+            float4x4 projInv = inverse(projection);
+            float4 unprojectedPoint =  viewInv * projInv * float4(x, y, z, 1.0);
             return unprojectedPoint.xyz / unprojectedPoint.w;
         }
 
@@ -48,7 +48,7 @@
             fragView = TINY_MatrixV;
             fragProj = TINY_MatrixP;
 
-            gl_Position = vec4(aPos, 1.0);
+            gl_Position = float4(aPos, 1.0);
         }
     }
     #TINY_VS_END
@@ -57,22 +57,22 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        in vec3 nearPoint;
-        in vec3 farPoint;
-        in mat4 fragView;
-        in mat4 fragProj;
+        in float3 nearPoint;
+        in float3 farPoint;
+        in float4x4 fragView;
+        in float4x4 fragProj;
 
-        out vec4 myGridColor;
+        out float4 myGridColor;
 
-        vec4 grid(vec3 fragPos3D, float scale)
+        float4 grid(float3 fragPos3D, float scale)
         {
-            vec2 coord = fragPos3D.xz * scale; // use the scale variable to set the distance between the lines
-            vec2 derivative = fwidth(coord);
-            vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative;
+            float2 coord = fragPos3D.xz * scale; // use the scale variable to set the distance between the lines
+            float2 derivative = fwidth(coord);
+            float2 grid = abs(fract(coord - 0.5) - 0.5) / derivative;
             float line = min(grid.x, grid.y);
             float minimumz = min(derivative.y, 1);
             float minimumx = min(derivative.x, 1);
-            vec4 color = vec4(0.2, 0.2, 0.2, 1.0 - min(line, 1.0));
+            float4 color = float4(0.2, 0.2, 0.2, 1.0 - min(line, 1.0));
             // z axis
             if(fragPos3D.x > -0.1 * minimumx && fragPos3D.x < 0.1 * minimumx)
                 color.z = 1.0;
@@ -82,15 +82,15 @@
             return color;
         }
 
-        float computeDepth(vec3 pos)
+        float computeDepth(float3 pos)
         {
-            vec4 clip_space_pos = fragProj * fragView * vec4(pos.xyz, 1.0);
+            float4 clip_space_pos = fragProj * fragView * float4(pos.xyz, 1.0);
             return (clip_space_pos.z / clip_space_pos.w);
         }
 
-        float computeLinearDepth(vec3 pos)
+        float computeLinearDepth(float3 pos)
         {
-            vec4 clip_space_pos = fragProj * fragView * vec4(pos.xyz, 1.0);
+            float4 clip_space_pos = fragProj * fragView * float4(pos.xyz, 1.0);
             float clip_space_depth = (clip_space_pos.z / clip_space_pos.w) * 2.0 - 1.0; // put back between -1 and 1
             float linearDepth = (2.0 * TINY_CameraNearFar.x * TINY_CameraNearFar.y) / (TINY_CameraNearFar.y + TINY_CameraNearFar.x - clip_space_depth * (TINY_CameraNearFar.y - TINY_CameraNearFar.x)); // get linear value between 0.01 and 100
             return linearDepth / TINY_CameraNearFar.y; // normalize
@@ -99,13 +99,13 @@
         void main()
         {
             float t = -nearPoint.y / (farPoint.y - nearPoint.y);
-            vec3 fragPos3D = nearPoint + t * (farPoint - nearPoint);
+            float3 fragPos3D = nearPoint + t * (farPoint - nearPoint);
             gl_FragDepth = computeDepth(fragPos3D);
 
             float linearDepth = computeLinearDepth(fragPos3D);
             float fading = max(0, (0.5 - linearDepth));
 
-            //myGridColor = vec4(float(t > 0), 0.0, 0.0, float(t > 0));
+            //myGridColor = float4(float(t > 0), 0.0, 0.0, float(t > 0));
             myGridColor = (grid(fragPos3D, 0.01) + grid(fragPos3D, 0.01)) * float(t > 0);
             //myGridColor.a = fading;
         }

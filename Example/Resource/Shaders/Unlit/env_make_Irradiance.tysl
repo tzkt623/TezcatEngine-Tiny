@@ -22,13 +22,13 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        out vec3 myWorldPosition;
+        layout (location = 0) in float3 aPos;
+        out float3 myWorldPosition;
 
         void main()
         {
             myWorldPosition = aPos;
-            gl_Position = TINY_MatrixP * TINY_MatrixV * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * float4(aPos, 1.0);
         }
     }
     #TINY_VS_END
@@ -37,45 +37,45 @@
     {
         #include "../Include/tiny_fs.tyin"
         
-        in vec3 myWorldPosition;
-        out vec4 myFinalColor;
+        in float3 myWorldPosition;
+        out float4 myFinalColor;
 
         void main()
         {		
-            // The world vector acts as the normal of a tangent surface
+            // The world floattor acts as the normal of a tangent surface
             // from the origin, aligned to WorldPos. Given this normal, calculate all
             // incoming radiance of the environment. The result of this radiance
             // is the radiance of light coming from -Normal direction, which is what
             // we use in the PBR shader to sample irradiance.
-            vec3 N = normalize(myWorldPosition);
+            float3 N = normalize(myWorldPosition);
 
-            vec3 irradiance = vec3(0.0);   
+            float3 irradiance = float3(0.0);   
             
             // tangent space calculation from origin point
-            vec3 up = vec3(0.0, 1.0, 0.0);
-            vec3 right = normalize(cross(up, N));
+            float3 up = float3(0.0, 1.0, 0.0);
+            float3 right = normalize(cross(up, N));
             up = normalize(cross(N, right));
             
             //float sampleDelta = 0.025;
             float sampleDelta = 0.025;
             int nrSamples = 0;
-            for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta)
+            for(float phi = 0.0; phi < 2.0 * TINY_PI; phi += sampleDelta)
             {
-                for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta)
+                for(float theta = 0.0; theta < 0.5 * TINY_PI; theta += sampleDelta)
                 {
                     // spherical to cartesian (in tangent space)
-                    vec3 tangentSample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
+                    float3 tangentSample = float3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
                     // tangent space to world
-                    vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N; 
+                    float3 samplefloat = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N; 
 
-                    irradiance += texture(TINY_TexSkybox, sampleVec).rgb * cos(theta) * sin(theta);
+                    irradiance += texture(TINY_TexSkybox, samplefloat).rgb * cos(theta) * sin(theta);
                     nrSamples++;
                 }
             }
-            irradiance = PI * irradiance * (1.0 / float(nrSamples));
+            irradiance = TINY_PI * irradiance * (1.0 / float(nrSamples));
             
-            myFinalColor = vec4(irradiance, 1.0);
-            //myFinalColor = vec4(1.0, 0.0, 0.0, 1.0);
+            myFinalColor = float4(irradiance, 1.0);
+            //myFinalColor = float4(1.0, 0.0, 0.0, 1.0);
         }
     }
     #TINY_FS_END

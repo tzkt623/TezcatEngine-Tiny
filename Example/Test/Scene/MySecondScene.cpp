@@ -39,17 +39,15 @@ void MySeconedScene::onEnter()
 
 		Texture2D* t2d = Texture2D::create("RB_Viewport");
 		t2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight(),
-			TextureInfo("RB_Viewport"
-				, TextureAttachPosition::ColorComponent
+			TextureInfo(TextureAttachPosition::ColorComponent
 				, TextureChannel::RGBA
 				, TextureChannel::RGBA
 				, DataType::UByte));
 		frame->addAttachment(t2d);
 
-		t2d = Texture2D::create("RB_Viewport");
+		t2d = Texture2D::create("DS_Viewport");
 		t2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight(),
-			TextureInfo("DS_Viewport"
-				, TextureAttachPosition::DepthComponent
+			TextureInfo(TextureAttachPosition::DepthComponent
 				, TextureChannel::Depth
 				, TextureChannel::Depth
 				, DataType::UByte));

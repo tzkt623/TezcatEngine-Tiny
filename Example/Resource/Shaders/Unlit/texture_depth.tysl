@@ -22,14 +22,14 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        layout (location = 2) in vec2 aUV;
+        layout (location = 0) in float3 aPos;
+        layout (location = 2) in float2 aUV;
 
-        out vec2 myUV;
+        out float2 myUV;
 
         void main()
         {
-            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * vec4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * float4(aPos, 1.0);
             myUV = aUV;
         }
     }
@@ -39,14 +39,14 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        out vec4 myFinalColor;
-        in vec2 myUV;
-        uniform sampler2D myTexDepth2D;
+        out float4 myFinalColor;
+        in float2 myUV;
+        uniform tex2D myTexDepth2D;
 
         void main()
         {
             float z = texture(myTexDepth2D, myUV).r;
-            myFinalColor = vec4(z, z, z, 1.0f);
+            myFinalColor = float4(z, z, z, 1.0f);
         }
     }
     #TINY_FS_END

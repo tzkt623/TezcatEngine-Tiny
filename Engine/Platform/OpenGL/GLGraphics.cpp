@@ -302,33 +302,6 @@ namespace tezcat::Tiny::GL
 			DepthTestWrapper(DepthTest::Equal,			GL_EQUAL),
 			DepthTestWrapper(DepthTest::NotEqual,		GL_NOTEQUAL)
 		};
-
-
-		ContextMap::UniformTypeUMap =
-		{
-			{ "bool",			UniformType::Bool },
-			{ "int",			UniformType::Int },
-			{ "ivec2",			UniformType::Int2 },
-			{ "ivec3",			UniformType::Int3 },
-			{ "ivec4",			UniformType::Int4 },
-			{ "uint",			UniformType::UInt },
-			{ "uvec2",			UniformType::UInt2 },
-			{ "uvec3",			UniformType::UInt3 },
-			{ "uvec4",			UniformType::UInt4 },
-			{ "float",			UniformType::Float },
-			{ "vec2",			UniformType::Float2 },
-			{ "vec3",			UniformType::Float3 },
-			{ "vec4",			UniformType::Float4 },
-			{ "double",			UniformType::Double },
-			{ "dvec2",			UniformType::Double2 },
-			{ "dvec3",			UniformType::Double3 },
-			{ "dvec4",			UniformType::Double4 },
-			{ "mat4",			UniformType::Mat3 },
-			{ "mat3",			UniformType::Mat4 },
-			{ "sampler2D",		UniformType::Tex2D },
-			{ "sampler3D",		UniformType::Tex3D },
-			{ "samplerCube",	UniformType::TexCube }
-		};
 	}
 
 	void GLGraphics::setViewport(const ViewportInfo& info)

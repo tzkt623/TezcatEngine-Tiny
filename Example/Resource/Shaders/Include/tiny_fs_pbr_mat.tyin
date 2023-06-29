@@ -1,6 +1,6 @@
 struct MatPBR_Test
 {
-    vec3 albedo;
+    float3 albedo;
     float metallic;
     float roughness;
     float ao;
@@ -8,8 +8,8 @@ struct MatPBR_Test
 
 struct MatPBR_Std1
 {
-    sampler2D albedo2D;
-    sampler2D metallic2D;
-    sampler2D roughness2D;
-    sampler2D ao2D;
+    tex2D albedo2D;
+    tex2D metallic2D;
+    tex2D roughness2D;
+    tex2D ao2D;
 };

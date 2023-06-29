@@ -24,25 +24,25 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in vec3 aPos;
-        layout (location = 1) in vec3 aNormal;
-        layout (location = 2) in vec2 aUV;
-        layout (location = 3) in vec4 aColor;
+        layout (location = 0) in float3 aPos;
+        layout (location = 1) in float3 aNormal;
+        layout (location = 2) in float2 aUV;
+        layout (location = 3) in float4 aColor;
 
-        out vec4 myColor;
-        out vec2 myUV;
-        out vec3 myNormal;
-        out vec3 myWorldPosition;
-        out vec4 myLightPosition;
+        out float4 myColor;
+        out float2 myUV;
+        out float3 myNormal;
+        out float3 myWorldPosition;
+        out float4 myLightPosition;
 
         void main()
         {
-            vec4 position = TINY_MatrixM * vec4(aPos, 1.0);
+            float4 position = TINY_MatrixM * float4(aPos, 1.0);
 
             myColor = aColor;
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
-            myWorldPosition = vec3(position);
+            myWorldPosition = float3(position);
 
             gl_Position = TINY_MatrixP * TINY_MatrixV * position;
         }
@@ -53,74 +53,74 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        in vec4 myColor;
-        in vec2 myUV;
-        in vec3 myNormal;
-        in vec3 myWorldPosition;
+        in float4 myColor;
+        in float2 myUV;
+        in float3 myNormal;
+        in float3 myWorldPosition;
         
-        out vec4 myFinalColor;
+        out float4 myFinalColor;
         uniform MatPBR_Std1 myPBR;
 
         void main()
         {
-            vec3 albedo = pow(texture(myPBR.albedo2D, myUV).rgb, vec3(2.2));
+            float3 albedo = pow(texture(myPBR.albedo2D, myUV).rgb, float3(2.2));
             float metallic = texture(myPBR.metallic2D, myUV).r;
             float roughness = texture(myPBR.roughness2D, myUV).r;
             float ao = texture(myPBR.ao2D, myUV).r;
 
-            vec3 F0 = vec3(0.04); 
+            float3 F0 = float3(0.04); 
             F0 = mix(F0, albedo, metallic);
 
-            vec3 N = normalize(myNormal);
-            vec3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
-            vec3 R = reflect(-V, N); 
+            float3 N = normalize(myNormal);
+            float3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
+            float3 R = reflect(-V, N); 
 
             //计算一个灯的光照
-            vec3 Lo = vec3(0.0);
+            float3 Lo = float3(0.0);
             {
-                vec3 L = normalize(-TINY_LitDir.direction);
-                vec3 H = normalize(V + L); 
+                float3 L = normalize(-TINY_LitDir.direction);
+                float3 H = normalize(V + L); 
                 float cosTheta = max(dot(N, L), 0.0);
-                vec3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
+                float3 radiance = TINY_LitDir.diffuse * cosTheta * 10;     
 
                 float NdotH = max(dot(N, H), 0.0);
                 float NDF = distributionGGX(NdotH, roughness);
                 float G = geometrySmith(N, V, L, roughness);
-                vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+                float3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-                vec3 kS = F;
-                vec3 kD = vec3(1.0) - kS;
+                float3 kS = F;
+                float3 kD = float3(1.0) - kS;
                 kD *= 1.0 - metallic;
 
-                vec3 nominator = NDF * G * F;
+                float3 nominator = NDF * G * F;
                 float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
-                vec3 specular = nominator / denominator;
+                float3 specular = nominator / denominator;
 
                 // add to outgoing radiance Lo
                 float NdotL = max(dot(N, L), 0.0);                
-                Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+                Lo += (kD * albedo / TINY_PI + specular) * radiance * NdotL; 
             }
 
-            vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+            float3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     
-            vec3 kS = F;
-            vec3 kD = 1.0 - kS;
+            float3 kS = F;
+            float3 kD = 1.0 - kS;
             kD *= 1.0 - metallic;	  
-            vec3 irradiance = texture(TINY_TexIrradiance, N).rgb;
-            vec3 diffuse = irradiance * albedo;
+            float3 irradiance = texture(TINY_TexIrradiance, N).rgb;
+            float3 diffuse = irradiance * albedo;
 
             const float MAX_REFLECTION_LOD = 4.0;
-            vec3 prefilteredColor = textureLod(TINY_TexPrefilter, R,  roughness * MAX_REFLECTION_LOD).rgb;    
-            vec2 brdf = texture(TINY_TexBRDFLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-            vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+            float3 prefilteredColor = textureLod(TINY_TexPrefilter, R,  roughness * MAX_REFLECTION_LOD).rgb;    
+            float2 brdf = texture(TINY_TexBRDFLUT, float2(max(dot(N, V), 0.0), roughness)).rg;
+            float3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-            vec3 ambient = (kD * diffuse + specular) * ao;
-            vec3 color = ambient + Lo;
+            float3 ambient = (kD * diffuse + specular) * ao;
+            float3 color = ambient + Lo;
 
-            color = color / (color + vec3(1.0));
-            color = pow(color, vec3(1.0 / 2.2)); 
+            color = color / (color + float3(1.0));
+            color = pow(color, float3(1.0 / 2.2)); 
 
-            myFinalColor = vec4(color, 1.0);
+            myFinalColor = float4(color, 1.0);
         }
     }
     #TINY_FS_END

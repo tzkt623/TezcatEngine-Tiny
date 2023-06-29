@@ -1,5 +1,5 @@
-uniform sampler2D TINY_TexDepth;
-uniform samplerCube TINY_TexSkybox;
-uniform samplerCube TINY_TexIrradiance;
-uniform samplerCube TINY_TexPrefilter;
-uniform sampler2D TINY_TexBRDFLUT;
+uniform tex2D TINY_TexDepth;
+uniform texCube TINY_TexSkybox;
+uniform texCube TINY_TexIrradiance;
+uniform texCube TINY_TexPrefilter;
+uniform tex2D TINY_TexBRDFLUT;

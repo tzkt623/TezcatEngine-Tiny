@@ -194,8 +194,7 @@ namespace tezcat::Tiny
 		mCubeFB = FrameBufferMgr::getInstance()->create("FB_Cube");
 		mCubeMap = TextureMgr::getInstance()->createCube("CB_CubeMap");
 		mCubeMap->setData(cube_size, cube_size,
-			TextureInfo("CB_CubeMap"
-				, TextureType::TextureCube
+			TextureInfo(TextureType::TextureCube
 				, TextureAttachPosition::ColorComponent
 				, TextureFilter::Linear_Mipmap_Linear
 				, TextureFilter::Linear
@@ -223,8 +222,7 @@ namespace tezcat::Tiny
 		mIrradianceFB = FrameBufferMgr::getInstance()->create("FB_Irradiance");
 		mIrradianceMap = TextureMgr::getInstance()->createCube("CB_IrradianceMap");
 		mIrradianceMap->setData(irr_size, irr_size,
-			TextureInfo("CB_IrradianceMap"
-				, TextureType::TextureCube
+			TextureInfo(TextureType::TextureCube
 				, TextureAttachPosition::ColorComponent
 				, TextureFilter::Linear
 				, TextureFilter::Linear
@@ -254,8 +252,7 @@ namespace tezcat::Tiny
 		mPrefilterFB = FrameBufferMgr::getInstance()->create("FB_Prefilter");
 		mPrefilterMap = TextureMgr::getInstance()->createCube("CB_PrefilterMap");
 		mPrefilterMap->setData(prefilter_size, prefilter_size,
-			TextureInfo("CB_PrefilterMap"
-				, TextureType::TextureCube
+			TextureInfo(TextureType::TextureCube
 				, TextureAttachPosition::ColorComponent
 				, TextureFilter::Linear_Mipmap_Linear
 				, TextureFilter::Linear
@@ -284,8 +281,7 @@ namespace tezcat::Tiny
 		auto fb = FrameBuffer::create("FB_BRDF_LUT");
 		mBRDFLUTMap = TextureMgr::getInstance()->create2D("CB_BRDF_LUT");
 		mBRDFLUTMap->setData(mCubeSize, mCubeSize,
-			TextureInfo("CB_BRDF_LUT"
-				, TextureType::Texture2D
+			TextureInfo(TextureType::Texture2D
 				, TextureAttachPosition::ColorComponent
 				, TextureFilter::Linear
 				, TextureFilter::Linear

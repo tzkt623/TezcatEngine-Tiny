@@ -280,8 +280,8 @@ namespace tezcat::Tiny::GL
 			graphics->setViewport(ViewportInfo(0, 0, mip_width, mip_height));
 
 			float roughness = (float)mip / (float)(mMipMaxLevel - 1);
-			graphics->setFloat1(shader, "roughness", &roughness);
-			graphics->setFloat1(shader, "resolution", &mResolution);
+			graphics->setFloat1(shader, "myRoughness", &roughness);
+			graphics->setFloat1(shader, "myResolution", &mResolution);
 
 			for (uint32_t i = 0; i < 6; ++i)
 			{
