@@ -15,18 +15,7 @@ namespace tezcat::Tiny
 		Double, Double2, Double3, Double4,
 		Mat3, Mat4,
 		Tex2D, Tex3D, TexCube,
-
-		Count
-	};
-
-	enum class TINY_API UniformBuildType : int8_t
-	{
-		Error = -1,
 		Struct,
-		Color,
-		Range,
-		Tex2D, Tex3D, TexCube,
-
 		Count
 	};
 

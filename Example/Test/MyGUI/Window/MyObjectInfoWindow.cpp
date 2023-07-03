@@ -83,16 +83,18 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			auto& uniforms = mt->getUniforms();
 			for (uint32_t i = 0; i < uniforms.size(); i++)
 			{
-				auto uniform = uniforms[i];
 				auto info = shader->getUniformInfo(i);
+				auto uniform = uniforms[i];
+
 				switch (uniform->getType())
 				{
 				case UniformType::Float:
 				{
 					auto f1 = (UniformF1*)uniform;
-					ImGui::Text(info->name.c_str());
+					auto range = (RangeFloat*)info->range.get();
+					ImGui::Text(info->editorName.c_str());
 					ImGui::PushID(widget_id++);
-					ImGui::DragFloat("", &f1->value, 0.02f);
+					ImGui::DragFloat("", &f1->value, 0.02f, range->min, range->max);
 					ImGui::PopID();
 
 					ImGui::Spacing();
@@ -102,20 +104,17 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 				{
 					auto f3 = (UniformF3*)uniform;
 
-					ImGui::Text(info->name.c_str());
-					ImGui::PushID(widget_id++);
-					ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f);
-
-					/*
-					if (config->isColor)
+					ImGui::Text(info->editorName.c_str());
+					ImGui::PushID(widget_id++);				
+					if (info->constraint == ShaderConstraint::Color)
 					{
 						ImGui::ColorEdit3("", glm::value_ptr(f3->value));
 					}
 					else
 					{
-						ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f);
+						auto range = (RangeFloat*)info->range.get();
+						ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f, range->min, range->max);
 					}
-					*/
 
 					ImGui::PopID();
 
@@ -125,7 +124,7 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 				case UniformType::Tex2D:
 				{
 					auto tex = (UniformTex2D*)uniform;
-					ImGui::Text(info->name.c_str());
+					ImGui::Text(info->editorName.c_str());
 					ImGui::Image((ImTextureID)tex->value->getTextureID()
 								, ImVec2(100, 100)
 								, ImVec2(0, 1)

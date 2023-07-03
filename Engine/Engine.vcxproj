@@ -276,6 +276,7 @@
     <ClInclude Include="Core\Base\TinyObject.h" />
     <ClInclude Include="Core\Component\GameObject.h" />
     <ClInclude Include="Core\Renderer\VertexConfig.h" />
+    <ClInclude Include="Core\Shader\ShaderConfig.h" />
     <ClInclude Include="Core\Shader\Uniform.h" />
     <ClInclude Include="Core\Tool\Collision\BoundingBox.h" />
     <ClInclude Include="Core\Tool\Collision\OBB.h" />

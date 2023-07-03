@@ -1,7 +1,11 @@
 struct StdMaterial
 {
+    [Editor(Diffuse2D)]
     tex2D diffuse;
+    [Editor(Normal2D)]
     tex2D normal;
+    [Editor(Specular2D)]
     tex2D specular;
+    [Editor(Shininess)]
     float shininess;
 };

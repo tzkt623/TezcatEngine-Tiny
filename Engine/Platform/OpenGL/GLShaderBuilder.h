@@ -1,7 +1,5 @@
 #pragma once
-#include "Core/Head/CppHead.h"
-#include "Core/Head/ConfigHead.h"
-#include "Core/Shader/Uniform.h"
+
 #include "Core/Shader/Shader.h"
 
 namespace tezcat::Tiny::GL
@@ -54,8 +52,9 @@ namespace tezcat::Tiny::GL
 		UniformID::USet mUniformSet;
 		std::unordered_set<std::string> mUserSet;
 
-		std::unordered_map<std::string, UniformType> mTinyUMap;
-		std::unordered_map<std::string, UniformType> mUserUMap;
+		std::unordered_map<std::string_view, std::shared_ptr<ArgMetaData>> mTinyUMap;
+		std::unordered_map<std::string_view, std::shared_ptr<ArgMetaData>> mUserUMap;
+		std::unordered_map<std::string_view, std::shared_ptr<ArgMetaData>> mStructUMap;
 
 		std::string mVertexShader;
 		std::string mFragShader;

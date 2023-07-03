@@ -1,15 +1,23 @@
 struct MatPBR_Test
 {
+    [Editor(Albedo, Color)]
     float3 albedo;
+    [Editor(Metallic, Range(0, 1))]
     float metallic;
+    [Editor(Roughness, Range(0, 1))]
     float roughness;
+    [Editor(AO,Range(0, 1))]
     float ao;
 };
 
 struct MatPBR_Std1
 {
+    [Editor(Albedo2D)]
     tex2D albedo2D;
+    [Editor(Metallic2D)]
     tex2D metallic2D;
+    [Editor(Roughness2D)]
     tex2D roughness2D;
+    [Editor(AO2D)]
     tex2D ao2D;
 };

@@ -41,6 +41,8 @@
 
         out float4 myFinalColor;
         in float2 myUV;
+
+        [Editor(DepthTexture)]
         uniform tex2D myTexDepth2D;
 
         void main()

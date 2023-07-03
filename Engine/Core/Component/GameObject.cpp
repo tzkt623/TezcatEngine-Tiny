@@ -122,7 +122,6 @@ namespace tezcat::Tiny
 			uid = sFreeObjects.front();
 			sFreeObjects.pop_front();
 			sPool[uid] = gameObject;
-			gameObject->addRef();
 		}
 
 		return uid;

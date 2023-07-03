@@ -70,7 +70,7 @@ void MyMainScene::onEnter()
 	this->createPlane();
 	//this->createTransparentObject();
 	this->createPBR();
-	//this->createCubes0();
+	this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
 	auto img = Resource::load<Image>("Image/blocky_photo_studio_2k.hdr");

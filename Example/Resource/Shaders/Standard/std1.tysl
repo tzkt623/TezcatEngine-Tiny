@@ -47,15 +47,6 @@
         out float3 myWorldPosition;
         out float4 myLightPosition;
 
-        out VS2FS
-        {
-            float4 color;
-            float2 uv;
-            float3 normal;
-            float3 worldPosition;
-            float4 lightPosition;
-        } TINY_VS2FS;
-
         void main()
         {
             float4 position =  float4(aPos, 1.0);
@@ -79,20 +70,14 @@
         in float3 myNormal;
         in float3 myWorldPosition;
         in float4 myLightPosition;
-
-        in VS2FS
-        {
-            float4 color;
-            float2 uv;
-            float3 normal;
-            float3 worldPosition;
-            float4 lightPosition;
-        } TINY_VS2FS;
         
         out float4 myFinalColor;
 
+        [Editor(Diffuse2D)]
         uniform tex2D myTexDiffuse2D;
+        [Editor(Specular2D)]
         uniform tex2D myTexSpecular2D;
+        [Editor(Shininess)]
         uniform float myShininess;
 
         float4 reflection(float3 I)

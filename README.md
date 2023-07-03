@@ -3,15 +3,28 @@
 ## **引擎二周目进行中**
 
 ![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
+![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
 
 Update
 
-- [x] 修改了整个shader体系的结构,现在不再有特殊内建变量,只有全局通用变量(The shader system has been modified so that there are no longer special built-in variables, only global common variables)
-- [x] 简化了shader头文件的包含,只需要包含一个通用的tiny头文件(Simplifies the inclusion of shader header files, only need to include a generic Tiny header file)
-- [x] 可以自己缓存uniform变量的index来快速更新数据(You can cache the index of uniform variables to quickly update the data)
-- [x] 基础模型加载(Basic Model load)
-- [x] 重定义了shader中的基本类型(float instead of vec)
 - [ ] 正在重构资源加载和管理方式(Refactoring resoure loader and managers)
+- [x] 可以加载和显示Shader数组对象了!(Can load and display Shader array objects in Editor!)
+- [x] 约束回归!在所有Uniform对象里设置约束信息以显示在Editor中.(Constraint return! Sets Uniform objects constraint information in ShaderFile to display in Editor)
+
+```glsl
+struct MatPBR_Test
+{
+    //Type(EditorName, Range)
+    [Editor(Albedo, Color)]
+    float3 albedo;
+    [Editor(Metallic, Range(0, 1))]
+    float metallic;
+    [Editor(Roughness, Range(0, 1))]
+    float roughness;
+    [Editor(AO,Range(0, 1))]
+    float ao;
+};
+```
 
 ## **依赖库版本(Libs Version)**
 

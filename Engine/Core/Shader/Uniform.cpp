@@ -52,6 +52,7 @@ namespace tezcat::Tiny
 	}
 
 	void UniformMat3::submit(BaseGraphics* graphics, Shader* shader)
+
 	{
 		graphics->setMat3(shader, *mShaderID, glm::value_ptr(value));
 	}

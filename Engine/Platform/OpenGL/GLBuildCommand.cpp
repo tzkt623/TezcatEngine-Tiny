@@ -223,13 +223,13 @@ namespace tezcat::Tiny::GL
 		for (unsigned int i = 0; i < 6; i++)
 		{
 			TINY_GL_Check(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
-						, 0
-						, mTex->getInternalChannel().platform
-						, width, height
-						, 0
-						, mTex->getChannel().platform
-						, mTex->getDataType().platform
-						, mTex->getData(i)));
+				, 0
+				, mTex->getInternalChannel().platform
+				, width, height
+				, 0
+				, mTex->getChannel().platform
+				, mTex->getDataType().platform
+				, mTex->getData(i)));
 		}
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mTex->getWrapS().platform);
@@ -550,24 +550,133 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
-		mShader->resizeTinyUniformAry(UniformID::allStringCount());
-		for (auto& pair : builder.mTinyUMap)
+		std::function<void(ArgMetaData*, const std::string&)> progress_tiny =
+			[this, &progress_tiny, &pid](ArgMetaData* metaData, const std::string& parentName)
 		{
-			auto uid = UniformID::getUIDStatic(pair.first);
-			if (uid < mShader->getTinyUniformCount())
+			auto name = metaData->valueName;
+			auto array_size = metaData->valueCount;
+			auto is_root = parentName.empty();
+
+			//如果是类,需要拼接名称
+			if (metaData->valueType == UniformType::Struct)
 			{
-				mShader->setupTinyUniform(pair.second, pair.first, uid, glGetUniformLocation(pid, pair.first.c_str()));
+				auto& members = metaData->getInfo<ArgStructInfo>()->members;
+
+				if (array_size > 0)
+				{
+					for (uint32_t i = 0; i < array_size; i++)
+					{
+						for (auto& m : members)
+						{
+							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+							progress_tiny(m.get(), true_name);
+						}
+					}
+				}
+				else
+				{
+					for (auto& m : members)
+					{
+						std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
+						progress_tiny(m.get(), true_name);
+					}
+				}
 			}
 			else
 			{
-				Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", pair.first));
+				if (array_size > 0)
+				{
+					for (uint32_t i = 0; i < array_size; i++)
+					{
+						std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+						auto uid = UniformID::getUIDStatic(true_name);
+						if (uid < mShader->getTinyUniformCount())
+						{
+							mShader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()), i);
+						}
+						else
+						{
+							Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
+						}
+					}
+				}
+				else
+				{
+					std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
+					auto uid = UniformID::getUIDStatic(true_name);
+					if (uid < mShader->getTinyUniformCount())
+					{
+						mShader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()));
+					}
+					else
+					{
+						Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
+					}
+				}
 			}
+		};
+
+		std::function<void(ArgMetaData*, const std::string&)> progress_user =
+			[this, &progress_user, &pid](ArgMetaData* metaData, const std::string& parentName)
+		{
+			auto& name = metaData->valueName;
+			auto array_size = metaData->valueCount;
+			auto is_root = parentName.empty();
+
+			//如果是类,需要拼接名称
+			if (metaData->valueType == UniformType::Struct)
+			{
+				auto& members = metaData->getInfo<ArgStructInfo>()->members;
+
+				if (array_size > 0)
+				{
+					for (uint32_t i = 0; i < array_size; i++)
+					{
+						for (auto& m : members)
+						{
+							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+							progress_user(m.get(), true_name);
+						}
+					}
+				}
+				else
+				{
+					for (auto& m : members)
+					{
+						std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
+						progress_user(m.get(), true_name);
+					}
+				}
+			}
+			else
+			{
+				if (array_size > 0)
+				{
+					for (uint32_t i = 0; i < array_size; i++)
+					{
+						std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+						mShader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()), i);
+					}
+				}
+				else
+				{
+					std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
+					mShader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()));
+				}
+			}
+		};
+
+		mShader->resizeTinyUniformAry(UniformID::allStringCount());
+		for (auto& pair : builder.mTinyUMap)
+		{
+			progress_tiny(pair.second.get(), "");
 		}
 
 		for (auto& pair : builder.mUserUMap)
 		{
-			mShader->setupUserUniformID(pair.second, pair.first, glGetUniformLocation(pid, pair.first.c_str()));
+			progress_user(pair.second.get(), "");
 		}
+
 
 		mShader->apply(pid);
 

@@ -38,7 +38,9 @@
         #include "../Include/tiny_fs.tyin"
         
         in float3 myUV;
+        [Editor(IsHDR)]
         uniform bool myIsHDR;
+        [Editor(LOD)]
         uniform float myLod = 0.0f;
         out float4 myFinalColor;
 

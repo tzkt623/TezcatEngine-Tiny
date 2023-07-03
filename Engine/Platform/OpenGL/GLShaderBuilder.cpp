@@ -353,113 +353,217 @@ namespace tezcat::Tiny::GL
 			//
 			// 分析struct中的arguments
 			//
-			struct ValueMetaData
-			{
-				struct Range
-				{
-					float min;
-					float max;
-				};
-
-				std::string name;
-				UniformBuildType buildType;
-				std::string showName;
-
-				union
-				{
-					Range range;
-				};
-			};
-
-			struct StructMetaData
-			{
-				std::string name;
-				//name, type
-				std::unordered_map<std::string, std::string> arguments;
-			};
-			std::unordered_map<std::string_view, StructMetaData*> struct_map;
-
 			//struct Name的解析规则
-			std::regex regex_struct(R"(struct\s+(\w+)\s+\{[\w\W]+?\};)");
-			//struct内容解析规则
-			std::regex regex_struct_data(R"(struct\s+\w+\s+\{([\w\W]+)\};)");
-			//type和name的解析规则
-			std::regex regex_argument(R"((\w+)\s*(\w+)(\[\w*\]|\s*=\s*\S*)*;)");
-			//这个专门解析数组
-			//std::regex regex_argument(R"((\w+)\s*(\w+)(\[\d+\])*;)");
+			//没有+后面的?就会进入贪婪模式匹配到所有struct甚至一堆无用的数据
+			std::regex regex_struct(R"(struct\s+(\w+)\s*\{([\w\W]+?)\s*\};)");
+			//解析带约束的argument
+			std::regex regex_constraint_argument(R"((?:(\[\w+\(.*\)\])\s*)*(\w+)\s+(\w+)\[?(\d*)\]?[\s\S]*?;)");
+			//解析约束
+			std::regex regex_constraint(R"(\[(\w+\(.*?\))\]\s*)");
+			//解析约束的名称和值
+			std::regex regex_constraint_name_value(R"((\w+)\((.*)\))");
+			//解析约束的值
+			std::regex regex_constraint_value(R"((\w+)\s*,?\s*(.*))");
+			//移除约束条件
+			std::regex regex_remove_constraint(R"(\[\w+\(.*\)\]\s*)");
+			//移除空白
+			std::regex regex_space(R"(\s)");
+
+
+			auto progress_constraint = [&regex_constraint_name_value, &regex_constraint_value, &regex_constraint, &regex_space]
+			(const std::ssub_match& match_constraints, UniformType& utype)
+			{
+				std::smatch match_constraint;
+				std::regex_match(match_constraints.first, match_constraints.second, match_constraint, regex_constraint);
+
+				//解析约束的名称和内容
+				std::smatch match_constraint_name_value;
+				std::regex_match(match_constraint[1].first, match_constraint[1].second, match_constraint_name_value, regex_constraint_name_value);
+				std::string constraint_name = match_constraint_name_value[1];
+				std::string constraint_value = match_constraint_name_value[2];
+
+				//解析约束值的类型
+				std::smatch match_constraint_value;
+				std::regex_match(match_constraint_name_value[2].first, match_constraint_name_value[2].second, match_constraint_value, regex_constraint_value);
+				std::string show_name = match_constraint_value[1];
+				std::string range = match_constraint_value[2];
+
+				//删除空白
+				show_name = std::regex_replace(show_name, regex_space, "");
+				range = std::regex_replace(range, regex_space, "");
+
+				ShaderConstraint constraint = ShaderConstraint::Error;
+				float range_min = 0, range_max = 0;
+				size_t pos;
+				std::shared_ptr<BaseRange> rangePtr;
+				if ((pos = range.find_first_of("Range")) != range.npos)
+				{
+					constraint = ShaderConstraint::Range;
+
+					range = range.substr(pos + 5, range.size() - pos);
+					range.erase(range.begin());
+					range.erase(range.end() - 1);
+
+					pos = range.find_first_of(',');
+					std::string min = range.substr(0, pos);
+					std::string max = range.substr(pos + 1, range.size() - pos - 1);
+
+
+					switch (utype)
+					{
+					case UniformType::Float:
+					case UniformType::Float2:
+					case UniformType::Float3:
+					case UniformType::Float4:
+						rangePtr.reset(new RangeFloat{ std::stof(min), std::stof(max) });
+						break;
+					case UniformType::Int:
+					case UniformType::Int2:
+					case UniformType::Int3:
+					case UniformType::Int4:
+						rangePtr.reset(new RangeInt{ std::stoi(min), std::stoi(max) });
+						break;
+					case UniformType::UInt:
+					case UniformType::UInt2:
+					case UniformType::UInt3:
+					case UniformType::UInt4:
+						rangePtr.reset(new RangeUInt{ std::stoul(min), std::stoul(max) });
+						break;
+					default:
+						break;
+					}
+
+					range_min = std::stof(min);
+					range_max = std::stof(max);
+				}
+				else if ((pos = range.find_first_of("Color")) != range.npos)
+				{
+					constraint = ShaderConstraint::Color;
+				}
+				else
+				{
+					rangePtr.reset(new RangeFloat{ 0.0f, 0.0f });
+				}
+
+				return std::tuple{ show_name, constraint, rangePtr };
+			};
 
 			//分析struct
 			for (auto struct_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_struct); struct_i != end; struct_i++)
 			{
-				std::string struct_name = (*struct_i)[1];
-				auto meta_data = new StructMetaData();
-				meta_data->name = struct_name;
-				struct_map[meta_data->name] = meta_data;
+				std::shared_ptr<ArgMetaData> meta_data(new ArgMetaData());
+				auto struct_info = meta_data->createInfo<ArgStructInfo>(UniformType::Struct);
+				struct_info->structName = (*struct_i)[1];
+				meta_data->valueName = (*struct_i)[1];
+				mStructUMap[meta_data->valueName] = meta_data;
 
 				//分析argument pair
-				std::string struct_data = (*struct_i)[0];
-				std::string arguments_data;
-				for (auto struct_data_i = std::sregex_iterator(struct_data.begin(), struct_data.end(), regex_struct_data); struct_data_i != end; struct_data_i++)
+				auto& struct_match = (*struct_i)[2];
+
+				for (auto argument_i = std::sregex_iterator(struct_match.first, struct_match.second, regex_constraint_argument); argument_i != end; argument_i++)
 				{
-					//分析argument
-					arguments_data = (*struct_data_i)[1];
-					for (auto argument_i = std::sregex_iterator(arguments_data.begin(), arguments_data.end(), regex_argument); argument_i != end; argument_i++)
+					std::string arg_type = (*argument_i)[2];
+					std::string arg_name = (*argument_i)[3];
+					std::string arg_count = (*argument_i)[4];
+					int array_count = 0;
+					if (!arg_count.empty())
 					{
-						//[name,type]
-						meta_data->arguments.emplace((*argument_i)[2], (*argument_i)[1]);
+						array_count = std::stoi(arg_count);
 					}
+
+					std::shared_ptr<ArgMetaData> member(new ArgMetaData());
+					member->valueName = arg_name;
+					member->valueCount = array_count;
+
+					auto it = ContextMap::UniformTypeUMap.find(arg_type);
+					if (it != ContextMap::UniformTypeUMap.end())
+					{
+						auto [show_name, constraint, rangePtr] = progress_constraint((*argument_i)[1], it->second);
+
+						auto member_info = member->createInfo<ArgMemberInfo>(it->second);
+						member_info->editorName = show_name;
+						member_info->constraint = constraint;
+						member_info->range = rangePtr;
+					}
+					else
+					{
+						auto member_info = member->createInfo<ArgStructInfo>(UniformType::Struct);
+						member_info->structName = arg_type;
+					}
+
+					//[name,type]
+					struct_info->members.emplace_back(member);
 				}
 			}
 
-			std::string cache, type;
 			//分析Uniform
-			std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(\[\w*\]|\s*=\s*\S*)*;)");
-			//这个专门解析数组
-			//std::regex regex_uniform(R"(uniform\s+(\w+)\s+(\w+)(\[\d+\])*;)");
+			std::regex regex_uniform(R"((?:(\[\w+\(.*\)\])\s*)*uniform\s+(\w+)\s+(\w+)\[?(\d*)\]?[\s\S]*?;)");
+
 			for (auto uniform_i = std::sregex_iterator(shader_content.begin(), shader_content.end(), regex_uniform); uniform_i != end; uniform_i++)
 			{
-				type = (*uniform_i)[1];
-				auto it = struct_map.find(type);
-				if (it != struct_map.end())
+				auto& uniform_match_type = (*uniform_i)[2];
+				auto& uniform_match_name = (*uniform_i)[3];
+				auto& uniform_match_array = (*uniform_i)[4];
+
+				std::string str_array = uniform_match_array;
+				int array_count = 0;
+				if (!str_array.empty())
 				{
-					auto meta_data = it->second;
-					for (auto& pair : meta_data->arguments)
+					array_count = std::stoi(str_array);
+				}
+
+				//查找是否是结构体
+				std::string uniform_type = uniform_match_type;
+				//查找是否是结构类型
+				auto it = mStructUMap.find(uniform_type);
+				//如果是结构类型,转到处理结构类型的方式
+				if (it != mStructUMap.end())
+				{
+					std::shared_ptr<ArgMetaData> uniform_value(new ArgMetaData());
+					auto uniform_info = uniform_value->createInfo<ArgStructInfo>(it->second->valueType);
+					uniform_value->valueName = uniform_match_name;
+					uniform_value->valueCount = array_count;
+
+					uniform_info->structName = it->second->getInfo<ArgStructInfo>()->structName;
+					auto& members = it->second->getInfo<ArgStructInfo>()->members;
+					uniform_info->members.assign(members.begin(), members.end());
+
+					if (uniform_value->valueName.starts_with("TINY_"))
 					{
-						cache = std::string((*uniform_i)[2]) + "." + pair.first;
-						if (cache.starts_with("TINY_"))
-						{
-							//组合struct中的uniform
-							//mUniformSet.emplace(std::move(cache));
-							mTinyUMap.emplace(std::move(cache), ContextMap::UniformTypeUMap[pair.second]);
-						}
-						else
-						{
-							//mUserSet.emplace(std::move(cache));
-							mUserUMap.emplace(std::move(cache), ContextMap::UniformTypeUMap[pair.second]);
-						}
+						mTinyUMap.emplace(uniform_value->valueName, uniform_value);
+					}
+					else
+					{
+						mUserUMap.emplace(uniform_value->valueName, uniform_value);
 					}
 				}
 				else
 				{
-					cache = (*uniform_i)[2];
-					if (cache.starts_with("TINY_"))
+					std::shared_ptr<ArgMetaData> uniform_value(new ArgMetaData());
+					auto uniform_info = uniform_value->createInfo<ArgMemberInfo>(ContextMap::UniformTypeUMap[uniform_match_type]);
+					uniform_value->valueName = uniform_match_name;
+					uniform_value->valueCount = array_count;
+
+					auto [show_name, constraint, rangePtr] = progress_constraint((*uniform_i)[1], uniform_value->valueType);
+
+					uniform_info->editorName = show_name;
+					uniform_info->constraint = constraint;
+					uniform_info->range = rangePtr;
+
+					if (uniform_value->valueName.starts_with("TINY_"))
 					{
 						//组合struct中的uniform
-						//mUniformSet.emplace(std::move(cache));
-						mTinyUMap.emplace(std::move(cache), ContextMap::UniformTypeUMap[(*uniform_i)[1]]);
+						mTinyUMap.emplace(uniform_value->valueName, uniform_value);
 					}
 					else
 					{
-						//mUserSet.emplace(std::move(cache));
-						mUserUMap.emplace(std::move(cache), ContextMap::UniformTypeUMap[(*uniform_i)[1]]);
+						mUserUMap.emplace(uniform_value->valueName, uniform_value);
 					}
 				}
 			}
 
-			for (auto& pair : struct_map)
-			{
-				delete pair.second;
-			}
+			//删除约束
+			shader_content = std::regex_replace(shader_content, regex_remove_constraint, "");
 
 			shader_content.insert(0, " core\n\r");
 			shader_content.insert(0, std::to_string(mConfigUMap["Version"].cast<int>()));

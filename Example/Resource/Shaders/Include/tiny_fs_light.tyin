@@ -1,19 +1,28 @@
 struct LightDirection
 {
+    [Editor(Direction)]
     float3 direction;
+    [Editor(Ambient, Color)]
     float3 ambient;
+    [Editor(Diffuse, Color)]
     float3 diffuse;
+    [Editor(Specular, Color)]
     float3 specular;
 };
 
 struct LightPoint
 {
+    [Editor(Direction)]
     float3 position;
 
+    [Editor(Ambient, Color)]
     float3 ambient;
+    [Editor(Diffuse, Color)]
     float3 diffuse;
+    [Editor(Specular, Color)]
     float3 specular;
 
+    [Editor(Config)]
     float3 config;
 };
 

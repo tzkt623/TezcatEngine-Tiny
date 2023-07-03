@@ -188,6 +188,7 @@ namespace tezcat::Tiny
 
 		static int addGameObject(GameObject* gameObject);
 		static void removeGameObject(GameObject* gameObject);
+		static GameObject* get(uint32_t index) { return sPool[index]; }
 
 	private:
 		static TinyVector<GameObject*> sPool;

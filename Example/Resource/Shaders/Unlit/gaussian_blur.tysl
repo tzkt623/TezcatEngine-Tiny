@@ -42,9 +42,13 @@
 
         in float2 myUV;
         out float4 myFinalColor;
+
+        [Editor(Color2D)]
         uniform tex2D myTexColor2D;
+        [Editor(KernelSize)]
         uniform int myKernelSize;
-        uniform float myKernel[256];
+        [Editor(Kernel)]
+        uniform float myKernel[32];
 
         const float2 texSize = float2(2048, 1024);
         const int radius = 5;
@@ -230,7 +234,6 @@
         {
             //myFinalColor = blur2(myUV);
             //myFinalColor = blur1(myUV);
-            
             myFinalColor = blur4(myUV);
             //myFinalColor = texture(TINY_TexColor, myUV, 4.0);
             //myFinalColor = float4(0.0, 1.0, 0.0, 1.0);
@@ -239,6 +242,7 @@
     #TINY_FS_END
 }
 #TINY_PASS_END
+
 
 
 

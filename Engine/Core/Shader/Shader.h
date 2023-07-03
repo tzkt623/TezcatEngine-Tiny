@@ -1,23 +1,14 @@
 #pragma once
 #include "ShaderParam.h"
 #include "Uniform.h"
+#include "ShaderConfig.h"
 
 #include "../Head/GLMHead.h"
-#include "../Head/ConfigHead.h"
-#include "../Head/RenderConfig.h"
 #include "../Base/TinyObject.h"
 
 
 namespace tezcat::Tiny
 {
-	struct TINY_API UniformInfo
-	{
-		std::string name;
-		UniformType type;
-		int shaderID;
-		int index;
-	};
-
 	/*
 	* Shader
 	* @brief 含有一个唯一UID,使用这个ID去创建对应的RenderPass
@@ -143,10 +134,10 @@ namespace tezcat::Tiny
 			return mUserUniformAry;
 		}
 
-		void setupTinyUniform(UniformType& uniformType, const std::string& name, const uint32_t& index, const int& shaderID);
+		void setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex = -1);
 		void resizeTinyUniformAry(uint64_t size);
 
-		void setupUserUniformID(UniformType& uniformType, const std::string& name, const int& shaderID);
+		void setupUserUniformID(ArgMetaData* metaData, const std::string& name, const int& shaderID, const int& arrayIndex = -1);
 		void resizeUserUniformAry(uint64_t size);
 
 	public:

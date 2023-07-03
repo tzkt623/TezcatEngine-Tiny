@@ -1399,6 +1399,7 @@
     <ClInclude Include="ThirdParty\fmt\ranges.h" />
     <ClInclude Include="ThirdParty\fmt\std.h" />
     <ClInclude Include="ThirdParty\fmt\xchar.h" />
+    <ClInclude Include="Core\Shader\ShaderConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

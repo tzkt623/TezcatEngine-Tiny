@@ -1,30 +1,38 @@
 #pragma once
 
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include <memory>
+
+#include <regex>
 #include <string>
+#include <string_view>
+
 #include <vector>
 #include <stack>
-#include <cstdio>
+#include <queue>
+#include <array>
 #include <list>
-#include <functional>
+#include <deque>
 #include <unordered_map>
 #include <unordered_set>
 #include <initializer_list>
-#include <regex>
+#include <variant>
+
 #include <typeindex>
 #include <type_traits>
-#include <memory>
-#include <iostream>
-#include <stdexcept>
-#include <fstream>
-#include <sstream>
+
 #include <chrono>
 #include <random>
-#include <array>
-#include <string_view>
 #include <tuple>
 #include <limits>
 #include <ranges>
+#include <functional>
 #include <filesystem>
+
 #include <mutex>
 #include <thread>
 #include <semaphore>
