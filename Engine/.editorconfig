@@ -1,11 +1,10 @@
 # Visual Studio 生成了具有 C++ 设置的 .editorconfig 文件。
 root = true
 
-# Unix-style newlines with a newline ending every file
 [*]
-charset = utf-8
+charset = utf-8-bom
 trim_trailing_whitespace = true
-end_of_line = lf
+end_of_line = crlf
 insert_final_newline = true
 
 # Tab indentation (no size specified)

@@ -1,4 +1,4 @@
-#include "MyObjectInfoWindow.h"
+﻿#include "MyObjectInfoWindow.h"
 #include "../../MyEvent.h"
 
 CreateInstanceCPP(MyObjectInfoWindow);
@@ -46,6 +46,74 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 
 				ImGui::EndTable();
 			}
+
+			static bool open_matrix_info = false;
+			ImGui::Checkbox("矩阵信息(MatrixInfo)", &open_matrix_info);
+			if (open_matrix_info)
+			{
+				int widget_id = 0;
+				auto& style = ImGui::GetStyle();
+				float space = style.ItemInnerSpacing.x;
+
+				auto draw_matrix = [&widget_id, &space](const char* label, float4x4& mat)
+					{
+						const float button_size = ImGui::GetFrameHeight();
+						ImGui::PushID(widget_id++);
+						ImGui::Text(label);
+
+						ImGui::PushItemWidth(ImGui::CalcItemWidth() / 4.0f);
+						//ImGui::PushItemWidth(-(ImGui::GetWindowContentRegionWidth() - ImGui::CalcItemWidth()));
+						ImGui::LabelText("##X", "X");
+						ImGui::SameLine(0.0f, space);
+						ImGui::LabelText("##Y", "Y");
+						ImGui::SameLine(0.0f, space);
+						ImGui::LabelText("##Z", "Z");
+						ImGui::SameLine(0.0f, space);
+						ImGui::LabelText("##W", "W");
+						ImGui::PopItemWidth();
+
+						ImGui::InputFloat4("##001", &mat[0][0]);
+						ImGui::InputFloat4("##002", &mat[1][0]);
+						ImGui::InputFloat4("##003", &mat[2][0]);
+						ImGui::InputFloat4("##004", &mat[3][0]);
+
+						ImGui::PopID();
+					};
+
+				auto mat4x4 = transform->getModelMatrix();
+				draw_matrix("Local2World", mat4x4);
+				auto inv_mat4x4 = glm::inverse(mat4x4);
+				draw_matrix("World2Local", inv_mat4x4);
+
+// 				ImGui::Text("Local2World");
+// 				ImGui::InputFloat4("##001", &mat4x4[0][0], "%.7f");
+// 				ImGui::InputFloat4("##002", &mat4x4[1][0], "%.7f");
+// 				ImGui::InputFloat4("##003", &mat4x4[2][0], "%.7f");
+// 				ImGui::InputFloat4("##004", &mat4x4[3][0], "%.7f");
+// 
+// 				ImGui::Text("World2Local");
+// 				auto inv_mat4x4 = glm::inverse(mat4x4);
+// 				ImGui::InputFloat4("x", &inv_mat4x4[0][0], "%.7f");
+// 				ImGui::InputFloat4("y", &inv_mat4x4[1][0], "%.7f");
+// 				ImGui::InputFloat4("z", &inv_mat4x4[2][0], "%.7f");
+// 				ImGui::InputFloat4("w", &inv_mat4x4[3][0], "%.7f");
+
+				ImGui::Text("Quat");
+				auto rotate = transform->getWorldRotation();
+				ImGui::InputFloat3("##rotate", &rotate[0]);
+
+				auto qx = glm::angleAxis(glm::radians(rotate.x), Transform::XAxis);
+				auto qy = glm::angleAxis(glm::radians(rotate.y), Transform::YAxis);
+				auto qz = glm::angleAxis(glm::radians(rotate.z), Transform::ZAxis);
+				glm::quat quat = qy * qx * qz;
+				ImGui::InputFloat4("##quat", &quat[0]);
+
+				//30,60,10
+				glm::quat test(0.8446119, -0.265384, -0.4615897, 0.05600987);
+				ImGui::InputFloat3("##test", &glm::degrees(glm::eulerAngles(test))[0]);
+
+			}
+
 
 
 			// 			ImGui::Text("Position");
@@ -105,7 +173,7 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 					auto f3 = (UniformF3*)uniform;
 
 					ImGui::Text(info->editorName.c_str());
-					ImGui::PushID(widget_id++);				
+					ImGui::PushID(widget_id++);
 					if (info->constraint == ShaderConstraint::Color)
 					{
 						ImGui::ColorEdit3("", glm::value_ptr(f3->value));
@@ -314,6 +382,13 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 
 				camera->setClearOption(clear_options);
 
+				// 				ImGui::Text("视图矩阵(ViewMatrix)");
+				// 				MyGUIContext::matrix4(camera->getViewMatrix());
+				// 				ImGui::Spacing();
+				// 
+				// 				ImGui::Text("模型矩阵(ModelMatrix)");
+				// 				MyGUIContext::matrix4(camera->getTransform()->getModelMatrix());
+
 				ImGui::EndTable();
 			}
 
@@ -336,13 +411,6 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 			ImGui::SameLine();
 			ImGui::InputFloat3("##右(Right)", glm::value_ptr(right));
 			ImGui::Spacing();
-
-			ImGui::Text("视图矩阵(ViewMatrix)");
-			MyGUIContext::matrix4(camera->getViewMatrix());
-			ImGui::Spacing();
-
-			ImGui::Text("模型矩阵(ModelMatrix)");
-			MyGUIContext::matrix4(camera->getTransform()->getModelMatrix());
 			*/
 		}
 	});

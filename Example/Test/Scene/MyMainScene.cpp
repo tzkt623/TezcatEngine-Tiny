@@ -70,7 +70,7 @@ void MyMainScene::onEnter()
 	this->createPlane();
 	//this->createTransparentObject();
 	this->createPBR();
-	this->createCubes0();
+	//this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
 	auto img = Resource::load<Image>("Image/blocky_photo_studio_2k.hdr");
@@ -101,6 +101,16 @@ void MyMainScene::onEnter()
 	{
 		fmt::print("{},", s);
 	}
+
+
+	float3 o1_translation(0.0f, 0.0f, 30);
+	float3 o1_rotation(0.0f, 60.0f, 0.0f);
+	float3 o1_scale(1.0f, 1.0f, 1.0f);
+	float4x4 o1_mat = glm::translate(float4x4(1.0f), o1_translation);
+	o1_mat = o1_mat * glm::mat4_cast(glm::quat(glm::radians(o1_rotation)));
+	o1_mat = o1_mat * glm::scale(o1_mat, o1_scale);
+
+
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)

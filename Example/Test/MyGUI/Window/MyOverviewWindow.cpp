@@ -44,11 +44,14 @@ void MyOverviewWindow::buildTree(std::list<TinyWeakRef<Transform>>& children)
 		}
 
 		auto open = ImGui::TreeNodeEx(game_object->getName().c_str(), flags);
-		if (ImGui::BeginDragDropSource())
+		if (mDragedTransform == nullptr && ImGui::BeginDragDropSource())
 		{
 			int s;
-			ImGui::SetDragDropPayload("ObjectMove", &s, sizeof(int));
-			mDragedTransform = transform.get();
+			if (ImGui::SetDragDropPayload("ObjectMove", &s, sizeof(int), ImGuiCond_Once))
+			{
+				mDragedTransform = transform.get();
+				Log_Info("!!!!");
+			}
 			ImGui::EndDragDropSource();
 		}
 

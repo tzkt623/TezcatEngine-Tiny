@@ -184,7 +184,7 @@ namespace tezcat::Tiny
 			auto end = mDataUSet.end();
 			while (it != end)
 			{
-				if ((*it)->refCount() == 1)
+				if ((*it)->getRefCount() == 1)
 				{
 					(*it)->subRef();
 					it = mDataUSet.erase(it);

@@ -18,10 +18,8 @@ namespace tezcat::Tiny
 		virtual ~TinyRefObject();
 
 		int getRefCount() { return mGCInfo->strongRef; }
-
 		void addRef() { ++mGCInfo->strongRef; }
 		void subRef();
-		int refCount() { return mGCInfo->strongRef; }
 
 		virtual const std::string& getClassName() const { return Empty; }
 		const TinyGCInfoID& getTinyID() const { return mGCInfo->index; }
@@ -197,13 +195,13 @@ namespace tezcat::Tiny
 		template<class To>
 		TinyWeakRef<ToType<To>> staticCast()
 		{
-			return std::move(TinyWeakRef(static_cast<Type*>(mGCInfo->pointer)));
+			return TinyWeakRef(static_cast<To*>(mGCInfo->pointer));
 		}
 
 		template<class To>
 		TinyWeakRef<ToType<To>> dynamicCast()
 		{
-			return std::move(TinyWeakRef(dynamic_cast<Type*>(mGCInfo->pointer)));
+			return TinyWeakRef(dynamic_cast<To*>(mGCInfo->pointer));
 		}
 
 	public:

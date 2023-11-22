@@ -6,6 +6,21 @@
 
 namespace tezcat::Tiny
 {
+	/*
+	* M_world = M_parent * M_child
+	* M_parent^-1 * M_world =  M_parent^-1 * M_parent * M_child
+	* M_parent^-1 * M_world = M_child
+	*
+	* 如果存储的是世界坐标系下的数据
+	* 要得到此Transform在本地坐标系下的数据
+	* 只需要Inverse父节点的数据然后计算就行了
+	*
+	* 如果存储的本地坐标系下的数据
+	* 要得到此Transform在世界坐标系的下的数据
+	* 需要得到他所有的父类并且依次进行计算
+	*
+	* glm euler Angle order is XYZ!!!!
+	*/
 	class TINY_API Transform : public ComponentT<Transform>
 	{
 		friend class Scene;
@@ -23,7 +38,7 @@ namespace tezcat::Tiny
 			mDelegateUpdate = function;
 		}
 
-		void setModelMatrix(const glm::mat4& mat4)
+		void setModelMatrix(const float4x4& mat4)
 		{
 			mModelMatrix = mat4;
 			this->updateChildren();
@@ -33,8 +48,8 @@ namespace tezcat::Tiny
 		void updateChildren();
 
 	public:
-		glm::vec3& getPosition() { return mLocalPosition; }
-		void setPosition(const glm::vec3& val)
+		float3& getPosition() { return mLocalPosition; }
+		void setPosition(const float3& val)
 		{
 			mIsDirty = true;
 			mLocalPosition = val;
@@ -48,12 +63,12 @@ namespace tezcat::Tiny
 			mLocalPosition.z = z;
 		}
 
-		glm::vec3& getRotation()
+		float3& getRotation()
 		{
 			return mLocalRotation;
 		}
 
-		void setRotation(const glm::vec3& val)
+		void setRotation(const float3& val)
 		{
 			mIsDirty = true;
 			mLocalRotation = val;
@@ -77,56 +92,75 @@ namespace tezcat::Tiny
 			this->clampRotation();
 		}
 
-		glm::vec3& getScale() { return mLocalScale; }
+		float3& getScale() { return mLocalScale; }
 
-		void setScale(const glm::vec3& val)
+		void setScale(const float3& val)
 		{
 			mIsDirty = true;
 			mLocalScale = val;
 		}
 
 	public:
-		glm::mat4& getModelMatrix() { return mModelMatrix; }
+		float4x4& getModelMatrix() { return mModelMatrix; }
 
-		glm::mat4 getWorldToLocalMatrix();
+		float4x4 getWorldToLocalMatrix();
+		const float4x4& getLocalToWorldMatrix() const { return mModelMatrix; }
 
-		void setWorldPosition(const glm::vec3& worldPosition)
+		void setWorldPosition(const float3& world)
 		{
-			mLocalPosition = worldPosition;
-			this->inverseTransformPoint(mLocalPosition);
+			mIsDirty = true;
+			this->inverseTransformPoint(world, mLocalPosition);
 		}
 
-		glm::vec3 getWorldPosition() { return mModelMatrix[3]; }
-
-		glm::vec3 getRight() const { return mModelMatrix[0]; }
-
-		glm::vec3 getUp() const { return mModelMatrix[1]; }
-
-		glm::vec3 getBackward() const { return mModelMatrix[2]; }
-		glm::vec3 getForward() const { return -mModelMatrix[2]; }
-
-		glm::vec3 getGlobalScale() const
+		void setWorldRotation(const float3& worldRotation)
 		{
-			return { glm::length(this->getRight()), glm::length(this->getUp()), glm::length(this->getBackward()) };
+			mIsDirty = true;
+			this->inverseTransformVector(worldRotation, mLocalRotation);
 		}
+
+		float3 getRight() const { return mModelMatrix[0]; }
+		float3 getLeft() const { return -mModelMatrix[0]; }
+		float3 getUp() const { return mModelMatrix[1]; }
+		float3 getDown() const { return -mModelMatrix[1]; }
+		float3 getBackward() const { return mModelMatrix[2]; }
+		float3 getForward() const { return -mModelMatrix[2]; }
+
+		float3 getWorldRotation();
+		float3 getWorldPosition() const { return mModelMatrix[3]; }
+		float3 getWorldScale() const;
 
 	public:
-		void transformPoint(glm::vec3& localPosition);
-		void transformPoint(const glm::vec3& localPosition, glm::vec3& worldPosition);
-		void transformVector(glm::vec3& localVector);
-		void transformVector(const glm::vec3& localVector, glm::vec3& worldVector);
+		void transformPoint(const float3& local, float3& world);
+		void transformVector(const float3& local, float3& world);
+		void transformRotation(const float3& local, float3& world);
+		//朝向永远以原点作为中心
+		void transformDirection(const float3& local, float3& world);
 
-		void inverseTransformPoint(glm::vec3& worldPosition);
-		void inverseTransformPoint(const glm::vec3& worldPosition, glm::vec3& localPosition);
-		void inverseTransformVector(glm::vec3& worldVector);
-		void inverseTransformVector(const glm::vec3& worldVector, glm::vec3& localVector);
+		//转化一个点,受位移,缩放和旋转影响
+		void inverseTransformPoint(const float3& world, float3& local);
+		//转化一个向量,受缩放和旋转影响
+		void inverseTransformVector(const float3& world, float3& local);
+		void inverseTransformRotation(const float3& world, float3& local);
+
+		//朝向永远以原点作为中心
+		void inverseTransformDirection(const float3& world, float3& local);
+
+	private:
+		void inverseTransform(const float3& worldPosition, const float3& worldRotation, const float3& worldScale, float3& localPosition, float3& localRotation, float3& localScale);
+
 
 	public:
 		Transform* getParent() const { return mParent; }
+
+		/*
+		* @author HCL
+		* @info 2023|7|5
+		* @brief 始终保持WorldSpace的状态
+		*/
 		void setParent(Transform* parent);
 
-		void addChild(Transform* val);
-		bool removeChild(Transform* val);
+		void addChild(Transform* tansform);
+		bool removeChild(Transform* tansform);
 
 		size_t getChildCount() { return mChildren->size(); }
 		std::list<TinyWeakRef<Transform>>* getChildren() { return mChildren; }
@@ -137,13 +171,13 @@ namespace tezcat::Tiny
 		void update();
 
 	public:
-		void translate(const glm::vec3& offset)
+		void translate(const float3& offset)
 		{
 			mIsDirty = true;
 			mLocalPosition += offset;
 		}
 
-		void rotate(const glm::vec3& offset)
+		void rotate(const float3& offset)
 		{
 			mIsDirty = true;
 			mLocalRotation += offset;
@@ -170,16 +204,17 @@ namespace tezcat::Tiny
 
 	private:
 		bool mIsDirty;
-		glm::vec3 mLocalPosition;
-		glm::vec3 mLocalRotation;
-		glm::vec3 mLocalScale;
-		glm::mat4 mModelMatrix;
+		float3 mLocalPosition;
+		float3 mLocalRotation;
+		float3 mLocalScale;
+		float4x4 mModelMatrix;
 
 		std::function<void(Transform*)> mDelegateUpdate;
 
-	private:
-		Transform* mPreTransform;
-		Transform* mNextTransform;
+	public:
+		static const float3 XAxis;
+		static const float3 YAxis;
+		static const float3 ZAxis;
 	};
 
 

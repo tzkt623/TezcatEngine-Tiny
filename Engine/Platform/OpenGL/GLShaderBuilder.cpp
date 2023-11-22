@@ -379,8 +379,8 @@ namespace tezcat::Tiny::GL
 				//解析约束的名称和内容
 				std::smatch match_constraint_name_value;
 				std::regex_match(match_constraint[1].first, match_constraint[1].second, match_constraint_name_value, regex_constraint_name_value);
-				std::string constraint_name = match_constraint_name_value[1];
-				std::string constraint_value = match_constraint_name_value[2];
+				//std::string constraint_name = match_constraint_name_value[1];
+				//std::string constraint_value = match_constraint_name_value[2];
 
 				//解析约束值的类型
 				std::smatch match_constraint_value;
@@ -393,7 +393,6 @@ namespace tezcat::Tiny::GL
 				range = std::regex_replace(range, regex_space, "");
 
 				ShaderConstraint constraint = ShaderConstraint::Error;
-				float range_min = 0, range_max = 0;
 				size_t pos;
 				std::shared_ptr<BaseRange> rangePtr;
 				if ((pos = range.find_first_of("Range")) != range.npos)
@@ -432,9 +431,6 @@ namespace tezcat::Tiny::GL
 					default:
 						break;
 					}
-
-					range_min = std::stof(min);
-					range_max = std::stof(max);
 				}
 				else if ((pos = range.find_first_of("Color")) != range.npos)
 				{
