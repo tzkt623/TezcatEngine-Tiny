@@ -98,15 +98,20 @@ MyObjectInfoWindow::MyObjectInfoWindow()
 // 				ImGui::InputFloat4("z", &inv_mat4x4[2][0], "%.7f");
 // 				ImGui::InputFloat4("w", &inv_mat4x4[3][0], "%.7f");
 
+				auto matrix = transform->getLocalToWorldMatrix();
+
 				ImGui::Text("Quat");
 				auto rotate = transform->getWorldRotation();
 				ImGui::InputFloat3("##rotate", &rotate[0]);
 
-				auto qx = glm::angleAxis(glm::radians(rotate.x), Transform::XAxis);
-				auto qy = glm::angleAxis(glm::radians(rotate.y), Transform::YAxis);
-				auto qz = glm::angleAxis(glm::radians(rotate.z), Transform::ZAxis);
-				glm::quat quat = qy * qx * qz;
-				ImGui::InputFloat4("##quat", &quat[0]);
+// 				auto qx = glm::angleAxis(glm::radians(rotate.x), Transform::XAxis);
+// 				auto qy = glm::angleAxis(glm::radians(rotate.y), Transform::YAxis);
+// 				auto qz = glm::angleAxis(glm::radians(rotate.z), Transform::ZAxis);
+// 				glm::quat quat = qy * qx * qz;
+
+				glm::quat quat = glm::quat_cast(matrix);
+				ImGui::InputFloat4("quat", &quat[0]);
+				ImGui::InputFloat3("eulerAngles", &glm::degrees(glm::eulerAngles(quat))[0]);
 
 				//30,60,10
 				glm::quat test(0.8446119, -0.265384, -0.4615897, 0.05600987);

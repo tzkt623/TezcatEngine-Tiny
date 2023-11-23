@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Component.h"
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
@@ -147,7 +147,7 @@ namespace tezcat::Tiny
 
 	private:
 		void inverseTransform(const float3& worldPosition, const float3& worldRotation, const float3& worldScale, float3& localPosition, float3& localRotation, float3& localScale);
-
+		void calculatePureLocalToWorldRotationMatrix(float3x3& outMatrix);
 
 	public:
 		Transform* getParent() const { return mParent; }
