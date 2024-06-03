@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Core/Head/CppHead.h"
 #include "Core/Head/ConfigHead.h"
@@ -224,7 +224,7 @@ namespace tezcat::Tiny
 
 		static const int getUIDStatic(const std::string& name)
 		{
-			TinyThrow_Runtime(!sStringMap.contains(name), name);
+			TINY_THROW_RUNTIME(!sStringMap.contains(name), name);
 			return sStringMap[name];
 		}
 

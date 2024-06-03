@@ -1,10 +1,10 @@
-#include "OctreeAgent.h"
+﻿#include "OctreeAgent.h"
 #include "../Tool/Octree/OctreeAgentList.h"
 #include "../Tool/Octree/OctreeNode.h"
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(OctreeAgent);
+	TINY_OBJECT_CPP(OctreeAgent, ComponentT<OctreeAgent>)
 	OctreeAgent::OctreeAgent()
 	{
 

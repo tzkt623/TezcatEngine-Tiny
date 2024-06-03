@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Core/Head/CppHead.h"
 #include "Core/Head/ConfigHead.h"

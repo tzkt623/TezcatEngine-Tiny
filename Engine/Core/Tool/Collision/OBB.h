@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Core/Head/ConfigHead.h"
 #include "Core/Head/GLMHead.h"
@@ -10,26 +10,23 @@ namespace tezcat::Tiny
 	{
 	public:
 		OBB();
-		OBB(const glm::vec3& min, const glm::vec3& max);
+		OBB(const float3& min, const float3& max);
 		OBB(const OBB& other);
 
 		virtual ~OBB();
 
-		glm::vec3 getCenter();
-		void getCorners(std::array<glm::vec3, 8>& array);
+		float3 getCenter();
+		void getCorners(std::array<float3, 8>& array);
 		bool impact(const OBB& other);
-		bool contain(const glm::vec3& point);
+		bool contain(const float3& point);
 		void combine(const OBB& other);
-		void updateMinMax(const std::array<glm::vec3, 8>& array);
-		void transform(const glm::mat4& localToWorldMatrix);
+		void updateMinMax(const std::array<float3, 8>& array);
+		void transform(const float4x4& localToWorldMatrix);
 		void reset();
 		bool isValid();
 
 	private:
-		glm::vec3 mMin;
-		glm::vec3 mMax;
+		float3 mMin;
+		float3 mMax;
 	};
-
-
-
 }

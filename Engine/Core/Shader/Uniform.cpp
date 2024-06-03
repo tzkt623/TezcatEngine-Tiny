@@ -1,4 +1,4 @@
-#include "Uniform.h"
+﻿#include "Uniform.h"
 #include "Shader.h"
 
 #include "../Head/RenderConfig.h"
@@ -64,7 +64,7 @@ namespace tezcat::Tiny
 
 	UniformTex2D::~UniformTex2D()
 	{
-		this->value->subRef();
+		this->value->deleteObject();
 	}
 
 	void UniformTex2D::submit(BaseGraphics* graphics, Shader* shader)
@@ -76,18 +76,18 @@ namespace tezcat::Tiny
 	{
 		if (this->value)
 		{
-			this->value->subRef();
+			this->value->deleteObject();
 		}
 	}
 
 	void UniformTex2D::endSetValue()
 	{
-		this->value->addRef();
+		this->value->saveObject();
 	}
 
 	UniformTexCube::~UniformTexCube()
 	{
-		this->value->subRef();
+		this->value->deleteObject();
 	}
 
 	void UniformTexCube::submit(BaseGraphics* graphics, Shader* shader)
@@ -99,13 +99,13 @@ namespace tezcat::Tiny
 	{
 		if (this->value)
 		{
-			this->value->subRef();
+			this->value->deleteObject();
 		}
 	}
 
 	void UniformTexCube::endSetValue()
 	{
-		this->value->addRef();
+		this->value->saveObject();
 	}
 
 }

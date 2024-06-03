@@ -1,14 +1,12 @@
-#pragma once
+﻿#pragma once
 
 #include "Tiny.h"
 
 
-class MyObserver;
 class Tutorial01 : public Scene
 {
 	Tutorial01(const std::string& name);
-	TINY_RTTI_H(Tutorial01);
-	TINY_Factory(Tutorial01);
+	TINY_OBJECT_H(Tutorial01, Scene)
 
 public:
 	virtual ~Tutorial01();
@@ -21,7 +19,7 @@ public:
 
 private:
 	Vertex* mVertex = nullptr;
-	MyObserver* mObserver = nullptr;
+	ReplacedPipelinePass* mPass = nullptr;
 };
 
 

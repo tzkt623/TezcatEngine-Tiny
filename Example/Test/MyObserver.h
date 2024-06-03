@@ -1,15 +1,12 @@
-#pragma once
+﻿#pragma once
 
 #include "Tiny.h"
 
 
-class MyObserver : public IRenderObserver
+class MyObserver : public BaseRenderObserver
 {
 public:
 	MyObserver();
 	virtual ~MyObserver();
-
-public:
-	void submit(BaseGraphics* graphics, Shader* shader) override;
 };
 

@@ -1,36 +1,38 @@
-#pragma once
+﻿#pragma once
 
-#include "../Head/CppHead.h"
 #include "TinyGCInfo.h"
 
 namespace tezcat::Tiny
 {
 	class TinyRefObject;
+
+	class TINY_API TinyPool
+	{
+
+	};
+
 	class TINY_API TinyGC
 	{
 		TinyGC() = delete;
 		~TinyGC() = delete;
 	public:
-		static void init();
 		static void manage(TinyRefObject* obj);
 		static void update();
 
 		static TinyGCInfo* getNextGCInfo(TinyRefObject* object);
 		static void recycle(TinyGCInfo* info);
+		static TinyGCInfo* getDefaultGCInfo() { return mGCInfos[0]; }
 
-		static uint32_t totalID() { return(uint32_t)mGCInfos.size(); }
-		static uint32_t freeID() { return (uint32_t)mFreeGCInfos.size(); }
-		static uint32_t usedID() { return (uint32_t)(mGCInfos.size() - mFreeGCInfos.size()); }
+		static uint32 totalID() { return(uint32)mGCInfos.size(); }
+		static uint32 freeID() { return (uint32)mFreeGCInfos.size(); }
+		static uint32 usedID() { return (uint32)(mGCInfos.size() - mFreeGCInfos.size()); }
 
 		static const std::vector<TinyGCInfo*>& getGCInfos() { return mGCInfos; }
 
 	private:
 		static std::vector<TinyRefObject*> mMemoryPool;
 		static std::vector<TinyGCInfo*> mGCInfos;
-		static std::deque<uint32_t> mFreeGCInfos;
-
-	public:
-		static TinyGCInfo* DefaultGCInfo;
+		static std::queue<uint32> mFreeGCInfos;
 	};
 
 	namespace v3
@@ -190,6 +192,4 @@ namespace tezcat::Tiny
 			PointerType* mPointer = nullptr;
 		};
 	}
-
-
 }

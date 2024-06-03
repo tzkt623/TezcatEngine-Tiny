@@ -1,4 +1,4 @@
-#include "Component.h"
+﻿#include "Component.h"
 #include "../Scene/Scene.h"
 #include "../Manager/SceneManager.h"
 #include "../Component/GameObject.h"
@@ -6,8 +6,9 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Component);
-	uint32_t Component::sID = 0;
+	TINY_OBJECT_CPP(Component, TinyObject)
+
+	uint32 Component::sID = 0;
 
 	Component::Component()
 		: mGameObject(nullptr)
@@ -18,18 +19,17 @@ namespace tezcat::Tiny
 
 	Component::~Component()
 	{
-		this->onDestroy();
 		mGameObject = nullptr;
 	}
 
 	void Component::startLogic(const std::function<void()>& logicFunction)
 	{
-		SceneMgr::getInstance()->getCurrentScene()->addLogicFunction(this, logicFunction);
+		SceneManager::getCurrentScene()->addLogicFunction(this, logicFunction);
 	}
 
 	void Component::stopLogic()
 	{
-		SceneMgr::getInstance()->getCurrentScene()->removeLogicFunction(this);
+		SceneManager::getCurrentScene()->removeLogicFunction(this);
 	}
 
 	Transform* Component::getTransform()
@@ -37,9 +37,30 @@ namespace tezcat::Tiny
 		return mGameObject->getTransform();
 	}
 
-	void Component::onDestroy()
+	void Component::onClose()
 	{
-		//mGameObject->removeComponent(this);
+		mGameObject->removeComponent(this);
+
+		mEnable = false;
+		this->onDisable();
+		this->onDestroy();
+	}
+
+	void Component::setEnable(bool val)
+	{
+		if (mEnable == val)
+		{
+			return;
+		}
+
+		if (mEnable)
+		{
+			this->onEnable();
+		}
+		else
+		{
+			this->onDisable();
+		}
 	}
 }
 

@@ -28,6 +28,7 @@
         void main()
         {
             myUV = aPos;
+            //myUV.yz = -myUV.yz;
             gl_Position = TINY_MatrixP * mat4(mat3(TINY_MatrixV)) * float4(aPos, 1.0);
         }
     }
@@ -42,21 +43,37 @@
         uniform bool myIsHDR;
         [Editor(LOD)]
         uniform float myLod = 0.0f;
+        uniform float myExposure = 0.0f;
         out float4 myFinalColor;
 
         void main()
         {
+            const float gamma = 2.2f;
+            float exposure = 0.2;
             //float3 color = texture(TINY_TexCube, myUV).rgb;
             float3 color = textureLod(TINY_TexSkybox, myUV, myLod).rgb;
             if(myIsHDR)
             {
-                color = color / (color + float3(1.0));
-                color = pow(color, float3(1.0/2.2)); 
+                //color = color / (color + float3(1.0));
+                //color = color * pow(2.0f, myExposure);
+                color = float3(1.0) - exp(-color * myExposure);
+                color = pow(color, float3(1.0 / gamma));
             }
+            //color = vec3(1.0,0.0,1.0);
             myFinalColor = float4(color, 1.0);
-            //myFinalColor = float4(1.0);
+            //myFinalColor = float4(1.0, 0.0, 0.0, 1.0);
         }
     }
     #TINY_FS_END
 }
 #TINY_PASS_END
+
+
+
+
+
+
+
+
+
+

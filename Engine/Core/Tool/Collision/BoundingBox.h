@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Core/Head/ConfigHead.h"
 #include "Core/Head/GLMHead.h"
@@ -9,21 +9,21 @@ namespace tezcat::Tiny
 	{
 	public:
 		BoundingBox();
-		BoundingBox(const glm::vec3& min, const glm::vec3& max);
+		BoundingBox(const float3& min, const float3& max);
 
-		void reset(const glm::vec3& min, const glm::vec3& max);
+		void reset(const float3& min, const float3& max);
 
 		bool contains(const BoundingBox& other);
 
 		bool impact(const BoundingBox& other);
 
-		void translate(const glm::vec3& offset)
+		void translate(const float3& offset)
 		{
 			this->min += offset;
 			this->max += offset;
 		}
 
-		void setPosition(glm::vec3& position)
+		void setPosition(float3& position)
 		{
 			auto d = this->getDimensions() * 0.5f;
 			this->min = position - d;
@@ -31,14 +31,14 @@ namespace tezcat::Tiny
 		}
 
 		void collect(const BoundingBox& other);
-		void collect(const glm::vec3& point);
+		void collect(const float3& point);
 
-		glm::vec3 getDimensions() { return max - min; }
-		glm::vec3 getPosition() { return (this->min + this->max) * 0.5f; }
+		float3 getDimensions() { return max - min; }
+		float3 getPosition() { return (this->min + this->max) * 0.5f; }
 
 
-		glm::vec3 max;
-		glm::vec3 min;
+		float3 max;
+		float3 min;
 
 	};
 

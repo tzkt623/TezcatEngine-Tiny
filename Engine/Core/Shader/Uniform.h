@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/GLMHead.h"
 #include "../Head/RenderConfig.h"
@@ -82,65 +82,65 @@ namespace tezcat::Tiny
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformI2 : public UniformT<glm::ivec2>
+	struct TINY_API UniformI2 : public UniformT<int2>
 	{
-		using UniformT<glm::ivec2>::UniformT;
+		using UniformT<int2>::UniformT;
 
 		UniformType getType() final { return UniformType::Int2; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformF2 : public UniformT<glm::vec2>
+	struct TINY_API UniformF2 : public UniformT<float2>
 	{
-		using UniformT<glm::vec2>::UniformT;
+		using UniformT<float2>::UniformT;
 
 		UniformType getType() final { return UniformType::Float2; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformI3 : public UniformT<glm::ivec3>
+	struct TINY_API UniformI3 : public UniformT<int3>
 	{
-		using UniformT<glm::ivec3>::UniformT;
+		using UniformT<int3>::UniformT;
 
 		UniformType getType() final { return UniformType::Int3; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformF3 : public UniformT<glm::vec3>
+	struct TINY_API UniformF3 : public UniformT<float3>
 	{
-		using UniformT<glm::vec3>::UniformT;
+		using UniformT<float3>::UniformT;
 
 		UniformType getType() final { return UniformType::Float3; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformI4 : public UniformT<glm::ivec4>
+	struct TINY_API UniformI4 : public UniformT<int4>
 	{
-		using UniformT<glm::ivec4>::UniformT;
+		using UniformT<int4>::UniformT;
 
 		UniformType getType() final { return UniformType::Int4; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformF4 : public UniformT<glm::vec4>
+	struct TINY_API UniformF4 : public UniformT<float4>
 	{
-		using UniformT<glm::vec4>::UniformT;
+		using UniformT<float4>::UniformT;
 
 		UniformType getType() final { return UniformType::Float4; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformMat3 : public UniformT<glm::mat3>
+	struct TINY_API UniformMat3 : public UniformT<float3x3>
 	{
-		using UniformT<glm::mat3>::UniformT;
+		using UniformT<float3x3>::UniformT;
 
 		UniformType getType() final { return UniformType::Mat3; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;
 	};
 
-	struct TINY_API UniformMat4 : public UniformT<glm::mat4>
+	struct TINY_API UniformMat4 : public UniformT<float4x4>
 	{
-		using UniformT<glm::mat4>::UniformT;
+		using UniformT<float4x4>::UniformT;
 
 		UniformType getType() final { return UniformType::Mat4; }
 		void submit(BaseGraphics* graphics, Shader* shader) override;

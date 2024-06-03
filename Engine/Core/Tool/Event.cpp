@@ -1,4 +1,4 @@
-#include "Event.h"
+﻿#include "Event.h"
 
 namespace tezcat::Tiny
 {
@@ -19,7 +19,7 @@ namespace tezcat::Tiny
 		{
 			auto vector = TinyUnique<std::vector<std::shared_ptr<Listener>>>();
 			vector->emplace_back(listener);
-			mListenerWithOwnerUMap.emplace(master, TinyMove(vector));
+			mListenerWithOwnerUMap.emplace(master, std::move(vector));
 		}
 		else
 		{
@@ -62,7 +62,6 @@ namespace tezcat::Tiny
 	void Event::init(int eventCount)
 	{
 		//mListenerList.resize(eventCount, TinyMove(TinyUnique<ListenerList>()));
-
 		mListenerList.resize(eventCount);
 
 		for (int i = 0; i < eventCount; i++)

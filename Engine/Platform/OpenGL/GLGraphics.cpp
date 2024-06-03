@@ -1,11 +1,9 @@
-#include "GLGraphics.h"
+﻿#include "GLGraphics.h"
 
 #include "GLHead.h"
 #include "GLShaderBuilder.h"
 #include "GLBuildCommand.h"
 #include "GLRenderCommand.h"
-
-#include "WindowsEngine.h"
 
 #include "Core/Head/CppHead.h"
 #include "Core/Head/RenderConfig.h"
@@ -15,10 +13,9 @@
 
 #include "Core/Engine.h"
 #include "Core/Profiler.h"
-#include "Core/GUI/GUI.h"
 #include "Core/Shader/ShaderPackage.h"
 #include "Core/Shader/Shader.h"
-#include "Core/Renderer/RenderObject.h"
+#include "Core/Renderer/Renderer.h"
 #include "Core/Renderer/Texture.h"
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/EngineIniter.h"
@@ -60,7 +57,7 @@ namespace tezcat::Tiny::GL
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
 			Log_Error("Failed to initialize GLAD");
-			TinyThrow_Logic("Failed to initialize GLAD");
+			TINY_THROW_LOGIC("Failed to initialize GLAD");
 		}
 
 		GLint max;
@@ -69,53 +66,53 @@ namespace tezcat::Tiny::GL
 		Log_Engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
 
 		auto get_default_color_buffer = [&](GLint id)
-		{
-			switch (id)
 			{
-			case GL_NONE:
-				//std::cout << "Default ColorBuffer: GL_NONE" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_NONE");
-				break;
-			case GL_FRONT_LEFT:
-				//std::cout << "Default ColorBuffer: GL_FRONT_LEFT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT_LEFT");
-				break;
-			case GL_FRONT_RIGHT:
-				//std::cout << "Default ColorBuffer: GL_FRONT_RIGHT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT_RIGHT");
-				break;
-			case GL_BACK_LEFT:
-				//std::cout << "Default ColorBuffer: GL_BACK_LEFT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_BACK_LEFT");
-				break;
-			case GL_BACK_RIGHT:
-				//std::cout << "Default ColorBuffer: GL_BACK_RIGHT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_BACK_RIGHT");
-				break;
-			case GL_FRONT:
-				//std::cout << "Default ColorBuffer: GL_FRONT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT");
-				break;
-			case GL_BACK:
-				//std::cout << "Default ColorBuffer: GL_BACK" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_BACK");
-				break;
-			case GL_LEFT:
-				//std::cout << "Default ColorBuffer: GL_LEFT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_LEFT");
-				break;
-			case GL_RIGHT:
-				//std::cout << "Default ColorBuffer: GL_RIGHT" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_RIGHT");
-				break;
-			case GL_FRONT_AND_BACK:
-				//std::cout << "Default ColorBuffer: GL_FRONT_AND_BACK" << std::endl;
-				Log_Engine("Default ColorBuffer: GL_FRONT_AND_BACK");
-				break;
-			default:
-				break;
-			}
-		};
+				switch (id)
+				{
+				case GL_NONE:
+					//std::cout << "Default ColorBuffer: GL_NONE" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_NONE");
+					break;
+				case GL_FRONT_LEFT:
+					//std::cout << "Default ColorBuffer: GL_FRONT_LEFT" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_FRONT_LEFT");
+					break;
+				case GL_FRONT_RIGHT:
+					//std::cout << "Default ColorBuffer: GL_FRONT_RIGHT" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_FRONT_RIGHT");
+					break;
+				case GL_BACK_LEFT:
+					//std::cout << "Default ColorBuffer: GL_BACK_LEFT" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_BACK_LEFT");
+					break;
+				case GL_BACK_RIGHT:
+					//std::cout << "Default ColorBuffer: GL_BACK_RIGHT" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_BACK_RIGHT");
+					break;
+				case GL_FRONT:
+					//std::cout << "Default ColorBuffer: GL_FRONT" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_FRONT");
+					break;
+				case GL_BACK:
+					//std::cout << "Default ColorBuffer: GL_BACK" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_BACK");
+					break;
+				case GL_LEFT:
+					//std::cout << "Default ColorBuffer: GL_LEFT" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_LEFT");
+					break;
+				case GL_RIGHT:
+					//std::cout << "Default ColorBuffer: GL_RIGHT" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_RIGHT");
+					break;
+				case GL_FRONT_AND_BACK:
+					//std::cout << "Default ColorBuffer: GL_FRONT_AND_BACK" << std::endl;
+					Log_Engine("Default ColorBuffer: GL_FRONT_AND_BACK");
+					break;
+				default:
+					break;
+				}
+			};
 
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
@@ -127,9 +124,6 @@ namespace tezcat::Tiny::GL
 		get_default_color_buffer(max);
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-		mGUI = new GUI();
-		mGUI->init(mWindow);
-
 		this->initContext();
 		BaseGraphics::init(engine);
 	}
@@ -138,19 +132,19 @@ namespace tezcat::Tiny::GL
 	{
 		Profiler::GPU = glGetString(GL_RENDERER);
 
-		ContextMap::DataTypeArray =
+		ContextMap::DataMemFormatArray =
 		{
-			DataTypeWrapper(DataType::Byte,			GL_BYTE),
-			DataTypeWrapper(DataType::UByte,		GL_UNSIGNED_BYTE),
-			DataTypeWrapper(DataType::Short,		GL_SHORT),
-			DataTypeWrapper(DataType::UShort,		GL_UNSIGNED_SHORT),
-			DataTypeWrapper(DataType::Int32,		GL_INT),
-			DataTypeWrapper(DataType::UInt32,		GL_UNSIGNED_INT),
-			DataTypeWrapper(DataType::Int64,		GL_INT),
-			DataTypeWrapper(DataType::UInt64,		GL_UNSIGNED_INT),
-			DataTypeWrapper(DataType::Float32,		GL_FLOAT),
-			DataTypeWrapper(DataType::Float64,		GL_DOUBLE),
-			DataTypeWrapper(DataType::UInt_24_8,	GL_UNSIGNED_INT_24_8),
+			DataMemFormatWrapper(DataMemFormat::Byte,		GL_BYTE),
+			DataMemFormatWrapper(DataMemFormat::UByte,		GL_UNSIGNED_BYTE),
+			DataMemFormatWrapper(DataMemFormat::Short,		GL_SHORT),
+			DataMemFormatWrapper(DataMemFormat::UShort,		GL_UNSIGNED_SHORT),
+			DataMemFormatWrapper(DataMemFormat::Int32,		GL_INT),
+			DataMemFormatWrapper(DataMemFormat::UInt32,		GL_UNSIGNED_INT),
+			DataMemFormatWrapper(DataMemFormat::Int64,		GL_INT),
+			DataMemFormatWrapper(DataMemFormat::UInt64,		GL_UNSIGNED_INT),
+			DataMemFormatWrapper(DataMemFormat::Float,		GL_FLOAT),
+			DataMemFormatWrapper(DataMemFormat::Float64,	GL_DOUBLE),
+			DataMemFormatWrapper(DataMemFormat::UInt_24_8,	GL_UNSIGNED_INT_24_8),
 		};
 
 		ContextMap::DrawModeArray =
@@ -190,24 +184,45 @@ namespace tezcat::Tiny::GL
 			TexWrapWrapper(TextureWrap::Clamp_To_Border,	GL_CLAMP_TO_BORDER)
 		};
 
-		ContextMap::TextureChannelArray =
+		ContextMap::TextureInternalFormatArray =
 		{
-			TexChannelWrapper(TextureChannel::None,	0),
-			TexChannelWrapper(TextureChannel::R,					GL_RED),
-			TexChannelWrapper(TextureChannel::RG,					GL_RG),
-			TexChannelWrapper(TextureChannel::RGB,					GL_RGB),
-			TexChannelWrapper(TextureChannel::RGBA,					GL_RGBA),
-			TexChannelWrapper(TextureChannel::Depth,				GL_DEPTH_COMPONENT),
-			TexChannelWrapper(TextureChannel::Depth16,				GL_DEPTH_COMPONENT16),
-			TexChannelWrapper(TextureChannel::Depth24,				GL_DEPTH_COMPONENT24),
-			TexChannelWrapper(TextureChannel::Depth32,				GL_DEPTH_COMPONENT32),
-			TexChannelWrapper(TextureChannel::Depth32f,				GL_DEPTH_COMPONENT32F),
-			TexChannelWrapper(TextureChannel::Depth_Stencil,		GL_DEPTH_STENCIL),
-			TexChannelWrapper(TextureChannel::Depth24_Stencil8,		GL_DEPTH24_STENCIL8),
-			TexChannelWrapper(TextureChannel::Depth32f_Stencil8,	GL_DEPTH32F_STENCIL8),
-			TexChannelWrapper(TextureChannel::Stencil8,				GL_STENCIL_INDEX8),
-			TexChannelWrapper(TextureChannel::RG16f,				GL_RG16F),
-			TexChannelWrapper(TextureChannel::RGB16f,				GL_RGB16F),
+			TexInternalFormatWrapper(TextureInternalFormat::None,					GL_NONE),
+			TexInternalFormatWrapper(TextureInternalFormat::Depth,					GL_DEPTH_COMPONENT),
+			TexInternalFormatWrapper(TextureInternalFormat::Depth_Stencil,			GL_DEPTH_STENCIL),
+			TexInternalFormatWrapper(TextureInternalFormat::R,						GL_RED),
+			TexInternalFormatWrapper(TextureInternalFormat::RG,						GL_RG),
+			TexInternalFormatWrapper(TextureInternalFormat::RGB,					GL_RGB),
+			TexInternalFormatWrapper(TextureInternalFormat::RGBA,					GL_RGBA),
+			TexInternalFormatWrapper(TextureInternalFormat::R8,						GL_R8),
+			TexInternalFormatWrapper(TextureInternalFormat::RG8,					GL_RG8),
+			TexInternalFormatWrapper(TextureInternalFormat::RGB8,					GL_RGB8),
+			TexInternalFormatWrapper(TextureInternalFormat::RGBA8,					GL_RGBA8),
+			TexInternalFormatWrapper(TextureInternalFormat::R16,					GL_R16),
+			TexInternalFormatWrapper(TextureInternalFormat::RG16,					GL_RG16),
+			TexInternalFormatWrapper(TextureInternalFormat::RGB16,					GL_RGB16),
+			TexInternalFormatWrapper(TextureInternalFormat::RGBA16,					GL_RGBA16),
+			TexInternalFormatWrapper(TextureInternalFormat::R16F,					GL_R16F),
+			TexInternalFormatWrapper(TextureInternalFormat::RG16F,					GL_RG16F),
+			TexInternalFormatWrapper(TextureInternalFormat::RGB16F,					GL_RGB16F),
+			TexInternalFormatWrapper(TextureInternalFormat::RGBA16F,				GL_RGBA16F),
+			TexInternalFormatWrapper(TextureInternalFormat::R32F,					GL_R32F),
+			TexInternalFormatWrapper(TextureInternalFormat::RG32F,					GL_RG32F),
+			TexInternalFormatWrapper(TextureInternalFormat::RGB32F,					GL_RGB32F),
+			TexInternalFormatWrapper(TextureInternalFormat::RGBA32F,				GL_RGBA32F),
+		};
+
+		ContextMap::TextureFormatArray =
+		{
+			TexFormatWrapper(TextureFormat::None,				GL_NONE),
+			TexFormatWrapper(TextureFormat::Depth,				GL_DEPTH_COMPONENT),
+			TexFormatWrapper(TextureFormat::Stencil,			GL_STENCIL_INDEX),
+			TexFormatWrapper(TextureFormat::Depth_Stencil,		GL_DEPTH_STENCIL),
+			TexFormatWrapper(TextureFormat::R,					GL_RED),
+			TexFormatWrapper(TextureFormat::RG,					GL_RG),
+			TexFormatWrapper(TextureFormat::RGB,				GL_RGB),
+			TexFormatWrapper(TextureFormat::RGBA,				GL_RGBA),
+			TexFormatWrapper(TextureFormat::BGR,				GL_BGR),
+			TexFormatWrapper(TextureFormat::BGRA,				GL_BGRA),
 		};
 
 		ContextMap::ColorBufferArray =
@@ -324,8 +339,6 @@ namespace tezcat::Tiny::GL
 	{
 		BaseGraphics::postRender();
 
-		mGUI->render();
-
 		if (Engine::sMultiThread)
 		{
 			glfwSwapBuffers(mWindow);
@@ -349,7 +362,6 @@ namespace tezcat::Tiny::GL
 		{
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(shader->getDepthTestWrapper().platform);
-
 		}
 		else
 		{
@@ -362,8 +374,7 @@ namespace tezcat::Tiny::GL
 		if (shader->isEnableBlend())
 		{
 			glEnable(GL_BLEND);
-			glBlendFunc(shader->getBlendSourceWrapper().platform
-				, shader->getBlendTargetWrapper().platform);
+			glBlendFunc(shader->getBlendSourceWrapper().platform, shader->getBlendTargetWrapper().platform);
 		}
 		else
 		{
@@ -393,6 +404,7 @@ namespace tezcat::Tiny::GL
 		if ((option & ClearOption::CO_Color) == ClearOption::CO_Color)
 		{
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+			//glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
 			mask |= GL_COLOR_BUFFER_BIT;
 		}
 
@@ -417,16 +429,16 @@ namespace tezcat::Tiny::GL
 
 	void GLGraphics::draw(Vertex* vertex)
 	{
-		glBindVertexArray(vertex->getVertexID());
+		TINY_GL_CHECK(glBindVertexArray(vertex->getVertexID()));
 		//glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount());
 
 		if (vertex->getIndexCount() > 0)
 		{
-			glDrawElements(vertex->getDrawMode().platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+			TINY_GL_CHECK(glDrawElements(vertex->getDrawMode().platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr));
 		}
 		else
 		{
-			glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount());
+			TINY_GL_CHECK(glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount()));
 		}
 	}
 
@@ -648,19 +660,19 @@ namespace tezcat::Tiny::GL
 
 	void GLGraphics::setFloat1(Shader* shader, const char* name, float* data)
 	{
-		auto id = glGetUniformLocation(shader->getProgramID(), name);
-		glUniform1fv(id, 1, data);
+		auto id = TINY_GL_CHECK(glGetUniformLocation(shader->getProgramID(), name));
+		TINY_GL_CHECK(glUniform1fv(id, 1, data));
 	}
 
 	void GLGraphics::setFloat1(Shader* shader, const int& shaderID, const float* data)
 	{
-		glUniform1fv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform1fv(shaderID, 1, data));
 	}
 
 	void GLGraphics::setFloat1(Shader* shader, const char* name, const float& data)
 	{
-		auto id = glGetUniformLocation(shader->getProgramID(), name);
-		glUniform1f(id, data);
+		auto id = TINY_GL_CHECK(glGetUniformLocation(shader->getProgramID(), name));
+		TINY_GL_CHECK(glUniform1f(id, data));
 	}
 
 	void GLGraphics::setFloat1(Shader* shader, const int& shaderID, const float& data)
@@ -726,7 +738,7 @@ namespace tezcat::Tiny::GL
 
 	void GLGraphics::setFloat3(Shader* shader, const int& shaderID, const float* data)
 	{
-		glUniform3fv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform3fv(shaderID, 1, data));
 	}
 
 	void GLGraphics::setFloat4(Shader* shader, UniformID& uniform, float* data)
@@ -859,7 +871,7 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix3fv(shader_id, 1, GL_FALSE, data);
 	}
 
-	void GLGraphics::setMat3(Shader* shader, UniformID& uniform, const glm::mat3& mat3)
+	void GLGraphics::setMat3(Shader* shader, UniformID& uniform, const float3x3& mat3)
 	{
 		int shader_id;
 		if (!shader->checkTinyUniform(uniform, shader_id))
@@ -879,7 +891,7 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix3fv(shaderID, 1, GL_FALSE, data);
 	}
 
-	void GLGraphics::setMat3(Shader* shader, const int& shaderID, const glm::mat3& mat3)
+	void GLGraphics::setMat3(Shader* shader, const int& shaderID, const float3x3& mat3)
 	{
 		glUniformMatrix3fv(shaderID, 1, GL_FALSE, glm::value_ptr(mat3));
 	}
@@ -894,7 +906,7 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix4fv(shader_id, 1, GL_FALSE, data);
 	}
 
-	void GLGraphics::setMat4(Shader* shader, UniformID& uniform, const glm::mat4& mat4)
+	void GLGraphics::setMat4(Shader* shader, UniformID& uniform, const float4x4& mat4)
 	{
 		int shader_id;
 		if (!shader->checkTinyUniform(uniform, shader_id))
@@ -904,7 +916,7 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix4fv(shader_id, 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
-	void GLGraphics::setMat4(Shader* shader, UniformID& uniform, glm::mat4 data[], int count)
+	void GLGraphics::setMat4(Shader* shader, UniformID& uniform, float4x4 data[], int count)
 	{
 		int shader_id;
 		if (!shader->checkTinyUniform(uniform, shader_id))
@@ -924,12 +936,12 @@ namespace tezcat::Tiny::GL
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, data);
 	}
 
-	void GLGraphics::setMat4(Shader* shader, const int& shaderID, const glm::mat4& mat4)
+	void GLGraphics::setMat4(Shader* shader, const int& shaderID, const float4x4& mat4)
 	{
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
-	void GLGraphics::setMat4(Shader* shader, const int& shaderID, glm::mat4 data[], int count)
+	void GLGraphics::setMat4(Shader* shader, const int& shaderID, float4x4 data[], int count)
 	{
 		glUniformMatrix4fv(shaderID, count, GL_FALSE, glm::value_ptr(data[0]));
 	}
@@ -953,14 +965,14 @@ namespace tezcat::Tiny::GL
 		return new GLRenderCMD_Mesh(vertex, transform, material);
 	}
 
-	RenderCommand* GLGraphics::createDrawSkyboxCMD(Shader* shader, Vertex* vertex, TextureCube* cube, float lod, bool isHdr)
+	RenderCommand* GLGraphics::createDrawSkyboxCMD(Vertex* vertex, TextureCube* cube, float lod, bool isHdr, float exposure)
 	{
-		return new GLRenderCMD_Skybox(shader, vertex, cube, lod, isHdr);
+		return new GLRenderCMD_Skybox(vertex, cube, lod, isHdr, exposure);
 	}
 
-	RenderCommand* GLGraphics::createDrawHDRToCubeCMD(Shader* shader, Vertex* vertex, int* unifromIDHDR, Texture2D* hdr, TextureCube* cube)
+	RenderCommand* GLGraphics::createDrawHDRToCubeCMD(Vertex* vertex, Texture2D* hdr, TextureCube* cube)
 	{
-		return new GLRenderCMD_HDRToCube(shader, vertex, unifromIDHDR, hdr, cube);
+		return new GLRenderCMD_HDRToCube(vertex, hdr, cube);
 	}
 
 	RenderCommand* GLGraphics::createDrawEnvMakeIrradiance(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* irradiance)

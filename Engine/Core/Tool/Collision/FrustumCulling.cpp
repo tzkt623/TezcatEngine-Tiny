@@ -1,18 +1,19 @@
-#include "FrustumCulling.h"
+﻿#include "FrustumCulling.h"
 
 #include "Core/Head/GLMHead.h"
-#include "Core/Renderer/RenderObject.h"
+#include "Core/Renderer/Renderer.h"
 #include "Core/Component/Transform.h"
+#include "../../Renderer/RenderObserver.h"
 
 
 namespace tezcat::Tiny
 {
-	void CullHelper::createFrustumWithCamera(IRenderObserver* camera, Frustum& frustum)
+	void CullHelper::createFrustumWithCamera(BaseRenderObserver* camera, Frustum& frustum)
 	{
 		auto transform = dynamic_cast<Component*>(camera)->getTransform();
 		const float halfVSide = camera->getFar() * tanf(camera->getFOV() * 0.5f);
 		const float halfHSide = halfVSide * camera->getAspect();
-		const glm::vec3 frontMultFar = camera->getFar() * transform->getForward();
+		const float3 frontMultFar = camera->getFar() * transform->getForward();
 
 		auto world_position = transform->getWorldPosition();
 		frustum.nearFace = { world_position + camera->getNear() * transform->getForward(), transform->getForward() };

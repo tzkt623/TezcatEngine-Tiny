@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Image.h"
 
 #include "../Head/TinyCpp.h"
@@ -16,7 +16,7 @@ namespace tezcat::Tiny
 	class TinyObject;
 	class Texture2D;
 
-	class Resource
+	class TINY_API Resource
 	{
 		Resource() = delete;
 		~Resource() = delete;
@@ -29,30 +29,30 @@ namespace tezcat::Tiny
 		static const std::string& getRelativeResDir() { return sRelativeResDir; }
 
 		template<class Data>
-		static Data* load(const std::string& path)
+		static Data* loadAndSave(const std::string& path)
 		{
-			TinyThrow_Logic("");
+			TINY_THROW_LOGIC("");
 			return nullptr;
 		}
 
 		template<class Data>
 		static Data* loadOnly(const std::string& path)
 		{
-			TinyThrow_Logic("");
+			TINY_THROW_LOGIC("");
 			return nullptr;
 		}
 
 		template<>
-		static Texture2D* load<>(const std::string& path)
+		static Texture2D* loadAndSave<>(const std::string& path)
 		{
 			std::filesystem::path file_path(sRelativeResDir + "/" + path);
 			Image* img = Image::create();
 			if (img->openFile(file_path.string(), true))
 			{
 				Texture2D* t2d = Texture2D::create(file_path.filename().string());
-				t2d->setData(img);
+				t2d->setImage(img);
 				t2d->generate();
-				t2d->addRef();
+				t2d->saveObject();
 
 				mDataUSet.emplace(t2d);
 				return t2d;
@@ -69,7 +69,7 @@ namespace tezcat::Tiny
 			if (img->openFile(file_path.string(), true))
 			{
 				Texture2D* t2d = Texture2D::create(file_path.filename().string());
-				t2d->setData(img);
+				t2d->setImage(img);
 				t2d->generate();
 				return t2d;
 			}
@@ -78,11 +78,11 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Shader* load<>(const std::string& path)
+		static Shader* loadAndSave<>(const std::string& path)
 		{
 			Shader* shader = Shader::create(sRelativeResDir + "/" + path);
 			shader->generate();
-			shader->addRef();
+			shader->saveObject();
 
 			mDataUSet.emplace(shader);
 			return shader;
@@ -97,12 +97,12 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Image* load<>(const std::string& path)
+		static Image* loadAndSave<>(const std::string& path)
 		{
 			Image* image = Image::create();
 			if (image->openFile(sRelativeResDir + "/" + path, true))
 			{
-				image->addRef();
+				image->saveObject();
 				mDataUSet.emplace(image);
 				return image;
 			}
@@ -124,11 +124,11 @@ namespace tezcat::Tiny
 
 
 		template<>
-		static Model* load<>(const std::string& path)
+		static Model* loadAndSave<>(const std::string& path)
 		{
 			Model* model = Model::create();
 			model->load(sRelativeResDir + "/" + path);
-			model->addRef();
+			model->saveObject();
 			mDataUSet.emplace(model);
 			return model;
 		}
@@ -145,7 +145,7 @@ namespace tezcat::Tiny
 		template<class Data>
 		static void unload(Data* data)
 		{
-			mDataUSet.erase(data);
+			auto result = mDataUSet.erase(data);
 			data->subRef();
 		}
 
@@ -153,28 +153,28 @@ namespace tezcat::Tiny
 		static void unload<>(Shader* data)
 		{
 			mDataUSet.erase(data);
-			data->subRef();
+			data->deleteObject();
 		}
 
 		template<>
 		static void unload<>(Texture2D* data)
 		{
 			mDataUSet.erase(data);
-			data->subRef();
+			data->deleteObject();
 		}
 
 		template<>
 		static void unload<>(Image* data)
 		{
 			mDataUSet.erase(data);
-			data->subRef();
+			data->deleteObject();
 		}
 
 		template<>
 		static void unload<>(Model* data)
 		{
 			mDataUSet.erase(data);
-			data->subRef();
+			data->deleteObject();
 		}
 
 
@@ -182,13 +182,12 @@ namespace tezcat::Tiny
 		{
 			auto it = mDataUSet.begin();
 			auto end = mDataUSet.end();
-			while (it != end)
+			while (it != mDataUSet.end())
 			{
 				if ((*it)->getRefCount() == 1)
 				{
-					(*it)->subRef();
+					(*it)->deleteObject();
 					it = mDataUSet.erase(it);
-					end = mDataUSet.end();
 				}
 				else
 				{
@@ -200,9 +199,9 @@ namespace tezcat::Tiny
 
 	private:
 		static std::unordered_set<TinyObject*> mDataUSet;
-		static std::unordered_map<std::string, Texture2D*> mTexture2DUSet;
-		static std::unordered_map<std::string, Shader*> mShaderUSet;
-		static std::unordered_map<std::string, Image*> mImageUSet;
+		static std::unordered_map<std::string_view, Texture2D*> mTexture2DUSet;
+		static std::unordered_map<std::string_view, Shader*> mShaderUSet;
+		static std::unordered_map<std::string_view, Image*> mImageUSet;
 
 	private:
 		static std::string sEngineDir;

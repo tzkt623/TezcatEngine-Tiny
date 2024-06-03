@@ -1,4 +1,4 @@
-#include "MeshData.h"
+﻿#include "MeshData.h"
 #include "../Renderer/Vertex.h"
 #include "../Component/Transform.h"
 #include "../Component/GameObject.h"
@@ -13,16 +13,18 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(MeshData);
+	TINY_OBJECT_CPP(MeshData, TinyObject)
 	MeshData::MeshData()
 		: MeshData("")
 	{
 
 	}
 
-	MeshData::MeshData(const std::string& name)
-		: mName(name)
+	MeshData::MeshData(std::string name)
+		: mName(std::move(name))
 		, mDrawMode(DrawMode::Triangles)
+		, mChildrenData(nullptr)
+		, mIndex(-1)
 	{
 
 	}
@@ -46,7 +48,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	int MeshData::getBufferSize()
+	int MeshData::getBufferSize() const
 	{
 		int count = 0;
 		if (!this->mVertices.empty())
@@ -87,7 +89,7 @@ namespace tezcat::Tiny
 		mChildrenData->push_back(meshData);
 	}
 
-	std::tuple<size_t, const void*> MeshData::getVertexData(const VertexPosition& position)
+	std::tuple<uint64, const void*> MeshData::getVertexData(const VertexPosition& position)
 	{
 		switch (position)
 		{
@@ -103,7 +105,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	std::tuple<size_t, const void*> MeshData::getIndexData()
+	std::tuple<uint64, const void*> MeshData::getIndexData()
 	{
 		return { this->indexSize(), this->mIndices.data() };
 	}
@@ -148,12 +150,12 @@ namespace tezcat::Tiny
 	{
 		if (mVertex)
 		{
-			mVertex->subRef();
+			mVertex->deleteObject();
 		}
 
 		if (mChildren)
 		{
-			for (uint32_t i = 0; i < mChildrenCount; i++)
+			for (uint32 i = 0; i < mChildrenCount; i++)
 			{
 				delete mChildren[i];
 			}
@@ -169,10 +171,10 @@ namespace tezcat::Tiny
 	void ModelNode::setVertex(Vertex* vertex)
 	{
 		mVertex = vertex;
-		mVertex->addRef();
+		mVertex->saveObject();
 	}
 
-	void ModelNode::init(uint32_t meshCount, uint32_t childCount)
+	void ModelNode::init(uint32 meshCount, uint32 childCount)
 	{
 		if (mInited)
 		{
@@ -193,7 +195,7 @@ namespace tezcat::Tiny
 	}
 
 
-	TINY_RTTI_CPP(Model);
+	TINY_OBJECT_CPP(Model, TinyObject)
 	Model::Model()
 		: mName()
 		, mRoot(nullptr)
@@ -211,7 +213,7 @@ namespace tezcat::Tiny
 		auto transform = func(mRoot);
 		if (mRoot->mChildrenCount > 0)
 		{
-			for (uint32_t i = 0; i < mRoot->mChildrenCount; i++)
+			for (uint32 i = 0; i < mRoot->mChildrenCount; i++)
 			{
 				this->foreachNode(func, mRoot->mChildren[i], transform);
 			}
@@ -224,7 +226,7 @@ namespace tezcat::Tiny
 		transform->setParent(parent);
 		if (node->mChildrenCount > 0)
 		{
-			for (uint32_t i = 0; i < node->mChildrenCount; i++)
+			for (uint32 i = 0; i < node->mChildrenCount; i++)
 			{
 				this->foreachNode(func, node->mChildren[i], transform);
 			}
@@ -238,12 +240,12 @@ namespace tezcat::Tiny
 			return;
 		}
 
-		uint32_t load_flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate
+		uint32 load_flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate
 			| aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
 			| aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_RemoveComponent
 			| aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_SplitLargeMeshes;
 
-		uint32_t remove_flag = aiComponent_LIGHTS | aiComponent_CAMERAS | aiComponent_MATERIALS;
+		uint32 remove_flag = aiComponent_LIGHTS | aiComponent_CAMERAS | aiComponent_MATERIALS;
 
 		Assimp::Importer importer;
 
@@ -257,8 +259,8 @@ namespace tezcat::Tiny
 			return;
 		}
 
-		std::function<void(const aiScene*, aiNode*, ModelNode*, uint32_t index)> func =
-			[this, &func](const aiScene* aiscene, aiNode* ainode, ModelNode* parent, uint32_t index)
+		std::function<void(const aiScene*, aiNode*, ModelNode*, uint32 index)> func =
+			[this, &func](const aiScene* aiscene, aiNode* ainode, ModelNode* parent, uint32 index)
 		{
 			auto mnode = this->createModelNode(aiscene, ainode);
 			if (parent != nullptr)
@@ -268,7 +270,7 @@ namespace tezcat::Tiny
 
 			if (ainode->mNumChildren > 0)
 			{
-				for (uint32_t i = 0; i < ainode->mNumChildren; i++)
+				for (uint32 i = 0; i < ainode->mNumChildren; i++)
 				{
 					func(aiscene, ainode->mChildren[i], mnode, i);
 				}
@@ -279,7 +281,7 @@ namespace tezcat::Tiny
 		mRoot = this->createModelNode(ai_scene, ai_node);
 		if (ai_node->mNumChildren > 0)
 		{
-			for (uint32_t i = 0; i < ai_node->mNumChildren; i++)
+			for (uint32 i = 0; i < ai_node->mNumChildren; i++)
 			{
 				func(ai_scene, ai_node->mChildren[i], mRoot, i);
 			}
@@ -311,7 +313,7 @@ namespace tezcat::Tiny
 			//把此层提升成父级
 			//把meshes和children合并成一层
 			//单独的mesh没有children
-			for (uint32_t i = 0; i < ainode->mNumMeshes; i++)
+			for (uint32 i = 0; i < ainode->mNumMeshes; i++)
 			{
 				auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[i]];
 				auto mesh_data = this->createMesh(ai_mesh, ainode);
@@ -349,7 +351,7 @@ namespace tezcat::Tiny
 		bool has_tangents = aimesh->HasTangentsAndBitangents();
 		auto& transform = node->mTransformation;
 
-		for (uint32_t ver_i = 0; ver_i < aimesh->mNumVertices; ver_i++)
+		for (uint32 ver_i = 0; ver_i < aimesh->mNumVertices; ver_i++)
 		{
 			auto& ai_vertex = aimesh->mVertices[ver_i];
 			auto v = transform * ai_vertex;
@@ -394,10 +396,10 @@ namespace tezcat::Tiny
 
 		if (aimesh->HasFaces())
 		{
-			for (uint32_t face_i = 0; face_i < aimesh->mNumFaces; face_i++)
+			for (uint32 face_i = 0; face_i < aimesh->mNumFaces; face_i++)
 			{
 				auto& ai_face = aimesh->mFaces[face_i];
-				for (uint32_t index_i = 0; index_i < ai_face.mNumIndices; index_i++)
+				for (uint32 index_i = 0; index_i < ai_face.mNumIndices; index_i++)
 				{
 					meshData->mIndices.emplace_back(ai_face.mIndices[index_i]);
 				}
@@ -410,7 +412,7 @@ namespace tezcat::Tiny
 
 	void Model::generate()
 	{
-		auto shader = ShaderMgr::getInstance()->find("Standard/PBRTest1");
+		auto shader = ShaderManager::find("Standard/PBRTest1");
 		auto index_albedo = shader->getUniformIndex("myPBR.albedo");
 		auto index_metallic = shader->getUniformIndex("myPBR.metallic");
 		auto index_roughness = shader->getUniformIndex("myPBR.roughness");
@@ -428,7 +430,7 @@ namespace tezcat::Tiny
 				auto material = Material::create(shader);
 				mr->setMaterial(material);
 
-				material->setUniform<UniformF3>(index_albedo, glm::vec3(1.0f, 1.0f, 1.0f));
+				material->setUniform<UniformF3>(index_albedo, float3(1.0f, 1.0f, 1.0f));
 				material->setUniform<UniformF1>(index_metallic, 0.8);
 				material->setUniform<UniformF1>(index_roughness, 0.3);
 				material->setUniform<UniformF1>(index_ao, 1.0f);

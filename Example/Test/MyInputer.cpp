@@ -1,4 +1,4 @@
-#include "MyInputer.h"
+﻿#include "MyInputer.h"
 #include "MyController.h"
 
 MyInputer::MyInputer()
@@ -21,7 +21,6 @@ void MyInputer::processInput(InputSystem* system)
 	{
 		return;
 	}
-
 
 	float speed = 100 * Engine::getDeltaTime();
 	bool flag = false;

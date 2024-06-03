@@ -1,32 +1,59 @@
-#include "Light.h"
+﻿#include "Light.h"
 #include "Transform.h"
 
 #include "../Shader/Shader.h"
-#include "../Manager/LightManager.h"
 #include "../Component/GameObject.h"
 #include "../Renderer/BaseGraphics.h"
+
+#include "../Manager/LightingManager.h"
 
 
 namespace tezcat::Tiny
 {
-	//------------------------------------------------------------------------
-	TINY_RTTI_CPP(DirectionalLight);
-	DirectionalLight::DirectionalLight()
-		: mDirection(0.0f, 0.0f, 0.0f)
-		, mAmbient(0.1f)
-		, mDiffuse(1.0f)
-		, mSpecular(0.2f)
+	TINY_OBJECT_CPP(ILight, BaseRenderer)
+
+	TINY_OBJECT_CPP(DirectionalLightAgent, ILight)
+	DirectionalLightAgent::DirectionalLightAgent()
+		: mDirection()
+		, mAmbient()
+		, mDiffuse()
+		, mSpecular()
 	{
 
 	}
-
-	DirectionalLight::DirectionalLight(const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular)
-		: mDirection(direction)
-		, mAmbient(ambient)
-		, mDiffuse(diffuse)
-		, mSpecular(specular)
+	void DirectionalLightAgent::submit(BaseGraphics* graphics, Shader* shader)
 	{
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));
+		graphics->setFloat3(shader, ShaderParam::LightDirection::Specular, glm::value_ptr(mSpecular));
+	}
 
+	void DirectionalLightAgent::makeRenderCommand(BaseGraphics* graphics, BaseRenderObserver* renderObserver)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void DirectionalLightAgent::makeRenderCommand(BaseGraphics* graphics, PipelinePass* pass)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	TINY_OBJECT_CPP(LightComponent, ComponentT<LightComponent>)
+
+	//------------------------------------------------------------------------
+	TINY_OBJECT_CPP(DirectionalLight, LightComponent)
+	DirectionalLight::DirectionalLight()
+		: mLightAgent(nullptr)
+	{
+		mLightAgent = DirectionalLightAgent::create();
+		mLightAgent->saveObject();
+	}
+
+	DirectionalLight::DirectionalLight(const float3& direction, const float3& ambient, const float3& diffuse, const float3& specular)
+		: mLightAgent(nullptr)
+	{
+		mLightAgent->deleteObject();
 	}
 
 	DirectionalLight::~DirectionalLight()
@@ -37,16 +64,13 @@ namespace tezcat::Tiny
 	void DirectionalLight::submit(BaseGraphics* graphics, Shader* shader)
 	{
 		auto transform = this->getTransform();
-		mDirection = glm::normalize(transform->getForward());
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Specular, glm::value_ptr(mSpecular));
+		mLightAgent->setDirection(glm::normalize(transform->getForward()));
+		mLightAgent->submit(graphics, shader);
 	}
 
 	void DirectionalLight::onEnable()
 	{
-		LightMgr::getInstance()->setDirectionalLight(this);
+
 	}
 
 	void DirectionalLight::onDisable()
@@ -59,8 +83,13 @@ namespace tezcat::Tiny
 
 	}
 
+	void DirectionalLight::onStart()
+	{
+		LightingManager::setDirectionalLight(this);
+	}
+
 	//------------------------------------------------------------------------
-	TINY_RTTI_CPP(PointLight);
+	TINY_OBJECT_CPP(PointLight, LightComponent)
 	PointLight::PointLight()
 		: mAmbient(0.2f)
 		, mDiffuse(0.5f)
@@ -86,7 +115,7 @@ namespace tezcat::Tiny
 
 	void PointLight::onEnable()
 	{
-		LightMgr::getInstance()->addPointLight(this);
+
 	}
 
 	void PointLight::onDisable()
@@ -95,13 +124,18 @@ namespace tezcat::Tiny
 	}
 
 	//------------------------------------------------------------------------
-	TINY_RTTI_CPP(SpotLight);
+	TINY_OBJECT_CPP(SpotLight, LightComponent)
 	SpotLight::SpotLight()
 	{
 
 	}
 
 	SpotLight::~SpotLight()
+	{
+
+	}
+
+	void SpotLight::submit(BaseGraphics* graphics, Shader* shader)
 	{
 
 	}

@@ -2,11 +2,18 @@
 
 ## **引擎二周目进行中**
 
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo1.jpg?raw=true)
-![示例](https://github.com/tzkt623/TezcatEngine-Tiny/blob/main/logo2.jpg?raw=true)
+![logo1](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/1faf72c8-36e8-4bb3-9e40-2b87a0656dfc)
 
-Update
+![logo2](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/0a9e3960-eae2-4ea7-8d4c-149b9a3a0ef4)
 
+<img width="1280" alt="屏幕截图 2024-06-03 144114" src="https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/52484691-2753-4d82-8995-cba8439866ff">
+
+## **Update**
+
+- [x] 全新的渲染流程架构,更加的合理好用(New Pipeline)
+- [x] 暂时取消多线程模式(Disabled multithreading mode for now)
+- [x] 一个简单的帧缓存查看器(A Sample Frames Viewer)
+- [ ] PBR效果被我改坏了(PBR Shader has issue now)
 - [ ] 正在重构资源加载和管理方式(Refactoring resoure loader and managers)
 - [x] 可以加载和显示Shader数组对象了!(Can load and display Shader array objects in Editor!)
 - [x] 约束回归!在所有Uniform对象里设置约束信息以显示在Editor中.(Constraint return! Sets Uniform objects constraint information in ShaderFile to display in Editor)
@@ -60,6 +67,79 @@ Editor
 - [x] Runtime Shader Rebuild
 - [x] Basic Resource Explorer
 - [ ] Node Based Shader Editor
+- [x] Sample FrameBuffers Viewer
+
+## **渲染管线(Pipeline)**
+
+![QQ截图20240601230356](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/77c7bbee-50df-4247-bee1-03b3d7c8e124)
+
+- ObserverPipelinePass
+  
+  用于玩家视角相机的渲染通道,用于自动处理并渲染MeshRender自带的Material
+
+  A rendering pass for the player's camera to automatically process and render Material that comes with MeshRender
+
+- ReplacedPipePass
+  
+  用于用户自定义渲染通道,可以处理各种自定义需求的渲染,例如阴影,后处理等
+
+  A custom rendering pass that can handle rendering for various custom needs, such as shading, post-processing, etc
+
+- RenderCommand Order
+  
+|   OrderID    |   Bit   | Byte  |  Range   |
+| :----------: | :-----: | :---: | :------: |
+| Camera Order | 24 - 31 |   1   | -127,128 |
+| Shader Queue | 16 - 23 |   1   |  0,256   |
+|  Pass Order  | 0 - 15  |   2   | 0,65535  |
+
+Sort Function ```a->getPipelineOrderID() < b->getPipelineOrderID()```
+
+```cpp
+//--------------------------------
+//
+//  Render Shadow
+//
+pass = ReplacedPipelinePass::create(mShadowObserver
+    , ShaderManager::find("Unlit/ShadowMap"));
+//Use RenderObject data in layer
+pass->setUseCullLayerData(true);
+pass->saveObject();
+pass->addToPipeline();
+
+//--------------------------------
+//
+//  Render Skybox
+//
+pass = ReplacedPipelinePass::create(CameraManager::getMainCamera()->getRenderObserver(), ShaderManager::find("Unlit/Skybox"));
+pass->saveObject();
+//not use RenderObject data in layer but custom function to rendering
+pass->setPreFunction([=](BaseGraphics* graphics, ReplacedPipelinePass* pass)
+{
+    auto cmd = graphics->createDrawSkyboxCMD(sSkyboxVertex
+        , sCurrentCubeMap
+        , sSkyboxLod
+        , sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float
+        , sExposure);
+    pass->addCommand(cmd);
+});
+pass->addToPipeline();
+
+//--------------------------------
+//
+//  Render Screen Effect
+//
+auto shader = ShaderManager::find("Tutorial/t01");
+pass = ReplacedPipelinePass::create(observer, shader);
+//not use RenderObject data in layer but custom function to rendering
+pass->setPreFunction([=](BaseGraphics* graphics, ReplacedPipelinePass* pass)
+{
+    pass->addCommand(Graphics::getInstance()->createDrawVertexCMD(shader, mVertex));
+});
+pass->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
+pass->saveObject();
+pass->addToPipeline();
+```
 
 ## **编辑器(Editor)**
 
@@ -107,6 +187,81 @@ Try Drag image file to envlighting map widget
 
 A simple reference counting based memory management, just still debugging......
 
+## **创建引擎对象(Create TinyObject)**
+
+TinyObject会自动进行内存管理
+
+TinyObject will auto manages memory
+
+- 创建一个对象```YourType::create(...)```
+- 保存一个对象```obj->saveObject()```
+- 删除一个对象```obj->deleteObject()```
+
+如果不调用```obj->saveObject()```方法,此对象会在当前帧结束时被删除
+
+TinyObject will be auto deleted in the end of current frame when you have not used this ```obj->saveObject()``` function
+
+```cpp
+//--------------------------------
+//
+// in .h file
+//
+
+//Abstract Object
+class TINY_API PipelinePass : public TinyObject
+{
+    ...
+    //Use This Macro To Define abstract TinyObject
+    //TINY_ABSTRACT_OBJECT_H(CurrentType, ParentType)
+    TINY_ABSTRACT_OBJECT_H(PipelinePass, TinyObject)
+    //remember define protected Access to all Constructor
+protected:
+    PipelinePass(uint32 globalSubmitMask);    
+public:
+    virtual ~PipelinePass();
+    ...
+}
+
+//Object
+class TINY_API ReplacedPipelinePass : public PipelinePass
+{
+    ...
+    //Use This Macro To Define TinyObject
+    //TINY_OBJECT_H(CurrentType, ParentType)
+    TINY_OBJECT_H(ReplacedPipelinePass, PipelinePass)
+    //remember define protected or private Access to all Constructor
+protected:
+    ReplacedPipelinePass(BaseRenderObserver* renderObserver
+        , Shader* shader
+        , uint32 globalFunction = GLOBAL_NONE);
+public:
+    virtual ~ReplacedPipelinePass();
+    ...
+}
+
+
+//--------------------------------
+//
+// in .cpp file
+//
+
+//Use this Macro to define TinyObject
+//TINY_OBJECT_CPP(CurrentType, ParentType)
+TINY_OBJECT_CPP(PipelinePass, TinyObject)
+....
+//Use this Macro to define TinyObject
+//TINY_OBJECT_CPP(CurrentType, ParentType)
+TINY_OBJECT_CPP(ReplacedPipelinePass, PipelinePass)
+....
+
+//--------------------------------
+//
+// create object
+//
+auto pass = ReplacedPipelinePass::create(render_observer, ShaderManager::find("Unlit/EnvMakeBRDFLut"));
+
+````
+
 ## **创建游戏对象(Create GameObjects)**
 
 - 创建相机
@@ -116,14 +271,40 @@ A simple reference counting based memory management, just still debugging......
 //gameobject will auto load into current scene
 auto go = GameObject::create("World1_Camera");
 //attach a Camera component
-auto camera = go->addComponent<Camera>(true);
+auto camera = go->addComponent<Camera>();
+camera->setMain();
 camera->setPerspective(60.0f, 0.1f, 2000.0f);
 //set culling layer, other layers will not render
 camera->setCullLayer(0);
+//set clear option
+camera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth | ClearOption::CO_Color);
+
 //attach a Transform component
 go->addComponent<Transform>();
 go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 go->getTransform()->setParent(controller_go->getTransform());
+```
+
+- 创建一个区域光
+  Create a DirectionLight
+
+```cpp
+auto go = GameObject::create("DirectionLight");
+go->addComponent<Transform>();
+go->getTransform()->setPosition(glm::vec3(0.0f, 600.0f, 600.0f));
+go->getTransform()->setScale(glm::vec3(100.0f));
+go->getTransform()->setRotation(-60.0f, 0.0f, 0.0f);
+
+auto dir_light = go->addComponent<DirectionalLight>();
+dir_light->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
+dir_light->setAmbient(glm::vec3(0.1f));
+dir_light->setSpecular(glm::vec3(0.5f));
+
+auto shadow_caster = go->addComponent<ShadowCaster>();
+shadow_caster->setOrtho(0.1f, 2000.0f);
+shadow_caster->setViewRect(0, 0, 1024, 1024);
+shadow_caster->setCullLayer(0);
+shadow_caster->setShadowMap(4096, 4096, "Shadow");
 ```
 
 - 创建天空盒
@@ -161,7 +342,7 @@ wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 - Load A Model
 
 ```cpp
-auto model = Resource::load<Model>("Model/Cerberus_LP.fbx");
+auto model = Resource::loadAndSave<Model>("Model/Cerberus_LP.fbx");
 model->generate();
 ```
 
@@ -169,63 +350,66 @@ model->generate();
   Create a FrameBuffer
 
 ```cpp
-//create a framebuffer named "FB_Viewport" and save in manager
-auto frame_buffer = FrameBufferMgr::getInstance()->create("FB_Viewport");
+//create and save or get a framebuffer with manager
+//flag2 return true if create framebuffer successfully
+//flag2 return false if get framebuffer successfully
+auto [flag2, frame_buffer] = FrameBufferManager::create("FB_Cube");
+if (flag2)
+{
+    //...................
 
-//create a texture2D named "RB_Viewport" and save in manager
-Texture2D* tex2d = TextureMgr::getInstance()->create2D("RB_Viewport");
-tex2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
-    , TextureInfo(
-        //Buffer Type(FrameBuffer Component)
-        TextureAttachPosition::ColorComponent
-        //Internal Format
-        , TextureChannel::RGBA
-        //Format
-        , TextureChannel::RGBA
-        //Data Type
-        , DataType::UByte));
+    sCubeTextureMap = TextureCube::create("CB_CubeMap");
+    sCubeTextureMap->setConfig(cube_size
+        , TextureInternalFormat::RGB16F
+        , TextureFormat::RGB
+        , DataMemFormat::Float
+        , TextureFilter::Linear_Mipmap_Linear
+        , TextureFilter::Linear);
+    sCubeTextureMap->setAttachPosition(TextureAttachPosition::ColorComponent);
 
-//create a render2D named "DS_Viewport" and save in manager
-TextureRender2D* render2d = TextureMgr::getInstance()->createRender2D("DS_Viewport");
-render2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
-    , TextureInfo(TextureAttachPosition::DepthComponent
-        , TextureChannel::Depth
-        , TextureChannel::Depth
-        , DataType::UByte));
+    auto render_buffer = Texture2D::create("Depth");
+    render_buffer->setConfig(cube_size, cube_size
+        , TextureInternalFormat::Depth
+        , TextureFormat::Depth
+        , DataMemFormat::Float);
+    render_buffer->setAttachPosition(TextureAttachPosition::DepthComponent);
 
-//attach textures into framebuffer
-frame_buffer->addAttachment(tex2d);
-frame_buffer->addAttachment(render2d);
-//generate framebuffer
-//in multi-thread mode, this method just make a CMD and send it to render-thread
-frame_buffer->generate();
+    frame_buffer->addAttachment(sCubeTextureMap);
+    frame_buffer->addAttachment(render_buffer);
+    frame_buffer->generate();
+}
 
-//let camera render objects to this framebuffer
-camera->setFrameBuffer(frame_buffer);
-
-//also you can find this framebuffer like
-fb = FrameBufferMgr::getInstance()->find("FB_World1");
-
-//set nullptr will switch render to mainframe
-camera->setFrameBuffer(nullptr);
+//create a framebuffer not saved in manager
+mFrameBuffer = FrameBuffer::create(shaderName + std::to_string(mUID));
+//remember call saveObject to save this object
+mFrameBuffer->saveObject();
+mFrameBuffer->addAttachment(mShadowTexture);
+mFrameBuffer->generate();
 ```
 
 - 创建一张贴图(Create a Texture)
 
 ```cpp
-//create a texture named "Shadow" and save in manager
-mShadwowTexutre = TextureMgr::getInstance()->create2D("Shadow");
-mShadwowTexutre->setData(width, height
-    , TextureInfo(TextureType::Texture2D
-        , TextureAttachPosition::DepthComponent
-        , TextureFilter::Nearest
-        , TextureFilter::Nearest
-        , TextureWrap::Clamp_To_Border
-        , TextureWrap::Clamp_To_Border
-        , TextureChannel::Depth
-        , TextureChannel::Depth
-        , DataType::Float32));
-mShadwowTexutre->generate();
+//create and save or get a texture named "MyTexture" with manager
+auto [flag, texture] = TextureManager::create2D("MyTexture");
+if (flag)
+{
+    texture->setConfig(width, height
+        , TextureInternalFormat::RGBA
+        , TextureFormat::RGBA
+        , DataMemFormat::UByte);
+    texture->generate();
+}
+
+//---------------------------------------
+
+//create a texture with image and not save in manager
+auto image = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
+texture = Texture2D::create("MyImage");
+//remember call saveObject to save this object
+texture->saveObject();
+texture->setImage(image);
+texture->generate();
 ```
 
 **具体使用方法请看Example.**
@@ -269,10 +453,10 @@ Attention! The .exe file must be in the same directory as the resource folder
         EngineIniter::prepareEngine(engine);
         MyEvent::get()->init(MyEventID::Count);
 
-        engine->setEnableMultiThread();
+        //engine->setEnableMultiThread();
 
         mResourceFolderName = "Resource";
-        mGameName = u8"YesIndeed,玩上老头环了!!!!!";
+        mGameName = u8"V0.2(没有黄金树之影玩我要死了)";
         mWindowWidth = 1920;
         mWindowHeight = 1080;
         mEnableVsync = true;
@@ -304,14 +488,10 @@ Attention! The .exe file must be in the same directory as the resource folder
     void MyEngineIniter::prepareGame(Engine* engine)
     {
         EngineIniter::prepareGame(engine);
-        ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
+        ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
 
-        auto main_window = new MyMainWindow();
-        main_window->open(Graphics::getInstance()->mGUI);
-        main_window->init();
-
-        SceneMgr::getInstance()->prepareScene(MyMainScene::create("MainScene"));
-        SceneMgr::getInstance()->prepareScene(Tutorial01::create("Tutorial01"));
+        MyMainScene::create("MainScene")->prepare();
+        Tutorial01::create("Tutorial01")->prepare();
     }
     ```
 
@@ -404,9 +584,9 @@ ShaderBuilder now combine header files to automatically generate a shader file
 ```cpp
 void EngineIniter::prepareResource(Engine* engine)
 {
-    ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
-    ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
-    ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
+    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
+    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
+    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
 
     this->createSomeMode();
 }

@@ -13,7 +13,7 @@
         int OrderID = 50;
         str Queue = Prepare;
         str DepthTest = Off;
-        bool ZWrite = true;
+        bool ZWrite = false;
         str CullFace = Front;
     }
     #TINY_CFG_END
@@ -53,13 +53,17 @@
         void main()
         {
             float2 uv = sampleSphericalMap(normalize(myWorldPosition));
-            float3 color = texture(myTexHDR2D, uv).rgb;
+            float3 color = textureLod(myTexHDR2D, uv, 0).rgb;
             myFinalColor = float4(color, 1.0f);
+            //myFinalColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
         }
     }
     #TINY_FS_END
 }
 #TINY_PASS_END
+
+
+
 
 
 

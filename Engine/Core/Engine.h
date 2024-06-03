@@ -1,21 +1,14 @@
-#pragma once
+﻿#pragma once
 
 #include "Head/ConfigHead.h"
 #include "Head/TinyCpp.h"
 
 namespace tezcat::Tiny
 {
-	class SceneManager;
-	class CameraManager;
 	class InputSystem;
 	class EngineIniter;
-	class ShaderManager;
-	class LightManager;
 	class BaseGraphics;
-	class FrameBufferManager;
-	class VertexBufferManager;
-	class ModelManager;
-	class TextureManager;
+	class Pipeline;
 
 	class TINY_API Engine
 	{
@@ -51,15 +44,10 @@ namespace tezcat::Tiny
 		virtual BaseGraphics* createGraphics() = 0;
 
 	protected:
-		ShaderManager* mShaderManager;
-		SceneManager* mSceneManager;
-		FrameBufferManager* mFrameBufferManager;
-		TextureManager* mTextureManager;
-		VertexBufferManager* mVertexManager;
-		ModelManager* mModelManager;
 		InputSystem* mInputSystem;
 		EngineIniter* mResourceLoader;
 		BaseGraphics* mGraphics;
+		Pipeline* mPipeline;
 
 	protected:
 		bool mIsRunning;
@@ -68,15 +56,15 @@ namespace tezcat::Tiny
 		std::atomic<bool> mRenderThreadInited;
 
 	public:
-		inline static const int& getScreenWidth() { return ScreenWidth; }
-		inline static const int& getScreenHeight() { return ScreenHeight; }
-		inline static const float& getDeltaTime() { return sDeltaTime; }
-		inline static const std::string& getName() { return sName; }
+		static const int32& getScreenWidth() { return ScreenWidth; }
+		static const int32& getScreenHeight() { return ScreenHeight; }
+		static const float& getDeltaTime() { return sDeltaTime; }
+		static const std::string& getName() { return sName; }
 
 	protected:
 		static std::string sName;
-		static int ScreenWidth;
-		static int ScreenHeight;
+		static int32 ScreenWidth;
+		static int32 ScreenHeight;
 		static float sDeltaTime;
 
 	public:
@@ -90,6 +78,5 @@ namespace tezcat::Tiny
 		static std::condition_variable sCVLogicThread;
 		static std::binary_semaphore sSemRenderThread;
 		static std::binary_semaphore sSemLogicThread;
-
 	};
 }

@@ -1,14 +1,7 @@
-#include "GUI.h"
-#include "../Engine.h"
-#include "../Profiler.h"
-#include "../Head//ImGuiHead.h"
-#include "Platform/OpenGL/GLHead.h"
+﻿#include "GUI.h"
 #include "GUIWidget.h"
 
-#include "../Platform/OpenGL/WindowsEngine.h"
-
-using namespace tezcat::Tiny::GL;
-namespace tezcat::Tiny
+namespace tezcat::Editor
 {
 	GUI::GUI()
 	{
@@ -34,13 +27,13 @@ namespace tezcat::Tiny
 			16.0f,
 			nullptr,
 			io.Fonts->GetGlyphRangesChineseFull());
-// 		io.Fonts->AddFontFromFileTTF(
-// 			"c:/windows/fonts/simhei.ttf",
-// 			16.0f,
-// 			nullptr,
-// 			io.Fonts->GetGlyphRangesChineseFull());
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		// 		io.Fonts->AddFontFromFileTTF(
+		// 			"c:/windows/fonts/simhei.ttf",
+		// 			16.0f,
+		// 			nullptr,
+		// 			io.Fonts->GetGlyphRangesChineseFull());
+				//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+				//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		io.ConfigDockingWithShift = true;
@@ -71,15 +64,13 @@ namespace tezcat::Tiny
 		ImGui::NewFrame();
 
 		auto it = mWindows.begin();
-		auto end = mWindows.end();
 
-		while (it != end)
+		while (it != mWindows.end())
 		{
 			if ((*it)->isClosed())
 			{
 				delete (*it);
 				it = mWindows.erase(it);
-				end = mWindows.end();
 			}
 			else
 			{
@@ -90,6 +81,7 @@ namespace tezcat::Tiny
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		TINY_GL_CHECK("ImGUI");
 
 		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{

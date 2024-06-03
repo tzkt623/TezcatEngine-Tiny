@@ -1,4 +1,4 @@
-#include "Material.h"
+﻿#include "Material.h"
 #include "../Tool/Tool.h"
 #include "../Head/RenderConfig.h"
 
@@ -8,19 +8,52 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Material);
-	Material::Material(const std::string& name)
-		: Material(ShaderMgr::getInstance()->find(name))
+	TINY_OBJECT_CPP(Material, TinyObject)
+	Material::Material(std::string name)
+		: mShader(nullptr)
+		, mName(std::move(name))
 	{
-
+		this->setShader(ShaderManager::find(mName));
 	}
 
 	Material::Material(Shader* shader)
-		: mShader(shader)
+		: mShader(nullptr)
 	{
-		TinyAssert(mShader != nullptr);
+		this->setShader(shader);
+		mName = shader->getName();
+	}
 
-		mShader->addRef();
+	Material::~Material()
+	{
+		for (auto p : mUniforms)
+		{
+			delete p;
+		}
+
+		mUniforms.clear();
+		mShader->deleteObject();
+	}
+
+	int Material::getUID() const
+	{
+		return mShader->getUID();
+	}
+
+	void Material::submit(BaseGraphics* graphics, Shader* shader)
+	{
+		shader->resetLocalState();
+		for (auto uniform : mUniforms)
+		{
+			uniform->submit(graphics, shader);
+		}
+	}
+
+	void Material::setShader(Shader* shader)
+	{
+		TINY_ASSERT(mShader == nullptr);
+
+		mShader = shader;
+		mShader->saveObject();
 
 		auto& umap = mShader->getUniformMap();
 		mUniforms.resize(umap.size(), nullptr);
@@ -107,30 +140,6 @@ namespace tezcat::Tiny
 			}
 
 			mUniforms[info->index] = uniform;
-		}
-	}
-
-	Material::~Material()
-	{
-		for (auto p : mUniforms)
-		{
-			delete p;
-		}
-		mUniforms.clear();
-		mShader->subRef();
-	}
-
-	int Material::getUID() const
-	{
-		return mShader->getUID();
-	}
-
-	void Material::submit(BaseGraphics* graphics, Shader* shader)
-	{
-		shader->resetLocalState();
-		for (auto uniform : mUniforms)
-		{
-			uniform->submit(graphics, shader);
 		}
 	}
 }

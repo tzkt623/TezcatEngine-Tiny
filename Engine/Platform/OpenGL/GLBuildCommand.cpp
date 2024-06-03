@@ -1,4 +1,4 @@
-#include "GLBuildCommand.h"
+﻿#include "GLBuildCommand.h"
 #include "GLHead.h"
 #include "GLShaderBuilder.h"
 
@@ -21,12 +21,12 @@ namespace tezcat::Tiny::GL
 	GLBuildCMD_CreateVertex::GLBuildCMD_CreateVertex(Vertex* vertex)
 		: mVertex(vertex)
 	{
-		mVertex->addRef();
+		mVertex->saveObject();
 	}
 
 	GLBuildCMD_CreateVertex::~GLBuildCMD_CreateVertex()
 	{
-		mVertex->subRef();
+		mVertex->deleteObject();
 	}
 
 	void GLBuildCMD_CreateVertex::execute(BaseGraphics* graphcis)
@@ -39,15 +39,14 @@ namespace tezcat::Tiny::GL
 		{
 			if (buffer->getBufferID() == 0)
 			{
-				GLBuildCMD_CreateVertexBuffer cmd(buffer);
-				cmd.execute(graphcis);
+				GLBuildCMD_CreateVertexBuffer(buffer).execute(graphcis);
 			}
 			else
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, buffer->getBufferID());
 			}
 
-			auto layout_data = buffer->getLayoutData();
+			auto& layout_data = buffer->getLayoutData();
 			switch (layout_data.type)
 			{
 			case  VertexLayoutType::Float1:
@@ -71,8 +70,7 @@ namespace tezcat::Tiny::GL
 		{
 			if (index_buffer->getBufferID() == 0)
 			{
-				GLBuildCMD_CreateIndexBuffer cmd(index_buffer);
-				cmd.execute(graphcis);
+				GLBuildCMD_CreateIndexBuffer(index_buffer).execute(graphcis);
 			}
 			else
 			{
@@ -92,12 +90,12 @@ namespace tezcat::Tiny::GL
 	GLBuildCMD_CreateVertexBuffer::GLBuildCMD_CreateVertexBuffer(VertexBuffer* vertexBuffer)
 		: mVertexBuffer(vertexBuffer)
 	{
-		mVertexBuffer->addRef();
+		mVertexBuffer->saveObject();
 	}
 
 	GLBuildCMD_CreateVertexBuffer::~GLBuildCMD_CreateVertexBuffer()
 	{
-		mVertexBuffer->subRef();
+		mVertexBuffer->deleteObject();
 	}
 
 	void GLBuildCMD_CreateVertexBuffer::execute(BaseGraphics* graphcis)
@@ -121,12 +119,12 @@ namespace tezcat::Tiny::GL
 	GLBuildCMD_CreateIndexBuffer::GLBuildCMD_CreateIndexBuffer(IndexBuffer* indexBuffer)
 		: mIndexBuffer(indexBuffer)
 	{
-		mIndexBuffer->addRef();
+		mIndexBuffer->saveObject();
 	}
 
 	GLBuildCMD_CreateIndexBuffer::~GLBuildCMD_CreateIndexBuffer()
 	{
-		mIndexBuffer->subRef();
+		mIndexBuffer->deleteObject();
 	}
 
 	void GLBuildCMD_CreateIndexBuffer::execute(BaseGraphics* graphcis)
@@ -149,50 +147,49 @@ namespace tezcat::Tiny::GL
 	GLBuildCMD_CreateTextrue2D::GLBuildCMD_CreateTextrue2D(Texture2D* tex)
 		: mTex(tex)
 	{
-		mTex->addRef();
+		mTex->saveObject();
 	}
 
 	GLBuildCMD_CreateTextrue2D::~GLBuildCMD_CreateTextrue2D()
 	{
-		mTex->subRef();
+		mTex->deleteObject();
 	}
 
 	void GLBuildCMD_CreateTextrue2D::execute(BaseGraphics* graphcis)
 	{
 		GLuint tex_id;
 		glGenTextures(1, &tex_id);
-		glBindTexture(GL_TEXTURE_2D, tex_id);
-		glTexImage2D(GL_TEXTURE_2D
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, tex_id));
+		TINY_GL_CHECK(glTexImage2D(GL_TEXTURE_2D
 				   , 0
-				   , mTex->getInternalChannel().platform
+				   , mTex->getInternalFormat().platform
 				   , mTex->getWidth(), mTex->getHeight()
 				   , 0
-				   , mTex->getChannel().platform
-				   , mTex->getDataType().platform
-				   , mTex->getData());
+				   , mTex->getFormat().platform
+				   , mTex->getDataMemFormat().platform
+				   , mTex->getData()));
 
 		if (mTex->getWrapS().tiny == TextureWrap::Clamp_To_Border
 			|| mTex->getWrapT().tiny == TextureWrap::Clamp_To_Border)
 		{
 			float borderColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+			TINY_GL_CHECK(glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor));
 		}
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mTex->getWrapS().platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mTex->getWrapT().platform);
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mTex->getWrapS().platform));
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mTex->getWrapT().platform));
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mTex->getMinFilter().platform);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mTex->getMagFilter().platform);
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mTex->getMinFilter().platform));
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mTex->getMagFilter().platform));
 
-		if (mTex->getMinFilter().tiny == TextureFilter::Linear_Mipmap_Linear
-			|| mTex->getMinFilter().tiny == TextureFilter::Linear_Mipmap_Linear)
+		if (mTex->getMinFilter().tiny == TextureFilter::Linear_Mipmap_Linear)
 		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 5);
-			glGenerateMipmap(GL_TEXTURE_2D);
+			TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
+			TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 5));
+			TINY_GL_CHECK(glGenerateMipmap(GL_TEXTURE_2D));
 		}
 
-		glBindTexture(GL_TEXTURE_2D, 0);
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
 		mTex->apply(tex_id);
 	}
 
@@ -203,51 +200,49 @@ namespace tezcat::Tiny::GL
 	GLBuildCMD_CreateTextrueCube::GLBuildCMD_CreateTextrueCube(TextureCube* tex)
 		: mTex(tex)
 	{
-		mTex->addRef();
+		mTex->saveObject();
 	}
 
 	GLBuildCMD_CreateTextrueCube::~GLBuildCMD_CreateTextrueCube()
 	{
-		mTex->subRef();
+		mTex->deleteObject();
 	}
 
 	void GLBuildCMD_CreateTextrueCube::execute(BaseGraphics* graphcis)
 	{
 		GLuint tex_id;
 		glGenTextures(1, &tex_id);
-		TINY_GL_Check(glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id));
 
-		auto width = mTex->getWidth();
-		auto height = mTex->getHeight();
+		auto size = mTex->getSize();
 
-		for (unsigned int i = 0; i < 6; i++)
+		for (uint32 i = 0; i < 6; i++)
 		{
-			TINY_GL_Check(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
+			TINY_GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
 				, 0
-				, mTex->getInternalChannel().platform
-				, width, height
+				, mTex->getInternalFormat().platform
+				, size, size
 				, 0
-				, mTex->getChannel().platform
-				, mTex->getDataType().platform
+				, mTex->getFormat().platform
+				, mTex->getDataMemFormat().platform
 				, mTex->getData(i)));
 		}
 
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mTex->getWrapS().platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mTex->getWrapT().platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mTex->getWrapR().platform);
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, mTex->getWrapS().platform));
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, mTex->getWrapT().platform));
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, mTex->getWrapR().platform));
 
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mTex->getMinFilter().platform);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mTex->getMagFilter().platform);
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mTex->getMinFilter().platform));
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mTex->getMagFilter().platform));
 
-		if (mTex->getMinFilter().tiny == TextureFilter::Linear_Mipmap_Linear
-			|| mTex->getMagFilter().tiny == TextureFilter::Linear_Mipmap_Linear)
+		if (mTex->getMinFilter().tiny == TextureFilter::Linear_Mipmap_Linear)
 		{
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 5);
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+			TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0));
+			TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 5));
+			TINY_GL_CHECK(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
 		}
 
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 
 		mTex->apply(tex_id);
 	}
@@ -259,24 +254,24 @@ namespace tezcat::Tiny::GL
 	GLBuildCMD_CreateRender2D::GLBuildCMD_CreateRender2D(TextureRender2D* tex)
 		: mTex(tex)
 	{
-		mTex->addRef();
+		mTex->saveObject();
 	}
 
 	GLBuildCMD_CreateRender2D::~GLBuildCMD_CreateRender2D()
 	{
-		mTex->subRef();
+		mTex->deleteObject();
 	}
 
 	void GLBuildCMD_CreateRender2D::execute(BaseGraphics* graphcis)
 	{
 		GLuint tex_id;
-		glGenRenderbuffers(1, &tex_id);
-		glBindRenderbuffer(GL_RENDERBUFFER, tex_id);
-		glRenderbufferStorage(GL_RENDERBUFFER
-			, mTex->getInternalChannel().platform
+		TINY_GL_CHECK(glGenRenderbuffers(1, &tex_id));
+		TINY_GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, tex_id));
+		TINY_GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER
+			, mTex->getInternalFormat().platform
 			, mTex->getWidth()
-			, mTex->getHeight());
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+			, mTex->getHeight()));
+		TINY_GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 		mTex->apply(tex_id);
 	}
 
@@ -288,19 +283,19 @@ namespace tezcat::Tiny::GL
 		: mFrameBuffer(frameBuffer)
 		, mColorCount(0)
 	{
-		mFrameBuffer->addRef();
+		mFrameBuffer->saveObject();
 	}
 
 	GLBuildCMD_CreateFrameBuffer::~GLBuildCMD_CreateFrameBuffer()
 	{
-		mFrameBuffer->subRef();
+		mFrameBuffer->deleteObject();
 	}
 
 	void GLBuildCMD_CreateFrameBuffer::execute(BaseGraphics* graphcis)
 	{
 		GLuint fbo;
-		glGenFramebuffers(1, &fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		TINY_GL_CHECK(glGenFramebuffers(1, &fbo));
+		TINY_GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
 
 		auto& attachmentes = mFrameBuffer->getAttachmentes();
 		for (auto i = 0; i < attachmentes.size(); i++)
@@ -312,8 +307,7 @@ namespace tezcat::Tiny::GL
 			{
 				if (tex->getTextureID() == 0)
 				{
-					GLBuildCMD_CreateTextrue2D cmd((Texture2D*)tex);
-					cmd.execute(graphcis);
+					GLBuildCMD_CreateTextrue2D((Texture2D*)tex).execute(graphcis);
 				}
 				this->attach2D((Texture2D*)tex);
 				break;
@@ -322,8 +316,7 @@ namespace tezcat::Tiny::GL
 			{
 				if (tex->getTextureID() == 0)
 				{
-					GLBuildCMD_CreateTextrueCube cmd((TextureCube*)tex);
-					cmd.execute(graphcis);
+					GLBuildCMD_CreateTextrueCube((TextureCube*)tex).execute(graphcis);
 				}
 				this->attachCube((TextureCube*)tex, 0, 0);
 				break;
@@ -332,8 +325,7 @@ namespace tezcat::Tiny::GL
 			{
 				if (tex->getTextureID() == 0)
 				{
-					GLBuildCMD_CreateRender2D cmd((TextureRender2D*)tex);
-					cmd.execute(graphcis);
+					GLBuildCMD_CreateRender2D((TextureRender2D*)tex).execute(graphcis);
 				}
 				this->attachRender((TextureRender2D*)tex);
 				break;
@@ -346,8 +338,8 @@ namespace tezcat::Tiny::GL
 		//如果没有ColorBuffer,需要关闭颜色通道
 		if (mColorCount < 1)
 		{
-			glDrawBuffer(GL_NONE);
-			glReadBuffer(GL_NONE);
+			TINY_GL_CHECK(glDrawBuffer(GL_NONE));
+			TINY_GL_CHECK(glReadBuffer(GL_NONE));
 		}
 		else if (mColorCount > 1)
 		{
@@ -356,13 +348,12 @@ namespace tezcat::Tiny::GL
 			{
 				colors[i] = GL_COLOR_ATTACHMENT0 + i;
 			}
-			glDrawBuffers(mColorCount, colors);
+			TINY_GL_CHECK(glDrawBuffers(mColorCount, colors));
 			delete[] colors;
 		}
 
-		TinyThrow_Runtime(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE, "ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		TINY_THROW_RUNTIME(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE, "ERROR::FRAMEBUFFER::Framebuffer is not complete!");
+		TINY_GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 		mFrameBuffer->apply(fbo);
 	}
@@ -466,7 +457,7 @@ namespace tezcat::Tiny::GL
 	void GLBuildCMD_CreateFrameBuffer::attachCube(TextureCube* tex)
 	{
 		mColorCount = 6;
-		for (uint32_t i = 0; i < mColorCount; i++)
+		for (uint32 i = 0; i < mColorCount; i++)
 		{
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 								 , GL_COLOR_ATTACHMENT0 + i
@@ -479,11 +470,11 @@ namespace tezcat::Tiny::GL
 	void GLBuildCMD_CreateFrameBuffer::attachCube(TextureCube* tex, int colorIndex, int faceIndex, int level)
 	{
 		mColorCount = 1;
-		glFramebufferTexture2D(GL_FRAMEBUFFER
+		TINY_GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER
 							 , GL_COLOR_ATTACHMENT0 + colorIndex
 							 , GL_TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex
 							 , tex->getTextureID()
-							 , level);
+							 , level));
 	}
 
 
@@ -497,19 +488,19 @@ namespace tezcat::Tiny::GL
 		: mShader(shader)
 		, mContent()
 	{
-		mShader->addRef();
+		mShader->saveObject();
 	}
 
 	GLBuildCMD_CreateShader::GLBuildCMD_CreateShader(Shader* shader, std::string& content)
 		: mShader(shader)
 		, mContent(content)
 	{
-		mShader->addRef();
+		mShader->saveObject();
 	}
 
 	GLBuildCMD_CreateShader::~GLBuildCMD_CreateShader()
 	{
-		mShader->subRef();
+		mShader->deleteObject();
 	}
 
 	void GLBuildCMD_CreateShader::execute(BaseGraphics* graphcis)
@@ -552,47 +543,61 @@ namespace tezcat::Tiny::GL
 
 		std::function<void(ArgMetaData*, const std::string&)> progress_tiny =
 			[this, &progress_tiny, &pid](ArgMetaData* metaData, const std::string& parentName)
-		{
-			auto name = metaData->valueName;
-			auto array_size = metaData->valueCount;
-			auto is_root = parentName.empty();
-
-			//如果是类,需要拼接名称
-			if (metaData->valueType == UniformType::Struct)
 			{
-				auto& members = metaData->getInfo<ArgStructInfo>()->members;
+				auto& name = metaData->valueName;
+				auto array_size = metaData->valueCount;
+				auto is_root = parentName.empty();
 
-				if (array_size > 0)
+				//如果是类,需要拼接名称
+				if (metaData->valueType == UniformType::Struct)
 				{
-					for (uint32_t i = 0; i < array_size; i++)
+					auto& members = metaData->getInfo<ArgStructInfo>()->members;
+
+					if (array_size > 0)
+					{
+						for (uint32_t i = 0; i < array_size; i++)
+						{
+							for (auto& m : members)
+							{
+								std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+								progress_tiny(m.get(), true_name);
+							}
+						}
+					}
+					else
 					{
 						for (auto& m : members)
 						{
-							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+							std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
 							progress_tiny(m.get(), true_name);
 						}
 					}
 				}
 				else
 				{
-					for (auto& m : members)
+					if (array_size > 0)
+					{
+						for (uint32_t i = 0; i < array_size; i++)
+						{
+							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+							auto uid = UniformID::getUIDStatic(true_name);
+							if (uid < mShader->getTinyUniformCount())
+							{
+								mShader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()), i);
+							}
+							else
+							{
+								Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
+							}
+						}
+					}
+					else
 					{
 						std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
-						progress_tiny(m.get(), true_name);
-					}
-				}
-			}
-			else
-			{
-				if (array_size > 0)
-				{
-					for (uint32_t i = 0; i < array_size; i++)
-					{
-						std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
 						auto uid = UniformID::getUIDStatic(true_name);
 						if (uid < mShader->getTinyUniformCount())
 						{
-							mShader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()), i);
+							mShader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()));
 						}
 						else
 						{
@@ -600,71 +605,57 @@ namespace tezcat::Tiny::GL
 						}
 					}
 				}
-				else
-				{
-					std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
-					auto uid = UniformID::getUIDStatic(true_name);
-					if (uid < mShader->getTinyUniformCount())
-					{
-						mShader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()));
-					}
-					else
-					{
-						Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
-					}
-				}
-			}
-		};
+			};
 
 		std::function<void(ArgMetaData*, const std::string&)> progress_user =
 			[this, &progress_user, &pid](ArgMetaData* metaData, const std::string& parentName)
-		{
-			auto& name = metaData->valueName;
-			auto array_size = metaData->valueCount;
-			auto is_root = parentName.empty();
-
-			//如果是类,需要拼接名称
-			if (metaData->valueType == UniformType::Struct)
 			{
-				auto& members = metaData->getInfo<ArgStructInfo>()->members;
+				auto& name = metaData->valueName;
+				auto array_size = metaData->valueCount;
+				auto is_root = parentName.empty();
 
-				if (array_size > 0)
+				//如果是类,需要拼接名称
+				if (metaData->valueType == UniformType::Struct)
 				{
-					for (uint32_t i = 0; i < array_size; i++)
+					auto& members = metaData->getInfo<ArgStructInfo>()->members;
+
+					if (array_size > 0)
+					{
+						for (uint32_t i = 0; i < array_size; i++)
+						{
+							for (auto& m : members)
+							{
+								std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+								progress_user(m.get(), true_name);
+							}
+						}
+					}
+					else
 					{
 						for (auto& m : members)
 						{
-							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+							std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
 							progress_user(m.get(), true_name);
 						}
 					}
 				}
 				else
 				{
-					for (auto& m : members)
+					if (array_size > 0)
+					{
+						for (uint32_t i = 0; i < array_size; i++)
+						{
+							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+							mShader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()), i);
+						}
+					}
+					else
 					{
 						std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
-						progress_user(m.get(), true_name);
+						mShader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()));
 					}
 				}
-			}
-			else
-			{
-				if (array_size > 0)
-				{
-					for (uint32_t i = 0; i < array_size; i++)
-					{
-						std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
-						mShader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()), i);
-					}
-				}
-				else
-				{
-					std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
-					mShader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()));
-				}
-			}
-		};
+			};
 
 		mShader->resizeTinyUniformAry(UniformID::allStringCount());
 		for (auto& pair : builder.mTinyUMap)
@@ -722,12 +713,12 @@ namespace tezcat::Tiny::GL
 	GLBuildCMD_UpdateTextrue2D::GLBuildCMD_UpdateTextrue2D(Texture2D* tex)
 		: mTex(tex)
 	{
-		mTex->addRef();
+		mTex->saveObject();
 	}
 
 	GLBuildCMD_UpdateTextrue2D::~GLBuildCMD_UpdateTextrue2D()
 	{
-		mTex->subRef();
+		mTex->deleteObject();
 	}
 
 	void GLBuildCMD_UpdateTextrue2D::execute(BaseGraphics* graphcis)
@@ -737,8 +728,8 @@ namespace tezcat::Tiny::GL
 					   , 0
 					   , 0, 0
 					   , mTex->getWidth(), mTex->getHeight()
-					   , mTex->getChannel().platform
-					   , mTex->getDataType().platform
+					   , mTex->getFormat().platform
+					   , mTex->getDataMemFormat().platform
 					   , mTex->getData());
 		glBindTexture(GL_TEXTURE_2D, 0);
 

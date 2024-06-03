@@ -1,4 +1,4 @@
-#include "Profiler.h"
+﻿#include "Profiler.h"
 
 namespace tezcat::Tiny
 {
@@ -8,8 +8,8 @@ namespace tezcat::Tiny
 	//
 	int Profiler::PassCount = 0;
 	int Profiler::DrawCall = 0;
-	glm::vec2 Profiler::mouseOffset(0.0f);
-	glm::vec2 Profiler::mousePosition;
+	float2 Profiler::mouseOffset(0.0f);
+	float2 Profiler::mousePosition;
 
 
 	size_t Profiler::MemoryAlloc;

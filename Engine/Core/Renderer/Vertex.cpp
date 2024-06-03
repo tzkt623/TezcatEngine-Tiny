@@ -1,4 +1,4 @@
-#include "Vertex.h"
+﻿#include "Vertex.h"
 #include "../Data/MeshData.h"
 #include "../Manager/VertexBufferManager.h"
 #include "../Tool/Tool.h"
@@ -9,15 +9,15 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Vertex);
+	TINY_OBJECT_CPP(Vertex, TinyObject)
 	Vertex::Vertex()
 		: mName("##ErrorVAO")
 	{
 
 	}
 
-	Vertex::Vertex(const std::string& name)
-		: mName(name)
+	Vertex::Vertex(std::string name)
+		: mName(std::move(name))
 	{
 
 	}
@@ -30,7 +30,7 @@ namespace tezcat::Tiny
 
 		if (mIndexBuffer)
 		{
-			mIndexBuffer->subRef();
+			mIndexBuffer->deleteObject();
 		}
 
 		delete mChildren;
@@ -86,7 +86,7 @@ namespace tezcat::Tiny
 	void Vertex::setIndexBuffer(IndexBuffer* buffer)
 	{
 		mIndexBuffer = buffer;
-		mIndexBuffer->addRef();
+		mIndexBuffer->saveObject();
 	}
 
 	void Vertex::generate()

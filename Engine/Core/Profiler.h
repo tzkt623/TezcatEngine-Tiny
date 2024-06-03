@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Head/GLMHead.h"
 #include "Head/ConfigHead.h"
 #include "Head/CppHead.h"
@@ -11,8 +11,8 @@ namespace tezcat::Tiny
 
 		static int PassCount;
 		static int DrawCall;
-		static glm::vec2 mouseOffset;
-		static glm::vec2 mousePosition;
+		static float2 mouseOffset;
+		static float2 mousePosition;
 
 		static double RenderTime;
 		static double LogicTime;

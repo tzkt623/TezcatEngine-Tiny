@@ -1,23 +1,25 @@
-#include "Scene.h"
+﻿#include "Scene.h"
 #include "../Component/GameObject.h"
 
-#include "../Manager/LightManager.h"
 #include "../Manager/CameraManager.h"
+#include "../Manager/SceneManager.h"
+#include "../Manager/LightingManager.h"
 
 #include "../Component/Camera.h"
 #include "../Component/Light.h"
 #include "../Component/Transform.h"
-#include "../Renderer/RenderLayer.h"
+#include "../Renderer/RenderObjectCache.h"
 #include "../Tool/Log.h"
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Scene);
+	TINY_OBJECT_CPP(Scene, TinyObject)
 
-	Scene::Scene(const std::string& name)
-		: mName(name)
+	Scene::Scene(std::string name)
+		: mName(std::move(name))
 		, mLightData(nullptr)
 		, mCameraData(nullptr)
+		, mGameObjectData(nullptr)
 	{
 
 	}
@@ -29,72 +31,51 @@ namespace tezcat::Tiny
 
 	void Scene::onEnter()
 	{
-		Log_Info(StringTool::stringFormat("Enter Scene: %s", this->getName().c_str()));
+		Log_Info(StringTool::stringFormat("Enter Scene: %s", mName.c_str()));
 
 		mCameraData = CameraData::create();
-		mCameraData->addRef();
+		mCameraData->saveObject();
 
 		mLightData = LightData::create();
-		mLightData->addRef();
+		mLightData->saveObject();
 
+		mGameObjectData = GameObjectData::create();
+		mGameObjectData->saveObject();
 
-		CameraMgr::getInstance()->setCameraData(mCameraData);
-		LightMgr::getInstance()->setData(mLightData);
+		CameraManager::setData(mCameraData);
+		LightingManager::setLightData(mLightData);
 	}
 
 	void Scene::onExit()
 	{
-		mLightData->subRef();
-		mCameraData->subRef();
+		mLightData->deleteObject();
+		mCameraData->deleteObject();
+		mGameObjectData->deleteObject();
 
 		mLogicList.clear();
 		mTransformList.clear();
 
-		for (auto obj : mObjectList)
-		{
-			if (auto ptr = obj.lock())
-			{
-				ptr->subRef();
-			}
-		}
-		mObjectList.clear();
+		CameraManager::setData(nullptr);
+		LightingManager::setLightData(nullptr);
 
-		CameraMgr::getInstance()->setCameraData(nullptr);
-		LightMgr::getInstance()->setData(nullptr);
-
-		Log_Info(StringTool::stringFormat("Exit Scene: %s", this->getName().c_str()));
+		Log_Info(StringTool::stringFormat("Exit Scene: %s", mName.c_str()));
 	}
 
 	void Scene::onPause()
 	{
-
+		CameraManager::setData(nullptr);
+		LightingManager::setLightData(nullptr);
 	}
 
 	void Scene::onResume()
 	{
-		CameraMgr::getInstance()->setCameraData(mCameraData);
-		LightMgr::getInstance()->setData(mLightData);
-	}
-
-	void Scene::addGameObject(GameObject* gameObject)
-	{
-		// 		mNewObjectList.push_back(gameObject);
-		// 		mObjectList.push_back(gameObject);
-	}
-
-	void Scene::addNewTransform(Transform* transform)
-	{
-		mNewTransformList.push_back(transform);
+		CameraManager::setData(mCameraData);
+		LightingManager::setLightData(mLightData);
 	}
 
 	void Scene::addTransform(Transform* transform)
 	{
 		mTransformList.emplace_back(transform);
-	}
-
-	void Scene::addCamera(Camera* camera)
-	{
-		CameraMgr::getInstance()->addCamera(camera);
 	}
 
 	void Scene::addLogicFunction(void* gameObject, const std::function<void()>& function)
@@ -107,36 +88,24 @@ namespace tezcat::Tiny
 		mLogicList.erase(gameObject);
 	}
 
-	void Scene::addNewObject(GameObject* gameObject)
-	{
-		mNewObjectList.emplace_back(gameObject);
-	}
-
+	/// <summary>
+	/// 退出后这里可能有问题
+	/// </summary>
 	void Scene::update()
 	{
 		//#InitNewObjects
-		if (!mNewTransformList.empty())
+		if (!mNewGameObjectList.empty())
 		{
-			for (auto transform : mNewTransformList)
+			for (auto go : mNewGameObjectList)
 			{
-				if (transform->getParent() == nullptr)
+				go->enterScene(this);
+				if (go->getTransform()->getParent() == nullptr)
 				{
-					transform->getGameObject()->enterScene(this);
-					mTransformList.emplace_back(transform);
-					mObjectList.emplace_back(transform->getGameObject());
+					mTransformList.push_back(go->getTransform());
 				}
 			}
 
-			mNewTransformList.clear();
-		}
-
-		//#SceneUpdate
-		if (!mLogicList.empty())
-		{
-			for (const auto& pair : mLogicList)
-			{
-				pair.second();
-			}
+			mNewGameObjectList.clear();
 		}
 
 		//#TransformUpdate
@@ -144,7 +113,7 @@ namespace tezcat::Tiny
 		auto end = mTransformList.end();
 		while (it != end)
 		{
-			auto child = (*it);
+			auto& child = *it;
 			if (child.lock())
 			{
 				child->update();
@@ -153,44 +122,77 @@ namespace tezcat::Tiny
 			else
 			{
 				it = mTransformList.erase(it);
+				end = mTransformList.end();
+			}
+		}
+
+		//#SceneUpdate
+		if (!mLogicList.empty())
+		{
+			for (auto& pair : mLogicList)
+			{
+				pair.second();
 			}
 		}
 	}
 
-	std::vector<TinyWeakRef<GameObject>> Scene::findGameObjects(const std::string& name)
+	TinyWeakRef<Transform> Scene::findTransform(const std::string& name)
 	{
-		std::vector<TinyWeakRef<GameObject>> result;
-		auto it = mObjectList.begin();
-		while (it != mObjectList.end())
+		auto it = mTransformList.begin();
+		while (it != mTransformList.end())
 		{
-			auto object = *it;
-			if (auto ptr = object.lock())
+			auto& ptr = *it;
+			if (ptr->getGameObject()->getName() == name)
 			{
-				if (object->getName() == name)
-				{
-					result.emplace_back(object);
-				}
-				++it;
+				return ptr;
 			}
-			else
+			++it;
+		}
+
+		return nullptr;
+	}
+
+	std::vector<TinyWeakRef<Transform>> Scene::findTransforms(const std::string& name)
+	{
+		std::vector<TinyWeakRef<Transform>> result;
+		auto it = mTransformList.begin();
+		while (it != mTransformList.end())
+		{
+			auto& ptr = *it;
+			if (ptr->getGameObject()->getName() == name)
 			{
-				mObjectList.erase(it);
+				result.emplace_back(ptr);
 			}
+			++it;
 		}
 
 		return result;
 	}
 
-	uint32_t Scene::addUpdateTransform(Transform* transform)
+	void Scene::open()
 	{
-		// 		mUpdateTransformList.emplace_back(transform);
-		// 		return mUpdateTransformList.size() - 1;
-		return 0;
+		SceneManager::switchScene(this);
 	}
 
-	void Scene::setUpdateTransform(const uint32_t& index, Transform* transform)
+	void Scene::push()
 	{
-		//mUpdateTransformList[index] = transform;
+		SceneManager::pushScene(this);
+	}
+
+	void Scene::prepare()
+	{
+		SceneManager::prepareScene(this);
+	}
+
+	int32 Scene::addGameObject(GameObject* gameObject)
+	{
+		mNewGameObjectList.push_back(gameObject);
+		return mGameObjectData->addGameObject(gameObject);
+	}
+
+	void Scene::removeGameObject(GameObject* gameObject)
+	{
+		mGameObjectData->removeGameObject(gameObject);
 	}
 
 }

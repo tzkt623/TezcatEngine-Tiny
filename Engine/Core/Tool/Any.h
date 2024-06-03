@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Core/Head/ConfigHead.h"
 #include "Core/Head/CppHead.h"
 
@@ -21,21 +21,21 @@ namespace tezcat::Tiny
 		struct ContainerT : Container
 		{
 			ContainerT(T&& other) noexcept
-				: m_Value(std::forward<T>(other))
+				: mValue(std::forward<T>(other))
 			{
 			}
 
 			ContainerT(const T& other)
-				: m_Value(other)
+				: mValue(other)
 			{
 			}
 
 			Container* clone() const final
 			{
-				return new ContainerT<T>(m_Value);
+				return new ContainerT<T>(mValue);
 			}
 
-			T m_Value;
+			T mValue;
 
 			ContainerT& operator=(const ContainerT&) = delete;
 		};
@@ -106,7 +106,7 @@ namespace tezcat::Tiny
 				throw std::bad_cast();
 			}
 
-			return dynamic_cast<ContainerT<U>*>(mContainer)->m_Value;
+			return dynamic_cast<ContainerT<U>*>(mContainer)->mValue;
 		}
 
 		Any& operator=(const Any& other)

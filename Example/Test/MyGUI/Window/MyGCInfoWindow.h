@@ -1,14 +1,16 @@
-#pragma once
+﻿#pragma once
 
 #include "../MyGUIContext.h"
 
-class MyGCInfoWindow : public GUIWindow
+namespace tezcat::Editor
 {
-	CreateInstanceH(MyGCInfoWindow);
+	class MyGCInfoWindow : public GUIWindow
+	{
+		TINY_EDITOR_WINDOW_INSTANCE_H(MyGCInfoWindow)
 
-protected:
-	void onRender() override;
+	protected:
+		void onRender() override;
 
-};
-
+	};
+}
 

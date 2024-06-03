@@ -1,47 +1,49 @@
-#include "MyGCInfoWindow.h"
+﻿#include "MyGCInfoWindow.h"
 
-
-CreateInstanceCPP(MyGCInfoWindow);
-MyGCInfoWindow::MyGCInfoWindow()
-	: GUIWindow("GCInfo")
+namespace tezcat::Editor
 {
-
-}
-
-MyGCInfoWindow::~MyGCInfoWindow()
-{
-	DeleteInstance();
-}
-
-void MyGCInfoWindow::onRender()
-{
-	GUIWindow::onRender();
-
-	auto& infos = TinyGC::getGCInfos();
-	ImGuiListClipper clipper;
-	clipper.Begin(infos.size(), ImGui::GetTextLineHeightWithSpacing());
-	while (clipper.Step())
+	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyGCInfoWindow)
+	MyGCInfoWindow::MyGCInfoWindow()
+		: GUIWindow("GCInfo")
 	{
-		for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
+
+	}
+
+	MyGCInfoWindow::~MyGCInfoWindow()
+	{
+		TINY_EDITOR_WINDOW_DELETE_INSTACNE();
+	}
+
+	void MyGCInfoWindow::onRender()
+	{
+		GUIWindow::onRender();
+
+		auto& infos = TinyGC::getGCInfos();
+		ImGuiListClipper clipper;
+		clipper.Begin(infos.size(), ImGui::GetTextLineHeightWithSpacing());
+		while (clipper.Step())
 		{
-			auto i = infos[line_no];
-			if (i->strongRef > 0)
+			for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
 			{
-				ImGui::Text("[%d]: <%d, %d> %s"
-					, i->index
-					, i->strongRef
-					, i->weakRef
-					, i->pointer->getClassName().c_str());
-			}
-			else
-			{
-				ImGui::Text("[%d]: <%d, %d> %s"
-					, i->index
-					, i->strongRef
-					, i->weakRef
-					, "FreeSlot");
+				auto i = infos[line_no];
+				if (i->strongRef > 0)
+				{
+					ImGui::Text("[%d]: <%d, %d> %s"
+						, i->index
+						, i->strongRef
+						, i->weakRef
+						, i->pointer->getClassName().c_str());
+				}
+				else
+				{
+					ImGui::Text("[%d]: <%d, %d> %s"
+						, i->index
+						, i->strongRef
+						, i->weakRef
+						, "FreeSlot");
+				}
 			}
 		}
+		clipper.End();
 	}
-	clipper.End();
 }

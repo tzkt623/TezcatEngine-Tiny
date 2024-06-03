@@ -1,27 +1,31 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/RenderConfig.h"
 #include "../Head/ConfigHead.h"
-#include "../Renderer/RenderObject.h"
+#include "../Renderer/MeshRenderAgent.h"
 
 
 namespace tezcat::Tiny
 {
+	class Pipeline;
+	class Camera;
 	class Vertex;
 	class Shader;
 	class Material;
 	class MeshData;
 	class RenderAgent;
-	class TINY_API MeshRenderer : public ComponentT<MeshRenderer>, public IRenderMesh
+
+	class TINY_API MeshRenderer : public ComponentT<MeshRenderer>
 	{
 		MeshRenderer();
-		TINY_Factory(MeshRenderer);
-		TINY_RTTI_H(MeshRenderer);
+		TINY_OBJECT_H(MeshRenderer, ComponentT<MeshRenderer>)
+		TINY_MESH_RENDER_FUNCTION(mRenderAgent)
+
 	public:
 		virtual ~MeshRenderer();
 
-		void sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue) override;
-		void setCastShadow(bool val) { mIsCastShadow = val; }
+		virtual void onComponentAdded(Component* component) override;
+		virtual void onComponentRemoved(Component* component) override;
 
 	protected:
 		void onEnable() override;
@@ -29,6 +33,6 @@ namespace tezcat::Tiny
 		void onStart() override;
 
 	private:
-		bool mIsCastShadow;
+		MeshRenderAgent* mRenderAgent;
 	};
 }

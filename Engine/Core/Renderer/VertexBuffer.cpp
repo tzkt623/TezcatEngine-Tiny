@@ -1,14 +1,32 @@
-#include "VertexBuffer.h"
+﻿#include "VertexBuffer.h"
 #include "BaseGraphics.h"
 #include "../Data/MeshData.h"
 
 namespace tezcat::Tiny
 {
+	TINY_OBJECT_CPP(IBuffer, TinyObject)
+
+
+	IBuffer::IBuffer()
+		: mBufferID(0)
+		, mData(nullptr)
+		, mDataSize(0)
+	{
+
+	}
+
+	IBuffer::~IBuffer()
+	{
+
+	}
+
+
+
 	//---------------------------------------------
 	//
 	//
 	//
-	TINY_RTTI_CPP(VertexBuffer);
+	TINY_OBJECT_CPP(VertexBuffer, IBuffer)
 	VertexBuffer::VertexBuffer()
 	{
 
@@ -30,7 +48,7 @@ namespace tezcat::Tiny
 	//
 	//
 	//
-	TINY_RTTI_CPP(IndexBuffer);
+	TINY_OBJECT_CPP(IndexBuffer, IBuffer)
 	IndexBuffer::IndexBuffer()
 	{
 

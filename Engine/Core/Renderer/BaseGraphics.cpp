@@ -1,16 +1,15 @@
-#include "BaseGraphics.h"
-#include "RenderObject.h"
+﻿#include "BaseGraphics.h"
+#include "Renderer.h"
+
+#include "RenderObjectCache.h"
+#include "BuildCommand.h"
+#include "FrameBuffer.h"
+#include "Pipeline.h"
 
 #include "../Manager/CameraManager.h"
-#include "../Manager/LightManager.h"
 #include "../Manager/FrameBufferManager.h"
 #include "../Manager/ShadowCasterManager.h"
-#include "../Manager/EnvironmentLightManager.h"
-
-#include "../Renderer/RenderLayer.h"
-#include "../Renderer/RenderPass.h"
-#include "../Renderer/BuildCommand.h"
-#include "../Renderer/FrameBuffer.h"
+#include "../Manager/LightingManager.h"
 
 #include "../Component/Camera.h"
 #include "../Component/GameObject.h"
@@ -29,29 +28,17 @@
 namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
-		: mShadowCasterManager(new ShadowCasterManager())
-		, mEnvLitManager(new EnvironmentLightManager())
-		, mCameraManager(new CameraManager())
-		, mLightManager(new LightManager())
-		, mGUI(nullptr)
-
 	{
-		RenderLayer::init();
 	}
 
 	BaseGraphics::~BaseGraphics()
 	{
-		delete mShadowCasterManager;
-		delete mEnvLitManager;
-		delete mCameraManager;
-		delete mLightManager;
+
 	}
 
 
 	void BaseGraphics::init(Engine* engine)
 	{
-		mEnvLitManager->init();
-		FrameBuffer::setDefaultBuffer(FrameBuffer::getDefaultBuffer());
 	}
 
 	void BaseGraphics::buildCMD()
@@ -64,19 +51,8 @@ namespace tezcat::Tiny
 		mBuildCmdAry.clear();
 	}
 
-	void BaseGraphics::setPipeline(RenderPhase type, const std::string& name, Pipeline* pl)
-	{
-		while (mPipelineAry.size() < (int)type)
-		{
-			mPipelineAry.push_back(nullptr);
-		}
-		mPipelineAry[(int)type] = pl;
-		mPipelineUMap.try_emplace(name, (int)type);
-	}
-
 	void BaseGraphics::render()
 	{
-		TINY_PROFILER_TIMER_OUT(Profiler::RenderTime);
 		this->preRender();
 		this->onRender();
 		this->postRender();
@@ -89,36 +65,18 @@ namespace tezcat::Tiny
 
 		this->buildCMD();
 
-		mShadowCasterManager->calculate(this);
-		mEnvLitManager->calculate(this);
-		mCameraManager->calculate(this);
+		//mPipeline->preRender(this);
 
 		this->buildCMD();
 	}
 
 	void BaseGraphics::onRender()
 	{
-		for (auto queue : mPreQueue)
-		{
-			queue->render(this);
-		}
-
-		for (auto queue : mBaseQueue)
-		{
-			queue->render(this);
-		}
-
-		for (auto queue : mPostQueue)
-		{
-			queue->render(this);
-		}
 	}
 
 	void BaseGraphics::postRender()
 	{
-		mPreQueue.clear();
-		mBaseQueue.clear();
-		mPostQueue.clear();
+		//mPipeline->postRender(this);
 	}
 
 
@@ -126,9 +84,8 @@ namespace tezcat::Tiny
 	//
 	//	draw
 	//
-	void BaseGraphics::drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color)
+	void BaseGraphics::drawLine(const float3& begin, const float3& end, const float3& color)
 	{
 
 	}
-
 }

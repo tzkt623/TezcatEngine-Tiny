@@ -1,9 +1,9 @@
-#include "Layer.h"
+﻿#include "Layer.h"
 
 #include "../Component/GameObject.h"
 #include "../Component/MeshRenderer.h"
 #include "../Component/Camera.h"
-#include "../Renderer/RenderObject.h"
+#include "../Renderer/Renderer.h"
 
 
 
@@ -20,7 +20,7 @@ namespace tezcat::Tiny
 
 	}
 
-	void Layer::addRenderObejct(IRenderObject* renderObject)
+	void Layer::addRenderObejct(BaseRenderer* renderObject)
 	{
 		mRenderObejctList.emplace_back(renderObject);
 	}

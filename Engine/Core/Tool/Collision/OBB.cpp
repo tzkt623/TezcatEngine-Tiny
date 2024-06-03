@@ -1,4 +1,4 @@
-#include "OBB.h"
+﻿#include "OBB.h"
 
 namespace tezcat::Tiny
 {
@@ -9,7 +9,7 @@ namespace tezcat::Tiny
 
 	}
 
-	OBB::OBB(const glm::vec3& min, const glm::vec3& max)
+	OBB::OBB(const float3& min, const float3& max)
 		: mMin(min)
 		, mMax(max)
 	{
@@ -28,16 +28,12 @@ namespace tezcat::Tiny
 
 	}
 
-	glm::vec3 OBB::getCenter()
+	float3 OBB::getCenter()
 	{
-		glm::vec3 center;
-		center.x = (mMin.x + mMax.x) * 0.5f;
-		center.y = (mMin.y + mMax.y) * 0.5f;
-		center.z = (mMin.z + mMax.z) * 0.5f;
-		return center;
+		return float3((mMin.x + mMax.x) * 0.5f, (mMin.y + mMax.y) * 0.5f, (mMin.z + mMax.z) * 0.5f);
 	}
 
-	void OBB::getCorners(std::array<glm::vec3, 8>& array)
+	void OBB::getCorners(std::array<float3, 8>& array)
 	{
 		array[0] = { mMin.x, mMax.y, mMax.z };
 		array[1] = { mMin.x, mMin.y, mMax.z };
@@ -57,7 +53,7 @@ namespace tezcat::Tiny
 			&& ((mMin.z >= other.mMin.z) && (mMax.z <= other.mMax.z) || (other.mMin.z >= mMin.z) && (other.mMax.z <= mMax.z));
 	}
 
-	bool OBB::contain(const glm::vec3& point)
+	bool OBB::contain(const float3& point)
 	{
 		if (point.x < mMin.x) return false;
 		if (point.y < mMin.y) return false;
@@ -75,9 +71,9 @@ namespace tezcat::Tiny
 		mMax = glm::max(mMax, other.mMax);
 	}
 
-	void OBB::updateMinMax(const std::array<glm::vec3, 8>& array)
+	void OBB::updateMinMax(const std::array<float3, 8>& array)
 	{
-		for (auto i : array)
+		for (auto& i : array)
 		{
 			//
 			if (i.x < mMin.x)
@@ -114,19 +110,19 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void OBB::transform(const glm::mat4& localToWorldMatrix)
+	void OBB::transform(const float4x4& localToWorldMatrix)
 	{
-		std::array<glm::vec3, 8> array =
+		std::array<float3, 8> array =
 		{
-			localToWorldMatrix * glm::vec4(mMin.x, mMax.y, mMax.z, 1.0f),
-			localToWorldMatrix * glm::vec4(mMin.x, mMin.y, mMax.z, 1.0f),
-			localToWorldMatrix * glm::vec4(mMax.x, mMin.y, mMax.z, 1.0f),
-			localToWorldMatrix * glm::vec4(mMax.x, mMax.y, mMax.z, 1.0f),
+			localToWorldMatrix * float4(mMin.x, mMax.y, mMax.z, 1.0f),
+			localToWorldMatrix * float4(mMin.x, mMin.y, mMax.z, 1.0f),
+			localToWorldMatrix * float4(mMax.x, mMin.y, mMax.z, 1.0f),
+			localToWorldMatrix * float4(mMax.x, mMax.y, mMax.z, 1.0f),
 
-			localToWorldMatrix * glm::vec4(mMax.x, mMax.y, mMin.z, 1.0f),
-			localToWorldMatrix * glm::vec4(mMax.x, mMin.y, mMin.z, 1.0f),
-			localToWorldMatrix * glm::vec4(mMin.x, mMin.y, mMin.z, 1.0f),
-			localToWorldMatrix * glm::vec4(mMin.x, mMax.y, mMin.z, 1.0f)
+			localToWorldMatrix * float4(mMax.x, mMax.y, mMin.z, 1.0f),
+			localToWorldMatrix * float4(mMax.x, mMin.y, mMin.z, 1.0f),
+			localToWorldMatrix * float4(mMin.x, mMin.y, mMin.z, 1.0f),
+			localToWorldMatrix * float4(mMin.x, mMax.y, mMin.z, 1.0f)
 		};
 
 		this->updateMinMax(array);
@@ -134,8 +130,8 @@ namespace tezcat::Tiny
 
 	void OBB::reset()
 	{
-		mMin = glm::vec3(std::numeric_limits<float>::max());
-		mMax = glm::vec3(std::numeric_limits<float>::min());
+		mMin = float3(std::numeric_limits<float>::max());
+		mMax = float3(std::numeric_limits<float>::min());
 	}
 
 	bool OBB::isValid()

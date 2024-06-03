@@ -1,9 +1,9 @@
-#include "FlyController.h"
+﻿#include "FlyController.h"
 #include "Transform.h"
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(FlyController);
+	TINY_OBJECT_CPP(FlyController, ComponentT<FlyController>)
 
 
 	/// <summary>
@@ -12,7 +12,7 @@ namespace tezcat::Tiny
 	/// 如果forward向量不与WorldUp垂直
 	/// 那么真正的up向量就是斜的
 	/// </summary>
-	const glm::vec3 FlyController::sWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	const float3 FlyController::sWorldUp = float3(0.0f, 1.0f, 0.0f);
 
 	FlyController::FlyController()
 		: mFront(0.0f, 0.0f, -1.0f)
@@ -88,7 +88,7 @@ namespace tezcat::Tiny
 
 	void FlyController::updateVector(Transform* transform)
 	{
-		glm::vec3 front;
+		float3 front;
 		front.x = glm::cos(glm::radians(mPitch)) * glm::cos(glm::radians(mYaw));
 		front.y = glm::sin(glm::radians(mPitch));
 		front.z = glm::cos(glm::radians(mPitch)) * glm::sin(glm::radians(mYaw));
@@ -100,7 +100,7 @@ namespace tezcat::Tiny
 		auto& matrix = transform->getModelMatrix();
 		auto& position = transform->getPosition();
 		matrix = glm::lookAt(position, position + mFront, mUp);
-		//matrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//matrix = glm::lookAt(float3(0.0f, 0.0f, 10.0f), float3(0.0f), float3(0.0f, 1.0f, 0.0f));
 
 		if (transform->getParent() != nullptr)
 		{
@@ -108,22 +108,22 @@ namespace tezcat::Tiny
 		}
 	}
 
-	glm::vec3 FlyController::getForward()
+	float3 FlyController::getForward()
 	{
 		return this->getTransform()->getForward();
 	}
 
-	glm::vec3 FlyController::getUp()
+	float3 FlyController::getUp()
 	{
 		return this->getTransform()->getUp();
 	}
 
-	glm::vec3 FlyController::getRight()
+	float3 FlyController::getRight()
 	{
 		return this->getTransform()->getRight();
 	}
 
-	void FlyController::translate(const glm::vec3& offset)
+	void FlyController::translate(const float3& offset)
 	{
 		this->getTransform()->translate(offset);
 	}

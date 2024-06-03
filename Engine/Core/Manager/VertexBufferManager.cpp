@@ -1,4 +1,4 @@
-#include "VertexBufferManager.h"
+﻿#include "VertexBufferManager.h"
 #include "../Renderer/Vertex.h"
 #include "../Renderer/VertexBuffer.h"
 #include "../Renderer/BaseGraphics.h"
@@ -8,19 +8,9 @@
 
 namespace tezcat::Tiny
 {
-	VertexBufferManager::VertexBufferManager()
-	{
-		VertexBufMgr::attach(this);
-	}
-
-	VertexBufferManager::~VertexBufferManager()
-	{
-		for (auto& pair : mVertexUMap)
-		{
-			pair.second->subRef();
-		}
-		mVertexUMap.clear();
-	}
+	std::vector<Vertex*> VertexBufferManager::mVertexAry;
+	std::unordered_map<std::string_view, MeshData*> VertexBufferManager::mMeshDataUMap;
+	std::unordered_map<std::string_view, Vertex*> VertexBufferManager::mVertexUMap;
 
 	void VertexBufferManager::add(MeshData* meshData)
 	{
@@ -32,7 +22,7 @@ namespace tezcat::Tiny
 		auto result = mMeshDataUMap.try_emplace(meshData->getName(), nullptr);
 		if (result.second)
 		{
-			meshData->addRef();
+			meshData->saveObject();
 			result.first->second = meshData;
 		}
 	}
@@ -61,13 +51,12 @@ namespace tezcat::Tiny
 
 	void VertexBufferManager::add(Vertex* vertex)
 	{
-		auto result = mVertexUMap.try_emplace(vertex->getName(), vertex);
-		if (!result.second)
+		auto result = mVertexUMap.try_emplace(vertex->getName(), nullptr);
+		if (result.second)
 		{
-			result.first->second->subRef();
 			result.first->second = vertex;
+			vertex->saveObject();
 		}
-		vertex->addRef();
 	}
 
 	Vertex* VertexBufferManager::create(const std::string& name)
@@ -90,7 +79,7 @@ namespace tezcat::Tiny
 			auto vertex = Vertex::create();
 			vertex->init(mMeshDataUMap[name]);
 			vertex->generate();
-			vertex->addRef();
+			vertex->saveObject();
 			result.first->second = vertex;
 		}
 

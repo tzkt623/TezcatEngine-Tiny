@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CppHead.h"
 
@@ -166,19 +166,19 @@ namespace tezcat::Tiny
 
 		void push(value_type&& value)
 		{
-			value->addRef();
+			value->saveObject();
 			mData.push(std::forward<value_type>(value));
 		}
 
 		void push(const value_type& value)
 		{
-			value->addRef();
+			value->saveObject();
 			mData.push(value);
 		}
 
 		void pop()
 		{
-			mData.top()->subRef();
+			mData.top()->deleteObject();
 			mData.pop();
 		}
 
@@ -201,7 +201,7 @@ namespace tezcat::Tiny
 		{
 			while (!mData.empty())
 			{
-				mData.top()->subRef();
+				mData.top()->deleteObject();
 				mData.pop();
 			}
 		}
@@ -231,13 +231,13 @@ namespace tezcat::Tiny
 
 		void push_back(value_type&& obj)
 		{
-			obj->addRef();
+			obj->saveObject();
 			mData.push_back(obj);
 		}
 
 		void push_back(const value_type& obj)
 		{
-			obj->addRef();
+			obj->saveObject();
 			mData.push_back(obj);
 		}
 
@@ -245,7 +245,7 @@ namespace tezcat::Tiny
 		constexpr decltype(auto) emplace_back(Args&&... args)
 		{
 			auto obj = mData.emplace_back(std::forward<Args>(args)...);
-			obj->addRef();
+			obj->saveObject();
 			return obj;
 		}
 
@@ -255,7 +255,7 @@ namespace tezcat::Tiny
 			{
 				if (s)
 				{
-					s->subRef();
+					s->deleteObject();
 				}
 			}
 
@@ -284,7 +284,7 @@ namespace tezcat::Tiny
 
 		constexpr iterator erase(iterator& it) noexcept
 		{
-			(*it)->subRef();
+			(*it)->deleteObject();
 			return mData.erase(it);
 		}
 
@@ -346,25 +346,25 @@ namespace tezcat::Tiny
 
 		void pop_back() noexcept
 		{
-			mData.back()->subRef();
+			mData.back()->deleteObject();
 			mData.pop_back();
 		}
 
 		void pop_front() noexcept
 		{
-			mData.front()->subRef();
+			mData.front()->deleteObject();
 			mData.pop_front();
 		}
 
 		constexpr void push_back(value_type&& obj)
 		{
-			obj->addRef();
+			obj->saveObject();
 			mData.push_back(obj);
 		}
 
 		constexpr void push_back(const value_type& obj)
 		{
-			obj->addRef();
+			obj->saveObject();
 			mData.push_back(obj);
 		}
 
@@ -372,7 +372,7 @@ namespace tezcat::Tiny
 		constexpr decltype(auto) emplace_back(Args&&... args)
 		{
 			auto obj = mData.emplace_back(std::forward<Args>(args)...);
-			obj->addRef();
+			obj->saveObject();
 			return obj;
 		}
 
@@ -380,7 +380,7 @@ namespace tezcat::Tiny
 		constexpr decltype(auto) emplace_front(Args&&... args)
 		{
 			auto obj = mData.emplace_front(std::forward<Args>(args)...);
-			obj->addRef();
+			obj->saveObject();
 			return obj;
 		}
 
@@ -399,7 +399,7 @@ namespace tezcat::Tiny
 		{
 			for (auto& s : mData)
 			{
-				s->subRef();
+				s->deleteObject();
 			}
 
 			mData.clear();
@@ -427,7 +427,7 @@ namespace tezcat::Tiny
 
 		iterator erase(iterator& it) noexcept
 		{
-			(*it)->subRef();
+			(*it)->deleteObject();
 			return mData.erase(it);
 		}
 
@@ -490,7 +490,7 @@ namespace tezcat::Tiny
 		constexpr iterator emplace_hint(const_iterator where, Values&&... args)
 		{
 			auto it = mData.emplace_hint(where, std::forward<Values>(args)...);
-			it->second->addRef();
+			it->second->saveObject();
 			return it;
 		}
 
@@ -500,7 +500,7 @@ namespace tezcat::Tiny
 			auto pair = mData.emplace(std::forward<Values>(values)...);
 			if (pair.second)
 			{
-				pair.first->second->addRef();
+				pair.first->second->saveObject();
 			}
 
 			return pair;
@@ -518,7 +518,7 @@ namespace tezcat::Tiny
 			if (pair.second)
 			{
 				pair.first->second = function();
-				pair.first->second->addRef();
+				pair.first->second->saveObject();
 			}
 
 			return pair;
@@ -582,7 +582,7 @@ namespace tezcat::Tiny
 		{
 			for (auto& pair : mData)
 			{
-				pair.second->subRef();
+				pair.second->deleteObject();
 			}
 
 			mData.clear();

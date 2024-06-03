@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
 #include "../Shader/ShaderParam.h"
@@ -12,18 +12,21 @@ namespace tezcat::Tiny
 	class BaseGraphics;
 	class TINY_API Material : public TinyObject
 	{
-		Material(const std::string& name);
+		Material(std::string name);
 		Material(Shader* shader);
-		TINY_Factory(Material);
-		TINY_RTTI_H(Material);
+		TINY_OBJECT_H(Material, TinyObject)
 
 	public:
 		virtual ~Material();
 
 	public:
+		std::string& getName() { return mName; }
+		std::string_view getNameView() { return mName; }
+
 		int getUID() const;
 		std::vector<Uniform*>& getUniforms() { return mUniforms; }
 		Shader* getShader() const { return mShader; }
+		void setShader(Shader* shader);
 
 	public:
 		template<typename UniformType, typename Args>
@@ -42,7 +45,7 @@ namespace tezcat::Tiny
 			}
 			else
 			{
-				TinyThrow_Logic(StringTool::stringFormat("Material : This uniform [%s] not found!", uniformID.getStringData()));
+				TINY_THROW_LOGIC(StringTool::stringFormat("Material : This uniform [%s] not found!", uniformID.getStringData()));
 			}
 		}
 
@@ -56,18 +59,18 @@ namespace tezcat::Tiny
 			}
 			else
 			{
-				TinyThrow_Logic(StringTool::stringFormat("Material : This uniform [%s] not found!", name.c_str()));
+				TINY_THROW_LOGIC(StringTool::stringFormat("Material : This uniform [%s] not found!", name.c_str()));
 			}
 		}
 
 		template<typename UniformType, typename ValueType>
-		void setUniform(const uint32_t& id, ValueType&& value)
+		void setUniform(const uint32& id, ValueType&& value)
 		{
 			static_cast<UniformType*>(mUniforms[id])->set(std::forward<ValueType>(value));
 		}
 
 		template<typename UniformType, typename ValueType>
-		void setUniform(const uint32_t& id, ValueType& value)
+		void setUniform(const uint32& id, ValueType& value)
 		{
 			static_cast<UniformType*>(mUniforms[id])->set(value);
 		}

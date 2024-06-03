@@ -1,4 +1,4 @@
-#include "ShaderManager.h"
+﻿#include "ShaderManager.h"
 #include "../Shader/Shader.h"
 #include "../Shader/ShaderPackage.h"
 #include "../Tool/FileTool.h"
@@ -6,15 +6,7 @@
 
 namespace tezcat::Tiny
 {
-	ShaderManager::ShaderManager()
-	{
-		SG<ShaderManager>::attach(this);
-	}
-
-	ShaderManager::~ShaderManager()
-	{
-
-	}
+	std::unordered_map<std::string_view, Shader*> ShaderManager::mShaderUMap;
 
 	void ShaderManager::loadShaderFiles(const std::string& path)
 	{
@@ -23,7 +15,7 @@ namespace tezcat::Tiny
 
 		for (auto& pair : out_files)
 		{
-			this->createShader(pair.second.path);
+			createShader(pair.second.path);
 		}
 	}
 
@@ -69,9 +61,10 @@ namespace tezcat::Tiny
 		auto result = mShaderUMap.try_emplace(shader->getName(), shader);
 		if (result.second)
 		{
-			shader->addRef();
+			shader->saveObject();
 		}
 	}
+
 
 }
 

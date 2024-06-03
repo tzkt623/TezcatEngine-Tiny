@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Base/TinyObject.h"
 #include "../Tool/Tool.h"
@@ -8,7 +8,6 @@ namespace tezcat::Tiny
 {
 	class ShadowCaster;
 	class Shader;
-	class Texture2D;
 	class BaseGraphics;
 
 	/*
@@ -16,23 +15,18 @@ namespace tezcat::Tiny
 	*/
 	class TINY_API ShadowCasterManager
 	{
+		friend class ShadowCaster;
+		static uint32 add(ShadowCaster* caster);
+		static void recycle(ShadowCaster* caster);
 	public:
-		ShadowCasterManager();
-
-		uint32_t addCaster(ShadowCaster* caster);
-		std::list<TinyWeakRef<ShadowCaster>>& getAllCaster() { return mCasterAry; }
-		Shader* getShader();
-	public:
-		void calculate(BaseGraphics* graphics);
-		void submit(BaseGraphics* graphics, Shader* mShader);
+		static std::list<TinyWeakRef<ShadowCaster>>& getAllCaster() { return mCasterAry; }
+		static void init();
+		static void submit(BaseGraphics* graphics, Shader* mShader);
 
 	private:
-		std::list<TinyWeakRef<ShadowCaster>> mCasterAry;
-		std::deque<uint32_t> mFreeIDs;
-		Shader* mShader;
-		Texture2D* mShadowTexture;
+		static bool mAdded;
+		static std::list<TinyWeakRef<ShadowCaster>> mCasterAry;
+		static std::queue<uint32> mFreeIDs;
+		static Shader* mShader;
 	};
-
-
-	using ShadowCasterMgr = SG<ShadowCasterManager>;
 }

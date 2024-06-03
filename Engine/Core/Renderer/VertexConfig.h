@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
@@ -6,7 +6,7 @@
 
 namespace tezcat::Tiny
 {
-	enum TINY_API VertexPosition : uint32_t
+	enum TINY_API VertexPosition : uint32
 	{
 		VP_Position = 0,
 		VP_Normal,
@@ -14,7 +14,7 @@ namespace tezcat::Tiny
 		VP_Color,
 	};
 
-	enum class TINY_API VertexLayoutType : uint32_t
+	enum class TINY_API VertexLayoutType : uint32
 	{
 		None = 0,
 		Float1,
@@ -30,9 +30,9 @@ namespace tezcat::Tiny
 		//顶点的数据类型
 		VertexLayoutType type;
 		//结构大小
-		size_t stride = 0;
+		uint64 stride = 0;
 
-		size_t dataLength;
+		uint64 dataLength;
 
 		const void* data;
 
@@ -44,8 +44,8 @@ namespace tezcat::Tiny
 	class TINY_API VertexLayout
 	{
 	public:
-		static int getTypeLength(VertexLayoutType type);
-		static uint32_t getTypeSize(VertexLayoutType type);
+		static int32 getTypeLength(VertexLayoutType type);
+		static uint32 getTypeSize(VertexLayoutType type);
 		static VertexLayoutType getLayoutType(VertexPosition position);
 	};
 }

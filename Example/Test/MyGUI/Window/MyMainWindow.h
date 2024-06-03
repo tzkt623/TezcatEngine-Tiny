@@ -1,26 +1,28 @@
-#pragma once
+﻿#pragma once
 
 #include "../MyGUIContext.h"
 
-class MyMainWindow : public GUIWindow
+namespace tezcat::Editor
 {
-public:
-	MyMainWindow();
-	virtual ~MyMainWindow();
+	class MyMainWindow : public GUIWindow
+	{
+	public:
+		MyMainWindow();
+		virtual ~MyMainWindow();
 
-	void init() override;
+		void init() override;
 
-protected:
-	void onRender() override;
+	protected:
+		void onRender() override;
 
-public:
-	bool begin() override;
-	void end() override;
+	public:
+		bool begin() override;
+		void end() override;
 
-private:
-	ImGuiWindowFlags mWindowFlags;
-	ImGuiDockNodeFlags mDockspaceFlags;
-};
+	private:
+		ImGuiWindowFlags mWindowFlags;
+		ImGuiDockNodeFlags mDockspaceFlags;
+	};
 
-
+}
 

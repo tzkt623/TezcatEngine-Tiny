@@ -1,15 +1,17 @@
-#pragma once
+﻿#pragma once
 
-#include "../Head/CppHead.h"
-#include "../Head/ConfigHead.h"
-#include "../Tool/Tool.h"
-
+#include "Tiny.h"
+#include "../ThirdParty/imgui/imgui.h"
+#include "../ThirdParty/imgui/imgui_impl_glfw.h"
+#include "../ThirdParty/imgui/imgui_impl_opengl3.h"
+#include "../ThirdParty/imgui/TextEditor/TextEditor.h"
 
 struct GLFWwindow;
-namespace tezcat::Tiny
+
+namespace tezcat::Editor
 {
 	class GUIWindow;
-	class TINY_API GUI
+	class GUI
 	{
 	public:
 		GUI();
@@ -43,7 +45,5 @@ namespace tezcat::Tiny
 		std::vector<GUIWindow*> mInitList;
 		std::list<GUIWindow*> mWindows;
 	};
+
 }
-
-
-

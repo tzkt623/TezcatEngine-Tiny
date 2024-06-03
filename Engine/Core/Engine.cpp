@@ -1,17 +1,12 @@
-#include "Engine.h"
+﻿#include "Engine.h"
 #include "EngineIniter.h"
 
-#include "Manager/LightManager.h"
-#include "Manager/ShaderManager.h"
 #include "Manager/SceneManager.h"
-#include "Manager/CameraManager.h"
-#include "Manager/VertexBufferManager.h"
-#include "Manager/FrameBufferManager.h"
-#include "Manager/TextureManager.h"
-#include "Manager/ModelManager.h"
 
 #include "Renderer/BaseGraphics.h"
 #include "Renderer/LayerMask.h"
+#include "Renderer/Pipeline.h"
+
 #include "Component/GameObject.h"
 #include "Shader/ShaderParam.h"
 #include "Data/Resource.h"
@@ -24,8 +19,8 @@
 
 namespace tezcat::Tiny
 {
-	int Engine::ScreenHeight = 0;
-	int Engine::ScreenWidth = 0;
+	int32 Engine::ScreenHeight = 0;
+	int32 Engine::ScreenWidth = 0;
 	float Engine::sDeltaTime = 0;
 	std::string Engine::sName;
 
@@ -42,25 +37,16 @@ namespace tezcat::Tiny
 
 	Engine::Engine()
 		: mResourceLoader(nullptr)
-		, mShaderManager(nullptr)
-		, mSceneManager(nullptr)
-		, mFrameBufferManager(nullptr)
-		, mTextureManager(nullptr)
-		, mVertexManager(nullptr)
-		, mModelManager(nullptr)
 		, mInputSystem(nullptr)
 		, mGraphics(nullptr)
 		, mIsRunning(true)
 	{
-
 	}
 
 	Engine::~Engine()
 	{
 		delete mInputSystem;
 		delete mGraphics;
-		delete mSceneManager;
-		delete mShaderManager;
 		delete mResourceLoader;
 	}
 
@@ -69,12 +55,7 @@ namespace tezcat::Tiny
 		EngineEvent::get()->init(EngineEventID::EE_IDCount);
 		mResourceLoader = loader;
 
-		mShaderManager = new ShaderManager();
-		mSceneManager = new SceneManager();
-		mFrameBufferManager = new FrameBufferManager();
-		mTextureManager = new TextureManager();
-		mVertexManager = new VertexBufferManager();
-		mModelManager = new ModelManager();
+		mPipeline = new PipelineBuildin();
 		mInputSystem = new InputSystem();
 
 		if (!this->preInit())
@@ -139,7 +120,8 @@ namespace tezcat::Tiny
 					sSemRenderThread.acquire();
 					//std::cout << "Render running......\n";
 
-					mGraphics->render();
+					//mGraphics->render();
+					mPipeline->render(mGraphics);
 
 					//allowRender.store(false);
 					//allowLogic.store(true);
@@ -175,7 +157,7 @@ namespace tezcat::Tiny
 
 	bool Engine::postInit()
 	{
-		mSceneManager->init();
+		SceneManager::init();
 		mResourceLoader->prepareGame(this);
 		return true;
 	}
@@ -229,7 +211,7 @@ namespace tezcat::Tiny
 	void Engine::onUpdate()
 	{
 		mInputSystem->update();
-		mSceneManager->update();
+		SceneManager::update();
 	}
 
 	void Engine::onRender()
@@ -256,7 +238,14 @@ namespace tezcat::Tiny
 
 	void Engine::notifyRender()
 	{
-		mGraphics->render();
+		/*
+		* 1.场景先更新完所有数据
+		* 2.玩家相机遍历所有Mesh生成渲染命令
+		* 3.管线对命令进行渲染
+		*/
+
+		mPipeline->render(mGraphics);
+		//mGraphics->render();
 	}
 
 	void Engine::notifyRenderThread()

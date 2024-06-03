@@ -1,14 +1,17 @@
-#pragma once
+﻿#pragma once
 
 #include "Tiny.h"
 
-class MyEngineIniter : public EngineIniter
+namespace tezcat::Editor
 {
-public:
-	MyEngineIniter();
+	class MyEngineIniter : public EngineIniter
+	{
+	public:
+		MyEngineIniter();
 
-	void prepareEngine(Engine* engine) override;
-	void prepareResource(Engine* engine) override;
-	void prepareGame(Engine* engine) override;
-	void initYourShaderParam() override;
-};
+		void prepareEngine(Engine* engine) override;
+		void prepareResource(Engine* engine) override;
+		void prepareGame(Engine* engine) override;
+		void initYourShaderParam() override;
+	};
+}

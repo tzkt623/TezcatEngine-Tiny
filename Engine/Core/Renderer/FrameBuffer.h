@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
@@ -6,48 +6,41 @@
 
 namespace tezcat::Tiny
 {
-	struct TextureInfo;
 	class Texture;
-	class Texture2D;
-	class TextureCube;
-	class TextureRender2D;
-	class BaseGraphics;
-
+	/*
+	* TODO: Attachment所属权的问题
+	*/
 	class TINY_API FrameBuffer : public TinyObject
 	{
+		friend class FrameBufferManager;
+
 		FrameBuffer();
-		FrameBuffer(const std::string& name);
-		TINY_RTTI_H(FrameBuffer);
-		TINY_Factory(FrameBuffer);
+		FrameBuffer(std::string name);
+		TINY_OBJECT_H(FrameBuffer, TinyObject)
 	public:
 		virtual ~FrameBuffer();
 		void generate();
 
-
-		void apply(uint32_t id) { mBufferID = id; }
-		uint32_t getFrameBufferID() { return mBufferID; }
-		TinyVector<Texture*>& getAttachmentes() { return mComponents; }
+	public:
+		void apply(uint32 id) { mBufferID = id; }
+		uint32 getFrameBufferID() const { return mBufferID; }
 		void addAttachment(Texture* tex);
-		Texture* getBuffer(const int& index);
+		Texture* getAttachment(int index) { return mComponents[index]; }
+
+		const std::vector<Texture*>& getAttachmentes() const { return mComponents; }
+		std::string_view getNameView() const { return mName; }
+		std::string& getName() { return mName; }
+		void setName(std::string& name) { mName.assign(std::move(name)); }
+
+		uint32 currentFrame() const { return mCurrentFrame; }
+		void updateCurrentFrame(uint32 val) { mCurrentFrame = val; }
 
 	protected:
+		uint32 mCurrentFrame;
+		uint32 mBufferID;
+		uint32 mUID;
 		std::string mName;
-		uint32_t mBufferID;
-		TinyVector<Texture*> mComponents;
-
-	public:
-		static void bind(BaseGraphics* graphics, FrameBuffer* buffer);
-		static void unbind(BaseGraphics* graphics, FrameBuffer* buffer);
-		static FrameBuffer* getDefaultBuffer() { return sDefaultBuffer; }
-		static void setDefaultBuffer(FrameBuffer* buffer)
-		{
-			sDefaultBuffer = buffer;
-			sFrameBufferStack.push(sDefaultBuffer);
-		}
-
-	private:
-		static TinyStack<FrameBuffer*> sFrameBufferStack;
-		static FrameBuffer* sDefaultBuffer;
+		std::vector<Texture*> mComponents;
 	};
 }
 

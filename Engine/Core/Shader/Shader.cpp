@@ -1,14 +1,14 @@
-#include "Shader.h"
+﻿#include "Shader.h"
 #include "../Tool/Tool.h"
 
 
 #include "../Manager/ShaderManager.h"
-#include "../Renderer/RenderPass.h"
 #include "../Renderer/BaseGraphics.h"
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Shader);
+	TINY_OBJECT_CPP(Shader, TinyObject)
+
 	Shader::Shader(const std::string& filePath)
 		: mProgramID(-1)
 		, mName()
@@ -49,7 +49,7 @@ namespace tezcat::Tiny
 	void Shader::apply(uint32_t pid)
 	{
 		mProgramID = pid;
-		ShaderMgr::getInstance()->registerShader(this);
+		ShaderManager::registerShader(this);
 	}
 
 	void Shader::generate()

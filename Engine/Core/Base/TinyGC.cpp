@@ -1,4 +1,4 @@
-#include "TinyGC.h"
+﻿#include "TinyGC.h"
 #include "TinyRefObject.h"
 #include "TinyObject.h"
 #include "../Tool/Log.h"
@@ -6,31 +6,25 @@
 
 namespace tezcat::Tiny
 {
-	std::deque<uint32_t> TinyGC::mFreeGCInfos;
+	std::queue<uint32> TinyGC::mFreeGCInfos;
 	std::vector<TinyRefObject*> TinyGC::mMemoryPool;
 	std::vector<TinyGCInfo*> TinyGC::mGCInfos =
 	{
 		new TinyGCInfo(0, -623, 0, nullptr)
 	};
 
-	TinyGCInfo* TinyGC::DefaultGCInfo = TinyGC::mGCInfos[0];
-
-
 	void TinyGC::update()
 	{
-		if (mMemoryPool.empty())
+		if (!mMemoryPool.empty())
 		{
-			return;
-		}
+			for (auto p : mMemoryPool)
+			{
+				//Log::engine(StringTool::stringFormat("Memory: {%s} RefSub: %d", s->getClassName().c_str(), s->getRefCount()));
+				p->deleteObject();
+			}
 
-		for (size_t i = 0; i < mMemoryPool.size(); i++)
-		{
-			auto s = mMemoryPool[i];
-			//Log::engine(StringTool::stringFormat("Memory: {%s} RefSub: %d", s->getClassName().c_str(), s->getRefCount()));
-			s->subRef();
+			mMemoryPool.clear();
 		}
-
-		mMemoryPool.clear();
 	}
 
 	void TinyGC::manage(TinyRefObject* obj)
@@ -48,12 +42,12 @@ namespace tezcat::Tiny
 		}
 		else
 		{
-			auto index = mFreeGCInfos.front();
-			mFreeGCInfos.pop_front();
-			auto info = mGCInfos[index];
+			auto info = mGCInfos[mFreeGCInfos.front()];
 			info->pointer = object;
 			info->strongRef = 1;
 			info->weakRef = 0;
+			info->unique = false;
+			mFreeGCInfos.pop();
 			return info;
 		}
 	}
@@ -63,7 +57,7 @@ namespace tezcat::Tiny
 		info->pointer = nullptr;
 		info->strongRef = -1;
 		info->weakRef = -1;
-		mFreeGCInfos.push_back(info->index);
+		mFreeGCInfos.push(info->index);
 	}
-}
 
+}

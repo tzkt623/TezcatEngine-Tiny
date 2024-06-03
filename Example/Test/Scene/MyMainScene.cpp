@@ -1,11 +1,11 @@
-#include "MyMainScene.h"
+﻿#include "MyMainScene.h"
 #include "../MyInputer.h"
 #include "../MyController.h"
 
-TINY_RTTI_CPP(MyMainScene);
+TINY_OBJECT_CPP(MyMainScene, Scene)
 
 MyMainScene::MyMainScene(const std::string& name)
-	: Scene(name)
+	: Base(name)
 	, mController(nullptr)
 {
 
@@ -14,7 +14,9 @@ MyMainScene::MyMainScene(const std::string& name)
 
 void MyMainScene::onEnter()
 {
-	Scene::onEnter();
+	Base::onEnter();
+	LightingManager::enableSkyBox();
+
 	InputSys::getInstance()->push(MyInputer::getInstance());
 
 	float gateWidth = 1920.0f / 4;
@@ -29,53 +31,49 @@ void MyMainScene::onEnter()
 	if (true)
 	{
 		auto go = GameObject::create("World1_Camera");
-		auto camera = go->addComponent<Camera>(true);
+		auto camera = go->addComponent<Camera>();
+		camera->setMain();
 		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
 		camera->setCullLayer(0);
-		camera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth);
+		camera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth | ClearOption::CO_Color);
+		camera->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 
 		go->addComponent<Transform>();
-		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
 		go->getTransform()->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 		//go->getTransform()->setParent(mController->getTransform());
 		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
-
-
-		auto frame_buffer = FrameBufferMgr::getInstance()->create("FB_Viewport");
-		Texture2D* tex2d = TextureMgr::getInstance()->create2D("RB_Viewport");
-		tex2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
-			, TextureInfo(TextureAttachPosition::ColorComponent
-				, TextureChannel::RGBA
-				, TextureChannel::RGBA
-				, DataType::UByte));
-
-		TextureRender2D* render2d = TextureMgr::getInstance()->createRender2D("DS_Viewport");
-		render2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight()
-			, TextureInfo(TextureAttachPosition::DepthComponent
-				, TextureChannel::Depth
-				, TextureChannel::Depth
-				, DataType::UByte));
-
-		frame_buffer->addAttachment(tex2d);
-		frame_buffer->addAttachment(render2d);
-		frame_buffer->generate();
-
-		camera->setFrameBuffer(frame_buffer);
 	}
+
+
 
 	//this->createInfinitePlane();
 	this->createDirectionLight();
 	this->createPaintings();
 	this->createPlane();
-	//this->createTransparentObject();
+	this->createTransparentObject();
 	this->createPBR();
-	//this->createCubes0();
+	this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
-	auto img = Resource::load<Image>("Image/blocky_photo_studio_2k.hdr");
-	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvLightingImage, img });
-	Resource::unload(img);
+	auto img = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
+	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+	//Resource::unload(img);
+
+	{
+		std::array<Image*, 6> imgs
+		{
+			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_R.jpg"),
+			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_L.jpg"),
+			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_U.jpg"),
+			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_D.jpg"),
+			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_F.jpg"),
+			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_B.jpg")
+		};
+
+		//LightingManager::setSkyBox(imgs);
+	}
 
 	//  	auto model = Resource::load<Model>("Model/Cerberus_LP.fbx");
 	//  	model->generate();
@@ -83,6 +81,7 @@ void MyMainScene::onEnter()
 	// 	model = Resource::load<Model>("Model/School.fbx");
 	// 	model->generate();
 
+	/*
 	int radius = 3;
 	int length;
 	auto vs = GaussianMatrix::calculate(radius, length);
@@ -109,8 +108,12 @@ void MyMainScene::onEnter()
 	float4x4 o1_mat = glm::translate(float4x4(1.0f), o1_translation);
 	o1_mat = o1_mat * glm::mat4_cast(glm::quat(glm::radians(o1_rotation)));
 	o1_mat = o1_mat * glm::scale(o1_mat, o1_scale);
+	*/
+}
 
-
+void MyMainScene::onExit()
+{
+	Base::onExit();
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
@@ -130,7 +133,7 @@ void MyMainScene::createGates(float gateWidth, float gateHigh)
 	mr1->setMaterial(world1_material);
 
 	auto shader = world1_material->getShader();
-	auto tex = (Texture2D*)TextureMgr::getInstance()->find("RB_World1");
+	auto tex = (Texture2D*)TextureManager::find("RB_World1");
 	auto index = shader->getUniformIndex("myTexColor2D");
 	world1_material->setUniform<UniformTex2D>(index, tex);
 
@@ -147,7 +150,7 @@ void MyMainScene::createGates(float gateWidth, float gateHigh)
 	auto world2_material = Material::create("Unlit/Texture");
 	mr2->setMaterial(world2_material);
 
-	tex = (Texture2D*)TextureMgr::getInstance()->find("RB_World2");
+	tex = (Texture2D*)TextureManager::find("RB_World2");
 	index = shader->getUniformIndex("myTexColor2D");
 	world2_material->setUniform<UniformTex2D>(index, tex);
 }
@@ -167,15 +170,16 @@ void MyMainScene::createPaintings()
 	wife->getTransform()->setParent(transform);
 
 	auto mr2 = wife->addComponent<MeshRenderer>();
-	auto wife_material2 = Material::create("Unlit/Texture");
-	mr2->setMaterial(wife_material2);
 	mr2->setMesh("Square");
 
+	auto wife_material2 = Material::create("Unlit/Texture");
 	auto shader = wife_material2->getShader();
-
 	auto my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
 	auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
 	wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
+	mr2->setMaterial(wife_material2);
+
+
 
 
 	//--------------------------------------
@@ -213,7 +217,7 @@ void MyMainScene::createPaintings()
 
 	auto img = Resource::loadOnly<Image>("Image/solitude_night_2k.hdr");
 	auto hdr = Texture2D::create();
-	hdr->setData(img);
+	hdr->setImage(img);
 	hdr->setMinFilter(TextureFilter::Linear_Mipmap_Linear);
 	hdr->generate();
 	auto gaussian = GameObject::create("Gaussian");
@@ -271,7 +275,7 @@ void MyMainScene::createCubes0()
 	std::uniform_int_distribution<> dis(-520, 520);
 	std::uniform_int_distribution<> dis_ro(0, 359);
 
-	auto shader = ShaderMgr::getInstance()->find("Standard/Std1");
+	auto shader = ShaderManager::find("Standard/Std1");
 
 	auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
 	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
@@ -337,7 +341,7 @@ void MyMainScene::createInfinitePlane()
 	auto go = GameObject::create("InfinitePlane");
 	go->addComponent<Transform>()->setPosition(0.0f, 0.0f, 0.0f);
 	auto mr = go->addComponent<MeshRenderer>();
-	mr->setCastShadow(false);
+	mr->setShadowReciever(false);
 	mr->setMesh("GridSquare");
 	auto material = Material::create("Utility/InfiniteGrid");
 	mr->setMaterial(material);
@@ -356,7 +360,6 @@ void MyMainScene::createDirectionLight()
 	mr->setMesh("Sphere");
 
 	auto light_material = Material::create("Unlit/Color");
-	mr->setCastShadow(false);
 	mr->setMaterial(light_material);
 
 	auto dir_light = go->addComponent<DirectionalLight>();
@@ -383,19 +386,19 @@ void MyMainScene::createPBR()
 	auto transform = go->addComponent<Transform>();
 	transform->setPosition(glm::vec3(0.0f, 0.0f, -20.0f));
 
-	auto shader = ShaderMgr::getInstance()->find("Standard/PBRTest1");
+	auto shader = ShaderManager::find("Standard/PBRTest1");
 	auto index_albedo = shader->getUniformIndex("myPBR.albedo");
 	auto index_metallic = shader->getUniformIndex("myPBR.metallic");
 	auto index_roughness = shader->getUniformIndex("myPBR.roughness");
 	auto index_ao = shader->getUniformIndex("myPBR.ao");
 
-	int number = 6;
+	int number = 5;
 	float rate = 1.0f / (float)number;
 	for (int y = 0; y <= number; y++)
 	{
 		for (int x = 0; x <= number; x++)
 		{
-			auto go = GameObject::create(StringTool::stringFormat("PBRBall_%d_%d", x, y));
+			go = GameObject::create(StringTool::stringFormat("PBRBall_%d_%d", x, y));
 			go->addComponent<Transform>();
 			go->getTransform()->setPosition(glm::vec3(x * 25.0f, y * 25.0f, -60.0f));
 			go->getTransform()->setScale(glm::vec3(10.0f));

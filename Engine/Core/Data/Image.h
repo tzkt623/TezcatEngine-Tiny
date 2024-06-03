@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
@@ -10,29 +10,28 @@ namespace tezcat::Tiny
 	class TINY_API Image : public TinyObject
 	{
 		Image();
-		TINY_Factory(Image);
-		TINY_RTTI_H(Image);
+		TINY_OBJECT_H(Image, TinyObject)
 	public:
 		virtual ~Image();
 
 		bool openFile(const std::string& path, bool flip = false);
 		bool openFile(const FileInfo& info, bool flip = false);
 
-		inline const int& getWidth() const { return mWidth; }
-		inline const int& getHeight() const { return mHeight; }
-		inline const int& getChannels() const { return mChannels; }
-		uint64_t getDataSize() const
+		const int& getWidth() const { return mWidth; }
+		const int& getHeight() const { return mHeight; }
+		const int& getChannels() const { return mChannels; }
+		uint64 getDataSize() const
 		{
-			return mWidth * mHeight * mChannels * uint64_t(mIsHDR ? sizeof(float) : sizeof(uint8_t));
+			return mWidth * mHeight * mChannels * uint64(mIsHDR ? sizeof(float) : sizeof(uint8));
 		}
-		inline void* getData() const { return mData; }
-		inline void* moveData()
+		void* getData() const { return mData; }
+		void* moveData()
 		{
 			auto temp = mData;
 			mData = nullptr;
 			return temp;
 		}
-		inline bool isHDR() const { return mIsHDR; }
+		bool isHDR() const { return mIsHDR; }
 
 	private:
 		int mWidth;

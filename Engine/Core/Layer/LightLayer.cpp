@@ -1,4 +1,4 @@
-#include "LightLayer.h"
+﻿#include "LightLayer.h"
 #include "../Component/GameObject.h"
 #include "../Component/Light.h"
 
@@ -16,7 +16,7 @@ namespace tezcat::Tiny
 
 	void LightLayer::addLight(PointLight* light)
 	{
-		mLightList.emplace_back(light);
+		//mLightList.emplace_back(light);
 	}
 
 	void LightLayer::addLight(SpotLight* light)
@@ -41,7 +41,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	bool LightLayer::testGameObject(Pipeline* pipeline, IRenderObject* renderObject)
+	bool LightLayer::testGameObject(Pipeline* pipeline, BaseRenderer* renderObject)
 	{
 		if (mLightList.empty())
 		{

@@ -1,4 +1,4 @@
-#include "MyController.h"
+﻿#include "MyController.h"
 #include "MyInputer.h"
 #include "Scene/MyMainScene.h"
 
@@ -40,10 +40,10 @@ void MyController::warp()
 	if (mWorldIndex == -1)
 	{
 		mWorldIndex = 1;
-		auto objects = this->getGameObject()->getScene()->findGameObjects("World1_Gate");
+		auto objects = this->getGameObject()->getScene()->findTransforms("World1_Gate");
 		mWorld1Gate = objects[0]->getTransform();
 
-		objects = this->getGameObject()->getScene()->findGameObjects("World2_Gate");
+		objects = this->getGameObject()->getScene()->findTransforms("World2_Gate");
 		mWorld2Gate = objects[0]->getTransform();
 	}
 
@@ -55,12 +55,12 @@ void MyController::warp()
 			if (distance < warp_distance)
 			{
 				mWorldIndex = 2;
-				CameraMgr::getInstance()->setMainCamera("World2_Camera");
+				CameraManager::setMainCamera("World2_Camera");
 
-				auto camera1 = CameraMgr::getInstance()->getCamera("World1_Camera");
-				camera1->setFrameBuffer(FrameBufferMgr::getInstance()->find("FB_World1"));
+				auto camera1 = CameraManager::findCamera("World1_Camera");
+				camera1->setFrameBuffer(FrameBufferManager::find("FB_World1"));
 
-				auto camera2 = CameraMgr::getInstance()->getCamera("World2_Camera");
+				auto camera2 = CameraManager::findCamera("World2_Camera");
 				camera2->setFrameBuffer(nullptr);
 			}
 		}
@@ -73,13 +73,13 @@ void MyController::warp()
 			if (distance < warp_distance)
 			{
 				mWorldIndex = 1;
-				CameraMgr::getInstance()->setMainCamera("World1_Camera");
+				CameraManager::setMainCamera("World1_Camera");
 
-				auto camera1 = CameraMgr::getInstance()->getCamera("World1_Camera");
+				auto camera1 = CameraManager::findCamera("World1_Camera");
 				camera1->setFrameBuffer(nullptr);
 
-				auto camera2 = CameraMgr::getInstance()->getCamera("World2_Camera");
-				camera2->setFrameBuffer(FrameBufferMgr::getInstance()->find("FB_World2"));
+				auto camera2 = CameraManager::findCamera("World2_Camera");
+				camera2->setFrameBuffer(FrameBufferManager::find("FB_World2"));
 			}
 		}
 	}

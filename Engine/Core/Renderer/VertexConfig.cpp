@@ -1,9 +1,9 @@
-#include "VertexConfig.h"
+﻿#include "VertexConfig.h"
 
 namespace tezcat::Tiny
 {
 
-	int VertexLayout::getTypeLength(VertexLayoutType type)
+	int32 VertexLayout::getTypeLength(VertexLayoutType type)
 	{
 		switch (type)
 		{
@@ -18,7 +18,7 @@ namespace tezcat::Tiny
 		return 0;
 	}
 
-	uint32_t VertexLayout::getTypeSize(VertexLayoutType type)
+	uint32 VertexLayout::getTypeSize(VertexLayoutType type)
 	{
 		switch (type)
 		{

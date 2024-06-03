@@ -1,4 +1,4 @@
-#include "SceneManager.h"
+﻿#include "SceneManager.h"
 #include "../Scene/Scene.h"
 #include "../Tool/Tool.h"
 #include "../Profiler.h"
@@ -6,47 +6,38 @@
 
 namespace tezcat::Tiny
 {
-	SceneManager::SceneManager()
-		: mNeedSwith(false)
-	{
-		SG<SceneManager>::attach(this);
-
-		EngineEvent::get()->addListener(EngineEventID::EE_PopScene
-			, this
-			, [this](const EventData& data)
-			{
-				this->popScene();
-			});
-
-		EngineEvent::get()->addListener(EngineEventID::EE_PushScene
-			, this
-			, [this](const EventData& data)
-			{
-				this->pushScene((Scene*)data.userData);
-			});
-	}
-
-	SceneManager::~SceneManager()
-	{
-		EngineEvent::get()->removeListener(this);
-	}
+	std::deque<tezcat::Tiny::SceneManager::CMDData> SceneManager::mCDMs;
+	std::unordered_map<std::string_view, Scene*> SceneManager::sSceneUMap;
+	std::stack<Scene*> SceneManager::sSceneArray;
 
 	void SceneManager::init()
 	{
+		EngineEvent::get()->addListener(EngineEventID::EE_PopScene
+			, &sSceneArray
+			, [](const EventData& data)
+			{
+				popScene();
+			});
 
+		EngineEvent::get()->addListener(EngineEventID::EE_PushScene
+			, &sSceneArray
+			, [](const EventData& data)
+			{
+				pushScene((Scene*)data.userData);
+			});
 	}
 
 	void SceneManager::pushScene(const std::string& name)
 	{
-		if (!mScenes.empty())
+		if (!sSceneArray.empty())
 		{
-			mScenes.top()->onPause();
+			sSceneArray.top()->onPause();
 		}
 
-		auto it = mSceneWithName.find(name);
-		if (it != mSceneWithName.end())
+		auto it = sSceneUMap.find(name);
+		if (it != sSceneUMap.end())
 		{
-			this->pushScene(it->second);
+			pushScene(it->second);
 		}
 	}
 
@@ -57,16 +48,26 @@ namespace tezcat::Tiny
 
 	void SceneManager::popScene()
 	{
-		if (mScenes.empty())
+		if (sSceneArray.empty())
 		{
 			return;
 		}
-		mCDMs.emplace_back(CMD::Pop, mScenes.top());
+
+		mCDMs.emplace_back(CMD::Pop, sSceneArray.top());
 	}
 
 	void SceneManager::prepareScene(Scene* scene)
 	{
-		mSceneWithName.emplace(scene->getName(), scene);
+		auto result = sSceneUMap.try_emplace(scene->getName(), nullptr);
+		if (result.second)
+		{
+			result.first->second = scene;
+			scene->saveObject();
+		}
+		else
+		{
+			TINY_THROW("Fatal Error!");
+		}
 	}
 
 	bool SceneManager::update()
@@ -75,35 +76,35 @@ namespace tezcat::Tiny
 
 		while (!mCDMs.empty())
 		{
-			auto cmd = mCDMs.front();
+			auto& cmd = mCDMs.front();
 			mCDMs.pop_front();
 			switch (cmd.cmd)
 			{
 			case CMD::Pop:
 			{
 				EngineEvent::get()->dispatch({ EngineEventID::EE_OnPopScene });
-				mScenes.top()->onExit();
-				mScenes.pop();
+				sSceneArray.top()->onExit();
+				sSceneArray.pop();
 
-				if (!mScenes.empty())
+				if (!sSceneArray.empty())
 				{
-					mScenes.top()->onResume();
+					sSceneArray.top()->onResume();
 				}
 				break;
 			}
 			case CMD::Push:
 			{
-				if (!mScenes.empty())
+				if (!sSceneArray.empty())
 				{
-					if (mScenes.top() == cmd.scene)
+					if (sSceneArray.top() == cmd.scene)
 					{
 						break;
 					}
 
-					mScenes.top()->onPause();
+					sSceneArray.top()->onPause();
 				}
 
-				mScenes.push(cmd.scene);
+				sSceneArray.push(cmd.scene);
 				EngineEvent::get()->dispatch({ EngineEventID::EE_OnPushScene });
 				cmd.scene->onEnter();
 				break;
@@ -113,27 +114,29 @@ namespace tezcat::Tiny
 			}
 		}
 
-		if (mScenes.empty())
+		if (sSceneArray.empty())
 		{
 			return false;
 		}
 
-		mScenes.top()->update();
+		sSceneArray.top()->update();
 		return true;
 	}
 
 	void SceneManager::switchScene(Scene* scene)
 	{
-		if (!mScenes.empty())
+		if (!sSceneArray.empty())
 		{
-			mScenes.top()->onExit();
-			mScenes.pop();
+			sSceneArray.top()->onExit();
+			sSceneArray.pop();
 			EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPopScene });
 		}
 
-		mScenes.push(scene);
+		sSceneArray.push(scene);
 		EngineEvent::get()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
 		scene->onEnter();
 	}
+
+
 
 }

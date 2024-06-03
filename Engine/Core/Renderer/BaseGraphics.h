@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../Head/ConfigHead.h"
 #include "../Head/RenderConfig.h"
 #include "../Head/GLMHead.h"
@@ -11,9 +11,9 @@ namespace tezcat::Tiny
 	class Vertex;
 	class MeshRenderer;
 	class Engine;
-	class RenderLayer;
-	class IRenderObject;
-	class IRenderMesh;
+	class RenderObjectCache;
+	class BaseRenderer;
+	class BaseMeshRenderer;
 	class Camera;
 	class Pipeline;
 	class TextureRender2D;
@@ -29,15 +29,17 @@ namespace tezcat::Tiny
 	class GUI;
 
 	class ShadowCasterManager;
-	class EnvironmentLightManager;
+	class LightingManager;
 	class CameraManager;
 	class LightManager;
 	class BaseQueue;
 	class ExtraQueue;
 	class RenderCommand;
 	class BuildCommand;
+	class Pipeline;
 
 	struct ViewportInfo;
+
 
 	/*
 	* BaseGraphics
@@ -68,27 +70,6 @@ namespace tezcat::Tiny
 		void buildCMD();
 
 		virtual void postRender();
-
-		void setPipeline(RenderPhase type, const std::string& name, Pipeline* pl);
-
-		LightManager* getLightManager() { return mLightManager; }
-		ShadowCasterManager* getShadowCasterManager() { return mShadowCasterManager; }
-		EnvironmentLightManager* getEnvLitManager() { return mEnvLitManager; }
-
-		void addBaseRenderPassQueue(BaseQueue* queue)
-		{
-			mBaseQueue.push_back(queue);
-		}
-
-		void addPreRenderPassQueue(ExtraQueue* queue)
-		{
-			mPreQueue.push_back(queue);
-		}
-
-		void addPostRenderPassQueue(ExtraQueue* queue)
-		{
-			mPostQueue.push_back(queue);
-		}
 
 		//----------------------------------------------------
 		//
@@ -129,14 +110,12 @@ namespace tezcat::Tiny
 		virtual RenderCommand* createDrawVertexCMD(Shader* shader, Vertex* vertex) = 0;
 		virtual RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform) = 0;
 		virtual RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material) = 0;
-		virtual RenderCommand* createDrawSkyboxCMD(Shader* shader
-												 , Vertex* vertex
+		virtual RenderCommand* createDrawSkyboxCMD(Vertex* vertex
 												 , TextureCube* cube
 												 , float lod = 0
-												 , bool isHdr = false) = 0;
-		virtual RenderCommand* createDrawHDRToCubeCMD(Shader* shader
-													, Vertex* vertex
-													, int* unifromIDHDR
+												 , bool isHdr = false
+												 , float exposure = 1) = 0;
+		virtual RenderCommand* createDrawHDRToCubeCMD(Vertex* vertex
 													, Texture2D* hdr
 													, TextureCube* cube) = 0;
 		virtual RenderCommand* createDrawEnvMakeIrradiance(Shader* shader
@@ -181,9 +160,9 @@ namespace tezcat::Tiny
 	public:
 		virtual void setFloat1(Shader* shader, UniformID& uniform, float* data) = 0;
 		virtual void setFloat2(Shader* shader, UniformID& uniform, float* data) = 0;
-		virtual void setFloat2(Shader* shader, UniformID& uniform, const glm::vec2& data) = 0;
+		virtual void setFloat2(Shader* shader, UniformID& uniform, const float2& data) = 0;
 		virtual void setFloat3(Shader* shader, UniformID& uniform, float* data) = 0;
-		virtual void setFloat3(Shader* shader, UniformID& uniform, const glm::vec3& data) = 0;
+		virtual void setFloat3(Shader* shader, UniformID& uniform, const float3& data) = 0;
 		virtual void setFloat4(Shader* shader, UniformID& uniform, float* data) = 0;
 
 		virtual void setInt1(Shader* shader, UniformID& uniform, const int& data) = 0;
@@ -193,10 +172,10 @@ namespace tezcat::Tiny
 		virtual void setInt4(Shader* shader, UniformID& uniform, int* data) = 0;
 
 		virtual void setMat3(Shader* shader, UniformID& uniform, float* data) = 0;
-		virtual void setMat3(Shader* shader, UniformID& uniform, const glm::mat3& mat3) = 0;
+		virtual void setMat3(Shader* shader, UniformID& uniform, const float3x3& mat3) = 0;
 		virtual void setMat4(Shader* shader, UniformID& uniform, const float* data) = 0;
-		virtual void setMat4(Shader* shader, UniformID& uniform, const glm::mat4& mat4) = 0;
-		virtual void setMat4(Shader* shader, UniformID& uniform, glm::mat4 data[], int count) = 0;
+		virtual void setMat4(Shader* shader, UniformID& uniform, const float4x4& mat4) = 0;
+		virtual void setMat4(Shader* shader, UniformID& uniform, float4x4 data[], int count) = 0;
 
 		virtual void setGlobalTexture2D(Shader* shader, UniformID& uniform, Texture2D* data) = 0;
 		virtual void setTexture2D(Shader* shader, UniformID& uniform, Texture2D* data) = 0;
@@ -223,10 +202,10 @@ namespace tezcat::Tiny
 		virtual void setInt4(Shader* shader, const int& shaderID, int* data) = 0;
 
 		virtual void setMat3(Shader* shader, const int& shaderID, const float* data) = 0;
-		virtual void setMat3(Shader* shader, const int& shaderID, const glm::mat3& mat3) = 0;
+		virtual void setMat3(Shader* shader, const int& shaderID, const float3x3& mat3) = 0;
 		virtual void setMat4(Shader* shader, const int& shaderID, const float* data) = 0;
-		virtual void setMat4(Shader* shader, const int& shaderID, const glm::mat4& mat4) = 0;
-		virtual void setMat4(Shader* shader, const int& shaderID, glm::mat4 data[], int count) = 0;
+		virtual void setMat4(Shader* shader, const int& shaderID, const float4x4& mat4) = 0;
+		virtual void setMat4(Shader* shader, const int& shaderID, float4x4 data[], int count) = 0;
 
 		virtual void setGlobalTexture2D(Shader* shader, const int& shaderID, Texture2D* data) = 0;
 		virtual void setTexture2D(Shader* shader, const int& shaderID, Texture2D* data) = 0;
@@ -252,45 +231,43 @@ namespace tezcat::Tiny
 	public:
 		virtual void draw(Vertex* vertex) = 0;
 
-		virtual void drawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec3& color = glm::vec3(0.0f, 1.0f, 0.0f));
+		virtual void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f));
 
 
 	private:
+		Pipeline* mPipeline;
 		std::vector<Pipeline*> mPipelineAry;
 		std::unordered_map<std::string, uint32_t> mPipelineUMap;
 
-
-	private:
-		ShadowCasterManager* mShadowCasterManager;
-		EnvironmentLightManager* mEnvLitManager;
-		CameraManager* mCameraManager;
-		LightManager* mLightManager;
-
 	protected:
 		std::vector<BuildCommand*> mBuildCmdAry;
-
-
-		/// <summary>
-		/// 无排序,每个queue独立工作
-		/// </summary>
-		std::vector<ExtraQueue*> mPreQueue;
-
-		/// <summary>
-		/// 基本渲染通道
-		/// 每一个对应一个Camera
-		/// 按早Order排序
-		/// </summary>
-		std::vector<BaseQueue*> mBaseQueue;
-
-		/// <summary>
-		/// 无排序,每个queue独立工作
-		/// </summary>
-		std::vector<ExtraQueue*> mPostQueue;
-	public:
-
-		GUI* mGUI;
 	};
 
 	using Graphics = SG<BaseGraphics>;
+
+
+	class TINY_API Graphics2
+	{
+		Graphics2() = delete;
+		~Graphics2() = delete;
+	public:
+		static void init(Engine *engine, BaseGraphics* agent)
+		{
+			mAgent = agent;
+			mAgent->init(engine);
+		}
+
+
+		static void draw(Vertex* vertex, const std::vector<Uniform*> uniforms);
+		static void draw(Vertex* vertex, Material* material);
+		static void draw(Vertex* vertex) { mAgent->draw(vertex); }
+
+		static void bind(Shader* shader) { mAgent->bind(shader); }
+		static void bind(FrameBuffer* frameBuffer) { mAgent->bind(frameBuffer); }
+
+
+	private:
+		static BaseGraphics* mAgent;
+	};
 }
 

@@ -1,19 +1,22 @@
-#pragma once
+﻿#pragma once
 #include "../MyGUIContext.h"
 
-class MyLightingWindow : public GUIWindow
+namespace tezcat::Editor
 {
-	CreateInstanceH(MyLightingWindow);
-public:
+	class MyLightingWindow : public GUIWindow
+	{
+		TINY_EDITOR_WINDOW_INSTANCE_H(MyLightingWindow)
+	public:
 
-protected:
-	void onRender() override;
+	protected:
+		void onRender() override;
 
-private:
-	float mSkyboxLod;
+	private:
+		float mSkyboxLod;
 
-	Texture2D* mCurrentHDR;
-	std::vector<Texture2D*> mHDR;
-};
+		Texture2D* mCurrentHDR;
+		std::vector<Texture2D*> mHDR;
+	};
 
 
+}

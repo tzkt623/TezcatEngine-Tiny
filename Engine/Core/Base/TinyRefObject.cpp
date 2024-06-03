@@ -1,4 +1,4 @@
-#include "TinyRefObject.h"
+﻿#include "TinyRefObject.h"
 #include "TinyGC.h"
 
 namespace tezcat::Tiny
@@ -7,17 +7,13 @@ namespace tezcat::Tiny
 	//
 	//	TinyRefObject
 	//
+	uint32 TinyRefObject::__ClassID = 1;
 	const std::string TinyRefObject::Empty = "TinyRefObject";
-
-	void TinyRefObject::manageThis()
-	{
-		TinyGC::manage(this);
-	}
+	const TinyRTTI TinyRefObject::__TINY__RTTI__453{ nullptr, "TinyRefObject", typeid(TinyRefObject), 0 };
 
 	TinyRefObject::TinyRefObject()
-		: mGCInfo(TinyGC::getNextGCInfo(this))
+		: mGCInfo(nullptr)
 	{
-
 	}
 
 	TinyRefObject::~TinyRefObject()
@@ -25,9 +21,9 @@ namespace tezcat::Tiny
 		mGCInfo = nullptr;
 	}
 
-	void TinyRefObject::subRef()
+	void TinyRefObject::deleteObject()
 	{
-		if (--mGCInfo->strongRef < 1)
+		if (--(mGCInfo->strongRef) < 1)
 		{
 			if (mGCInfo->weakRef < 1)
 			{
@@ -39,31 +35,10 @@ namespace tezcat::Tiny
 		}
 	}
 
-
-	//-----------------------------------------------------------------
-	//
-	//	TinyBaseWeakRef
-	//
-	TinyBaseWeakRef::~TinyBaseWeakRef()
+	void TinyRefObject::autoGC()
 	{
-		this->release();
-		mGCInfo = nullptr;
-	}
-
-	void TinyBaseWeakRef::release()
-	{
-		if (--mGCInfo->weakRef < 1)
-		{
-			if (mGCInfo->strongRef == -623)
-			{
-				return;
-			}
-
-			if (mGCInfo->strongRef < 1)
-			{
-				TinyGC::recycle(mGCInfo);
-			}
-		}
+		mGCInfo = TinyGC::getNextGCInfo(this);
+		TinyGC::manage(this);
 	}
 }
 

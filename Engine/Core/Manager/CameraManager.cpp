@@ -1,126 +1,82 @@
-#include "CameraManager.h"
+﻿#include "CameraManager.h"
 #include "../Component/GameObject.h"
 #include "../Component/MeshRenderer.h"
 #include "../Component/Camera.h"
 
-#include "../Renderer/RenderLayer.h"
+#include "../Renderer/RenderObjectCache.h"
 #include "../Renderer/BaseGraphics.h"
 
 #include "../Event/EngineEvent.h"
 
 namespace tezcat::Tiny
 {
-	CameraManager::CameraManager()
-		: mData()
-	{
-		CameraMgr::attach(this);
-	}
+	CameraData* CameraManager::mCurrentData = nullptr;
 
 	void CameraManager::addCamera(Camera* camera)
 	{
-		mData->addCamera(camera);
+		mCurrentData->addCamera(camera);
 	}
 
 	void CameraManager::setMainCamera(Camera* camera)
 	{
-		mData->setMain(camera);
+		mCurrentData->setMain(camera);
 	}
 
 	void CameraManager::setMainCamera(const std::string& name)
 	{
-		mData->setMain(name);
+		mCurrentData->setMain(name);
 	}
 
-	Camera* CameraManager::getCamera(int index)
+	Camera* CameraManager::findCamera(const std::string& name)
 	{
-		return mData->getCamera(index);
-	}
-
-	Camera* CameraManager::getCamera(const std::string& name)
-	{
-		return mData->getCamera(name);
-	}
-
-	void CameraManager::setCameraData(CameraData* data)
-	{
-		mData = data;
-	}
-
-	const std::vector<Camera*>& CameraManager::getSortedCameraAry()
-	{
-		if (auto ptr = mData.lock())
-		{
-			return ptr->getAllCamera();
-		}
-
-		return mEmptyCamera;
+		return mCurrentData->findCamera(name);
 	}
 
 	void CameraManager::calculate(BaseGraphics* graphics)
 	{
-		if (!mData.lock())
+		if (mCurrentData)
 		{
-			return;
-		}
-
-		auto cameras = mData->getAllCamera();
-		for (auto camera : cameras)
-		{
-			if (camera->isEnable())
-			{
-				RenderQueue* queue = camera->getRenderQueue();
-				graphics->addBaseRenderPassQueue((BaseQueue*)queue);
-
-				//先剔除
-				auto& cull_list = camera->getCullLayerList();
-				for (auto& index : cull_list)
-				{
-					//剔除到对应的渲染通道
-					RenderLayer::getRenderLayer(index)->culling(graphics, camera, queue);
-				}
-			}
+			mCurrentData->calculate(graphics);
 		}
 	}
+
+	void CameraManager::addRenderObserver(BaseRenderObserver* renderObserver)
+	{
+		mCurrentData->addRenderObserver(renderObserver);
+	}
+
 
 	//--------------------------------------------------------
 	//
 	//	CameraData
 	//
-	TINY_RTTI_CPP(CameraData);
+	TINY_OBJECT_CPP(CameraData, TinyObject)
+
+	CameraData::CameraData()
+		: mMain(nullptr)
+		, mDirty(true)
+	{
+
+	}
+
 	Camera* CameraData::getMainCamera()
 	{
 		return mMain;
 	}
 
-	const std::vector<Camera*>& CameraData::getAllCamera()
-	{
-		this->sort();
-		return mCameraList;
-	}
-
-	const std::unordered_map<std::string, Camera*>& CameraData::getCameraMap()
-	{
-		return mCameraWithName;
-	}
-
 	void CameraData::addCamera(Camera* camera)
 	{
+		auto result = mCameraWithName.try_emplace(camera->getGameObject()->getName(), nullptr);
+		if (result.second)
+		{
+			result.first->second = camera;
+			this->addRenderObserver(camera->getRenderObserver());
+		}
+
 		this->setMain(camera);
-
-		if (mCameraList.empty())
-		{
-			mCameraList.push_back(camera);
-		}
-		else
-		{
-			mDirty = true;
-			mCameraList.push_back(camera);
-		}
-
-		mCameraWithName.try_emplace(camera->getGameObject()->getName(), camera);
 	}
 
-	Camera* CameraData::getCamera(const std::string& name)
+	Camera* CameraData::findCamera(const std::string& name)
 	{
 		auto it = mCameraWithName.find(name);
 		if (it != mCameraWithName.end())
@@ -131,28 +87,14 @@ namespace tezcat::Tiny
 		return nullptr;
 	}
 
-	Camera* CameraData::getCamera(int index)
-	{
-		return mCameraList[index];
-	}
-
-	void CameraData::sort()
-	{
-		if (mDirty)
-		{
-			mDirty = false;
-			std::ranges::sort(mCameraList, [](Camera* a, Camera* b)->auto
-			{
-				return a->getOrder() < b->getOrder();
-			});
-		}
-	}
-
 	void CameraData::setMain(Camera* camera)
 	{
-		mDirty = true;
+		if (camera == mMain)
+		{
+			return;
+		}
 
-		if (mMain != nullptr && mMain != camera)
+		if (mMain != nullptr)
 		{
 			mMain->clearMain();
 		}
@@ -167,6 +109,55 @@ namespace tezcat::Tiny
 		if (it != mCameraWithName.end())
 		{
 			this->setMain(it->second);
+		}
+	}
+
+	void CameraData::addRenderObserver(BaseRenderObserver* observer)
+	{
+		mDirty = true;
+		mObserverArray.push_back(observer);
+	}
+
+	void CameraData::calculate(BaseGraphics* graphics)
+	{
+		if (mDirty)
+		{
+			mDirty = false;
+			std::ranges::sort(mObserverArray, [](TinyWeakRef<BaseRenderObserver>& a, TinyWeakRef<BaseRenderObserver>& b)
+			{
+				return a->getOrderID() < b->getOrderID();
+			});
+		}
+
+		auto it = mObserverArray.begin();
+		while (it != mObserverArray.end())
+		{
+			if (auto observer = (*it).lock())
+			{
+				if (!observer->getEnable())
+				{
+					continue;
+				}
+
+				if (observer->isNeedRemove())
+				{
+					observer->onExitPipeline();
+					it = mObserverArray.erase(it);
+					continue;
+				}
+
+				//先剔除
+				for (auto& index : observer->getCullLayerList())
+				{
+					//剔除到对应的渲染通道
+					RenderObjectCache::culling(index, graphics, observer);
+				}
+				it++;
+			}
+			else
+			{
+				it = mObserverArray.erase(it);
+			}
 		}
 	}
 }

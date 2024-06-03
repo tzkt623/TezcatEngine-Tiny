@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include "CppHead.h"
 #include "ConfigHead.h"
 
 namespace tezcat::Tiny
 {
-	enum class TINY_API UniformType : int8_t
+	enum class TINY_API UniformType : int8
 	{
 		Error = -1,
 		Bool,
@@ -19,7 +19,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API DataType : uint8_t
+	enum class TINY_API DataMemFormat : uint8
 	{
 		Byte = 0,
 		UByte,
@@ -29,14 +29,14 @@ namespace tezcat::Tiny
 		UInt32,
 		Int64,
 		UInt64,
-		Float32,
+		Float,
 		Float64,
 		UInt_24_8,
 
 		Count
 	};
 
-	enum class TINY_API TextureType : uint8_t
+	enum class TINY_API TextureType : uint8
 	{
 		Texture1D = 0,
 		Texture2D,
@@ -49,7 +49,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureWrap : uint8_t
+	enum class TINY_API TextureWrap : uint8
 	{
 		Repeat = 0,
 		Mirrored_Repeat,
@@ -59,7 +59,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureFilter : uint8_t
+	enum class TINY_API TextureFilter : uint8
 	{
 		Nearest = 0,
 		Linear,
@@ -67,47 +67,63 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureChannel : uint8_t
+	enum class TINY_API TextureInternalFormat : uint8
 	{
 		None = 0,
+		//Base
+		Depth,
+		Depth_Stencil,
 		R,
 		RG,
 		RGB,
 		RGBA,
-		Depth,
-		//internal only
-		Depth16,
-		//internal only
-		Depth24,
-		//internal only
-		Depth32,
-		//internal only
-		Depth32f,
-		//not internal only
-		Depth_Stencil,
-		//internal only
-		Depth24_Stencil8,
-		//internal only
-		Depth32f_Stencil8,
-		//internal only
-		Stencil8,
-
-		RG16f,
-		RGB16f,
-
+		//8I
+		R8,
+		RG8,
+		RGB8,
+		RGBA8,
+		R16,
+		RG16,
+		RGB16,
+		RGBA16,
+		//16F
+		R16F,
+		RG16F,
+		RGB16F,
+		RGBA16F,
+		R32F,
+		RG32F,
+		RGB32F,
+		RGBA32F,
 		Count
 	};
 
-	enum class TINY_API TextureAttachPosition : uint8_t
+	enum class TINY_API TextureFormat : uint8
 	{
-		ColorComponent = 0,
+		None = 0,
+		Depth,
+		Stencil,
+		Depth_Stencil,
+		R,
+		RG,
+		RGB,
+		RGBA,
+		BGR,
+		BGRA,
+		Count
+	};
+
+	enum class TINY_API TextureAttachPosition : uint8
+	{
+		None = 0,
+		ColorComponent,
 		DepthComponent,
 		StencilCompoent,
 		DepthStencilComponent,
 	};
 
 	//颜色缓冲区
-	enum class TINY_API ColorBuffer : uint8_t
+	enum class TINY_API ColorBuffer : uint8
 	{
 		None = 0,
 		A0,
@@ -123,7 +139,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API DrawMode : uint8_t
+	enum class TINY_API DrawMode : uint8
 	{
 		Points = 0,
 		Lines,
@@ -136,7 +152,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API CullFace : uint8_t
+	enum class TINY_API CullFace : uint8
 	{
 		Off = 0,
 		Back,
@@ -146,7 +162,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API DepthTest : uint8_t
+	enum class TINY_API DepthTest : uint8
 	{
 		Off = 0,
 		Always,
@@ -161,7 +177,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API Blend : uint8_t
+	enum class TINY_API Blend : uint8
 	{
 		Zero = 0,
 		One,
@@ -181,7 +197,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API LightMode : uint8_t
+	enum class TINY_API LightMode : uint8
 	{
 		Unlit,
 		Forward,
@@ -189,7 +205,7 @@ namespace tezcat::Tiny
 		Deferred
 	};
 
-	enum class TINY_API Queue : uint8_t
+	enum class TINY_API Queue : uint8
 	{
 		None = 0,
 		Prepare,
@@ -202,7 +218,7 @@ namespace tezcat::Tiny
 		Post
 	};
 
-	using ClearOptionID = uint32_t;
+	using ClearOptionID = uint32;
 	enum TINY_API ClearOption : ClearOptionID
 	{
 		CO_None = 0,
@@ -287,23 +303,21 @@ namespace tezcat::Tiny
 		}
 	};
 
-	using DataTypeWrapper = TinyValueConventor<DataType, uint32_t>;
-	using TexTypeWrapper = TinyValueConventor<TextureType, uint32_t>;
-	using TexWrapWrapper = TinyValueConventor<TextureWrap, uint32_t>;
-	using TexFilterWrapper = TinyValueConventor<TextureFilter, uint32_t>;
-	/*
-	* @brief format位置只能用大类R,RG,RGBA等,不能用RGB32f,R8这种具体类型
-	*/
-	using TexChannelWrapper = TinyValueConventor<TextureChannel, uint32_t>;
-	using ColorBufferWrapper = TinyValueConventor<ColorBuffer, uint32_t>;
-	using DrawModeWrapper = TinyValueConventor<DrawMode, uint32_t>;
-	using CullFaceWrapper = TinyValueConventor<CullFace, uint32_t>;
-	using BlendWrapper = TinyValueConventor<Blend, uint32_t>;
-	using DepthTestWrapper = TinyValueConventor<DepthTest, uint32_t>;
+	using DataMemFormatWrapper = TinyValueConventor<DataMemFormat, uint32>;
+	using TexTypeWrapper = TinyValueConventor<TextureType, uint32>;
+	using TexWrapWrapper = TinyValueConventor<TextureWrap, uint32>;
+	using TexFilterWrapper = TinyValueConventor<TextureFilter, uint32>;
+	using TexInternalFormatWrapper = TinyValueConventor<TextureInternalFormat, uint32>;
+	using TexFormatWrapper = TinyValueConventor<TextureFormat, uint32>;
+	using ColorBufferWrapper = TinyValueConventor<ColorBuffer, uint32>;
+	using DrawModeWrapper = TinyValueConventor<DrawMode, uint32>;
+	using CullFaceWrapper = TinyValueConventor<CullFace, uint32>;
+	using BlendWrapper = TinyValueConventor<Blend, uint32>;
+	using DepthTestWrapper = TinyValueConventor<DepthTest, uint32>;
 
 	struct TINY_API ContextMap
 	{
-		static std::array<DataTypeWrapper, (std::size_t)DataType::Count> DataTypeArray;
+		static std::array<DataMemFormatWrapper, (uint32)DataMemFormat::Count> DataMemFormatArray;
 
 		/// <summary>
 		///	Texture1D
@@ -313,7 +327,7 @@ namespace tezcat::Tiny
 		///	Texture1DA
 		///	Texture2DA
 		/// </summary>
-		static std::array<TexTypeWrapper, (std::size_t)TextureType::Count> TextureTypeArray;
+		static std::array<TexTypeWrapper, (uint32)TextureType::Count> TextureTypeArray;
 
 		/// <summary>
 		/// Tex_REPEAT
@@ -321,24 +335,29 @@ namespace tezcat::Tiny
 		///	Tex_CLAMP_TO_EDGE
 		///	Tex_CLAMP_TO_BORDER
 		/// </summary>
-		static std::array<TexWrapWrapper, (std::size_t)TextureWrap::Count> TextureWrapArray;
+		static std::array<TexWrapWrapper, (uint32)TextureWrap::Count> TextureWrapArray;
 
 		/// <summary>
 		/// Tex_NEAREST
 		/// Tex_LINEAR
 		/// </summary>
-		static std::array<TexFilterWrapper, (std::size_t)TextureFilter::Count> TextureFilterArray;
+		static std::array<TexFilterWrapper, (uint32)TextureFilter::Count> TextureFilterArray;
 
 		/// <summary>
 		/// Tex_RGB
 		/// Tex_RGBA
 		/// </summary>
-		static std::array<TexChannelWrapper, (std::size_t)TextureChannel::Count> TextureChannelArray;
+		static std::array<TexInternalFormatWrapper, (uint32)TextureInternalFormat::Count> TextureInternalFormatArray;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		static std::array<ColorBufferWrapper, (std::size_t)ColorBuffer::Count> ColorBufferArray;
+		static std::array<TexFormatWrapper, (uint32)TextureFormat::Count> TextureFormatArray;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		static std::array<ColorBufferWrapper, (uint32)ColorBuffer::Count> ColorBufferArray;
 
 		/// <summary>
 		/// Points
@@ -349,21 +368,20 @@ namespace tezcat::Tiny
 		///	Triangles_Strip
 		///	Triangles_Fan
 		/// </summary>
-		static std::array<DrawModeWrapper, (std::size_t)DrawMode::Count> DrawModeArray;
+		static std::array<DrawModeWrapper, (uint32)DrawMode::Count> DrawModeArray;
 
 		static std::unordered_map<std::string, CullFaceWrapper> CullFaceMap;
-		static std::array<CullFaceWrapper, (std::size_t)CullFace::Count> CullFaceArray;
+		static std::array<CullFaceWrapper, (uint32)CullFace::Count> CullFaceArray;
 
 		static std::unordered_map<std::string, BlendWrapper> BlendMap;
-		static std::array<BlendWrapper, (std::size_t)Blend::Count> BlendArray;
+		static std::array<BlendWrapper, (uint32)Blend::Count> BlendArray;
 
 		static std::unordered_map<std::string, DepthTestWrapper> DepthTestMap;
-		static std::array<DepthTestWrapper, (std::size_t)DepthTest::Count> DepthTestArray;
+		static std::array<DepthTestWrapper, (uint32)DepthTest::Count> DepthTestArray;
 
 		static std::unordered_map<std::string, LightMode> LightModeMap;
 
 		static std::unordered_map<std::string, Queue> QueueMap;
-
 
 		static std::unordered_map<std::string, UniformType> UniformTypeUMap;
 	};

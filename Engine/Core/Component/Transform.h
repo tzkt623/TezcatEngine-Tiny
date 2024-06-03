@@ -26,8 +26,8 @@ namespace tezcat::Tiny
 		friend class Scene;
 		Transform();
 		Transform(Transform* parent);
-		TINY_RTTI_H(Transform);
-		TINY_Factory(Transform);
+
+		TINY_OBJECT_H(Transform, ComponentT<Transform>)
 
 	public:
 		virtual ~Transform();
@@ -98,6 +98,14 @@ namespace tezcat::Tiny
 		{
 			mIsDirty = true;
 			mLocalScale = val;
+		}
+
+		void setScale(float x, float y, float z)
+		{
+			mIsDirty = true;
+			mLocalScale.x = x;
+			mLocalScale.y = y;
+			mLocalScale.z = z;
 		}
 
 	public:

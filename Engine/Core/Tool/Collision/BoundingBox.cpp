@@ -1,11 +1,11 @@
-#include "BoundingBox.h"
+﻿#include "BoundingBox.h"
 
 namespace tezcat::Tiny
 {
 #define fmin std::numeric_limits<float>::min()
 #define fmax std::numeric_limits<float>::max()
 
-	BoundingBox::BoundingBox(const glm::vec3& min, const glm::vec3& max)
+	BoundingBox::BoundingBox(const float3& min, const float3& max)
 		: min(min)
 		, max(max)
 	{
@@ -52,7 +52,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void BoundingBox::collect(const glm::vec3& point)
+	void BoundingBox::collect(const float3& point)
 	{
 		if (min.x > point.x)
 		{
@@ -107,7 +107,7 @@ namespace tezcat::Tiny
 		return true;
 	}
 
-	void BoundingBox::reset(const glm::vec3& min, const glm::vec3& max)
+	void BoundingBox::reset(const float3& min, const float3& max)
 	{
 		this->min = min;
 		this->max = max;

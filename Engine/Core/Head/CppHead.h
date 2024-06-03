@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdio>
 #include <iostream>
@@ -44,8 +44,19 @@
 #include "ThirdParty/fmt/format.h"
 #include "ThirdParty/fmt/printf.h"
 
+
 namespace tezcat::Tiny
 {
+	using int8 = char;
+	using int16 = short;
+	using int32 = int;
+	using int64 = long long;
+
+	using uint8 = unsigned char;
+	using uint16 = unsigned short;
+	using uint32 = unsigned int;
+	using uint64 = unsigned long long;
+
 	inline namespace v1
 	{
 		template<typename T, typename... Args>
@@ -72,18 +83,29 @@ namespace tezcat::Tiny
 			return std::dynamic_pointer_cast<T1>(pointer);
 		}
 
-#define TinyMove(x) std::move(x)
+#define TINY_BIND_THIS0(func) std::bind(&func, this)
+#define TINY_BIND_THIS1(func) std::bind(&func, this, std::placeholders::_1)
+#define TINY_BIND_THIS2(func) std::bind(&func, this, std::placeholders::_1, std::placeholders::_2)
+#define TINY_BIND_THIS3(func) std::bind(&func, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+#define TINY_BIND_THIS4(func) std::bind(&func, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)
 
-#ifndef TINY_Release
-#define TinyThrow(x) throw x
-#define TinyThrow_Logic(x) throw std::logic_error(x)
-#define TinyThrow_Runtime(condition, message) if(condition) { fmt::print("=======RuntimeError=======\nFile:{1}\nLine:{2}\n{0}\n==========================\n", message, __FILE__, __LINE__); abort(); }
-#define TinyAssert(x) assert(x)
+#define TINY_BIND0(func) std::bind(&func)
+#define TINY_BIND1(func) std::bind(&func, std::placeholders::_1)
+#define TINY_BIND2(func) std::bind(&func, std::placeholders::_1, std::placeholders::_2)
+#define TINY_BIND3(func) std::bind(&func, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+#define TINY_BIND4(func) std::bind(&func, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)
+
+
+#ifndef TINY_RELEASE
+#define TINY_THROW(x) throw x
+#define TINY_THROW_LOGIC(x) throw std::logic_error(x)
+#define TINY_THROW_RUNTIME(condition, message) if(condition) { fmt::print("=======RuntimeError=======\nFile:{1}\nLine:{2}\n{0}\n==========================\n", message, __FILE__, __LINE__); abort(); }
+#define TINY_ASSERT(x) assert(x)
 #else
-#define TinyThrow(x)
-#define TinyThrow_Logic(x)
-#define TinyThrow_Runtime(condition, info)
-#define TinyAssert(x)
+#define TINY_THROW(x)
+#define TINY_THROW_LOGIC(x)
+#define TINY_THROW_RUNTIME(condition, info)
+#define TINY_ASSERT(x)
 #endif
 	}
 }

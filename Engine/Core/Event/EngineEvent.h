@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Tool/Tool.h"
 
@@ -26,8 +26,7 @@ namespace tezcat::Tiny
 
 		EE_SetMainCamera,
 		EE_ActiveSkybox,
-		EE_ChangeEnvLightingImage,
-		EE_ChangeEnvLightingTexture,
+		EE_ChangeEnvImage,
 
 		EE_IDCount
 	};

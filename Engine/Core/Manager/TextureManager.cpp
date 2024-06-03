@@ -1,19 +1,12 @@
-#include "TextureManager.h"
+﻿#include "TextureManager.h"
 #include "../Renderer/Texture.h"
 #include "../Tool/Tool.h"
 #include "../Data/Image.h"
+#include "../Head/RenderConfig.h"
 
 namespace tezcat::Tiny
 {
-	TextureManager::TextureManager()
-	{
-		SG<TextureManager>::attach(this);
-	}
-
-	TextureManager::~TextureManager()
-	{
-
-	}
+	std::unordered_map<std::string_view, Texture*> TextureManager::mTextureMap;
 
 	void TextureManager::loadResource(const std::string& dir)
 	{
@@ -79,10 +72,10 @@ namespace tezcat::Tiny
 				Image* image = Image::create();
 				image->openFile(info, true);
 				Texture2D* t2d = Texture2D::create(info.name);
-				t2d->setData(image);
+				t2d->setImage(image);
 				t2d->generate();
 
-				this->add(t2d->getName(), t2d);
+				add(t2d->getName(), t2d);
 			}
 		}
 
@@ -96,13 +89,13 @@ namespace tezcat::Tiny
 			}
 
 			TextureCube* cube = TextureCube::create(pair.first);
-			cube->setData(skybox_images);
+			cube->setImage(skybox_images);
 			cube->generate();
 
-			this->add(cube->getName(), cube);
+			add(cube->getName(), cube);
 		}
 	}
-	
+
 
 	Texture* TextureManager::find(const std::string& name)
 	{
@@ -121,8 +114,8 @@ namespace tezcat::Tiny
 		{
 			if (pair.second->getTextureType() == TextureType::Texture2D)
 			{
-				auto type = static_cast<Texture2D*>(pair.second)->getInternalChannel().tiny;
-				if (type == TextureChannel::RGB16f)
+				auto type = static_cast<Texture2D*>(pair.second)->getInternalFormat().tiny;
+				if (type == TextureInternalFormat::RGB16F)
 				{
 					container.push_back(static_cast<Texture2D*>(pair.second));
 				}
@@ -130,51 +123,58 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void TextureManager::add(const std::string& name, Texture* tex)
+	void TextureManager::add(const std::string_view& name, Texture* tex)
 	{
 		auto result = mTextureMap.try_emplace(name, tex);
-		tex->addRef();
-		if (!result.second)
-		{
-			result.first->second->subRef();
-			result.first->second = tex;
-		}
-	}
-
-	Texture2D* TextureManager::create2D(const std::string& name)
-	{
-		auto result = mTextureMap.try_emplace(name, nullptr);
 		if (result.second)
 		{
-			auto t = Texture2D::create(name);
-			t->addRef();
-			result.first->second = t;
+			tex->saveObject();
 		}
-		return (Texture2D*)result.first->second;
 	}
 
-	TextureCube* TextureManager::createCube(const std::string& name)
+	std::tuple<bool, Texture2D*> TextureManager::create2D(std::string name)
 	{
-		auto result = mTextureMap.try_emplace(name, nullptr);
-		if (result.second)
+		auto result = mTextureMap.find(name);
+		if (result != mTextureMap.end())
 		{
-			auto t = TextureCube::create(name);
-			t->addRef();
-			result.first->second = t;
+			return { false, (Texture2D*)result->second };
 		}
-		return (TextureCube*)result.first->second;
+
+		auto t = Texture2D::create();
+		t->setName(name);
+		t->saveObject();
+		mTextureMap.emplace(t->getName(), t);
+		return { true, t };
+
 	}
 
-	TextureRender2D* TextureManager::createRender2D(const std::string& name)
+	std::tuple<bool, TextureCube*> TextureManager::createCube(std::string name)
 	{
-		auto result = mTextureMap.try_emplace(name, nullptr);
-		if (result.second)
+		auto result = mTextureMap.find(name);
+		if (result != mTextureMap.end())
 		{
-			auto t = TextureRender2D::create(name);
-			t->addRef();
-			result.first->second = t;
+			return { false, (TextureCube*)result->second };
 		}
-		return (TextureRender2D*)result.first->second;
+
+		auto t = TextureCube::create();
+		t->setName(name);
+		t->saveObject();
+		mTextureMap.emplace(t->getName(), t);
+		return { true, t };
 	}
 
+	std::tuple<bool, TextureRender2D*> TextureManager::createRender2D(std::string name)
+	{
+		auto result = mTextureMap.find(name);
+		if (result != mTextureMap.end())
+		{
+			return { false, (TextureRender2D*)result->second };
+		}
+
+		auto t = TextureRender2D::create();
+		t->setName(name);
+		t->saveObject();
+		mTextureMap.emplace(t->getName(), t);
+		return { true, t };
+	}
 }

@@ -1,19 +1,19 @@
-#pragma once
+﻿#pragma once
 #include "Core/Head/ConfigHead.h"
 #include "Core/Head/GLMHead.h"
 
 
 namespace tezcat::Tiny
 {
-	class IRenderObserver;
+	class BaseRenderObserver;
 	struct TINY_API CullHelper
 	{
 		struct FrustumPlan
 		{
-			glm::vec3 normal = { 0.0f, 1.0f, 0.0f };
+			float3 normal = { 0.0f, 1.0f, 0.0f };
 			float distance = 0.f;
 
-			FrustumPlan(const glm::vec3& p1, const glm::vec3& inNormal)
+			FrustumPlan(const float3& p1, const float3& inNormal)
 				: normal(glm::normalize(inNormal)),
 				distance(glm::dot(normal, p1))
 			{
@@ -34,6 +34,6 @@ namespace tezcat::Tiny
 
 		};
 
-		void createFrustumWithCamera(IRenderObserver* camera, Frustum &frustum);
+		void createFrustumWithCamera(BaseRenderObserver* camera, Frustum &frustum);
 	};
 }

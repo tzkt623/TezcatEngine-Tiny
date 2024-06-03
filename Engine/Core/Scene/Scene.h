@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/TinyCpp.h"
 #include "../Base/TinyObject.h"
@@ -7,27 +7,31 @@
 namespace tezcat::Tiny
 {
 	class GameObject;
+	class GameObjectData;
 	class Camera;
 	class CameraData;
 	class LightData;
 	class Transform;
 	class Layer;
-	class RenderLayer;
+	class RenderObjectCache;
 	class LightLayer;
 	class BaseGraphics;
 	class TINY_API Scene : public TinyObject
 	{
 		friend class GameObject;
 		friend class Transform;
-
-		TINY_RTTI_H(Scene);
+		TINY_ABSTRACT_OBJECT_H(Scene, TinyObject)
 
 	protected:
-		Scene(const std::string& name);
+		Scene(std::string name);
 
 	public:
 		virtual ~Scene();
-		const std::string& getName() const { return mName; }
+		std::string_view getName() { return mName; }
+
+		void prepare();
+		void open();
+		void push();
 
 	public:
 		virtual void onEnter();
@@ -37,42 +41,35 @@ namespace tezcat::Tiny
 
 	public:
 		void update();
-		void addCamera(Camera* camera);
 
 	public:
 		void addLogicFunction(void* gameObject, const std::function<void()>& function);
 		void removeLogicFunction(void* gameObject);
 		void addTransform(Transform* transform);
-		void addNewTransform(Transform* transform);
-
-	private:
-		void addGameObject(GameObject* gameObject);
-		void addNewObject(GameObject* gameObject);
-
 
 	public:
-		std::list<TinyWeakRef<GameObject>>& getObjectList() { return mObjectList; }
 		std::list<TinyWeakRef<Transform>>& getTransformList() { return mTransformList; }
-		std::vector<TinyWeakRef<GameObject>> findGameObjects(const std::string& name);
+		std::vector<TinyWeakRef<Transform>> findTransforms(const std::string& name);
+		TinyWeakRef<Transform> findTransform(const std::string& name);
 
 	private:
-		uint32_t addUpdateTransform(Transform* transform);
-		void setUpdateTransform(const uint32_t& index, Transform* transform);
+		int32 addGameObject(GameObject* gameObject);
+		void removeGameObject(GameObject* gameObject);
 
 	private:
 		std::string mName;
-		std::list<GameObject*> mNewObjectList;
-		std::list<Transform*> mNewTransformList;
+		std::list<GameObject*> mNewGameObjectList;
 		std::unordered_map<void*, std::function<void()>> mLogicList;
 
 	public:
-		std::list<TinyWeakRef<GameObject>> mObjectList;
 		std::list<TinyWeakRef<Transform>> mTransformList;
 	private:
 		//灯光数据
 		LightData* mLightData;
 		//相机数据
 		CameraData* mCameraData;
+		//
+		GameObjectData* mGameObjectData;
 	};
 }
 

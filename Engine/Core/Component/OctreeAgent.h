@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Tool/Collision/BoundingBox.h"
 #include "Component.h"
@@ -10,8 +10,7 @@ namespace tezcat::Tiny
 	class TINY_API OctreeAgent : public ComponentT<OctreeAgent>
 	{
 		OctreeAgent();
-		TINY_Factory(OctreeAgent);
-		TINY_RTTI_H(OctreeAgent);
+		TINY_OBJECT_H(OctreeAgent, ComponentT<OctreeAgent>)
 
 	public:
 		virtual ~OctreeAgent();

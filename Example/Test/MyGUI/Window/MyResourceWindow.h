@@ -1,42 +1,43 @@
-#pragma once
+﻿#pragma once
 
 #include "../MyGUIContext.h"
-
-class MyResourceWindow : public GUIWindow
+namespace tezcat::Editor
 {
-	CreateInstanceH(MyResourceWindow);
+	class MyResourceWindow : public GUIWindow
+	{
+		TINY_EDITOR_WINDOW_INSTANCE_H(MyResourceWindow)
 
 
-public:
-	bool begin() override;
-	void end() override;
+	public:
+		bool begin() override;
+		void end() override;
 
-	uint32_t loadIcon(const std::string& filePath);
+		uint32_t loadIcon(const std::string& filePath);
 
-protected:
-	void onRender() override;
-	void drawFolder();
-	void drawDirectory(std::filesystem::directory_entry& entry);
-	void drawFile(const std::filesystem::path& path);
+	protected:
+		void onRender() override;
+		void drawFolder();
+		void drawDirectory(std::filesystem::directory_entry& entry);
+		void drawFile(const std::filesystem::path& path);
 
-	void itemDoubleClick(const std::filesystem::path& path);
-	void itemDrag(const std::filesystem::path& path);
+		void itemDoubleClick(const std::filesystem::path& path);
+		void itemDrag(const std::filesystem::path& path);
 
-private:
-	std::string mRootPath;
-	std::filesystem::directory_entry mDirectoryEntry;
-	std::filesystem::directory_entry mFolderEntry;
-	std::filesystem::path mPath;
-	std::filesystem::path mCurrentPath;
+	private:
+		std::string mRootPath;
+		std::filesystem::directory_entry mDirectoryEntry;
+		std::filesystem::directory_entry mFolderEntry;
+		std::filesystem::path mPath;
+		std::filesystem::path mCurrentPath;
 
-	std::vector<Texture2D*> mIconAry;
-	std::vector<std::filesystem::path> mPathAry;
+		std::vector<Texture2D*> mIconAry;
+		std::vector<std::filesystem::path> mPathAry;
 
-	int mFileItemSize;
-	bool mIsDraging;
+		int mFileItemSize;
+		bool mIsDraging;
 
-	ImVec2 mUVx;
-	ImVec2 mUVy;
-};
+		ImVec2 mUVx;
+		ImVec2 mUVy;
+	};
 
-
+}

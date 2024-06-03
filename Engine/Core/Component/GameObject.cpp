@@ -1,4 +1,4 @@
-#include "GameObject.h"
+﻿#include "GameObject.h"
 #include "../Scene/Scene.h"
 #include "../Manager/SceneManager.h"
 #include "../Tool/Tool.h"
@@ -6,7 +6,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(GameObject);
+	TINY_OBJECT_CPP(GameObject, TinyObject)
 
 	GameObject::GameObject()
 		: GameObject("GameObject")
@@ -14,31 +14,24 @@ namespace tezcat::Tiny
 
 	}
 
-	GameObject::GameObject(const std::string& name)
+	GameObject::GameObject(std::string name)
 		: mIsLogic(false)
 		, mScene(nullptr)
 		, mLayerMaskIndex(0)
 		, mUID(-1)
-		, mName(name)
+		, mName(std::move(name))
 	{
-		mUID = GameObjectPool::addGameObject(this);
+
+	}
+
+	void GameObject::init()
+	{
+		mUID = SceneManager::getCurrentScene()->addGameObject(this);
 	}
 
 	GameObject::~GameObject()
 	{
-		auto children = this->getTransform()->getChildren();
-		if (children)
-		{
-			for (auto& child : *children)
-			{
-				child->getGameObject()->subRef();
-			}
-		}
 
-		mComponentList.clear();
-		mScene = nullptr;
-
-		GameObjectPool::removeGameObject(this);
 	}
 
 	void GameObject::enterScene(Scene* scene)
@@ -46,24 +39,30 @@ namespace tezcat::Tiny
 		mScene = scene;
 		for (auto com : mComponentList)
 		{
-			com->onStart();
-		}
-
-		auto children = this->getTransform()->getChildren();
-		if (children)
-		{
-			for (auto& child : *children)
+			if (com)
 			{
-				child->getGameObject()->enterScene(scene);
+				com->onStart();
 			}
 		}
+
+		//auto children = this->getTransform()->getChildren();
+		//if (children)
+		//{
+		//	for (auto& child : *children)
+		//	{
+		//		child->getGameObject()->enterScene(scene);
+		//	}
+		//}
 	}
 
 	void GameObject::exitScene()
 	{
 		for (auto com : mComponentList)
 		{
-			com->onDisable();
+			if (com)
+			{
+				com->onDisable();
+			}
 		}
 
 		auto children = this->getTransform()->getChildren();
@@ -95,43 +94,111 @@ namespace tezcat::Tiny
 
 		for (int i = 1; i < mComponentList.size(); i++)
 		{
-			mComponentList[i]->onComponentAdded(component);
+			if (mComponentList[i])
+			{
+				mComponentList[i]->onComponentAdded(component);
+			}
 		}
 
-		mComponentList.push_back(component);
+		auto id = component->getComponentTypeID();
+		if (mComponentList.size() <= id)
+		{
+			mComponentList.resize(id + 1);
+		}
+
+		mComponentList[id] = component;
+		component->saveObject();
 		component->onEnable();
 	}
 
-	//-------------------------------------------------
-	//
-	//
-	//
-	TinyVector<GameObject*> GameObjectPool::sPool;
-	std::deque<int> GameObjectPool::sFreeObjects;
-
-	int GameObjectPool::addGameObject(GameObject* gameObject)
+	void GameObject::onClose()
 	{
-		int uid;
-		if (sFreeObjects.empty())
+		auto children = this->getTransform()->getChildren();
+		if (children)
 		{
-			uid = sPool.size();
-			sPool.push_back(gameObject);
+			for (auto& child : *children)
+			{
+				child->getGameObject()->deleteObject();
+			}
+		}
+
+		SceneManager::getCurrentScene()->removeGameObject(this);
+
+		for (auto com : mComponentList)
+		{
+			if (com)
+			{
+				com->deleteObject();
+			}
+		}
+		mComponentList.clear();
+
+		mScene = nullptr;
+		mUID = -1;
+	}
+
+	void GameObject::removeComponent(Component* com)
+	{
+		for (uint32 i = 0; i < mComponentList.size(); i++)
+		{		
+			if (auto ptr = mComponentList[i])
+			{
+				if (ptr == com)
+				{
+					mComponentList[i] = nullptr;
+				}
+				else
+				{
+					ptr->onComponentRemoved(com);
+				}
+			}
+		}
+	}
+
+	//-------------------------------------------
+	//
+	//	GameObjectData
+	//
+	TINY_OBJECT_CPP(GameObjectData, TinyObject)
+	GameObjectData::GameObjectData()
+	{
+
+	}
+
+	GameObjectData::~GameObjectData()
+	{
+		for (auto go : mArray)
+		{
+			if (go)
+			{
+				go->deleteObject();
+			}
+		}
+		mArray.clear();
+	}
+
+	int32 GameObjectData::addGameObject(GameObject* gameObject)
+	{
+		gameObject->saveObject();
+		if (mFreeIDQueue.empty())
+		{
+			int32 id = mArray.size();
+			mArray.push_back(gameObject);
+			return id;
 		}
 		else
 		{
-			uid = sFreeObjects.front();
-			sFreeObjects.pop_front();
-			sPool[uid] = gameObject;
+			int32 id = mFreeIDQueue.front();
+			mFreeIDQueue.pop();
+			mArray[id] = gameObject;
+			return id;
 		}
-
-		return uid;
 	}
 
-	void GameObjectPool::removeGameObject(GameObject* gameObject)
+	void GameObjectData::removeGameObject(GameObject* gameObject)
 	{
-		auto uid = gameObject->getUID();
-		sPool[uid] = nullptr;
-		sFreeObjects.push_back(uid);
+		int32 id = gameObject->getUID();
+		mFreeIDQueue.push(id);
+		mArray[id] = nullptr;
 	}
-
 }

@@ -1,12 +1,13 @@
-#include "MySecondScene.h"
+﻿#include "MySecondScene.h"
 #include "../MyInputer.h"
 #include "../MyController.h"
 
-TINY_RTTI_CPP(MySeconedScene);
+TINY_OBJECT_CPP(MySeconedScene, Scene)
 
 MySeconedScene::MySeconedScene(const std::string& name)
 	: Scene(name)
 {
+
 }
 
 MySeconedScene::~MySeconedScene()
@@ -16,7 +17,7 @@ MySeconedScene::~MySeconedScene()
 
 void MySeconedScene::onEnter()
 {
-	Scene::onEnter();
+	Base::onEnter();
 	InputSys::getInstance()->push(MyInputer::getInstance());
 
 	if (true)
@@ -26,35 +27,14 @@ void MySeconedScene::onEnter()
 		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
 		camera->setCullLayer(0);
-		camera->setOrder(0);
+		camera->setOrderID(0);
+		camera->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 
 		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 
 		go->addComponent<Transform>();
 		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-
-
-		auto frame = FrameBuffer::create("FB_Viewport");
-
-		Texture2D* t2d = Texture2D::create("RB_Viewport");
-		t2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight(),
-			TextureInfo(TextureAttachPosition::ColorComponent
-				, TextureChannel::RGBA
-				, TextureChannel::RGBA
-				, DataType::UByte));
-		frame->addAttachment(t2d);
-
-		t2d = Texture2D::create("DS_Viewport");
-		t2d->setData(Engine::getScreenWidth(), Engine::getScreenHeight(),
-			TextureInfo(TextureAttachPosition::DepthComponent
-				, TextureChannel::Depth
-				, TextureChannel::Depth
-				, DataType::UByte));
-		frame->addAttachment(t2d);
-		frame->generate();
-
-		camera->setFrameBuffer(frame);
 	}
 
 	//----------------------------------------
@@ -67,7 +47,7 @@ void MySeconedScene::onEnter()
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> dis(-1000, 1000);
 
-		auto shader = ShaderMgr::getInstance()->find("Standard/Std1");
+		auto shader = ShaderManager::find("Standard/Std1");
 
 		auto index_diffuse = shader->getUniformIndex("myTex2DDiffuse");
 		auto index_specular = shader->getUniformIndex("myTex2DSpecular");
@@ -91,9 +71,9 @@ void MySeconedScene::onEnter()
 			auto material = Material::create(shader);
 			mr->setMaterial(material);
 
- 			material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
- 			material->setUniform<UniformTex2D>(index_specular, tex_spec);
- 			material->setUniform<UniformF1>(index_shininess, 16.0f);
+			material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
+			material->setUniform<UniformTex2D>(index_specular, tex_spec);
+			material->setUniform<UniformF1>(index_shininess, 16.0f);
 			//material->addUniform<UniformTexCube>(ShaderParam::TexCube, "skybox_2");
 		}
 	}
@@ -101,16 +81,16 @@ void MySeconedScene::onEnter()
 
 void MySeconedScene::onExit()
 {
-	Scene::onExit();
+	Base::onExit();
 }
 
 void MySeconedScene::onPause()
 {
-
+	Base::onPause();
 }
 
 void MySeconedScene::onResume()
 {
-
+	Base::onResume();
 }
 

@@ -1,4 +1,4 @@
-#include "GLRenderCommand.h"
+﻿#include "GLRenderCommand.h"
 #include "GLHead.h"
 
 #include "Core/Renderer/BaseGraphics.h"
@@ -8,6 +8,7 @@
 #include "Core/Shader/ShaderPackage.h"
 #include "Core/Data/Material.h"
 #include "Core/Manager/ShadowCasterManager.h"
+#include "Core/Manager/LightingManager.h"
 
 namespace tezcat::Tiny::GL
 {
@@ -73,7 +74,7 @@ namespace tezcat::Tiny::GL
 	}
 
 	GLRenderCMD_Shadow::GLRenderCMD_Shadow(Vertex* vertex, Transform* transform)
-		: RenderCommand(ShadowCasterMgr::getInstance()->getShader())
+		: RenderCommand(nullptr)
 		, mVertex(vertex)
 		, mTransform(transform)
 	{
@@ -97,25 +98,27 @@ namespace tezcat::Tiny::GL
 
 	}
 
-	GLRenderCMD_Skybox::GLRenderCMD_Skybox(Shader* shader
-		, Vertex* vertex
+	GLRenderCMD_Skybox::GLRenderCMD_Skybox(Vertex* vertex
 		, TextureCube* skybox
 		, float lod
-		, bool isHdr)
-		: RenderCommand(shader)
+		, bool isHdr
+		, float exposure)
+		: RenderCommand(nullptr)
 		, mVertex(vertex)
 		, mSkybox(skybox)
 		, mLod(lod)
 		, mIsHdr(isHdr)
+		, mExposure(exposure)
 	{
 
 	}
 
 	void GLRenderCMD_Skybox::run(BaseGraphics* graphics, Shader* shader)
 	{
-		graphics->setTextureCube(mShader, ShaderParam::TexSkybox, mSkybox);
+		graphics->setTextureCube(shader, ShaderParam::TexSkybox, mSkybox);
 		graphics->setFloat1(shader, "myLod", mLod);
 		graphics->setBool(shader, "myIsHDR", mIsHdr);
+		graphics->setFloat1(shader, "myExposure", mExposure);
 		graphics->draw(mVertex);
 	}
 
@@ -124,14 +127,11 @@ namespace tezcat::Tiny::GL
 	//
 	//	RenderCMD_HDRToCube
 	//
-	GLRenderCMD_HDRToCube::GLRenderCMD_HDRToCube(Shader* shader
-		, Vertex* vertex
-		, int* uniformIDHDR
+	GLRenderCMD_HDRToCube::GLRenderCMD_HDRToCube(Vertex* vertex
 		, Texture2D* texHDR
 		, TextureCube* skybox)
-		: RenderCommand(shader)
+		: RenderCommand(nullptr)
 		, mVertex(vertex)
-		, mUniformIDHDR(uniformIDHDR)
 		, mTexHDR(texHDR)
 		, mSkybox(skybox)
 	{
@@ -145,28 +145,41 @@ namespace tezcat::Tiny::GL
 
 	void GLRenderCMD_HDRToCube::run(BaseGraphics* graphics, Shader* shader)
 	{
-		glm::mat4 captureViews[] =
+		float4x4 captureViews[] =
 		{
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(1.0f,  0.0f,  0.0f), float3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(-1.0f, 0.0f,  0.0f), float3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  1.0f,  0.0f), float3(0.0f,  0.0f,  1.0f)),
+		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f, -1.0f,  0.0f), float3(0.0f,  0.0f, -1.0f)),
+		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  0.0f,  1.0f), float3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  0.0f, -1.0f), float3(0.0f, -1.0f,  0.0f))
 		};
 
 		shader->resetLocalState();
-		graphics->setTexture2D(shader, *mUniformIDHDR, mTexHDR);
+		auto uinfo = shader->getUniformInfo("myTexHDR2D");
+		graphics->setTexture2D(shader, uinfo->shaderID, mTexHDR);
 
-		for (uint32_t i = 0; i < 6; i++)
+		Texture2D** array = LightingManager::getCubeMapTextureArray();
+
+		for (uint32 i = 0; i < 6; i++)
 		{
-			glFramebufferTexture2D(GL_FRAMEBUFFER
-								 , GL_COLOR_ATTACHMENT0
-								 , GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
-								 , mSkybox->getTextureID()
-								 , 0);
-
 			graphics->setMat4(shader, ShaderParam::MatrixV, captureViews[i]);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER
+				 , GL_COLOR_ATTACHMENT0
+				 , GL_TEXTURE_2D
+				 , array[i]->getTextureID()
+				 , 0);
+
+			graphics->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+			graphics->draw(mVertex);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER
+				, GL_COLOR_ATTACHMENT0
+				, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
+				, mSkybox->getTextureID()
+				, 0);
+
 			graphics->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 			graphics->draw(mVertex);
 		}
@@ -176,7 +189,6 @@ namespace tezcat::Tiny::GL
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 5);
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
 	}
 
 	//-------------------------------------------------------

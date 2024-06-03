@@ -1,9 +1,6 @@
-#pragma once
-#include "../Manager/Manager.h"
+﻿#pragma once
 #include "../Head/TinyCpp.h"
-#include "../Head/RenderConfig.h"
 
-#include "../Tool/Tool.h"
 
 
 namespace tezcat::Tiny
@@ -15,24 +12,40 @@ namespace tezcat::Tiny
 
 	class TINY_API TextureManager
 	{
+		TextureManager() = delete;
+		~TextureManager() = delete;
 	public:
-		TextureManager();
-		virtual ~TextureManager();
-		void loadResource(const std::string& dir);
 
-		Texture2D* create2D(const std::string& name);
-		TextureCube* createCube(const std::string& name);
-		TextureRender2D* createRender2D(const std::string& name);
+		static void loadResource(const std::string& dir);
+
+		static std::tuple<bool, Texture2D*> create2D(std::string name);
+		static std::tuple<bool, TextureCube*> createCube(std::string name);
+		static std::tuple<bool, TextureRender2D*> createRender2D(std::string name);
 
 	public:
-		void add(const std::string& name, Texture* tex);
-		Texture* find(const std::string& name);
-		void outputAll2DHDR(std::vector<Texture2D*>& container);
+		static Texture* find(const std::string& name);
+
+		template<class Type>
+		static Type* find(const std::string& name)
+		{
+			auto it = mTextureMap.find(name);
+			if (it != mTextureMap.end())
+			{
+				return (Type*)it->second;
+			}
+
+			return nullptr;
+		}
+
+
+		static void outputAll2DHDR(std::vector<Texture2D*>& container);
 
 	private:
-		TinyUMap<std::string, Texture*> mTextureMap;
-	};
+		static void add(const std::string_view& name, Texture* tex);
 
-	using TextureMgr = SG<TextureManager>;
+
+	private:
+		static std::unordered_map<std::string_view, Texture*> mTextureMap;
+	};
 }
 

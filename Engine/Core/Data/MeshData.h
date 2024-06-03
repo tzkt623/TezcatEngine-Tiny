@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
@@ -21,44 +21,43 @@ namespace tezcat::Tiny
 	class TINY_API MeshData : public TinyObject
 	{
 		MeshData();
-		MeshData(const std::string& name);
-		TINY_Factory(MeshData);
-		TINY_RTTI_H(MeshData);
+		MeshData(std::string name);
+		TINY_OBJECT_H(MeshData, TinyObject)
 	public:
 
 		virtual ~MeshData();
 
-		const std::string& getName() { return mName; }
+		const std::string& getName() const { return mName; }
 
-		size_t vertexSize()
+		uint64 vertexSize() const
 		{
-			return this->mVertices.size() * sizeof(glm::vec3);
+			return this->mVertices.size() * sizeof(float3);
 		}
 
-		size_t normalSize()
+		uint64 normalSize() const
 		{
-			return this->mNormals.size() * sizeof(glm::vec3);
+			return this->mNormals.size() * sizeof(float3);
 		}
 
-		size_t colorSize()
+		uint64 colorSize() const
 		{
-			return this->mColors.size() * sizeof(glm::vec4);
+			return this->mColors.size() * sizeof(float4);
 		}
 
-		size_t uvSize()
+		uint64 uvSize() const
 		{
-			return this->mUVs.size() * sizeof(glm::vec2);
+			return this->mUVs.size() * sizeof(float2);
 		}
 
-		size_t indexSize()
+		uint64 indexSize() const
 		{
 			return this->mIndices.size() * sizeof(unsigned int);
 		}
 
-		int getBufferSize();
+		int getBufferSize() const;
 
-		std::tuple<size_t, const void*> getVertexData(const VertexPosition& position);
-		std::tuple<size_t, const void*> getIndexData();
+		std::tuple<uint64, const void*> getVertexData(const VertexPosition& position);
+		std::tuple<uint64, const void*> getIndexData();
 
 		void apply(DrawMode drawMode = DrawMode::Triangles);
 
@@ -71,14 +70,14 @@ namespace tezcat::Tiny
 	public:
 		int mIndex;
 		std::string mName;
-		std::vector<glm::vec3> mVertices;
-		std::vector<glm::vec3> mNormals;
-		std::vector<glm::vec4> mColors;
-		std::vector<glm::vec2> mUVs;
-		std::vector<glm::vec3> mTangents;
-		std::vector<glm::vec3> mBitTangents;
+		std::vector<float3> mVertices;
+		std::vector<float3> mNormals;
+		std::vector<float4> mColors;
+		std::vector<float2> mUVs;
+		std::vector<float3> mTangents;
+		std::vector<float3> mBitTangents;
 
-		std::vector<unsigned int> mIndices;
+		std::vector<uint32> mIndices;
 
 		DrawMode mDrawMode;
 		std::vector<VertexPosition> mLayoutPositions;
@@ -96,10 +95,10 @@ namespace tezcat::Tiny
 		ModelNode();
 		~ModelNode();
 
-		bool hasChildren() { return mChildrenCount != 0; }
-		bool hasMesh() { return mVertex != nullptr; }
+		bool hasChildren() const { return mChildrenCount != 0; }
+		bool hasMesh() const { return mVertex != nullptr; }
 
-		void init(uint32_t meshCount, uint32_t childCount);
+		void init(uint32 meshCount, uint32 childCount);
 		void addChild(ModelNode* node);
 		void setVertex(Vertex* vertex);
 
@@ -108,9 +107,9 @@ namespace tezcat::Tiny
 		Vertex* mVertex;
 
 		bool mInited;
-		uint32_t mIndex;
+		uint32 mIndex;
 		ModelNode** mChildren;
-		uint32_t mChildrenCount;
+		uint32 mChildrenCount;
 	};
 
 
@@ -118,8 +117,7 @@ namespace tezcat::Tiny
 	class Model : public TinyObject
 	{
 		Model();
-		TINY_RTTI_H(Model);
-		TINY_Factory(Model);
+		TINY_OBJECT_H(Model, TinyObject)
 	public:
 		virtual ~Model();
 

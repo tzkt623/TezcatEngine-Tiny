@@ -1,4 +1,4 @@
-#include "ModelManager.h"
+﻿#include "ModelManager.h"
 #include "SceneManager.h"
 #include "VertexBufferManager.h"
 
@@ -16,19 +16,12 @@
 
 namespace tezcat::Tiny
 {
-	ModelManager::ModelManager()
-	{
-		ModelMgr::attach(this);
-	}
-
-	ModelManager::~ModelManager()
-	{
-
-	}
+	std::vector<MeshData*> ModelManager::mMeshDataAry;
+	std::unordered_map<uint64, ModelNode*> ModelManager::mModelUMap;
 
 	void ModelManager::loadModel(const std::string& path)
 	{
-		if (SceneMgr::getInstance()->empty())
+		if (SceneManager::empty())
 		{
 			return;
 		}
@@ -37,7 +30,7 @@ namespace tezcat::Tiny
 		auto result = mModelUMap.find(hash_id);
 		if (result == mModelUMap.end())
 		{
-			auto current_scene = SceneMgr::getInstance()->getCurrentScene();
+			auto current_scene = SceneManager::getCurrentScene();
 
 			uint32_t load_flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate
 				| aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
@@ -59,9 +52,9 @@ namespace tezcat::Tiny
 			}
 
 			std::function<void(const aiScene*, aiNode*, ModelNode*, uint32_t index)> func =
-				[this, func](const aiScene* aiscene, aiNode* ainode, ModelNode* parent, uint32_t index)
+				[func](const aiScene* aiscene, aiNode* ainode, ModelNode* parent, uint32_t index)
 			{
-				auto mnode = this->createModelNode(aiscene, ainode);
+				auto mnode = createModelNode(aiscene, ainode);
 				if (parent != nullptr)
 				{
 					parent->addChild(mnode);
@@ -77,7 +70,7 @@ namespace tezcat::Tiny
 			};
 
 			auto ai_node = ai_scene->mRootNode;
-			auto mnode = this->createModelNode(ai_scene, ai_node);
+			auto mnode = createModelNode(ai_scene, ai_node);
 			mModelUMap.emplace(hash_id, mnode);
 			if (ai_node->mNumChildren > 0)
 			{
@@ -98,8 +91,8 @@ namespace tezcat::Tiny
 		if (ainode->mNumMeshes > 0)
 		{
 			auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[0]];
-			auto mesh_data = this->createMesh(ai_mesh);
-			VertexBufMgr::getInstance()->create(mesh_data);
+			auto mesh_data = createMesh(ai_mesh);
+			VertexBufferManager::create(mesh_data);
 		}
 
 		return mnode;
@@ -113,7 +106,7 @@ namespace tezcat::Tiny
 		{
 			auto mr = go->addComponent<MeshRenderer>();
 			auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[0]];
-			mr->setMesh(this->createMesh(ai_mesh));
+			mr->setMesh(createMesh(ai_mesh));
 		}
 
 		return transform;
@@ -206,6 +199,8 @@ namespace tezcat::Tiny
 
 		return meshData;
 	}
+
+
 
 }
 

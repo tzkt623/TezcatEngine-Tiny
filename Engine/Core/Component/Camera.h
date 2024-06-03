@@ -1,16 +1,18 @@
-#pragma once
+﻿#pragma once
 #include "Component.h"
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-
-#include "../Renderer/RenderObject.h"
+#include "../Renderer/CameraAgent.h"
 
 namespace tezcat::Tiny
 {
 	class Shader;
+	class Renderer;
 	class BaseGraphics;
-
+	class Pipeline;
+	class CameraAgent;
+	class FrameBuffer;
 
 	/*
 	* Camera
@@ -18,24 +20,18 @@ namespace tezcat::Tiny
 	* @brief 相机模块,负责在渲染流程中查找可见单位,以及提供ViewMatrix的数据
 	* @brief 相机可以把自己看到
 	*/
-	class TINY_API Camera : public ComponentT<Camera>, public IRenderObserver
+	class TINY_API Camera : public ComponentT<Camera>
 	{
 		//创建一个forward主相机
 		Camera();
 		//创建一个forward相机
 		Camera(bool mainCamera);
 
-		TINY_Factory(Camera);
-		TINY_RTTI_H(Camera);
-
+		TINY_OBJECT_H(Camera, ComponentT<Camera>)
+		TINY_RENDER_OBSERVER_FUNCTION(mCameraAgent)
 	public:
 		virtual ~Camera();
-
-		uint32_t getID() const { return mUID; }
-
-		void render(BaseGraphics* graphics);
-		void submit(BaseGraphics* graphics, Shader* shader) override;
-		void submitViewMatrix(BaseGraphics* graphics, Shader* shader) override;
+		uint32 getUID() const { return mUID; }
 
 	public:
 		bool isMain() const { return mIsMain; }
@@ -46,9 +42,11 @@ namespace tezcat::Tiny
 		void onStart() override;
 		void onEnable() override;
 		void onDisable() override;
-		
+
 	private:
+		CameraAgent* mCameraAgent;
+
 		bool mIsMain;
-		uint32_t mUID;
+		uint32 mUID;
 	};
 }

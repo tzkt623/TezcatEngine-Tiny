@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "../Head/ConfigHead.h"
 #include "../Head/CppHead.h"
 
 
 namespace tezcat::Tiny
 {
-	typedef uint32_t EventID;
+	typedef uint32 EventID;
 
 	struct EventData
 	{

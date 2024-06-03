@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
@@ -7,15 +7,13 @@
 
 namespace tezcat::Tiny
 {
-#define LogicBind(func) std::bind(&func, this)
-
 	class GameObject;
 	class Transform;
 
 	class TINY_API Component : public TinyObject
 	{
 		friend class GameObject;
-		TINY_RTTI_H(Component);
+		TINY_ABSTRACT_OBJECT_H(Component, TinyObject)
 
 	public:
 		Component();
@@ -38,29 +36,24 @@ namespace tezcat::Tiny
 
 		}
 
-		//加入GameObject/手动启用时执行
+		//加入GameObject/手动启用
 		virtual void onEnable()
 		{
 
 		}
 
-		//退出场景/手动操作时执行
+		//离开GameObject/手动关闭
 		virtual void onDisable()
 		{
 
 		}
 
-		//析构函数执行
-		virtual void onDestroy();
-
-		//virtual void onUpdate() {}
-
-		void onDetach()
+		//销毁此组件时执行
+		virtual void onDestroy()
 		{
-			mEnable = false;
-			this->onDisable();
-			mGameObject = nullptr;
+
 		}
+
 
 	public:
 		GameObject* getGameObject() const { return mGameObject; }
@@ -69,35 +62,17 @@ namespace tezcat::Tiny
 		Transform* getTransform();
 
 		bool isEnable() const { return mEnable; }
-		void setEnable(bool val)
-		{
-			mEnable = val;
-			if (mEnable)
-			{
-				this->onEnable();
-			}
-			else
-			{
-				this->onDisable();
-			}
-		}
-
-		bool isDetached() const { return mGameObject == nullptr; }
+		void setEnable(bool val);
 
 	public:
 		virtual void onComponentAdded(Component* component) {}
 		virtual void onComponentRemoved(Component* component) {}
 
 	public://RTTI
-		template<class Com>
-		bool is() { return this->is(std::type_index(typeid(Com))); }
-		virtual const std::type_index& getComponentType() = 0;
+		virtual uint32 getComponentTypeID() = 0;
 
-		virtual uint32_t getComponentTypeID() = 0;
-		virtual bool is(const uint32_t& id) = 0;
-
-	protected:
-		virtual bool is(const std::type_index& type) = 0;
+	private:
+		virtual void onClose() override;
 
 	protected:
 		bool mEnable;
@@ -106,14 +81,14 @@ namespace tezcat::Tiny
 		GameObject* mGameObject;
 
 	private:
-		static uint32_t sID;
+		static uint32 sID;
 	public:
-		static uint32_t giveID()
+		static uint32 giveID()
 		{
 			return sID++;
 		}
 
-		static uint32_t totalID()
+		static uint32 totalID()
 		{
 			return sID;
 		}
@@ -125,28 +100,22 @@ namespace tezcat::Tiny
 	template<typename Com>
 	class TINY_API ComponentT : public Component
 	{
-	public:
+	protected:
 		ComponentT() = default;
+	public:
 		virtual ~ComponentT() = default;
 
 	public:
-		const std::type_index& getComponentType() override { return sTypeIndex; }
-		bool is(const std::type_index& type) override { return sTypeIndex == type; }
-
-		uint32_t getComponentTypeID() override { return sTypeID; }
-		bool is(const uint32_t& id) override { return sTypeID == id; }
+		uint32 getComponentTypeID() override { return sTypeID; }
+		bool isComponentID(const uint32& id) { return sTypeID == id; }
 
 	public:
-		static const std::type_index& getComponentTypeStatic() { return sTypeIndex; }
-		static const uint32_t getComponentTypeIDStatic() { return sTypeID; }
+		static const uint32 getComponentTypeIDStatic() { return sTypeID; }
 
 	private:
-		static std::type_index sTypeIndex;
-		static uint32_t sTypeID;
+		static uint32 sTypeID;
 	};
-	template<typename Com>
-	uint32_t ComponentT<Com>::sTypeID = Component::giveID();
 
 	template<typename Com>
-	std::type_index ComponentT<Com>::sTypeIndex = typeid(Com);
+	uint32 ComponentT<Com>::sTypeID = Component::giveID();
 }

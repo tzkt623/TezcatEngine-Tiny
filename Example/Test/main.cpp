@@ -1,6 +1,9 @@
-#include "MyEngineIniter.h"
+﻿#include "MyEngineIniter.h"
+#include "WindowsEngine.h"
+
 //#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
-using namespace tezcat::Tiny::GL;
+
+using namespace tezcat::Editor;
 
 int main()
 {
@@ -11,3 +14,4 @@ int main()
 	}
 	return 0;
 }
+

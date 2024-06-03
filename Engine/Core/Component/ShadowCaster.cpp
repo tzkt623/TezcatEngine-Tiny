@@ -1,28 +1,33 @@
-#include "ShadowCaster.h"
+﻿#include "ShadowCaster.h"
 #include "Transform.h"
+#include "GameObject.h"
 
 #include "../Shader/ShaderParam.h"
 #include "../Shader/Shader.h"
 
 #include "../Manager/FrameBufferManager.h"
 #include "../Manager/TextureManager.h"
+#include "../Manager/ShaderManager.h"
+
 #include "../Renderer/Texture.h"
 #include "../Renderer/FrameBuffer.h"
 #include "../Renderer/BaseGraphics.h"
-#include "../Renderer/RenderPass.h"
+#include "../Renderer/Pipeline.h"
 
 #include "../Manager/ShadowCasterManager.h"
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(ShadowCaster);
+	TINY_OBJECT_CPP(ShadowCaster, ComponentT<ShadowCaster>)
+
 	ShadowCaster::ShadowCaster()
-		: IRenderObserver(new ExtraQueue(this))
-		, mCasterID(0)
-		, mShadwowTexutre(nullptr)
+		: mShadowObserver()
+		, mShadowTexture(nullptr)
+		, mPipePass(nullptr)
+		, mFrameBuffer(nullptr)
+		, mUID(0)
 	{
-		mClearOption = ClearOption::CO_Depth;
-		mRenderPhase = RenderPhase::Shadow;
+
 	}
 
 	ShadowCaster::~ShadowCaster()
@@ -30,79 +35,78 @@ namespace tezcat::Tiny
 
 	}
 
-	void ShadowCaster::submitViewMatrix(BaseGraphics* graphcis, Shader* shader)
+	void ShadowCaster::init()
 	{
-		this->updateObserverMatrix();
+		Base::init();
 
-		auto transform = this->getTransform();
-		mViewMatrix = glm::lookAt(transform->getWorldPosition()
-								, transform->getWorldPosition() + transform->getForward()
-								, transform->getUp());
+		mShadowObserver = RenderObserver::create();
+		mShadowObserver->saveObject();
+		mShadowObserver->setOrderID(-126);
 
-		auto lpv = mProjectionMatrix * mViewMatrix;
-		//这里caster是观察者,所以传vp
-		graphcis->setMat4(shader, ShaderParam::MatrixVP, lpv);
-	}
-
-	void ShadowCaster::submit(BaseGraphics* graphcis, Shader* shader)
-	{
-		auto transform = this->getTransform();
-		mViewMatrix = glm::lookAt(transform->getWorldPosition()
-								, transform->getWorldPosition() + transform->getForward()
-								, transform->getUp());
-
-		auto lpv = mProjectionMatrix * mViewMatrix;
-		//这里caster是数据提供者,所以传lightvp
-		graphcis->setMat4(shader, ShaderParam::MatrixLightVP, lpv);
+		mPipePass = ReplacedPipelinePass::create(mShadowObserver
+			, ShaderManager::find("Unlit/ShadowMap"));
+		mPipePass->setUseCullLayerData(true);
+		mPipePass->saveObject();
 	}
 
 	void ShadowCaster::onStart()
 	{
-
+		mShadowObserver->setTransform(mGameObject->getTransform());
 	}
 
 	void ShadowCaster::onEnable()
 	{
-		mCasterID = ShadowCasterMgr::getInstance()->addCaster(this);
+		mUID = ShadowCasterManager::add(this);
+		mPipePass->addToPipeline();
 	}
 
 	void ShadowCaster::onDisable()
 	{
+		ShadowCasterManager::recycle(this);
+		mPipePass->removeFromPipeline();
+		mUID = 0;
 	}
 
 	void ShadowCaster::onDestroy()
 	{
-		mFrameBuffer->subRef();
+		ShadowCasterManager::recycle(this);
+		mUID = 0;
+
+		mFrameBuffer->deleteObject();
+		mShadowObserver->deleteObject();
+		mShadowTexture->deleteObject();
+		mPipePass->deleteObject();
 	}
 
 	void ShadowCaster::setShadowMap(int width, int height, const std::string& shaderName)
 	{
 		if (mFrameBuffer)
 		{
-			mFrameBuffer->subRef();
+			return;
 		}
 
-		mViewInfo.OX = 0;
-		mViewInfo.OY = 0;
-		mViewInfo.Width = width;
-		mViewInfo.Height = height;
+		mShadowTexture = Texture2D::create("Shadow");
+		mShadowTexture->saveObject();
+		mShadowTexture->setConfig(width, height
+			, TextureInternalFormat::Depth
+			, TextureFormat::Depth
+			, DataMemFormat::Float);
+		mShadowTexture->setAttachPosition(TextureAttachPosition::DepthComponent);
 
-		mShadwowTexutre = Texture2D::create();
-		mShadwowTexutre->setData(width, height
-			, TextureInfo(TextureType::Texture2D
-				, TextureAttachPosition::DepthComponent
-				, TextureFilter::Nearest
-				, TextureFilter::Nearest
-				, TextureWrap::Clamp_To_Border
-				, TextureWrap::Clamp_To_Border
-				, TextureChannel::Depth32f
-				, TextureChannel::Depth
-				, DataType::Float32));
-
-		mFrameBuffer = FrameBuffer::create("Shadow");
-		mFrameBuffer->addAttachment(mShadwowTexutre);
+		mFrameBuffer = FrameBuffer::create(shaderName + std::to_string(mUID));
+		mFrameBuffer->saveObject();
+		mFrameBuffer->addAttachment(mShadowTexture);
 		mFrameBuffer->generate();
 
-		mFrameBuffer->addRef();
+		mShadowObserver->setFrameBuffer(mFrameBuffer);
+		mShadowObserver->setViewRect(0, 0, width, height);
 	}
+
+	void ShadowCaster::submit(BaseGraphics* graphics, Shader* shader)
+	{
+		auto pv = mShadowObserver->getProjectionMatrix() * mShadowObserver->getViewMatrix();
+		graphics->setMat4(shader, ShaderParam::MatrixLightVP, pv);
+		graphics->setGlobalTexture2D(shader, ShaderParam::TexDepth, mShadowTexture);
+	}
+
 }

@@ -1,64 +1,38 @@
-#include "FrameBuffer.h"
-#include "../Renderer/Texture.h"
-#include "../Renderer/BaseGraphics.h"
+﻿#include "FrameBuffer.h"
+#include "Texture.h"
+#include "BaseGraphics.h"
+#include "Pipeline.h"
+
+#include "../Manager/FrameBufferManager.h"
 
 
 namespace tezcat::Tiny
 {
-	FrameBuffer* FrameBuffer::sDefaultBuffer = new FrameBuffer();
-	TinyStack<FrameBuffer*> FrameBuffer::sFrameBufferStack;
-
-	TINY_RTTI_CPP(FrameBuffer);
+	TINY_OBJECT_CPP(FrameBuffer, TinyObject)
 
 	FrameBuffer::FrameBuffer()
 		: mBufferID(0)
 		, mComponents()
 		, mName()
+		, mUID(FrameBufferManager::giveID())
+		, mCurrentFrame(Pipeline::getFrameCount() - 1)
 	{
 
 	}
 
-	FrameBuffer::FrameBuffer(const std::string& name)
+	FrameBuffer::FrameBuffer(std::string name)
 		: mBufferID(0)
 		, mComponents()
-		, mName(name)
+		, mName(std::move(name))
+		, mUID(FrameBufferManager::giveID())
+		, mCurrentFrame(Pipeline::getFrameCount() - 1)
 	{
 
 	}
 
 	FrameBuffer::~FrameBuffer()
 	{
-
-	}
-
-	Texture* FrameBuffer::getBuffer(const int& index)
-	{
-		return mComponents[index];
-	}
-
-	void FrameBuffer::bind(BaseGraphics* graphics, FrameBuffer* buffer)
-	{
-		buffer->addRef();
-		sFrameBufferStack.push(buffer);
-		graphics->bind(buffer);
-	}
-
-	void FrameBuffer::unbind(BaseGraphics* graphics, FrameBuffer* buffer)
-	{
-		if (sFrameBufferStack.top() != buffer)
-		{
-			throw std::invalid_argument("Unbind FrameBuffer Error!!! the buffer must be the same");
-		}
-
-		sFrameBufferStack.top()->subRef();
-
-		if (sFrameBufferStack.empty())
-		{
-			return;
-		}
-
-		sFrameBufferStack.pop();
-		graphics->bind(sFrameBufferStack.top());
+		FrameBufferManager::recycleID(mUID);
 	}
 
 	void FrameBuffer::generate()
@@ -68,7 +42,7 @@ namespace tezcat::Tiny
 
 	void FrameBuffer::addAttachment(Texture* tex)
 	{
+		tex->saveObject();
 		mComponents.push_back(tex);
-		tex->addRef();
 	}
 }

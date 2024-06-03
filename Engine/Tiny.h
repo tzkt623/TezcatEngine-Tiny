@@ -1,20 +1,23 @@
-#pragma once
+﻿#pragma once
+
+#include "Core/Head/TinyCpp.h"
 
 #include "Core/Engine.h"
 #include "Core/EngineIniter.h"
 #include "Core/Profiler.h"
 
-#include "Core/GUI/GUIWidget.h"
+#include "Core/Base/TinyObject.h"
 
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/Texture.h"
 #include "Core/Renderer/FrameBuffer.h"
-#include "Core/Renderer/RenderObject.h"
+#include "Core/Renderer/Renderer.h"
 #include "Core/Renderer/Vertex.h"
 #include "Core/Renderer/RenderCommand.h"
-#include "Core/Renderer/RenderPass.h"
+#include "Core/Renderer/RenderObserver.h"
+#include "Core/Renderer/Pipeline.h"
 
-#include "Core/Manager/EnvironmentLightManager.h"
+#include "Core/Manager/LightingManager.h"
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/CameraManager.h"
 #include "Core/Manager/TextureManager.h"
@@ -51,8 +54,11 @@
 
 
 #ifdef TINY_PLATFORM_WINDOWS
-#include "Platform/OpenGL/WindowsEngine.h"
+#include "Platform/OpenGL/GLHead.h"
 #endif
+
+using namespace tezcat::Tiny;
+using namespace tezcat::Tiny::GL;
 
 
 #define TINY_ENGINE_ENTRY(my_engine, resouce_loader)\

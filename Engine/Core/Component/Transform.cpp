@@ -8,7 +8,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(Transform);
+	TINY_OBJECT_CPP(Transform, ComponentT<Transform>)
 
 	static float4x4 WORLD_MATRIX(1.0f);
 	const float3 Transform::XAxis(1.0f, 0.0f, 0.0f);
@@ -48,8 +48,7 @@ namespace tezcat::Tiny
 
 	void Transform::onEnable()
 	{
-		mGameObject->swapTransform();
-		SceneMgr::getInstance()->getCurrentScene()->addNewTransform(this);
+
 	}
 
 	void Transform::onDisable()
@@ -96,7 +95,7 @@ namespace tezcat::Tiny
 				mLocalScale = world_scale;
 
 				mIndex = 0;
-				SceneMgr::getInstance()->getCurrentScene()->addTransform(this);
+				SceneManager::getCurrentScene()->addTransform(this);
 			}
 			//如果没有变到根节点上,使用当前父节点的矩阵得到本地坐标
 			else
@@ -125,7 +124,6 @@ namespace tezcat::Tiny
 			if (mParent == nullptr)
 			{
 				mIndex = 0;
-				SceneMgr::getInstance()->getCurrentScene()->addNewTransform(this);
 			}
 			else
 			{
@@ -206,7 +204,7 @@ namespace tezcat::Tiny
 			auto it = mChildren->begin();
 			while (it != mChildren->end())
 			{
-				auto child = (*it);
+				auto& child = (*it);
 				if (child.lock())
 				{
 					child->forceUpdate();
@@ -227,7 +225,7 @@ namespace tezcat::Tiny
 			auto it = mChildren->begin();
 			while (it != mChildren->end())
 			{
-				auto child = (*it);
+				auto& child = (*it);
 				if (child.lock())
 				{
 					child->update();

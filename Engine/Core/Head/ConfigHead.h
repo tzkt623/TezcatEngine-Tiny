@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef TINY_PLATFORM_WINDOWS
 
@@ -14,6 +14,9 @@
 #else
 #error Windows Only
 #endif
+
+#define interface public virtual
+
 
 namespace tezcat::Tiny
 {

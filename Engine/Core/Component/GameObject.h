@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 #include "../Head/TinyCpp.h"
 #include "../Head/ConfigHead.h"
-#include "../Component/Transform.h"
 #include "../Base/TinyObject.h"
+
+#include "../Component/Transform.h"
 
 namespace tezcat::Tiny
 {
@@ -18,15 +19,18 @@ namespace tezcat::Tiny
 	{
 		friend class Component;
 		friend class Transform;
+		friend class Scene;
 
 		GameObject();
-		GameObject(const std::string& name);
+		GameObject(std::string name);
 
-		TINY_Factory(GameObject);
-		TINY_RTTI_H(GameObject);
+		TINY_OBJECT_H(GameObject, TinyObject)
 	public:
 
 		virtual ~GameObject();
+
+	protected:
+		virtual void init() override;
 
 	public:
 
@@ -37,16 +41,16 @@ namespace tezcat::Tiny
 		void enterScene(Scene* scene);
 		void exitScene();
 
-		uint32_t getLayerMask() { return 1 << mLayerMaskIndex; }
-		uint32_t getLayerIndex() { return mLayerMaskIndex; }
-		void setLayerMaskIndex(uint32_t maskIndex) { mLayerMaskIndex = maskIndex; }
+		uint32 getLayerMask() const { return 1 << mLayerMaskIndex; }
+		uint32 getLayerIndex() const { return mLayerMaskIndex; }
+		void setLayerMaskIndex(uint32 maskIndex) { mLayerMaskIndex = maskIndex; }
 
 	public:
-		int getUID() const { return mUID; }
+		int32 getUID() const { return mUID; }
 
 		Transform* getTransform()
 		{
-			return static_cast<Transform*>(mComponentList[0]);
+			return static_cast<Transform*>(mComponentList[Transform::getComponentTypeIDStatic()]);
 		}
 
 		template<class Com>
@@ -54,7 +58,7 @@ namespace tezcat::Tiny
 		{
 			for (auto const& com : mComponentList)
 			{
-				if (com->is<Com>())
+				if (com->typeIDEqual<Com>())
 				{
 					return static_cast<Com*>(com);
 				}
@@ -68,7 +72,7 @@ namespace tezcat::Tiny
 		{
 			for (auto const& com : mComponentList)
 			{
-				if (com->is<Com>())
+				if (com->typeIDEqual<Com>())
 				{
 					return static_cast<Com*>(com);
 				}
@@ -98,101 +102,41 @@ namespace tezcat::Tiny
 
 		void addComponent(Component* component);
 
-		template<typename Com>
-		void removeComponent()
-		{
-			auto it = mComponentList.begin();
-			while (it != mComponentList.end())
-			{
-				if ((*it)->is<Com>())
-				{
-					(*it)->onDetach();
-					mComponentList.erase(it);
-					break;
-				}
-			}
-		}
-
-		void detachAllComponent() { mComponentList.clear(); }
-
-		TinyVector<Component*>& getCompoents() { return mComponentList; }
+		std::vector<Component*>& getCompoents() { return mComponentList; }
 
 	private:
-		void removeComponent(Component* com)
-		{
-			auto it = mComponentList.begin();
-			while (it != mComponentList.end())
-			{
-				if (*it == com)
-				{
-					it = mComponentList.erase(it);
-				}
-				else
-				{
-					(*it)->onComponentRemoved(com);
-				}
-			}
-		}
-
+		void removeComponent(Component* com);
 		void swapTransform();
 
-	public:
-		template<typename T>
-		static T* instantiate()
-		{
-			GameObject go = new GameObject();
-			return go->addComponent<T>();
-		}
-
-		template<typename T>
-		static T* instantiate(const std::string& name)
-		{
-			GameObject go = new GameObject(name);
-			return go->addComponent<T>();
-		}
-
-		template<typename T>
-		static T* instantiate(Transform* parent)
-		{
-			GameObject go = new GameObject();
-			go->getTransform()->setParent(parent);
-			return go->addComponent<T>();
-		}
-
-		template<typename T>
-		static T* instantiate(const std::string& name, Transform* parent)
-		{
-			GameObject go = new GameObject(name);
-			go->getTransform()->setParent(parent);
-			return go->addComponent<T>();
-		}
+	protected:
+		virtual void onClose() override;
 
 	private:
-		std::string mName;
-		int mUID;
-		uint32_t mLayerMaskIndex;
-
 		bool mIsLogic;
+		std::string mName;
+		int32 mUID;
+		uint32 mLayerMaskIndex;
 
 	private:
 		Scene* mScene;
-		TinyVector<Component*> mComponentList;
+		std::vector<Component*> mComponentList;
 	};
 
-
-	class GameObjectPool
+	class GameObjectData : public TinyObject
 	{
-		GameObjectPool() = delete;
-		~GameObjectPool() = delete;
-	public:
+		TINY_OBJECT_H(GameObjectData, TinyObject)
+	private:
+		GameObjectData();
 
-		static int addGameObject(GameObject* gameObject);
-		static void removeGameObject(GameObject* gameObject);
-		static GameObject* get(uint32_t index) { return sPool[index]; }
+	public:
+		virtual ~GameObjectData();
+
+		int32 addGameObject(GameObject* gameObject);
+		void removeGameObject(GameObject* gameObject);
 
 	private:
-		static TinyVector<GameObject*> sPool;
-		static std::deque<int> sFreeObjects;
+		std::vector<GameObject*> mArray;
+		std::queue<int32> mFreeIDQueue;
 	};
 }
 

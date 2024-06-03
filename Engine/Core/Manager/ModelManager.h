@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/TinyCpp.h"
 #include "../Tool/Tool.h"
@@ -13,21 +13,18 @@ namespace tezcat::Tiny
 	class Transform;
 	class ModelManager
 	{
+		ModelManager() = delete;
+		~ModelManager() = delete;
 	public:
-		ModelManager();
-		~ModelManager();
+		static void loadModel(const std::string& path);
 
-		void loadModel(const std::string& path);
+		static Transform* createModel(const aiScene* aiscene, aiNode* ainode);
+		static ModelNode* createModelNode(const aiScene* aiscene, aiNode* ainode);
 
-		Transform* createModel(const aiScene* aiscene, aiNode* ainode);
-		ModelNode* createModelNode(const aiScene* aiscene, aiNode* ainode);
-
-		MeshData* createMesh(aiMesh* aimesh);
+		static MeshData* createMesh(aiMesh* aimesh);
 
 	private:
-		std::unordered_map<uint64_t, ModelNode*> mModelUMap;
-		std::vector<MeshData*> mMeshDataAry;
+		static std::unordered_map<uint64, ModelNode*> mModelUMap;
+		static std::vector<MeshData*> mMeshDataAry;
 	};
-
-	using ModelMgr = SG<ModelManager>;
 }

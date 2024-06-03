@@ -1,12 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include "Tiny.h"
 
 class MyMainScene : public Scene
 {
 	MyMainScene(const std::string& name);
-	TINY_RTTI_H(MyMainScene);
-	TINY_Factory(MyMainScene);
+	TINY_OBJECT_H(MyMainScene, Scene)
 
 public:
 	void createGates(float gateWidth, float gateHigh);
@@ -19,7 +18,8 @@ public:
 	void createPBR();
 
 protected:
-	void onEnter() override;
+	virtual void onEnter() override;
+	virtual void onExit() override;
 
 private:
 	GameObject* mController;

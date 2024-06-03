@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Core/Renderer/RenderCommand.h"
 
@@ -43,7 +43,7 @@ namespace tezcat::Tiny::GL
 	class GLRenderCMD_Skybox : public RenderCommand
 	{
 	public:
-		GLRenderCMD_Skybox(Shader* shader, Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false);
+		GLRenderCMD_Skybox(Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false, float exposure = 1);
 		virtual ~GLRenderCMD_Skybox();
 
 		void run(BaseGraphics* graphics, Shader* shader) override;
@@ -52,6 +52,7 @@ namespace tezcat::Tiny::GL
 		TextureCube* mSkybox;
 		float mLod;
 		bool mIsHdr;
+		float mExposure;
 	};
 
 	class GLRenderCMD_Mesh : public RenderCommand
@@ -72,9 +73,7 @@ namespace tezcat::Tiny::GL
 	class GLRenderCMD_HDRToCube : public RenderCommand
 	{
 	public:
-		GLRenderCMD_HDRToCube(Shader* shader
-			, Vertex* vertex
-			, int* uniformIDHDR
+		GLRenderCMD_HDRToCube(Vertex* vertex
 			, Texture2D* texHDR
 			, TextureCube* skybox);
 		virtual ~GLRenderCMD_HDRToCube();
@@ -83,7 +82,6 @@ namespace tezcat::Tiny::GL
 
 	private:
 		Vertex* mVertex;
-		int* mUniformIDHDR;
 		Texture2D* mTexHDR;
 		TextureCube* mSkybox;
 	};

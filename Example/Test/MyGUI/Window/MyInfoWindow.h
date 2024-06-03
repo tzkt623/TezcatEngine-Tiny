@@ -1,20 +1,23 @@
-#pragma once
+﻿#pragma once
 
 #include "../MyGUIContext.h"
 
-class MyInfoWindow : public GUIWindow
+namespace tezcat::Editor
 {
-public:
-	MyInfoWindow();
-	~MyInfoWindow();
+	class MyInfoWindow : public GUIWindow
+	{
+	public:
+		MyInfoWindow();
+		~MyInfoWindow();
 
-	void init() override;
+		void init() override;
 
-protected:
-	void onRender() override;
+	protected:
+		void onRender() override;
 
-private:
-	std::vector<float> mFrameTimeBuffer;
-};
+	private:
+		std::vector<float> mFrameTimeBuffer;
+	};
 
 
+}

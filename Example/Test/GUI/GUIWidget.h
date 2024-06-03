@@ -1,14 +1,7 @@
-#pragma once
-#include "../Head/CppHead.h"
-#include "../Head/ConfigHead.h"
-#include "../Head/ImGuiHead.h"
-#include "../Head/GLMHead.h"
+﻿#pragma once
+#include "GUI.h"
 
-#include "../Tool/Tool.h"
-
-
-
-namespace tezcat::Tiny
+namespace tezcat::Editor
 {
 	class GUI;
 
@@ -63,7 +56,7 @@ namespace tezcat::Tiny
 
 		void update() override;
 		void onRender() override;
-		bool isClosed() { return !mIsOpen; }
+		bool isClosed() const { return !mIsOpen; }
 		void setClose() { mIsOpen = false; }
 		GUI* getHost() { return mHost; }
 

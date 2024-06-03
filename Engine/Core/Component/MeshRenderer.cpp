@@ -1,45 +1,32 @@
-#include "MeshRenderer.h"
+﻿#include "MeshRenderer.h"
 #include "Transform.h"
-#include "../Tool/Tool.h"
+#include "GameObject.h"
 
-
-#include "../Data/Material.h"
-#include "../Component/GameObject.h"
-
-#include "../Shader/Shader.h"
-#include "../Shader/ShaderPackage.h"
-#include "../Shader/Uniform.h"
-
-#include "../Renderer/Vertex.h"
-#include "../Renderer/RenderPass.h"
-#include "../Renderer/VertexBuffer.h"
-#include "../Renderer/RenderAgent.h"
-#include "../Renderer/RenderLayer.h"
-#include "../Renderer/RenderCommand.h"
-#include "../Renderer/BaseGraphics.h"
-
-#include "../Manager/ShadowCasterManager.h"
-#include "../Manager/VertexBufferManager.h"
+#include "../Renderer/RenderObjectCache.h"
 
 
 namespace tezcat::Tiny
 {
-	TINY_RTTI_CPP(MeshRenderer);
+	TINY_OBJECT_CPP(MeshRenderer, ComponentT<MeshRenderer>)
 
 	MeshRenderer::MeshRenderer()
-		: mIsCastShadow(true)
+		: mRenderAgent(nullptr)
 	{
-		mRenderAgent->setComponent(this);
+		mRenderAgent = MeshRenderAgent::create();
+		mRenderAgent->saveObject();
 	}
 
 	MeshRenderer::~MeshRenderer()
 	{
-
+		mRenderAgent->deleteObject();
 	}
 
 	void MeshRenderer::onEnable()
 	{
-
+		if (auto transform = mGameObject->getComponent<Transform>())
+		{
+			mRenderAgent->setTransform(transform);
+		}
 	}
 
 	void MeshRenderer::onDisable()
@@ -49,33 +36,20 @@ namespace tezcat::Tiny
 
 	void MeshRenderer::onStart()
 	{
-		RenderLayer::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
+		RenderObjectCache::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
 	}
 
-	void MeshRenderer::sendToQueue(BaseGraphics* graphics, const RenderPhase& phase, RenderQueue* queue)
+	void MeshRenderer::onComponentAdded(Component* component)
 	{
-		switch (phase)
+		if (component->typeIDEqual<Transform>())
 		{
-		case RenderPhase::Shadow:
-		{
-			if (!mIsCastShadow)
-			{
-				break;
-			}
+			mRenderAgent->setTransform((Transform*)component);
+		}
+	}
 
-			auto cmd = graphics->createDrawShadowCMD(mVertex, this->getTransform());
-			queue->addRenderCommand(cmd);
-			break;
-		}
-		case RenderPhase::Forward:
-		{
-			auto cmd = graphics->createDrawMeshCMD(mVertex, this->getTransform(), mMaterial);
-			queue->addRenderCommand(cmd);
-			break;
-		}
-		default:
-			break;
-		}
+	void MeshRenderer::onComponentRemoved(Component* component)
+	{
+
 	}
 
 }

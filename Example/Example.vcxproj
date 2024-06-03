@@ -130,7 +130,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Example\;$(SolutionDir)Example\ThirdParty\;$(SolutionDir)Engine\;$(SolutionDir)Engine\ThirdParty</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -169,11 +169,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Test\GUI\GUI.cpp" />
+    <ClCompile Include="Test\GUI\GUIWidget.cpp" />
     <ClCompile Include="Test\MyController.cpp" />
     <ClCompile Include="Test\main.cpp" />
     <ClCompile Include="Test\MyEvent.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUI.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUIContext.cpp" />
+    <ClCompile Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyResourceWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyGCInfoWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyInfoWindow.cpp" />
@@ -191,12 +194,23 @@
     <ClCompile Include="Test\MyObserver.cpp" />
     <ClCompile Include="Test\Scene\MySecondScene.cpp" />
     <ClCompile Include="Test\Scene\Tutorial01.cpp" />
+    <ClCompile Include="Test\ThirdParty\imgui\imgui.cpp" />
+    <ClCompile Include="Test\ThirdParty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Test\ThirdParty\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Test\ThirdParty\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Test\ThirdParty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Test\ThirdParty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Test\ThirdParty\imgui\TextEditor\TextEditor.cpp" />
+    <ClCompile Include="Test\WindowsEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Test\GUI\GUI.h" />
+    <ClInclude Include="Test\GUI\GUIWidget.h" />
     <ClInclude Include="Test\MyController.h" />
     <ClInclude Include="Test\MyEvent.h" />
     <ClInclude Include="Test\MyGUI\MyGUI.h" />
     <ClInclude Include="Test\MyGUI\MyGUIContext.h" />
+    <ClInclude Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyResourceWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyGCInfoWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyInfoWindow.h" />
@@ -214,6 +228,17 @@
     <ClInclude Include="Test\MyObserver.h" />
     <ClInclude Include="Test\Scene\MySecondScene.h" />
     <ClInclude Include="Test\Scene\Tutorial01.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imconfig.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imgui.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imgui_internal.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imstb_textedit.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\imstb_truetype.h" />
+    <ClInclude Include="Test\ThirdParty\imgui\TextEditor\TextEditor.h" />
+    <ClInclude Include="Test\WindowsEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

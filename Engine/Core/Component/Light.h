@@ -1,5 +1,5 @@
-#pragma once
-#include "../Renderer/RenderObject.h"
+﻿#pragma once
+#include "../Renderer/Renderer.h"
 
 #include "../Head/CppHead.h"
 #include "../Shader/Shader.h"
@@ -17,8 +17,12 @@ namespace tezcat::Tiny
 	class FrameBuffer;
 	class BaseGraphics;
 
-	class TINY_API ILight : public IRenderObject
+#pragma region Agent
+
+
+	class TINY_API ILight : public BaseRenderer
 	{
+		TINY_ABSTRACT_OBJECT_H(ILight, BaseRenderer)
 	public:
 		virtual ~ILight() = default;
 		virtual LightType getLightType() = 0;
@@ -26,13 +30,65 @@ namespace tezcat::Tiny
 		virtual void render(BaseGraphics* graphics) {}
 	};
 
-	class TINY_API DirectionalLight : public ComponentT<DirectionalLight>, public ILight
+	class TINY_API DirectionalLightAgent : public ILight
+	{
+		DirectionalLightAgent();
+		TINY_OBJECT_H(DirectionalLightAgent, ILight)
+
+	public:
+		virtual ~DirectionalLightAgent() {}
+
+		virtual LightType getLightType() final { return LightType::Directional; }
+
+		float3& getDirection() { return mDirection; }
+		void setDirection(const float3& val) { mDirection = val; }
+
+		float3& getAmbient() { return mAmbient; }
+		void setAmbient(const float3& val) { mAmbient = val; }
+
+		float3& getDiffuse() { return mDiffuse; }
+		void setDiffuse(const float3& val) { mDiffuse = val; }
+
+		float3& getSpecular() { return mSpecular; }
+		void setSpecular(const float3& val) { mSpecular = val; }
+
+		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
+
+
+		void makeRenderCommand(BaseGraphics* graphics, BaseRenderObserver* renderObserver) override;
+		void makeRenderCommand(BaseGraphics* graphics, PipelinePass* pass) override;
+
+	private:
+		float3 mDirection;
+		float3 mAmbient;
+		float3 mDiffuse;
+		float3 mSpecular;
+	};
+#pragma endregion
+
+
+#pragma region Component
+
+
+	class TINY_API LightComponent : public ComponentT<LightComponent>
+	{
+		TINY_ABSTRACT_OBJECT_H(LightComponent, ComponentT<LightComponent>)
+
+	protected:
+		LightComponent() = default;
+		virtual LightType getLightType() = 0;
+
+	public:
+		virtual ~LightComponent() = default;
+		virtual void submit(BaseGraphics* graphics, Shader* shader) = 0;
+	};
+
+	class TINY_API DirectionalLight : public LightComponent
 	{
 		DirectionalLight();
-		DirectionalLight(const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
+		DirectionalLight(const float3& direction, const float3& ambient, const float3& diffuse, const float3& specular);
 	public:
-		TINY_Factory(DirectionalLight);
-		TINY_RTTI_H(DirectionalLight);
+		TINY_OBJECT_H(DirectionalLight, LightComponent)
 
 	public:
 		virtual ~DirectionalLight();
@@ -40,55 +96,52 @@ namespace tezcat::Tiny
 		LightType getLightType() final { return LightType::Directional; }
 
 	public:
-		void render(BaseGraphics* graphics) override;
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void render(BaseGraphics* graphics);
+		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
 
-		glm::vec3& getDirection() { return mDirection; }
-		void setDirection(const glm::vec3& val) { mDirection = val; }
+		float3& getDirection() { return mLightAgent->getDirection(); }
+		void setDirection(const float3& val) { mLightAgent->setDirection(val); }
 
-		glm::vec3& getAmbient() { return mAmbient; }
-		void setAmbient(const glm::vec3& val) { mAmbient = val; }
+		float3& getAmbient() { return mLightAgent->getAmbient(); }
+		void setAmbient(const float3& val) { mLightAgent->setAmbient(val); }
 
-		glm::vec3& getDiffuse() { return mDiffuse; }
-		void setDiffuse(const glm::vec3& val) { mDiffuse = val; }
+		float3& getDiffuse() { return mLightAgent->getDiffuse(); }
+		void setDiffuse(const float3& val) { mLightAgent->setDiffuse(val); }
 
-		glm::vec3& getSpecular() { return mSpecular; }
-		void setSpecular(const glm::vec3& val) { mSpecular = val; }
+		float3& getSpecular() { return mLightAgent->getSpecular(); }
+		void setSpecular(const float3& val) { mLightAgent->setSpecular(val); }
 
 	protected:
 		void onEnable() override;
 		void onDisable() override;
+		void onStart() override;
 
 	private:
-		glm::vec3 mDirection;
-		glm::vec3 mAmbient;
-		glm::vec3 mDiffuse;
-		glm::vec3 mSpecular;
+		DirectionalLightAgent* mLightAgent;
 	};
 
 
-	class TINY_API PointLight : public ComponentT<PointLight>, public ILight
+	class TINY_API PointLight : public LightComponent
 	{
 		PointLight();
-		TINY_Factory(PointLight);
-		TINY_RTTI_H(PointLight);
+		TINY_OBJECT_H(PointLight, LightComponent)
 
 	public:
 		virtual ~PointLight();
 
 		LightType getLightType() final { return LightType::Point; }
 
-		glm::vec3& getAmbient() { return mAmbient; }
-		void setAmbient(const glm::vec3& val) { mAmbient = val; }
+		float3& getAmbient() { return mAmbient; }
+		void setAmbient(const float3& val) { mAmbient = val; }
 
-		glm::vec3& getDiffuse() { return mDiffuse; }
-		void setDiffuse(const glm::vec3& val) { mDiffuse = val; }
+		float3& getDiffuse() { return mDiffuse; }
+		void setDiffuse(const float3& val) { mDiffuse = val; }
 
-		glm::vec3& getSpecular() { return mSpecular; }
-		void setSpecular(const glm::vec3& val) { mSpecular = val; }
+		float3& getSpecular() { return mSpecular; }
+		void setSpecular(const float3& val) { mSpecular = val; }
 
-		glm::vec3& getConfig() { return mConfig; }
-		void setConfig(const glm::vec3& val) { mConfig = val; }
+		float3& getConfig() { return mConfig; }
+		void setConfig(const float3& val) { mConfig = val; }
 
 		void setConfig(float constant, float linear, float quadratic)
 		{
@@ -112,30 +165,33 @@ namespace tezcat::Tiny
 			mConfig.z = quadratic;
 		}
 
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
+
 
 	protected:
 		void onEnable() override;
 		void onDisable() override;
 
 	private:
-		glm::vec3 mAmbient;
-		glm::vec3 mDiffuse;
-		glm::vec3 mSpecular;
-		glm::vec3 mConfig;
+		float3 mAmbient;
+		float3 mDiffuse;
+		float3 mSpecular;
+		float3 mConfig;
 	};
 
-	class TINY_API SpotLight : public ComponentT<SpotLight>, public ILight
+	class TINY_API SpotLight : public LightComponent
 	{
 		SpotLight();
-		TINY_Factory(SpotLight);
-		TINY_RTTI_H(SpotLight);
+		TINY_OBJECT_H(SpotLight, LightComponent)
 	public:
 		virtual ~SpotLight();
 
 		LightType getLightType() final { return LightType::Spot; }
+		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
 
 	private:
 
 	};
+#pragma endregion
+
 }

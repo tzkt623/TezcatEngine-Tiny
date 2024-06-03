@@ -1,8 +1,6 @@
-#include "GUIWidget.h"
-#include "../Tool/Tool.h"
-#include "GUI.h"
+﻿#include "GUIWidget.h"
 
-namespace tezcat::Tiny
+namespace tezcat::Editor
 {
 	float GUIFunction::getFrameRate()
 	{

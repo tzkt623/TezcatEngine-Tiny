@@ -1,4 +1,4 @@
-#include "EngineIniter.h"
+﻿#include "EngineIniter.h"
 #include "Renderer/BaseGraphics.h"
 #include "Manager/ShaderManager.h"
 #include "Manager/VertexBufferManager.h"
@@ -10,6 +10,8 @@ namespace tezcat::Tiny
 	EngineIniter::EngineIniter(RenderAPI renderAPI)
 		: mWindowWidth(0)
 		, mWindowHeight(0)
+		, mGLMajor(0)
+		, mGLMinor(0)
 		, mEnableVsync(true)
 	{
 		EngineConfig::sRenderAPI = renderAPI;
@@ -22,11 +24,9 @@ namespace tezcat::Tiny
 
 	void EngineIniter::prepareResource(Engine* engine)
 	{
-//		ShaderMgr::getInstance()->loadIncludeFiles(FileTool::getRootRelativeResDir() + "/Shaders/Include");
-		ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
-		ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
-		ShaderMgr::getInstance()->loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
-//		ShaderMgr::getInstance()->clearIncludeFiles();
+		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
+		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
+		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
 
 		this->createSomeMode();
 	}
@@ -60,7 +60,7 @@ namespace tezcat::Tiny
 		//
 		mesh_data->mVertices.emplace_back(-size, -size, size);	//
 		mesh_data->mVertices.emplace_back(size, -size, size);	//
-		mesh_data->mVertices.emplace_back(size, size, size);		//
+		mesh_data->mVertices.emplace_back(size, size, size);	//
 		mesh_data->mVertices.emplace_back(-size, size, size);	//
 
 		mesh_data->mNormals.emplace_back(0.0f, 0.0f, 1.0f);
@@ -70,7 +70,7 @@ namespace tezcat::Tiny
 
 		//
 		mesh_data->mVertices.emplace_back(-size, size, size);	//
-		mesh_data->mVertices.emplace_back(size, size, size);		//
+		mesh_data->mVertices.emplace_back(size, size, size);	//
 		mesh_data->mVertices.emplace_back(size, size, -size);	//
 		mesh_data->mVertices.emplace_back(-size, size, -size);	//
 
@@ -147,7 +147,7 @@ namespace tezcat::Tiny
 
 		mesh_data->apply();
 
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 
 	void EngineIniter::createSphere()
@@ -212,7 +212,7 @@ namespace tezcat::Tiny
 		//indices.clear();
 		mesh_data->apply(DrawMode::Triangles_Strip);
 
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 
 	void EngineIniter::createSphere(int prec)
@@ -262,7 +262,7 @@ namespace tezcat::Tiny
 
 
 		mesh_data->apply();
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 
 	void EngineIniter::createSquare()
@@ -299,7 +299,7 @@ namespace tezcat::Tiny
 
 		mesh_data->apply();
 
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 
 	void EngineIniter::createRect()
@@ -336,7 +336,7 @@ namespace tezcat::Tiny
 
 		mesh_data->apply();
 
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 
 	void EngineIniter::createGridSquare()
@@ -357,7 +357,7 @@ namespace tezcat::Tiny
 		mesh_data->mIndices.emplace_back(3);
 
 		mesh_data->apply();
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 
 	void EngineIniter::createPlane()
@@ -393,57 +393,61 @@ namespace tezcat::Tiny
 		mesh_data->mNormals.emplace_back(0.0f, 1.0f, 0.0f);
 
 		mesh_data->apply();
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 
 	void EngineIniter::createSkybox()
 	{
 		MeshData* mesh_data = MeshData::create("Skybox");
 
+		float size = 1.0f;
+
 		//一个面,两个三角形,没有index,NDC坐标系
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, -1.0f);
+		mesh_data->mVertices.emplace_back(-size, size, -size);
+		mesh_data->mVertices.emplace_back(-size, -size, -size);
+		mesh_data->mVertices.emplace_back(size, -size, -size);
 
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, 1.0f);
+		mesh_data->mVertices.emplace_back(-size, size, -size);
+		mesh_data->mVertices.emplace_back(size, -size, -size);
+		mesh_data->mVertices.emplace_back(size, size, -size);
 
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, -1.0f);
+		//
+		mesh_data->mVertices.emplace_back(-size, -size, size);
+		mesh_data->mVertices.emplace_back(-size, -size, -size);
+		mesh_data->mVertices.emplace_back(-size, size, -size);
+		mesh_data->mVertices.emplace_back(-size, size, -size);
+		mesh_data->mVertices.emplace_back(-size, size, size);
+		mesh_data->mVertices.emplace_back(-size, -size, size);
 
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, 1.0f);
+		mesh_data->mVertices.emplace_back(size, -size, -size);
+		mesh_data->mVertices.emplace_back(size, -size, size);
+		mesh_data->mVertices.emplace_back(size, size, size);
+		mesh_data->mVertices.emplace_back(size, size, size);
+		mesh_data->mVertices.emplace_back(size, size, -size);
+		mesh_data->mVertices.emplace_back(size, -size, -size);
 
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, 1.0f, -1.0f);
+		mesh_data->mVertices.emplace_back(-size, -size, size);
+		mesh_data->mVertices.emplace_back(-size, size, size);
+		mesh_data->mVertices.emplace_back(size, size, size);
+		mesh_data->mVertices.emplace_back(size, size, size);
+		mesh_data->mVertices.emplace_back(size, -size, size);
+		mesh_data->mVertices.emplace_back(-size, -size, size);
 
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, -1.0f);
-		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, 1.0f);
-		mesh_data->mVertices.emplace_back(1.0f, -1.0f, 1.0f);
+		mesh_data->mVertices.emplace_back(-size, size, -size);
+		mesh_data->mVertices.emplace_back(size, size, -size);
+		mesh_data->mVertices.emplace_back(size, size, size);
+		mesh_data->mVertices.emplace_back(size, size, size);
+		mesh_data->mVertices.emplace_back(-size, size, size);
+		mesh_data->mVertices.emplace_back(-size, size, -size);
+
+		mesh_data->mVertices.emplace_back(-size, -size, -size);
+		mesh_data->mVertices.emplace_back(-size, -size, size);
+		mesh_data->mVertices.emplace_back(size, -size, -size);
+		mesh_data->mVertices.emplace_back(size, -size, -size);
+		mesh_data->mVertices.emplace_back(-size, -size, size);
+		mesh_data->mVertices.emplace_back(size, -size, size);
 
 		mesh_data->apply();
-		VertexBufMgr::getInstance()->add(mesh_data);
+		VertexBufferManager::add(mesh_data);
 	}
 }

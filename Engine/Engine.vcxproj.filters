@@ -13,11 +13,8 @@
     <ClCompile Include="Core\Renderer\Vertex.cpp">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Renderer\RenderObject.cpp">
+    <ClCompile Include="Core\Renderer\Renderer.cpp">
       <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Renderer\RenderPass.cpp">
-      <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClCompile>
     <ClCompile Include="Core\Shader\Shader.cpp">
       <Filter>Engine\Core\Shader</Filter>
@@ -33,27 +30,6 @@
     </ClCompile>
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp">
       <Filter>Engine\Thirdparty\glm</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\GUI\GUI.cpp">
-      <Filter>Engine\Core\Renderer\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui.cpp">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_impl_glfw.cpp">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_impl_opengl3.cpp">
-      <Filter>Engine\Thirdparty\imgui</Filter>
     </ClCompile>
     <ClCompile Include="Core\Profiler.cpp">
       <Filter>Engine\Core</Filter>
@@ -75,9 +51,6 @@
     </ClCompile>
     <ClCompile Include="Core\Shader\ShaderParam.cpp">
       <Filter>Engine\Core\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\GUI\GUIWidget.cpp">
-      <Filter>Engine\Core\Renderer\GUI</Filter>
     </ClCompile>
     <ClCompile Include="Core\Component\Transform.cpp">
       <Filter>Engine\Core\Transform</Filter>
@@ -106,9 +79,6 @@
     <ClCompile Include="Core\Component\Light.cpp">
       <Filter>Engine\Core\Renderer\Object\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Manager\LightManager.cpp">
-      <Filter>Engine\Core\Renderer\Object\Light</Filter>
-    </ClCompile>
     <ClCompile Include="Core\EngineIniter.cpp">
       <Filter>Engine\Core\Data</Filter>
     </ClCompile>
@@ -122,12 +92,11 @@
       <Filter>Engine\Core\Data</Filter>
     </ClCompile>
     <ClCompile Include="Core\Shader\ShaderPackage.cpp" />
-    <ClCompile Include="Platform\OpenGL\WindowsEngine.cpp" />
     <ClCompile Include="Platform\OpenGL\GLGraphics.cpp" />
     <ClCompile Include="Core\Renderer\BaseGraphics.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Core\Layer\Layer.cpp" />
-    <ClCompile Include="Core\Renderer\RenderLayer.cpp" />
+    <ClCompile Include="Core\Renderer\RenderObjectCache.cpp" />
     <ClCompile Include="Core\Head\ConfigHead.cpp" />
     <ClCompile Include="Core\Head\CppHead.cpp" />
     <ClCompile Include="Core\Head\RenderConfig.cpp" />
@@ -146,7 +115,6 @@
     <ClCompile Include="Core\Renderer\VertexConfig.cpp" />
     <ClCompile Include="Core\Base\TinyGC.cpp" />
     <ClCompile Include="Core\Base\TinyRefObject.cpp" />
-    <ClCompile Include="Core\Renderer\RenderAgent.cpp" />
     <ClCompile Include="Core\Base\TinyGCInfo.cpp" />
     <ClCompile Include="Core\Component\ShadowCaster.cpp" />
     <ClCompile Include="Core\Manager\ShadowCasterManager.cpp" />
@@ -156,15 +124,22 @@
     <ClCompile Include="Core\Tool\Octree\OctreeConfig.cpp" />
     <ClCompile Include="Core\Tool\Octree\OctreeNode.cpp" />
     <ClCompile Include="Core\Tool\Collision\BoundingBox.cpp" />
-    <ClCompile Include="Core\Manager\EnvironmentLightManager.cpp" />
+    <ClCompile Include="Core\Manager\LightingManager.cpp" />
     <ClCompile Include="Core\Manager\ModelManager.cpp" />
-    <ClCompile Include="ThirdParty\imgui\TextEditor\TextEditor.cpp" />
     <ClCompile Include="Core\Data\Resource.cpp" />
     <ClCompile Include="ThirdParty\Hash\city.cc" />
     <ClCompile Include="Core\Renderer\BuildCommand.cpp" />
     <ClCompile Include="Platform\OpenGL\GLBuildCommand.cpp" />
     <ClCompile Include="Platform\OpenGL\GLRenderCommand.cpp" />
     <ClCompile Include="Core\Data\Text.cpp" />
+    <ClCompile Include="Core\Renderer\Pipeline.cpp" />
+    <ClCompile Include="Core\Renderer\MeshRenderAgent.cpp" />
+    <ClCompile Include="Core\Renderer\CameraAgent.cpp" />
+    <ClCompile Include="Core\Renderer\RenderObserver.cpp" />
+    <ClCompile Include="Core\Base\TinyObject.cpp" />
+    <ClCompile Include="Core\Renderer\PipeQueue.cpp" />
+    <ClCompile Include="Platform\OpenGL\GLHead.cpp" />
+    <ClCompile Include="Core\Renderer\GraphicsAgent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -250,11 +225,8 @@
     <ClInclude Include="Core\Renderer\Vertex.h">
       <Filter>Engine\Core\Renderer\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Renderer\RenderObject.h">
+    <ClInclude Include="Core\Renderer\Renderer.h">
       <Filter>Engine\Core\Renderer\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Renderer\RenderPass.h">
-      <Filter>Engine\Core\Renderer\Pass</Filter>
     </ClInclude>
     <ClInclude Include="Core\Shader\Shader.h">
       <Filter>Engine\Core\Shader</Filter>
@@ -1132,36 +1104,6 @@
     <ClInclude Include="ThirdParty\glm\vector_relational.hpp">
       <Filter>Engine\Thirdparty\glm</Filter>
     </ClInclude>
-    <ClInclude Include="Core\GUI\GUI.h">
-      <Filter>Engine\Core\Renderer\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imconfig.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui_internal.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui_impl_glfw.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui_impl_opengl3.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui_impl_opengl3_loader.h">
-      <Filter>Engine\Thirdparty\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Tool\Tool.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
@@ -1195,12 +1137,6 @@
     <ClInclude Include="Core\Shader\ShaderParam.h">
       <Filter>Engine\Core\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Core\GUI\GUIWidget.h">
-      <Filter>Engine\Core\Renderer\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Head\ImGuiHead.h">
-      <Filter>Engine\Header</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Component\Transform.h">
       <Filter>Engine\Core\Transform</Filter>
     </ClInclude>
@@ -1224,9 +1160,6 @@
     </ClInclude>
     <ClInclude Include="Core\Component\Camera.h">
       <Filter>Engine\Core\Scene\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Manager\LightManager.h">
-      <Filter>Engine\Core\Renderer\Object\Light</Filter>
     </ClInclude>
     <ClInclude Include="Core\Component\Light.h">
       <Filter>Engine\Core\Renderer\Object\Light</Filter>
@@ -1252,12 +1185,11 @@
     <ClInclude Include="Core\Shader\ShaderPackage.h" />
     <ClInclude Include="Core\Head\ConfigHead.h" />
     <ClInclude Include="Core\Tool\Bitmask.h" />
-    <ClInclude Include="Platform\OpenGL\WindowsEngine.h" />
     <ClInclude Include="Platform\OpenGL\GLGraphics.h" />
     <ClInclude Include="Core\Renderer\BaseGraphics.h" />
     <ClInclude Include="Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="Core\Layer\Layer.h" />
-    <ClInclude Include="Core\Renderer\RenderLayer.h" />
+    <ClInclude Include="Core\Renderer\RenderObjectCache.h" />
     <ClInclude Include="Core\Head\RenderConfig.h" />
     <ClInclude Include="Core\Tool\IDString.h" />
     <ClInclude Include="Core\Shader\Uniform.h" />
@@ -1271,11 +1203,9 @@
     <ClInclude Include="Core\Layer\LightLayer.h" />
     <ClInclude Include="Core\Tool\Collision\OBB.h" />
     <ClInclude Include="Core\Tool\Collision\FrustumCulling.h" />
-    <ClInclude Include="Core\Renderer\RenderObjectTag.h" />
     <ClInclude Include="Core\Base\TinyObject.h" />
     <ClInclude Include="Core\Renderer\FrameBuffer.h" />
     <ClInclude Include="Core\Manager\FrameBufferManager.h" />
-    <ClInclude Include="Core\Manager\Manager.h" />
     <ClInclude Include="Core\Tool\FileTool.h" />
     <ClInclude Include="Core\Component\FlyController.h" />
     <ClInclude Include="Core\Tool\Log.h" />
@@ -1284,7 +1214,6 @@
     <ClInclude Include="Core\Base\TinyRefObject.h" />
     <ClInclude Include="Core\Base\TinyGC.h" />
     <ClInclude Include="Core\Head\TinyCpp.h" />
-    <ClInclude Include="Core\Renderer\RenderAgent.h" />
     <ClInclude Include="Core\Base\TinyGCInfo.h" />
     <ClInclude Include="Core\Component\ShadowCaster.h" />
     <ClInclude Include="Core\Manager\ShadowCasterManager.h" />
@@ -1294,7 +1223,7 @@
     <ClInclude Include="Core\Tool\Octree\OctreeAgentList.h" />
     <ClInclude Include="Core\Tool\Octree\OctreeConfig.h" />
     <ClInclude Include="Core\Tool\Octree\OctreeNode.h" />
-    <ClInclude Include="Core\Manager\EnvironmentLightManager.h" />
+    <ClInclude Include="Core\Manager\LightingManager.h" />
     <ClInclude Include="ThirdParty\assimp\Compiler\poppack1.h" />
     <ClInclude Include="ThirdParty\assimp\Compiler\pstdint.h" />
     <ClInclude Include="ThirdParty\assimp\Compiler\pushpack1.h" />
@@ -1378,7 +1307,6 @@
     <ClInclude Include="ThirdParty\assimp\XMLTools.h" />
     <ClInclude Include="ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="Core\Manager\ModelManager.h" />
-    <ClInclude Include="ThirdParty\imgui\TextEditor\TextEditor.h" />
     <ClInclude Include="Core\Data\Resource.h" />
     <ClInclude Include="ThirdParty\Hash\city.h" />
     <ClInclude Include="Core\Renderer\BuildCommand.h" />
@@ -1400,6 +1328,12 @@
     <ClInclude Include="ThirdParty\fmt\std.h" />
     <ClInclude Include="ThirdParty\fmt\xchar.h" />
     <ClInclude Include="Core\Shader\ShaderConfig.h" />
+    <ClInclude Include="Core\Renderer\Pipeline.h" />
+    <ClInclude Include="Core\Renderer\MeshRenderAgent.h" />
+    <ClInclude Include="Core\Renderer\CameraAgent.h" />
+    <ClInclude Include="Core\Renderer\RenderObserver.h" />
+    <ClInclude Include="Core\Renderer\PipeQueue.h" />
+    <ClInclude Include="Core\Renderer\GraphicsAgent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

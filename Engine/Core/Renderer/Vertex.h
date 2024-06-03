@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "VertexConfig.h"
 
 #include "../Head/TinyCpp.h"
@@ -19,9 +19,11 @@ namespace tezcat::Tiny
 	class TINY_API Vertex : public TinyObject
 	{
 		Vertex();
-		Vertex(const std::string& name);
-		TINY_RTTI_H(Vertex);
-		TINY_Factory(Vertex);
+		Vertex(std::string name);
+		TINY_OBJECT_H(Vertex, TinyObject)
+
+	protected:
+		virtual void init() override {}
 
 	public:
 		virtual ~Vertex();
@@ -31,14 +33,14 @@ namespace tezcat::Tiny
 		int getIndexCount() const { return mIndexCount; }
 		DrawModeWrapper& getDrawMode() { return mDrawModeWrapper; }
 
-		uint32_t getVertexID() const { return mVertexID; }
-		void apply(uint32_t id) { mVertexID = id; }
+		uint32 getVertexID() const { return mVertexID; }
+		void apply(uint32 id) { mVertexID = id; }
 		void generate();
 
 		void setVertexBuffer(VertexBuffer* buffer);
 		void setIndexBuffer(IndexBuffer* buffer);
-		void setVertexCount(size_t size) { mVertexCount = (uint32_t)size; }
-		void setIndexCount(size_t size) { mIndexCount = (uint32_t)size; }
+		void setVertexCount(size_t size) { mVertexCount = (uint32)size; }
+		void setIndexCount(size_t size) { mIndexCount = (uint32)size; }
 
 		void addChild(Vertex* vertex);
 
@@ -58,10 +60,10 @@ namespace tezcat::Tiny
 
 	protected:
 		std::string mName;
-		uint32_t mVertexID = 0;
+		uint32 mVertexID = 0;
 
-		uint32_t mVertexCount = 0;
-		uint32_t mIndexCount = 0;
+		uint32 mVertexCount = 0;
+		uint32 mIndexCount = 0;
 
 		DrawModeWrapper mDrawModeWrapper;
 		TinyVector<VertexBuffer*> mVertexBuffers;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ShaderParam.h"
 #include "Uniform.h"
 #include "ShaderConfig.h"
@@ -18,9 +18,8 @@ namespace tezcat::Tiny
 	{
 		friend class BaseGraphics;
 		Shader(const std::string& filePath);
+		TINY_OBJECT_H(Shader, TinyObject)
 
-		TINY_RTTI_H(Shader);
-		TINY_Factory(Shader);
 	public:
 
 		virtual ~Shader();
@@ -34,6 +33,8 @@ namespace tezcat::Tiny
 		Queue getRenderQueue() const { return mRenderQueue; }
 		void setRenderQueue(Queue val) { mRenderQueue = val; }
 		void setName(const std::string& name) { mName = name; }
+		void setName(std::string& name) { mName.assign(name); }
+
 		int getProgramID() const { return mProgramID; }
 		int getOrderID() const { return mOrderID; }
 		void setOrderID(int orderID) { mOrderID = orderID; }
@@ -41,13 +42,13 @@ namespace tezcat::Tiny
 		int getVersion() const { return mVersion; }
 		void setVersion(int val) { mVersion = val; }
 		void setLightMode(LightMode lightMode) { mLightMode = lightMode; }
-		LightMode getLightMode() { return mLightMode; }
-		bool isShadowReceiver() { return mIsShadowReceiver; }
+		LightMode getLightMode() const { return mLightMode; }
+		bool isShadowReceiver() const { return mIsShadowReceiver; }
 
 		int32_t getPropertyID(const std::string& name)
 		{
 			auto it = mUserUniformUMap.find(name);
-			TinyAssert(it != mUserUniformUMap.end());
+			TINY_ASSERT(it != mUserUniformUMap.end());
 			return it->second->index;
 		}
 
@@ -55,14 +56,14 @@ namespace tezcat::Tiny
 		int getUniformIndex(const std::string& name)
 		{
 			auto it = mUserUniformUMap.find(name);
-			TinyThrow_Runtime(it == mUserUniformUMap.end(), name);
+			TINY_THROW_RUNTIME(it == mUserUniformUMap.end(), name);
 			return it->second->index;
 		}
 
 		UniformInfo* getUniformInfo(const std::string& name) const
 		{
 			auto it = mUserUniformUMap.find(name);
-			TinyThrow_Runtime(it == mUserUniformUMap.end(), name);
+			TINY_THROW_RUNTIME(it == mUserUniformUMap.end(), name);
 			return it->second;
 		}
 
