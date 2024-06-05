@@ -37,14 +37,14 @@ namespace tezcat::Tiny
 		return { true, frame_buffer };
 	}
 
-	void FrameBufferManager::bind(BaseGraphics* graphics, FrameBuffer* buffer)
+	void FrameBufferManager::bind(FrameBuffer* buffer)
 	{
 		buffer->saveObject();
 		sFrameBufferStack.push(buffer);
-		graphics->bind(buffer);
+		Graphics::getInstance()->bind(buffer);
 	}
 
-	void FrameBufferManager::unbind(BaseGraphics* graphics, FrameBuffer* buffer)
+	void FrameBufferManager::unbind(FrameBuffer* buffer)
 	{
 		if (sFrameBufferStack.top() != buffer)
 		{
@@ -59,7 +59,7 @@ namespace tezcat::Tiny
 		}
 
 		sFrameBufferStack.pop();
-		graphics->bind(sFrameBufferStack.top());
+		Graphics::getInstance()->bind(sFrameBufferStack.top());
 	}
 
 	FrameBuffer* FrameBufferManager::getMainFrameBufferBuildin()

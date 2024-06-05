@@ -137,7 +137,6 @@
     <ClCompile Include="Core\Renderer\CameraAgent.cpp" />
     <ClCompile Include="Core\Renderer\RenderObserver.cpp" />
     <ClCompile Include="Core\Base\TinyObject.cpp" />
-    <ClCompile Include="Core\Renderer\PipeQueue.cpp" />
     <ClCompile Include="Platform\OpenGL\GLHead.cpp" />
     <ClCompile Include="Core\Renderer\GraphicsAgent.cpp" />
   </ItemGroup>
@@ -1332,7 +1331,6 @@
     <ClInclude Include="Core\Renderer\MeshRenderAgent.h" />
     <ClInclude Include="Core\Renderer\CameraAgent.h" />
     <ClInclude Include="Core\Renderer\RenderObserver.h" />
-    <ClInclude Include="Core\Renderer\PipeQueue.h" />
     <ClInclude Include="Core\Renderer\GraphicsAgent.h" />
   </ItemGroup>
   <ItemGroup>

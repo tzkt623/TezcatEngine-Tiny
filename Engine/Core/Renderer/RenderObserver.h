@@ -7,7 +7,6 @@
 
 namespace tezcat::Tiny
 {
-	class BaseGraphics;
 	class Shader;
 	class Transform;
 	class FrameBuffer;
@@ -37,7 +36,7 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~BaseRenderObserver();
-		virtual void submitViewMatrix(BaseGraphics* graphics, Shader* shader) = 0;
+		virtual void submitViewMatrix(Shader* shader) = 0;
 
 	public:
 		virtual bool culling(GameObject* gameObject) { return true; }
@@ -185,7 +184,7 @@ namespace tezcat::Tiny
 		virtual ~RenderObserver();
 
 	public:
-		virtual void submitViewMatrix(BaseGraphics* graphics, Shader* shader) override;
+		virtual void submitViewMatrix(Shader* shader) override;
 		virtual float4x4& getViewMatrix() { return mViewMatrix; }
 
 		virtual float4x4& getViewMatrix(int32 index) const final { TINY_THROW("Fatal Error!"); }
@@ -205,7 +204,7 @@ namespace tezcat::Tiny
 		virtual ~RenderObserverMultView();
 		void setViewMartixArray(float4x4* array, int32 size);
 
-		virtual void submitViewMatrix(BaseGraphics* graphics, Shader* shader) override;
+		virtual void submitViewMatrix(Shader* shader) override;
 
 	public:
 		virtual float4x4& getViewMatrix() override final { TINY_THROW("Fatal Error!"); }

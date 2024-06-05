@@ -732,8 +732,6 @@ namespace tezcat::Tiny::GL
 					   , mTex->getDataMemFormat().platform
 					   , mTex->getData());
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-		mTex->apply(mTex->getTextureID());
 	}
 #pragma endregion
 

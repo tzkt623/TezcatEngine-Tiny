@@ -21,29 +21,29 @@ namespace tezcat::Tiny
 	{
 
 	}
-	void DirectionalLightAgent::submit(BaseGraphics* graphics, Shader* shader)
+	void DirectionalLightAgent::submit(Shader* shader)
 	{
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));
-		graphics->setFloat3(shader, ShaderParam::LightDirection::Specular, glm::value_ptr(mSpecular));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightDirection::Direction, glm::value_ptr(mDirection));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightDirection::Ambient, glm::value_ptr(mAmbient));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightDirection::Diffuse, glm::value_ptr(mDiffuse));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightDirection::Specular, glm::value_ptr(mSpecular));
 	}
 
-	void DirectionalLightAgent::makeRenderCommand(BaseGraphics* graphics, BaseRenderObserver* renderObserver)
+	void DirectionalLightAgent::makeRenderCommand(BaseRenderObserver* renderObserver)
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	void DirectionalLightAgent::makeRenderCommand(BaseGraphics* graphics, PipelinePass* pass)
+	void DirectionalLightAgent::makeRenderCommand(PipelinePass* pass)
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
 	TINY_OBJECT_CPP(LightComponent, ComponentT<LightComponent>)
 
-	//------------------------------------------------------------------------
-	TINY_OBJECT_CPP(DirectionalLight, LightComponent)
-	DirectionalLight::DirectionalLight()
+		//------------------------------------------------------------------------
+		TINY_OBJECT_CPP(DirectionalLight, LightComponent)
+		DirectionalLight::DirectionalLight()
 		: mLightAgent(nullptr)
 	{
 		mLightAgent = DirectionalLightAgent::create();
@@ -61,11 +61,11 @@ namespace tezcat::Tiny
 
 	}
 
-	void DirectionalLight::submit(BaseGraphics* graphics, Shader* shader)
+	void DirectionalLight::submit(Shader* shader)
 	{
 		auto transform = this->getTransform();
 		mLightAgent->setDirection(glm::normalize(transform->getForward()));
-		mLightAgent->submit(graphics, shader);
+		mLightAgent->submit(shader);
 	}
 
 	void DirectionalLight::onEnable()
@@ -90,7 +90,7 @@ namespace tezcat::Tiny
 
 	//------------------------------------------------------------------------
 	TINY_OBJECT_CPP(PointLight, LightComponent)
-	PointLight::PointLight()
+		PointLight::PointLight()
 		: mAmbient(0.2f)
 		, mDiffuse(0.5f)
 		, mSpecular(1.0f)
@@ -104,13 +104,13 @@ namespace tezcat::Tiny
 
 	}
 
-	void PointLight::submit(BaseGraphics* graphics, Shader* shader)
+	void PointLight::submit(Shader* shader)
 	{
-		graphics->setFloat3(shader, ShaderParam::LightPoint::Position, glm::value_ptr(this->getTransform()->getPosition()));
-		graphics->setFloat3(shader, ShaderParam::LightPoint::Ambient, glm::value_ptr(mAmbient));
-		graphics->setFloat3(shader, ShaderParam::LightPoint::Diffuse, glm::value_ptr(mDiffuse));
-		graphics->setFloat3(shader, ShaderParam::LightPoint::Specular, glm::value_ptr(mSpecular));
-		graphics->setFloat3(shader, ShaderParam::LightPoint::Config, glm::value_ptr(mConfig));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightPoint::Position, glm::value_ptr(this->getTransform()->getPosition()));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightPoint::Ambient, glm::value_ptr(mAmbient));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightPoint::Diffuse, glm::value_ptr(mDiffuse));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightPoint::Specular, glm::value_ptr(mSpecular));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightPoint::Config, glm::value_ptr(mConfig));
 	}
 
 	void PointLight::onEnable()
@@ -135,7 +135,7 @@ namespace tezcat::Tiny
 
 	}
 
-	void SpotLight::submit(BaseGraphics* graphics, Shader* shader)
+	void SpotLight::submit(Shader* shader)
 	{
 
 	}

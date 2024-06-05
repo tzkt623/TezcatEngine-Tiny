@@ -18,13 +18,10 @@ namespace tezcat::Tiny::GL
 	class GLRenderCMD_Vertex : public RenderCommand
 	{
 	public:
-		GLRenderCMD_Vertex(Shader* shader, Vertex* vertex);
+		GLRenderCMD_Vertex(Vertex* vertex);
 		virtual ~GLRenderCMD_Vertex();
 
-		void run(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Vertex* mVertex;
+		void run(Shader* shader) override;
 	};
 
 	class GLRenderCMD_Shadow : public RenderCommand
@@ -33,11 +30,7 @@ namespace tezcat::Tiny::GL
 		GLRenderCMD_Shadow(Vertex* vertex, Transform* transform);
 		virtual ~GLRenderCMD_Shadow();
 
-		void run(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Transform* mTransform;
-		Vertex* mVertex;
+		void run(Shader* shader) override;
 	};
 
 	class GLRenderCMD_Skybox : public RenderCommand
@@ -46,9 +39,8 @@ namespace tezcat::Tiny::GL
 		GLRenderCMD_Skybox(Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false, float exposure = 1);
 		virtual ~GLRenderCMD_Skybox();
 
-		void run(BaseGraphics* graphics, Shader* shader) override;
+		void run(Shader* shader) override;
 	private:
-		Vertex* mVertex;
 		TextureCube* mSkybox;
 		float mLod;
 		bool mIsHdr;
@@ -61,12 +53,7 @@ namespace tezcat::Tiny::GL
 		GLRenderCMD_Mesh(Vertex* vertex, Transform* transform, Material* material);
 		virtual ~GLRenderCMD_Mesh();
 
-		void run(BaseGraphics* graphics, Shader* shader) override;
-
-	private:
-		Vertex* mVertex;
-		Transform* mTransform;
-		Material* mMaterial;
+		void run(Shader* shader) override;
 	};
 
 
@@ -78,10 +65,9 @@ namespace tezcat::Tiny::GL
 			, TextureCube* skybox);
 		virtual ~GLRenderCMD_HDRToCube();
 
-		void run(BaseGraphics* graphics, Shader* shader) override;
+		void run(Shader* shader) override;
 
 	private:
-		Vertex* mVertex;
 		Texture2D* mTexHDR;
 		TextureCube* mSkybox;
 	};
@@ -89,16 +75,14 @@ namespace tezcat::Tiny::GL
 	class GLRenderCMD_EnvMakeIrradiance : public RenderCommand
 	{
 	public:
-		GLRenderCMD_EnvMakeIrradiance(Shader* shader
-			, Vertex* vertex
+		GLRenderCMD_EnvMakeIrradiance(Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* irradiance);
 		virtual ~GLRenderCMD_EnvMakeIrradiance();
 
-		void run(BaseGraphics* graphics, Shader* shader) override;
+		void run(Shader* shader) override;
 
 	private:
-		Vertex* mVertex;
 		TextureCube* mSkyboxMap;
 		TextureCube* mIrradianceMap;
 	};
@@ -106,25 +90,23 @@ namespace tezcat::Tiny::GL
 	class GLRenderCMD_EnvMakePrefilter : public RenderCommand
 	{
 	public:
-		GLRenderCMD_EnvMakePrefilter(Shader* shader
-			, Vertex* vertex
+		GLRenderCMD_EnvMakePrefilter(Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* prefitler
-			, uint32_t mipMaxLevel
-			, uint32_t mipWidth
-			, uint32_t mipHeight
+			, uint32 mipMaxLevel
+			, uint32 mipWidth
+			, uint32 mipHeight
 			, float resolution);
 		virtual ~GLRenderCMD_EnvMakePrefilter();
 
-		void run(BaseGraphics* graphics, Shader* shader) override;
+		void run(Shader* shader) override;
 
 	private:
-		Vertex* mVertex;
 		TextureCube* mSkyboxMap;
 		TextureCube* mPrefilterMap;
-		uint32_t mMipMaxLevel;
-		uint32_t mMipWidth;
-		uint32_t mMipHeight;
+		uint32 mMipMaxLevel;
+		uint32 mMipWidth;
+		uint32 mMipHeight;
 		float mResolution;
 	};
 }

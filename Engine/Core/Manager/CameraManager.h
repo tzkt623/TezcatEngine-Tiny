@@ -7,7 +7,6 @@
 namespace tezcat::Tiny
 {
 	class Camera;
-	class BaseGraphics;
 	class BaseRenderObserver;
 
 	class TINY_API CameraData : public TinyObject
@@ -26,7 +25,7 @@ namespace tezcat::Tiny
 		void addCamera(Camera* camera);
 		void addRenderObserver(BaseRenderObserver* observer);
 
-		void calculate(BaseGraphics* graphics);
+		void calculate();
 
 	private:
 		bool mDirty;
@@ -52,7 +51,7 @@ namespace tezcat::Tiny
 
 	public:
 		static void addRenderObserver(BaseRenderObserver* renderObserver);
-		static void calculate(BaseGraphics* graphics);
+		static void calculate();
 
 	private:
 		static CameraData* mCurrentData;

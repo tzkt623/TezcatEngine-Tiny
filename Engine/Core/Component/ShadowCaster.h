@@ -9,7 +9,6 @@ namespace tezcat::Tiny
 	class FrameBuffer;
 	class Texture2D;
 	class ReplacedPipelinePass;
-	class BaseGraphics;
 	class Shader;
 	class RenderObserver;
 
@@ -25,7 +24,7 @@ namespace tezcat::Tiny
 		uint32 getUID() const { return mUID; }
 		Texture2D* getShadowTexutre() { return mShadowTexture; }
 
-		void submit(BaseGraphics* graphics, Shader* shader);
+		void submit(Shader* shader);
 
 	protected:
 		virtual void init() override;

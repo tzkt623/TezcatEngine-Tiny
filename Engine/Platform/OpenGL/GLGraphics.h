@@ -20,10 +20,6 @@ namespace tezcat::Tiny::GL
 
 	public:
 		void init(Engine* engine) override;
-		void preRender() override;
-		void onRender() override;
-		void postRender() override;
-
 		GLFWwindow* getGLFWwindow() { return mWindow; }
 
 	public:
@@ -36,16 +32,16 @@ namespace tezcat::Tiny::GL
 
 		void draw(Vertex* vertex) override;
 		void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f)) override;
-		void drawLine(Vertex* vertex, const uint32_t& needCount);
+		void drawLine(Vertex* vertex, const uint32& needCount);
 
 	public:
-		RenderCommand* createDrawVertexCMD(Shader* shader, Vertex* vertex) override;
+		RenderCommand* createDrawVertexCMD(Vertex* vertex) override;
 		RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform) override;
 		RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material) override;
 		RenderCommand* createDrawSkyboxCMD(Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false, float exposure = 1) override;
 		RenderCommand* createDrawHDRToCubeCMD(Vertex* vertex, Texture2D* hdr, TextureCube* cube) override;
-		RenderCommand* createDrawEnvMakeIrradiance(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* irradiance) override;
-		RenderCommand* createDrawEnvMakePrefilter(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* prefitler, uint32_t mipMaxLevel, uint32_t mipWidth, uint32_t mipHeight, float resolution) override;
+		RenderCommand* createDrawEnvMakeIrradiance(Vertex* vertex, TextureCube* cube, TextureCube* irradiance) override;
+		RenderCommand* createDrawEnvMakePrefilter(Vertex* vertex, TextureCube* cube, TextureCube* prefitler, uint32 mipMaxLevel, uint32 mipWidth, uint32 mipHeight, float resolution) override;
 
 	public:
 		void setBool(Shader* shader, const char* name, const bool& data) override;
@@ -130,18 +126,17 @@ namespace tezcat::Tiny::GL
 
 
 	public:
-		void cmdDeleteTexture2D(uint32_t id) override;
-		void cmdDeleteTextureCube(uint32_t id) override;
-		void cmdDeleteRender2D(uint32_t id) override;
-		void cmdDeleteVertex(uint32_t id) override;
-		void cmdDeleteVertexBuffer(uint32_t id) override;
-		void cmdDeleteIndexBuffer(uint32_t id) override;
-		void cmdDeleteFrameBuffer(uint32_t id) override;
-		void cmdDeleteShader(uint32_t id) override;
+		void cmdDeleteTexture2D(uint32 id) override;
+		void cmdDeleteTextureCube(uint32 id) override;
+		void cmdDeleteRender2D(uint32 id) override;
+		void cmdDeleteVertex(uint32 id) override;
+		void cmdDeleteVertexBuffer(uint32 id) override;
+		void cmdDeleteIndexBuffer(uint32 id) override;
+		void cmdDeleteFrameBuffer(uint32 id) override;
+		void cmdDeleteShader(uint32 id) override;
 
 	private:
 		void initContext();
-
 
 		template<class CMD, typename... Args>
 		void createCMD(Args&&... args)

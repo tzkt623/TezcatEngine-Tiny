@@ -5,7 +5,6 @@
 namespace tezcat::Tiny
 {
 	class FrameBuffer;
-	class BaseGraphics;
 
 	/*
 	* FrameBufferManager
@@ -70,8 +69,8 @@ namespace tezcat::Tiny
 		}
 
 	public:
-		static void bind(BaseGraphics* graphics, FrameBuffer* buffer);
-		static void unbind(BaseGraphics* graphics, FrameBuffer* buffer);
+		static void bind(FrameBuffer* buffer);
+		static void unbind(FrameBuffer* buffer);
 		static FrameBuffer* getDefaultBuffer() { return sDefaultBuffer; }
 
 	private:

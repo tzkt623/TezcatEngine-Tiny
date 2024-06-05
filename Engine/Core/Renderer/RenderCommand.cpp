@@ -1,17 +1,25 @@
-#include "RenderCommand.h"
+﻿#include "RenderCommand.h"
 #include "../Shader/Shader.h"
 
 namespace tezcat::Tiny
 {
-	RenderCommand::RenderCommand(Shader* shader)
-		: mShader(shader)
-		, mOrderID(0)
+	RenderCommand::RenderCommand()
+	{
+
+	}
+
+	RenderCommand::RenderCommand(Vertex* vertex, Transform* transform, Material* material)
+		: mVertex(vertex)
+		, mTransform(transform)
+		, mMaterial(material)
 	{
 
 	}
 
 	RenderCommand::~RenderCommand()
 	{
-		mShader = nullptr;
+		mVertex = nullptr;
+		mTransform = nullptr;
+		mMaterial = nullptr;
 	}
 }

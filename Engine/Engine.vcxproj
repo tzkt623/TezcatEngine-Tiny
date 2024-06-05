@@ -187,7 +187,6 @@
     <ClCompile Include="Core\Renderer\GraphicsAgent.cpp" />
     <ClCompile Include="Core\Renderer\MeshRenderAgent.cpp" />
     <ClCompile Include="Core\Renderer\Pipeline.cpp" />
-    <ClCompile Include="Core\Renderer\PipeQueue.cpp" />
     <ClCompile Include="Core\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="Core\Renderer\RenderObserver.cpp" />
     <ClCompile Include="Core\Renderer\VertexBuffer.cpp" />
@@ -262,7 +261,6 @@
     <ClInclude Include="Core\Renderer\GraphicsAgent.h" />
     <ClInclude Include="Core\Renderer\MeshRenderAgent.h" />
     <ClInclude Include="Core\Renderer\Pipeline.h" />
-    <ClInclude Include="Core\Renderer\PipeQueue.h" />
     <ClInclude Include="Core\Manager\CameraManager.h" />
     <ClInclude Include="Core\Component\Component.h" />
     <ClInclude Include="Core\Head\CppHead.h" />

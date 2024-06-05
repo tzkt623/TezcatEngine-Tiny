@@ -121,7 +121,7 @@ namespace tezcat::Tiny
 					//std::cout << "Render running......\n";
 
 					//mGraphics->render();
-					mPipeline->render(mGraphics);
+					mPipeline->render();
 
 					//allowRender.store(false);
 					//allowLogic.store(true);
@@ -244,7 +244,7 @@ namespace tezcat::Tiny
 		* 3.管线对命令进行渲染
 		*/
 
-		mPipeline->render(mGraphics);
+		mPipeline->render();
 		//mGraphics->render();
 	}
 

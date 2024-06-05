@@ -77,7 +77,7 @@ namespace tezcat::Tiny
 		if (result.second)
 		{
 			auto vertex = Vertex::create();
-			vertex->init(mMeshDataUMap[name]);
+			vertex->setMesh(mMeshDataUMap[name]);
 			vertex->generate();
 			vertex->saveObject();
 			result.first->second = vertex;

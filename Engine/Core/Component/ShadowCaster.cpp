@@ -102,11 +102,11 @@ namespace tezcat::Tiny
 		mShadowObserver->setViewRect(0, 0, width, height);
 	}
 
-	void ShadowCaster::submit(BaseGraphics* graphics, Shader* shader)
+	void ShadowCaster::submit(Shader* shader)
 	{
 		auto pv = mShadowObserver->getProjectionMatrix() * mShadowObserver->getViewMatrix();
-		graphics->setMat4(shader, ShaderParam::MatrixLightVP, pv);
-		graphics->setGlobalTexture2D(shader, ShaderParam::TexDepth, mShadowTexture);
+		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixLightVP, pv);
+		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexDepth, mShadowTexture);
 	}
 
 }

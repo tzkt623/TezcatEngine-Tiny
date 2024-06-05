@@ -29,7 +29,7 @@ void Tutorial01::onEnter()
 	mesh->apply();
 
 	mVertex = Vertex::create();
-	mVertex->init(mesh);
+	mVertex->setMesh(mesh);
 	mVertex->generate();
 	mVertex->saveObject();
 
@@ -40,9 +40,9 @@ void Tutorial01::onEnter()
 
 	auto shader = ShaderManager::find("Tutorial/t01");
 	mPass = ReplacedPipelinePass::create(observer, shader);
-	mPass->setPreFunction([=](BaseGraphics* graphics, ReplacedPipelinePass* pass)
+	mPass->setPreFunction([=](ReplacedPipelinePass* pass)
 	{
-		pass->addCommand(Graphics::getInstance()->createDrawVertexCMD(shader, mVertex));
+		pass->addCommand(Graphics::getInstance()->createDrawVertexCMD(mVertex));
 	});
 	mPass->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 	mPass->addToPipeline();

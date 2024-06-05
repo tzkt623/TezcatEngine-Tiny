@@ -51,35 +51,6 @@ namespace tezcat::Tiny
 		mBuildCmdAry.clear();
 	}
 
-	void BaseGraphics::render()
-	{
-		this->preRender();
-		this->onRender();
-		this->postRender();
-	}
-
-	void BaseGraphics::preRender()
-	{
-		Profiler_ResetDrawCall();
-		Profiler_ResetPassCount();
-
-		this->buildCMD();
-
-		//mPipeline->preRender(this);
-
-		this->buildCMD();
-	}
-
-	void BaseGraphics::onRender()
-	{
-	}
-
-	void BaseGraphics::postRender()
-	{
-		//mPipeline->postRender(this);
-	}
-
-
 	//---------------------------------------------------------
 	//
 	//	draw

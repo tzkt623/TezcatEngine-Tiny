@@ -11,34 +11,27 @@ namespace tezcat::Tiny
 {
 	TINY_OBJECT_CPP(Vertex, TinyObject)
 	Vertex::Vertex()
-		: mName("##ErrorVAO")
+		: Vertex("##ErrorVAO")
 	{
 
 	}
 
 	Vertex::Vertex(std::string name)
 		: mName(std::move(name))
+		, mChildren(nullptr)
+		, mIndexBuffer(nullptr)
 	{
 
 	}
 
 	Vertex::~Vertex()
 	{
-		Graphics::getInstance()->cmdDeleteVertex(mVertexID);
 
-		mVertexBuffers.clear();
-
-		if (mIndexBuffer)
-		{
-			mIndexBuffer->deleteObject();
-		}
-
-		delete mChildren;
 	}
 
-	void Vertex::init(MeshData* meshData)
+	void Vertex::setMesh(MeshData* meshData)
 	{
-		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->mDrawMode];
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32)meshData->mDrawMode];
 		mVertexCount = meshData->mVertices.size();
 		mName = meshData->getName();
 
@@ -61,18 +54,18 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void Vertex::init(const std::string& name, const size_t& vertexCount, const DrawMode& drawMode)
+	void Vertex::setMesh(const std::string& name, const uint32& vertexCount, const DrawMode& drawMode)
 	{
 		mName = name;
-		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)drawMode];
-		mVertexCount = (uint32_t)vertexCount;
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32)drawMode];
+		mVertexCount = vertexCount;
 	}
 
 	void Vertex::addChild(Vertex* vertex)
 	{
 		if (mChildren == nullptr)
 		{
-			mChildren = new TinyVector<Vertex*>();
+			mChildren = new std::vector<Vertex*>();
 		}
 
 		mChildren->emplace_back(vertex);
@@ -80,6 +73,7 @@ namespace tezcat::Tiny
 
 	void Vertex::setVertexBuffer(VertexBuffer* buffer)
 	{
+		buffer->saveObject();
 		mVertexBuffers.push_back(buffer);
 	}
 
@@ -92,6 +86,32 @@ namespace tezcat::Tiny
 	void Vertex::generate()
 	{
 		Graphics::getInstance()->cmdCreateVertex(this);
+	}
+
+	void Vertex::onClose()
+	{
+		Graphics::getInstance()->cmdDeleteVertex(mVertexID);
+
+		for (auto buffer : mVertexBuffers)
+		{
+			buffer->deleteObject();
+		}
+		mVertexBuffers.clear();
+
+		if (mIndexBuffer)
+		{
+			mIndexBuffer->deleteObject();
+		}
+
+		if (mChildren)
+		{
+			for (auto child : *mChildren)
+			{
+				child->deleteObject();
+			}
+
+			delete mChildren;
+		}
 	}
 }
 

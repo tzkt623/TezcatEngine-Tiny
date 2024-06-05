@@ -52,11 +52,11 @@ namespace tezcat::Tiny
 		float3& getSpecular() { return mSpecular; }
 		void setSpecular(const float3& val) { mSpecular = val; }
 
-		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
+		virtual void submit(Shader* shader) override;
 
 
-		void makeRenderCommand(BaseGraphics* graphics, BaseRenderObserver* renderObserver) override;
-		void makeRenderCommand(BaseGraphics* graphics, PipelinePass* pass) override;
+		void makeRenderCommand(BaseRenderObserver* renderObserver) override;
+		void makeRenderCommand(PipelinePass* pass) override;
 
 	private:
 		float3 mDirection;
@@ -80,7 +80,7 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~LightComponent() = default;
-		virtual void submit(BaseGraphics* graphics, Shader* shader) = 0;
+		virtual void submit(Shader* shader) = 0;
 	};
 
 	class TINY_API DirectionalLight : public LightComponent
@@ -97,7 +97,7 @@ namespace tezcat::Tiny
 
 	public:
 		void render(BaseGraphics* graphics);
-		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
+		virtual void submit(Shader* shader) override;
 
 		float3& getDirection() { return mLightAgent->getDirection(); }
 		void setDirection(const float3& val) { mLightAgent->setDirection(val); }
@@ -165,7 +165,7 @@ namespace tezcat::Tiny
 			mConfig.z = quadratic;
 		}
 
-		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
+		virtual void submit(Shader* shader) override;
 
 
 	protected:
@@ -187,7 +187,7 @@ namespace tezcat::Tiny
 		virtual ~SpotLight();
 
 		LightType getLightType() final { return LightType::Spot; }
-		virtual void submit(BaseGraphics* graphics, Shader* shader) override;
+		virtual void submit(Shader* shader) override;
 
 	private:
 

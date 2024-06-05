@@ -303,7 +303,7 @@ namespace tezcat::Tiny
 			auto mesh_data = this->createMesh(ai_mesh, ainode);
 
 			auto vertex = Vertex::create();
-			vertex->init(mesh_data);
+			vertex->setMesh(mesh_data);
 			vertex->generate();
 			mode_node->setVertex(vertex);
 		}
@@ -319,7 +319,7 @@ namespace tezcat::Tiny
 				auto mesh_data = this->createMesh(ai_mesh, ainode);
 
 				auto vertex = Vertex::create();
-				vertex->init(mesh_data);
+				vertex->setMesh(mesh_data);
 				vertex->generate();
 
 				ModelNode* child = new ModelNode();

@@ -219,7 +219,7 @@ namespace tezcat::Tiny
 
 	}
 
-	void RenderObserver::submitViewMatrix(BaseGraphics* graphics, Shader* shader)
+	void RenderObserver::submitViewMatrix(Shader* shader)
 	{
 		if (!mTransform)
 		{
@@ -234,13 +234,13 @@ namespace tezcat::Tiny
 
 		auto VP = mProjectionMatrix * mViewMatrix;
 
-		graphics->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
-		graphics->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
-		graphics->setMat4(shader, ShaderParam::MatrixVP, VP);
-		//graphics->setMat4(shader, ShaderParam::MatrixMV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
+		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
+		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
+		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixVP, VP);
+		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixMV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
 
-		graphics->setFloat3(shader, ShaderParam::CameraWorldPosition, mTransform->getWorldPosition());
-		graphics->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
+		Graphics::getInstance()->setFloat3(shader, ShaderParam::CameraWorldPosition, mTransform->getWorldPosition());
+		Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
 	}
 
 #pragma endregion
@@ -250,7 +250,7 @@ namespace tezcat::Tiny
 #pragma region RenderObserverMultView
 	TINY_OBJECT_CPP(RenderObserverMultView, BaseRenderObserver)
 
-	RenderObserverMultView::RenderObserverMultView()
+		RenderObserverMultView::RenderObserverMultView()
 		: mArraySize(-1)
 		, mViewMatrixArray(nullptr)
 	{
@@ -268,11 +268,11 @@ namespace tezcat::Tiny
 		mArraySize = size;
 	}
 
-	void RenderObserverMultView::submitViewMatrix(BaseGraphics* graphics, Shader* shader)
+	void RenderObserverMultView::submitViewMatrix(Shader* shader)
 	{
 		this->updateObserverMatrix();
-		graphics->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
-		graphics->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
+		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
+		Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
 	}
 
 #pragma endregion

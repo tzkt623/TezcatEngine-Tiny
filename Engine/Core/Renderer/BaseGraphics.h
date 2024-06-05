@@ -26,7 +26,6 @@ namespace tezcat::Tiny
 	class Texture2D;
 	class Transform;
 	class Material;
-	class GUI;
 
 	class ShadowCasterManager;
 	class LightingManager;
@@ -37,9 +36,7 @@ namespace tezcat::Tiny
 	class RenderCommand;
 	class BuildCommand;
 	class Pipeline;
-
 	struct ViewportInfo;
-
 
 	/*
 	* BaseGraphics
@@ -57,19 +54,16 @@ namespace tezcat::Tiny
 	public:
 		BaseGraphics();
 		virtual ~BaseGraphics() = 0;
-
-	public:
-		void render();
-
 	public:
 		virtual void init(Engine* engine);
 
-		virtual void preRender();
-		virtual void onRender();
-
 		void buildCMD();
 
-		virtual void postRender();
+		template<class CMD, typename... Args>
+		static CMD* createCMD(Args&&... args)
+		{
+			return new CMD(std::forward<Args>(args)...);
+		}
 
 		//----------------------------------------------------
 		//
@@ -90,24 +84,17 @@ namespace tezcat::Tiny
 		virtual void cmdUpdateTexture2D(Texture2D* tex2d) = 0;
 
 	public:
-		virtual void cmdDeleteTexture2D(uint32_t id) = 0;
-		virtual void cmdDeleteTextureCube(uint32_t id) = 0;
-		virtual void cmdDeleteRender2D(uint32_t id) = 0;
-		virtual void cmdDeleteVertex(uint32_t id) = 0;
-		virtual void cmdDeleteVertexBuffer(uint32_t id) = 0;
-		virtual void cmdDeleteIndexBuffer(uint32_t id) = 0;
-		virtual void cmdDeleteFrameBuffer(uint32_t id) = 0;
-		virtual void cmdDeleteShader(uint32_t id) = 0;
+		virtual void cmdDeleteTexture2D(uint32 id) = 0;
+		virtual void cmdDeleteTextureCube(uint32 id) = 0;
+		virtual void cmdDeleteRender2D(uint32 id) = 0;
+		virtual void cmdDeleteVertex(uint32 id) = 0;
+		virtual void cmdDeleteVertexBuffer(uint32 id) = 0;
+		virtual void cmdDeleteIndexBuffer(uint32 id) = 0;
+		virtual void cmdDeleteFrameBuffer(uint32 id) = 0;
+		virtual void cmdDeleteShader(uint32 id) = 0;
 
 	public:
-		template<class CMD, typename... Args>
-		CMD* createCMD(Args&&... args)
-		{
-			return new CMD(std::forward<Args>(args)...);
-		}
-
-
-		virtual RenderCommand* createDrawVertexCMD(Shader* shader, Vertex* vertex) = 0;
+		virtual RenderCommand* createDrawVertexCMD(Vertex* vertex) = 0;
 		virtual RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform) = 0;
 		virtual RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material) = 0;
 		virtual RenderCommand* createDrawSkyboxCMD(Vertex* vertex
@@ -118,17 +105,15 @@ namespace tezcat::Tiny
 		virtual RenderCommand* createDrawHDRToCubeCMD(Vertex* vertex
 													, Texture2D* hdr
 													, TextureCube* cube) = 0;
-		virtual RenderCommand* createDrawEnvMakeIrradiance(Shader* shader
-														 , Vertex* vertex
+		virtual RenderCommand* createDrawEnvMakeIrradiance(Vertex* vertex
 														 , TextureCube* cube
 														 , TextureCube* irradiance) = 0;
-		virtual RenderCommand* createDrawEnvMakePrefilter(Shader* shader
-														, Vertex* vertex
+		virtual RenderCommand* createDrawEnvMakePrefilter(Vertex* vertex
 														, TextureCube* cube
 														, TextureCube* prefitler
-														, uint32_t mipMaxLevel
-														, uint32_t mipWidth
-														, uint32_t mipHeight
+														, uint32 mipMaxLevel
+														, uint32 mipWidth
+														, uint32 mipHeight
 														, float resolution) = 0;
 
 		//----------------------------------------------------
@@ -230,14 +215,7 @@ namespace tezcat::Tiny
 		//
 	public:
 		virtual void draw(Vertex* vertex) = 0;
-
 		virtual void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f));
-
-
-	private:
-		Pipeline* mPipeline;
-		std::vector<Pipeline*> mPipelineAry;
-		std::unordered_map<std::string, uint32_t> mPipelineUMap;
 
 	protected:
 		std::vector<BuildCommand*> mBuildCmdAry;
@@ -251,7 +229,7 @@ namespace tezcat::Tiny
 		Graphics2() = delete;
 		~Graphics2() = delete;
 	public:
-		static void init(Engine *engine, BaseGraphics* agent)
+		static void init(Engine* engine, BaseGraphics* agent)
 		{
 			mAgent = agent;
 			mAgent->init(engine);
@@ -265,6 +243,84 @@ namespace tezcat::Tiny
 		static void bind(Shader* shader) { mAgent->bind(shader); }
 		static void bind(FrameBuffer* frameBuffer) { mAgent->bind(frameBuffer); }
 
+	public:
+		static void cmdCreateVertex(Vertex* vertex) { mAgent->cmdCreateVertex(vertex); }
+		static void cmdCreateVertexBuffer(VertexBuffer* vertexBuffer) { mAgent->cmdCreateVertexBuffer(vertexBuffer); }
+		static void cmdCreateIndexBuffer(IndexBuffer* indexBuffer) { mAgent->cmdCreateIndexBuffer(indexBuffer); }
+		static void cmdCreateTexture2D(Texture2D* tex2D) { mAgent->cmdCreateTexture2D(tex2D); }
+		static void cmdCreateTextureCube(TextureCube* texCube) { mAgent->cmdCreateTextureCube(texCube); }
+		static void cmdCreateRender2D(TextureRender2D* render2d) { mAgent->cmdCreateRender2D(render2d); }
+		static void cmdCreateFrameBuffer(FrameBuffer* frameBuffer) { mAgent->cmdCreateFrameBuffer(frameBuffer); }
+		static void cmdCreateShader(Shader* shader) { mAgent->cmdCreateShader(shader); }
+		static void cmdCreateShader(Shader* shader, std::string& data) { mAgent->cmdCreateShader(shader, data); }
+
+	public:
+		static void cmdUpdateTexture2D(Texture2D* tex2d) { mAgent->cmdUpdateTexture2D(tex2d); }
+	public:
+		static void cmdDeleteTexture2D(uint32 id) { mAgent->cmdDeleteTexture2D(id); }
+		static void cmdDeleteTextureCube(uint32 id) { mAgent->cmdDeleteTextureCube(id); }
+		static void cmdDeleteRender2D(uint32 id) { mAgent->cmdDeleteRender2D(id); }
+		static void cmdDeleteVertex(uint32 id) { mAgent->cmdDeleteVertex(id); }
+		static void cmdDeleteVertexBuffer(uint32 id) { mAgent->cmdDeleteVertexBuffer(id); }
+		static void cmdDeleteIndexBuffer(uint32 id) { mAgent->cmdDeleteIndexBuffer(id); }
+		static void cmdDeleteFrameBuffer(uint32 id) { mAgent->cmdDeleteFrameBuffer(id); }
+		static void cmdDeleteShader(uint32 id) { mAgent->cmdDeleteShader(id); }
+
+
+	public:
+		static RenderCommand* createDrawVertexCMD(Vertex* vertex)
+		{
+			mAgent->createDrawVertexCMD(vertex);
+		}
+
+		static RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform)
+		{
+			mAgent->createDrawShadowCMD(vertex, transform);
+		}
+		static RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material)
+		{
+			mAgent->createDrawMeshCMD(vertex, transform, material);
+		}
+
+		static RenderCommand* createDrawSkyboxCMD(Vertex* vertex
+												 , TextureCube* cube
+												 , float lod = 0
+												 , bool isHdr = false
+												 , float exposure = 1)
+		{
+			mAgent->createDrawSkyboxCMD(vertex, cube, lod, isHdr, exposure);
+		}
+
+		static RenderCommand* createDrawHDRToCubeCMD(Vertex* vertex
+													, Texture2D* hdr
+													, TextureCube* cube)
+		{
+			mAgent->createDrawHDRToCubeCMD(vertex, hdr, cube);
+		}
+		static RenderCommand* createDrawEnvMakeIrradiance(Vertex* vertex
+														 , TextureCube* cube
+														 , TextureCube* irradiance)
+		{
+			mAgent->createDrawEnvMakeIrradiance(vertex, cube, irradiance);
+		}
+		static RenderCommand* createDrawEnvMakePrefilter(Vertex* vertex
+														, TextureCube* cube
+														, TextureCube* prefitler
+														, uint32 mipMaxLevel
+														, uint32 mipWidth
+														, uint32 mipHeight
+														, float resolution)
+		{
+			mAgent->createDrawEnvMakePrefilter(vertex, cube, prefitler, mipMaxLevel, mipWidth, mipHeight, resolution);
+		}
+
+
+	public:
+		template<class CMD, typename... Args>
+		CMD* createCMD(Args&&... args)
+		{
+			return new CMD(std::forward<Args>(args)...);
+		}
 
 	private:
 		static BaseGraphics* mAgent;

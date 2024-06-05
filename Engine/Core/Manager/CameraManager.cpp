@@ -32,11 +32,11 @@ namespace tezcat::Tiny
 		return mCurrentData->findCamera(name);
 	}
 
-	void CameraManager::calculate(BaseGraphics* graphics)
+	void CameraManager::calculate()
 	{
 		if (mCurrentData)
 		{
-			mCurrentData->calculate(graphics);
+			mCurrentData->calculate();
 		}
 	}
 
@@ -118,7 +118,7 @@ namespace tezcat::Tiny
 		mObserverArray.push_back(observer);
 	}
 
-	void CameraData::calculate(BaseGraphics* graphics)
+	void CameraData::calculate()
 	{
 		if (mDirty)
 		{
@@ -150,7 +150,7 @@ namespace tezcat::Tiny
 				for (auto& index : observer->getCullLayerList())
 				{
 					//剔除到对应的渲染通道
-					RenderObjectCache::culling(index, graphics, observer);
+					RenderObjectCache::culling(index, observer);
 				}
 				it++;
 			}

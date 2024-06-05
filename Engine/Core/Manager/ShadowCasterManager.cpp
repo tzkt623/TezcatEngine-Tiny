@@ -42,11 +42,11 @@ namespace tezcat::Tiny
 		mFreeIDs.push(caster->getUID());
 	}
 
-	void ShadowCasterManager::submit(BaseGraphics* graphics, Shader* mShader)
+	void ShadowCasterManager::submit(Shader* mShader)
 	{
 		for (auto& caster : mCasterAry)
 		{
-			caster->submit(graphics, mShader);
+			caster->submit(mShader);
 		}
 	}
 

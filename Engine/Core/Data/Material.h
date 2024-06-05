@@ -9,7 +9,6 @@
 namespace tezcat::Tiny
 {
 	class Shader;
-	class BaseGraphics;
 	class TINY_API Material : public TinyObject
 	{
 		Material(std::string name);
@@ -23,14 +22,14 @@ namespace tezcat::Tiny
 		std::string& getName() { return mName; }
 		std::string_view getNameView() { return mName; }
 
-		int getUID() const;
+		int32 getUID() const;
 		std::vector<Uniform*>& getUniforms() { return mUniforms; }
 		Shader* getShader() const { return mShader; }
 		void setShader(Shader* shader);
 
 	public:
-		template<typename UniformType, typename Args>
-		void setTinyUniform(const UniformID& uniformID, Args&& value)
+		template<typename UniformType, typename... Args>
+		void setTinyUniform(const UniformID& uniformID, Args&&... value)
 		{
 			auto shader_id = mShader->getTinyUniformShaderID(uniformID);
 
@@ -41,7 +40,7 @@ namespace tezcat::Tiny
 
 			if (result != mUniforms.end())
 			{
-				static_cast<UniformType*>(*result)->set(std::forward<Args>(value));
+				static_cast<UniformType*>(*result)->set(std::forward<Args>(value)...);
 			}
 			else
 			{
@@ -75,7 +74,7 @@ namespace tezcat::Tiny
 			static_cast<UniformType*>(mUniforms[id])->set(value);
 		}
 
-		void submit(BaseGraphics* graphics, Shader* shader);
+		void submit(Shader* shader);
 
 	private:
 		std::string mName;

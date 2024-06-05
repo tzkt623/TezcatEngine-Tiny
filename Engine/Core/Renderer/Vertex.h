@@ -29,8 +29,8 @@ namespace tezcat::Tiny
 		virtual ~Vertex();
 		void setName(const std::string& val) { mName = val; }
 		std::string getName() const { return mName; }
-		int getVertexCount() const { return mVertexCount; }
-		int getIndexCount() const { return mIndexCount; }
+		int32 getVertexCount() const { return mVertexCount; }
+		int32 getIndexCount() const { return mIndexCount; }
 		DrawModeWrapper& getDrawMode() { return mDrawModeWrapper; }
 
 		uint32 getVertexID() const { return mVertexID; }
@@ -39,24 +39,27 @@ namespace tezcat::Tiny
 
 		void setVertexBuffer(VertexBuffer* buffer);
 		void setIndexBuffer(IndexBuffer* buffer);
-		void setVertexCount(size_t size) { mVertexCount = (uint32)size; }
-		void setIndexCount(size_t size) { mIndexCount = (uint32)size; }
+		void setVertexCount(uint32 size) { mVertexCount = size; }
+		void setIndexCount(uint32 size) { mIndexCount = size; }
 
 		void addChild(Vertex* vertex);
 
-		TinyVector<VertexBuffer*>& getVertexBuffers()
+		const std::vector<VertexBuffer*>& getVertexBuffers() const
 		{
 			return mVertexBuffers;
 		}
 
-		IndexBuffer* getIndexBuffer()
+		IndexBuffer* getIndexBuffer() const
 		{
 			return mIndexBuffer;
 		}
 
 	public:
-		void init(MeshData* mesh);
-		void init(const std::string& name, const size_t& vertexCount, const DrawMode& drawMode);
+		void setMesh(MeshData* mesh);
+		void setMesh(const std::string& name, const uint32& vertexCount, const DrawMode& drawMode);
+
+	protected:
+		virtual void onClose() override;
 
 	protected:
 		std::string mName;
@@ -66,8 +69,8 @@ namespace tezcat::Tiny
 		uint32 mIndexCount = 0;
 
 		DrawModeWrapper mDrawModeWrapper;
-		TinyVector<VertexBuffer*> mVertexBuffers;
-		IndexBuffer* mIndexBuffer = nullptr;
-		TinyVector<Vertex*>* mChildren = nullptr;
+		std::vector<VertexBuffer*> mVertexBuffers;
+		IndexBuffer* mIndexBuffer;
+		std::vector<Vertex*>* mChildren;
 	};
 }

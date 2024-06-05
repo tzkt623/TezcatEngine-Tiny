@@ -4,7 +4,6 @@
 
 #include "../Manager/ShaderManager.h"
 #include "../Shader/Shader.h"
-#include "../Renderer/BaseGraphics.h"
 
 namespace tezcat::Tiny
 {
@@ -39,12 +38,12 @@ namespace tezcat::Tiny
 		return mShader->getUID();
 	}
 
-	void Material::submit(BaseGraphics* graphics, Shader* shader)
+	void Material::submit(Shader* shader)
 	{
 		shader->resetLocalState();
 		for (auto uniform : mUniforms)
 		{
-			uniform->submit(graphics, shader);
+			uniform->submit(shader);
 		}
 	}
 

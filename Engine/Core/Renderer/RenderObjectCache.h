@@ -6,7 +6,6 @@ namespace tezcat::Tiny
 {
 	class BaseRenderObserver;
 	class BaseRenderer;
-	class BaseGraphics;
 	class PipelinePass;
 
 	/*
@@ -36,8 +35,8 @@ namespace tezcat::Tiny
 	public:
 		static void init();
 
-		static void culling(int layerIndex, BaseGraphics* graphics, BaseRenderObserver* renderObserver);
-		static void culling(int layerIndex, BaseGraphics* graphics, PipelinePass* pass);
+		static void culling(int layerIndex, BaseRenderObserver* renderObserver);
+		static void culling(int layerIndex, PipelinePass* pass);
 		static RenderObjectCache* getRenderLayer(uint32 index)
 		{
 			return sLayerAry[index];

@@ -6,7 +6,6 @@
 
 namespace tezcat::Tiny
 {
-	class BaseGraphics;
 	class ShadowCasterManager;
 	class LightingManager;
 	class LightManager;
@@ -64,11 +63,11 @@ namespace tezcat::Tiny
 		virtual void onEnterPipeline();
 		virtual void onExitPipeline();
 
-		void beginRender(BaseGraphics* graphics);
-		void render(BaseGraphics* graphics);
-		void endRender(BaseGraphics* graphics);
+		void beginRender();
+		void render();
+		void endRender();
 
-		void addGlobalSubmit(std::function<void(BaseGraphics*, Shader*)>& function)
+		void addGlobalSubmit(std::function<void(Shader*)>& function)
 		{
 			mGlobalSubmitArray.emplace_back(function);
 		}
@@ -124,7 +123,7 @@ namespace tezcat::Tiny
 		BaseRenderObserver* mRenderObserver;
 		FrameBuffer* mFrameBuffer;
 		std::vector<RenderCommand*> mCommandArray;
-		std::vector<std::function<void(BaseGraphics*, Shader*)>> mGlobalSubmitArray;
+		std::vector<std::function<void(Shader*)>> mGlobalSubmitArray;
 	};
 
 	/*
@@ -164,16 +163,16 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~ReplacedPipelinePass();
-		void preCalculate(BaseGraphics* graphics);
+		void preCalculate();
 		void setUseCullLayerData(bool val) { mUseCullLayer = val; }
-		void setPreFunction(const std::function<void(BaseGraphics*, ReplacedPipelinePass*)>& preFunction)
+		void setPreFunction(const std::function<void(ReplacedPipelinePass*)>& preFunction)
 		{
 			mPreFunction = preFunction;
 		}
 
 	private:
 		bool mUseCullLayer;
-		std::function<void(BaseGraphics*, ReplacedPipelinePass*)> mPreFunction;
+		std::function<void(ReplacedPipelinePass*)> mPreFunction;
 	};
 
 	/*
@@ -186,15 +185,15 @@ namespace tezcat::Tiny
 		virtual ~Pipeline() = default;
 
 		virtual void init();
-		virtual void render(BaseGraphics* graphics);
+		virtual void render();
 		virtual void addPipePass(PipelinePass* pass) = 0;
 
 		static uint32 getFrameCount() { return sFrameCount; }
 
 	protected:
-		virtual void preRender(BaseGraphics* graphics) = 0;
-		virtual void onRender(BaseGraphics* graphics) = 0;
-		virtual void postRender(BaseGraphics* graphics) = 0;
+		virtual void preRender() = 0;
+		virtual void onRender() = 0;
+		virtual void postRender() = 0;
 
 	protected:
 		static uint32 sFrameCount;
@@ -219,9 +218,9 @@ namespace tezcat::Tiny
 		virtual ~PipelineBuildin() noexcept;
 		virtual void addPipePass(PipelinePass* pass) override;
 	protected:
-		virtual void preRender(BaseGraphics* graphics) override;
-		virtual void onRender(BaseGraphics* graphics) override;
-		virtual void postRender(BaseGraphics* graphics) override;
+		virtual void preRender() override;
+		virtual void onRender() override;
+		virtual void postRender() override;
 
 	protected:
 		bool mDirty;

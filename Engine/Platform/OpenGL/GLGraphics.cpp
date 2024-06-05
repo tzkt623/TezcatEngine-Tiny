@@ -324,28 +324,6 @@ namespace tezcat::Tiny::GL
 		glViewport(info.OX, info.OY, info.Width, info.Height);
 	}
 
-	void GLGraphics::preRender()
-	{
-		BaseGraphics::preRender();
-	}
-
-	void GLGraphics::onRender()
-	{
-		glClear(GL_COLOR_BUFFER_BIT);
-		BaseGraphics::onRender();
-	}
-
-	void GLGraphics::postRender()
-	{
-		BaseGraphics::postRender();
-
-		if (Engine::sMultiThread)
-		{
-			glfwSwapBuffers(mWindow);
-			glfwPollEvents();
-		}
-	}
-
 	void GLGraphics::setPassState(Shader* shader)
 	{
 		if (shader->getCullFaceWrapper().platform != 0)
@@ -442,7 +420,7 @@ namespace tezcat::Tiny::GL
 		}
 	}
 
-	void GLGraphics::drawLine(Vertex* vertex, const uint32_t& needCount)
+	void GLGraphics::drawLine(Vertex* vertex, const uint32& needCount)
 	{
 		glBindVertexArray(vertex->getVertexID());
 		glDrawArrays(GL_LINE, 0, needCount);
@@ -508,42 +486,42 @@ namespace tezcat::Tiny::GL
 #pragma endregion
 
 #pragma region Delete
-	void GLGraphics::cmdDeleteTexture2D(uint32_t id)
+	void GLGraphics::cmdDeleteTexture2D(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteTexture>(id);
 	}
 
-	void GLGraphics::cmdDeleteTextureCube(uint32_t id)
+	void GLGraphics::cmdDeleteTextureCube(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteTexture>(id);
 	}
 
-	void GLGraphics::cmdDeleteRender2D(uint32_t id)
+	void GLGraphics::cmdDeleteRender2D(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteRender2D>(id);
 	}
 
-	void GLGraphics::cmdDeleteVertex(uint32_t id)
+	void GLGraphics::cmdDeleteVertex(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteVAO>(id);
 	}
 
-	void GLGraphics::cmdDeleteVertexBuffer(uint32_t id)
+	void GLGraphics::cmdDeleteVertexBuffer(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteVBO>(id);
 	}
 
-	void GLGraphics::cmdDeleteIndexBuffer(uint32_t id)
+	void GLGraphics::cmdDeleteIndexBuffer(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteIBO>(id);
 	}
 
-	void GLGraphics::cmdDeleteFrameBuffer(uint32_t id)
+	void GLGraphics::cmdDeleteFrameBuffer(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteFrameBuffer>(id);
 	}
 
-	void GLGraphics::cmdDeleteShader(uint32_t id)
+	void GLGraphics::cmdDeleteShader(uint32 id)
 	{
 		this->createCMD<GLBuildCMD_DeleteShader>(id);
 	}
@@ -950,9 +928,9 @@ namespace tezcat::Tiny::GL
 	//
 	//	Render CMD
 	//
-	RenderCommand* GLGraphics::createDrawVertexCMD(Shader* shader, Vertex* vertex)
+	RenderCommand* GLGraphics::createDrawVertexCMD(Vertex* vertex)
 	{
-		return new GLRenderCMD_Vertex(shader, vertex);
+		return new GLRenderCMD_Vertex(vertex);
 	}
 
 	RenderCommand* GLGraphics::createDrawShadowCMD(Vertex* vertex, Transform* transform)
@@ -975,14 +953,14 @@ namespace tezcat::Tiny::GL
 		return new GLRenderCMD_HDRToCube(vertex, hdr, cube);
 	}
 
-	RenderCommand* GLGraphics::createDrawEnvMakeIrradiance(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* irradiance)
+	RenderCommand* GLGraphics::createDrawEnvMakeIrradiance(Vertex* vertex, TextureCube* cube, TextureCube* irradiance)
 	{
-		return new GLRenderCMD_EnvMakeIrradiance(shader, vertex, cube, irradiance);
+		return new GLRenderCMD_EnvMakeIrradiance(vertex, cube, irradiance);
 	}
 
-	RenderCommand* GLGraphics::createDrawEnvMakePrefilter(Shader* shader, Vertex* vertex, TextureCube* cube, TextureCube* prefitler, uint32_t mipMaxLevel, uint32_t mipWidth, uint32_t mipHeight, float resolution)
+	RenderCommand* GLGraphics::createDrawEnvMakePrefilter(Vertex* vertex, TextureCube* cube, TextureCube* prefitler, uint32 mipMaxLevel, uint32 mipWidth, uint32 mipHeight, float resolution)
 	{
-		return new GLRenderCMD_EnvMakePrefilter(shader, vertex, cube, prefitler, mipMaxLevel, mipWidth, mipHeight, resolution);
+		return new GLRenderCMD_EnvMakePrefilter(vertex, cube, prefitler, mipMaxLevel, mipWidth, mipHeight, resolution);
 	}
 
 }

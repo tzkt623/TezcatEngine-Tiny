@@ -66,11 +66,11 @@ namespace tezcat::Tiny
 		* Parameter:	Shader * shader
 		* Comment: 向shader提交数据
 		*/
-		virtual void submit(BaseGraphics* graphics, Shader* shader) = 0;
+		virtual void submit(Shader* shader) = 0;
 
 
-		virtual void makeRenderCommand(BaseGraphics* graphics, BaseRenderObserver* renderObserver) = 0;
-		virtual void makeRenderCommand(BaseGraphics* graphics, PipelinePass* pass) = 0;
+		virtual void makeRenderCommand(BaseRenderObserver* renderObserver) = 0;
+		virtual void makeRenderCommand(PipelinePass* pass) = 0;
 	};
 
 	/*
@@ -122,13 +122,13 @@ namespace tezcat::Tiny
 		void setMesh(Vertex* vertex);
 		Vertex* getVertex() const { return mVertex; }
 
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 
 		void setShadowReciever(bool value) { mIsShadowReciever = true; }
 		bool isShadowReciever() const { return mIsShadowReciever; }
 
-		virtual void makeRenderCommand(BaseGraphics* graphics, BaseRenderObserver* renderObserver) override;
-		virtual void makeRenderCommand(BaseGraphics* graphics, PipelinePass* pass) override;
+		virtual void makeRenderCommand(BaseRenderObserver* renderObserver) override;
+		virtual void makeRenderCommand(PipelinePass* pass) override;
 
 		void setTransform(Transform* value) { mTransform = value; }
 

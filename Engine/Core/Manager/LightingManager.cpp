@@ -135,21 +135,36 @@ namespace tezcat::Tiny
 			{
 				if (CameraManager::getMainCamera())
 				{
+					auto shader = ShaderManager::find("Unlit/Skybox");
 					sSkyBoxPass = ReplacedPipelinePass::create(CameraManager::getMainCamera()->getRenderObserver()
-						, ShaderManager::find("Unlit/Skybox"));
+						, shader);
 					sSkyBoxPass->saveObject();
 					if (sCurrentCubeMap == nullptr)
 					{
 						sCurrentCubeMap = sCubeTextureMap;
 					}
 
-					sSkyBoxPass->setPreFunction([=](BaseGraphics* graphics, ReplacedPipelinePass* pass)
+// 					auto material = Material::create(shader);
+// 					material->saveObject();
+// 
+// 					auto skybox_lod_index = shader->getUniformIndex("mySkyboxLod");
+// 					auto is_hdr_index = shader->getUniformIndex("myIsHDR");
+// 					auto exposure_index = shader->getUniformIndex("myExposure");
+
+					sSkyBoxPass->setPreFunction([=](ReplacedPipelinePass* pass)
 					{
-						auto cmd = graphics->createDrawSkyboxCMD(sSkyboxVertex
+// 						material->setTinyUniform<UniformTexCube>(ShaderParam::TexSkybox, sCurrentCubeMap);
+// 						material->setUniform<UniformI1>(skybox_lod_index, sSkyboxLod);
+// 						material->setUniform<UniformI1>(is_hdr_index, sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float);
+// 						material->setUniform<UniformF1>(exposure_index, sExposure);
+
+						auto cmd = Graphics::getInstance()->createDrawSkyboxCMD(sSkyboxVertex
 							, sCurrentCubeMap
 							, sSkyboxLod
 							, sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float
 							, sExposure);
+
+						//new RenderCommand(sSkyboxVertex, nullptr, material);
 						pass->addCommand(cmd);
 					});
 				}
@@ -170,11 +185,11 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void LightingManager::submitEnvLighting(BaseGraphics* graphics, Shader* shader)
+	void LightingManager::submitEnvLighting(Shader* shader)
 	{
-		graphics->setGlobalTextureCube(shader, ShaderParam::TexIrradiance, sIrradianceMap);
-		graphics->setGlobalTextureCube(shader, ShaderParam::TexPrefilter, sPrefilterMap);
-		graphics->setGlobalTexture2D(shader, ShaderParam::TexBRDFLUT, sBRDFLUTMap);
+		Graphics::getInstance()->setGlobalTextureCube(shader, ShaderParam::TexIrradiance, sIrradianceMap);
+		Graphics::getInstance()->setGlobalTextureCube(shader, ShaderParam::TexPrefilter, sPrefilterMap);
+		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexBRDFLUT, sBRDFLUTMap);
 	}
 
 	void LightingManager::createCube()
@@ -226,9 +241,9 @@ namespace tezcat::Tiny
 		sTexturePass = ReplacedPipelinePass::create(observer, ShaderManager::find("Unlit/EnvMakeCube"));
 		sTexturePass->setOnceMode();
 		sTexturePass->setFrameBuffer(frame_buffer);
-		sTexturePass->setPreFunction([=](BaseGraphics* grahpics, ReplacedPipelinePass* pass)
+		sTexturePass->setPreFunction([=](ReplacedPipelinePass* pass)
 		{
-			pass->addCommand(grahpics->createDrawHDRToCubeCMD(sHDRVertex, sTexHDR, sCubeTextureMap));
+			pass->addCommand(Graphics::getInstance()->createDrawHDRToCubeCMD(sHDRVertex, sTexHDR, sCubeTextureMap));
 		});
 		sTexturePass->setOrderID(0);
 		sTexturePass->saveObject();
@@ -269,9 +284,9 @@ namespace tezcat::Tiny
 		sIrradiancePass = ReplacedPipelinePass::create(observer, shader);
 		sIrradiancePass->setOnceMode();
 		sIrradiancePass->setFrameBuffer(frame_buffer);
-		sIrradiancePass->setPreFunction([=](BaseGraphics* grahpics, ReplacedPipelinePass* pass)
+		sIrradiancePass->setPreFunction([=](ReplacedPipelinePass* pass)
 		{
-			pass->addCommand(grahpics->createDrawEnvMakeIrradiance(nullptr, sHDRVertex, sCubeTextureMap, sIrradianceMap));
+			pass->addCommand(Graphics::getInstance()->createDrawEnvMakeIrradiance(sHDRVertex, sCubeTextureMap, sIrradianceMap));
 		});
 		sIrradiancePass->setOrderID(1);
 		sIrradiancePass->saveObject();
@@ -313,10 +328,9 @@ namespace tezcat::Tiny
 			, ShaderManager::find("Unlit/EnvMakePrefilter"));
 		sPrefilterPass->setOnceMode();
 		sPrefilterPass->setFrameBuffer(frame_buffer);
-		sPrefilterPass->setPreFunction([=](BaseGraphics* grahpics, ReplacedPipelinePass* pass)
+		sPrefilterPass->setPreFunction([=](ReplacedPipelinePass* pass)
 		{
-			pass->addCommand(grahpics->createDrawEnvMakePrefilter(nullptr
-				, sHDRVertex
+			pass->addCommand(Graphics::getInstance()->createDrawEnvMakePrefilter(sHDRVertex
 				, sCubeTextureMap
 				, sPrefilterMap
 				, 5
@@ -358,10 +372,10 @@ namespace tezcat::Tiny
 			, ShaderManager::find("Unlit/EnvMakeBRDFLut"));
 		sBRDFLUTPass->setOnceMode();
 		sBRDFLUTPass->setFrameBuffer(frame_buffer);
-		sBRDFLUTPass->setPreFunction([=](BaseGraphics* grahpics, ReplacedPipelinePass* pass)
+		sBRDFLUTPass->setPreFunction([=](ReplacedPipelinePass* pass)
 		{
 			auto rect_vertex = VertexBufferManager::create("Rect");
-			pass->addCommand(grahpics->createDrawVertexCMD(nullptr, rect_vertex));
+			pass->addCommand(Graphics::getInstance()->createDrawVertexCMD(rect_vertex));
 		});
 		sBRDFLUTPass->setOrderID(3);
 		sBRDFLUTPass->saveObject();
@@ -421,7 +435,7 @@ namespace tezcat::Tiny
 		return p;
 	}
 
-	void LightingManager::submitLighting(BaseGraphics* graphics, Shader* shader)
+	void LightingManager::submitLighting(Shader* shader)
 	{
 		if (!sLightData)
 		{
@@ -430,17 +444,17 @@ namespace tezcat::Tiny
 
 		if (sLightData->directionalLight)
 		{
-			sLightData->directionalLight->submit(graphics, shader);
+			sLightData->directionalLight->submit(shader);
 		}
 
 		for (auto point_light : sLightData->pointLights)
 		{
-			point_light->submit(graphics, shader);
+			point_light->submit(shader);
 		}
 
 		for (auto spot_light : sLightData->spotLights)
 		{
-			spot_light->submit(graphics, shader);
+			spot_light->submit(shader);
 		}
 	}
 

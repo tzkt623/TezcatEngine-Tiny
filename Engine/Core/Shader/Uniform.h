@@ -11,7 +11,6 @@ namespace tezcat::Tiny
 	class TextureCube;
 	class Shader;
 	class Transform;
-	class BaseGraphics;
 
 	struct TINY_API UniformIDDef {};
 	using UniformID = IDString<UniformIDDef>;
@@ -28,7 +27,7 @@ namespace tezcat::Tiny
 		virtual ~Uniform() {}
 
 		virtual UniformType getType() = 0;
-		virtual void submit(BaseGraphics* graphics, Shader* shader) = 0;
+		virtual void submit(Shader* shader) = 0;
 
 		int* mShaderID;
 	};
@@ -71,7 +70,7 @@ namespace tezcat::Tiny
 		using UniformT<int>::UniformT;
 
 		UniformType getType() final { return UniformType::Int; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformF1 : public UniformT<float>
@@ -79,7 +78,7 @@ namespace tezcat::Tiny
 		using UniformT<float>::UniformT;
 
 		UniformType getType() final { return UniformType::Float; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformI2 : public UniformT<int2>
@@ -87,7 +86,7 @@ namespace tezcat::Tiny
 		using UniformT<int2>::UniformT;
 
 		UniformType getType() final { return UniformType::Int2; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformF2 : public UniformT<float2>
@@ -95,7 +94,7 @@ namespace tezcat::Tiny
 		using UniformT<float2>::UniformT;
 
 		UniformType getType() final { return UniformType::Float2; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformI3 : public UniformT<int3>
@@ -103,7 +102,7 @@ namespace tezcat::Tiny
 		using UniformT<int3>::UniformT;
 
 		UniformType getType() final { return UniformType::Int3; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformF3 : public UniformT<float3>
@@ -111,7 +110,7 @@ namespace tezcat::Tiny
 		using UniformT<float3>::UniformT;
 
 		UniformType getType() final { return UniformType::Float3; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformI4 : public UniformT<int4>
@@ -119,7 +118,7 @@ namespace tezcat::Tiny
 		using UniformT<int4>::UniformT;
 
 		UniformType getType() final { return UniformType::Int4; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformF4 : public UniformT<float4>
@@ -127,7 +126,7 @@ namespace tezcat::Tiny
 		using UniformT<float4>::UniformT;
 
 		UniformType getType() final { return UniformType::Float4; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformMat3 : public UniformT<float3x3>
@@ -135,7 +134,7 @@ namespace tezcat::Tiny
 		using UniformT<float3x3>::UniformT;
 
 		UniformType getType() final { return UniformType::Mat3; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformMat4 : public UniformT<float4x4>
@@ -143,7 +142,7 @@ namespace tezcat::Tiny
 		using UniformT<float4x4>::UniformT;
 
 		UniformType getType() final { return UniformType::Mat4; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 	};
 
 	struct TINY_API UniformTex2D : public UniformT<Texture2D*>
@@ -153,7 +152,7 @@ namespace tezcat::Tiny
 
 
 		UniformType getType() final { return UniformType::Tex2D; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 
 	protected:
 		void beginSetValue() override;
@@ -167,7 +166,7 @@ namespace tezcat::Tiny
 
 
 		UniformType getType() final { return UniformType::TexCube; }
-		void submit(BaseGraphics* graphics, Shader* shader) override;
+		void submit(Shader* shader) override;
 
 	protected:
 		void beginSetValue() override;

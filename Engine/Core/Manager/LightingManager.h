@@ -5,7 +5,6 @@
 
 namespace tezcat::Tiny
 {
-	class BaseGraphics;
 	class Skybox;
 	class Texture;
 	class TextureCube;
@@ -58,7 +57,7 @@ namespace tezcat::Tiny
 		//	Normal Lighting
 		//
 		static void setLightData(LightData* data);
-		static void submitLighting(BaseGraphics* graphics, Shader* shader);
+		static void submitLighting(Shader* shader);
 		static void setDirectionalLight(DirectionalLight* agent);
 
 	public:
@@ -67,7 +66,7 @@ namespace tezcat::Tiny
 		// Environment Lighting
 		//
 		static void calculate();
-		static void submitEnvLighting(BaseGraphics* graphics, Shader* shader);
+		static void submitEnvLighting(Shader* shader);
 		static void setSkyBoxHDRTexture(Image* image);
 		static Texture2D* getSkyBoxHDRTexture() { return sTexHDR; }
 		static auto getCubeMapTextureArray() { return sCubeTextures; }

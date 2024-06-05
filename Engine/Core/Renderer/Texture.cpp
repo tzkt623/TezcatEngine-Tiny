@@ -188,7 +188,7 @@ namespace tezcat::Tiny
 
 	void Texture2D::apply(uint32 id)
 	{
-		Texture::apply(id);
+		Base::apply(id);
 		free(mData);
 		mData = nullptr;
 	}

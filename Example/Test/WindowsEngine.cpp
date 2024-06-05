@@ -65,7 +65,7 @@ namespace tezcat::Editor
 	void WindowsEditor::notifyRender()
 	{
 		mGUI->render();
-		mPipeline->render(mGraphics);
+		mPipeline->render();
 		glfwPollEvents();
 		glfwSwapBuffers(mWindow);
 	}

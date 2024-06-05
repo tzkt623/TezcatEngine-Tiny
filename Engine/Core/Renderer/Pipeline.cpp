@@ -59,7 +59,7 @@ namespace tezcat::Tiny
 		return ((mRenderObserver->getOrderID() + 127) << 24) | ((uint32)mShader->getRenderQueue() << 16) | mOrderID;
 	}
 
-	void PipelinePass::beginRender(BaseGraphics* graphics)
+	void PipelinePass::beginRender()
 	{
 		FrameBuffer* frame_buffer = nullptr;
 		if (mFrameBuffer != nullptr)
@@ -75,45 +75,45 @@ namespace tezcat::Tiny
 			frame_buffer = FrameBufferManager::getDefaultBuffer();
 		}
 
-		FrameBufferManager::bind(graphics, frame_buffer);
+		FrameBufferManager::bind(frame_buffer);
 		if (Pipeline::getFrameCount() != frame_buffer->currentFrame())
 		{
 			frame_buffer->updateCurrentFrame(Pipeline::getFrameCount());
-			graphics->clear(mRenderObserver->getClearOption());
-			graphics->setViewport(mRenderObserver->getViewportInfo());
+			Graphics::getInstance()->clear(mRenderObserver->getClearOption());
+			Graphics::getInstance()->setViewport(mRenderObserver->getViewportInfo());
 		}
 	}
 
-	void PipelinePass::render(BaseGraphics* graphics)
+	void PipelinePass::render()
 	{
 		mShader->resetGlobalState();
-		graphics->bind(mShader);
-		graphics->setPassState(mShader);
-		mRenderObserver->submitViewMatrix(graphics, mShader);
+		Graphics::getInstance()->bind(mShader);
+		Graphics::getInstance()->setPassState(mShader);
+		mRenderObserver->submitViewMatrix(mShader);
 
 		for (auto& fun : mGlobalSubmitArray)
 		{
-			fun(graphics, mShader);
+			fun(mShader);
 		}
 
 		for (auto cmd : mCommandArray)
 		{
-			cmd->run(graphics, mShader);
+			cmd->run(mShader);
 			delete cmd;
 		}
 
 		mCommandArray.clear();
 	}
 
-	void PipelinePass::endRender(BaseGraphics* graphics)
+	void PipelinePass::endRender()
 	{
 		if (mFrameBuffer != nullptr)
 		{
-			FrameBufferManager::unbind(graphics, mFrameBuffer);
+			FrameBufferManager::unbind(mFrameBuffer);
 		}
 		else if (mRenderObserver->getFrameBuffer())
 		{
-			FrameBufferManager::unbind(graphics, mRenderObserver->getFrameBuffer());
+			FrameBufferManager::unbind(mRenderObserver->getFrameBuffer());
 		}
 
 		if (mMode == Mode::Once)
@@ -133,17 +133,17 @@ namespace tezcat::Tiny
 
 		if (TINY_MASK_NONE_OF(globalFunctionMask, GlobalSubmit::NO_SHADOW))
 		{
-			mGlobalSubmitArray.emplace_back(TINY_BIND2(ShadowCasterManager::submit));
+			mGlobalSubmitArray.emplace_back(TINY_BIND1(ShadowCasterManager::submit));
 		}
 
 		if (TINY_MASK_NONE_OF(globalFunctionMask, GlobalSubmit::NO_LIGHTING))
 		{
-			mGlobalSubmitArray.emplace_back(TINY_BIND2(LightingManager::submitLighting));
+			mGlobalSubmitArray.emplace_back(TINY_BIND1(LightingManager::submitLighting));
 		}
 
 		if (TINY_MASK_NONE_OF(globalFunctionMask, GlobalSubmit::NO_ENVLIGHTING))
 		{
-			mGlobalSubmitArray.emplace_back(TINY_BIND2(LightingManager::submitEnvLighting));
+			mGlobalSubmitArray.emplace_back(TINY_BIND1(LightingManager::submitEnvLighting));
 		}
 	}
 
@@ -253,7 +253,7 @@ namespace tezcat::Tiny
 		mShader = nullptr;
 	}
 
-	void ReplacedPipelinePass::preCalculate(BaseGraphics* graphics)
+	void ReplacedPipelinePass::preCalculate()
 	{
 		if (mUseCullLayer)
 		{
@@ -261,13 +261,13 @@ namespace tezcat::Tiny
 			for (auto& index : mRenderObserver->getCullLayerList())
 			{
 				//剔除到对应的渲染通道
-				RenderObjectCache::culling(index, graphics, this);
+				RenderObjectCache::culling(index, this);
 			}
 		}
 
 		if (mPreFunction)
 		{
-			mPreFunction(graphics, this);
+			mPreFunction(this);
 		}
 	}
 
@@ -295,12 +295,12 @@ namespace tezcat::Tiny
 		ShadowCasterManager::init();
 	}
 
-	void Pipeline::render(BaseGraphics* graphics)
+	void Pipeline::render()
 	{
 		TINY_PROFILER_TIMER_OUT(Profiler::RenderTime);
-		this->preRender(graphics);
-		this->onRender(graphics);
-		this->postRender(graphics);
+		this->preRender();
+		this->onRender();
+		this->postRender();
 	}
 
 	//-------------------------------------------
@@ -333,16 +333,16 @@ namespace tezcat::Tiny
 		EngineEvent::get()->removeListener(this);
 	}
 
-	void PipelineBuildin::preRender(BaseGraphics* graphics)
+	void PipelineBuildin::preRender()
 	{
 		Profiler_ResetDrawCall();
 		Profiler_ResetPassCount();
 
-		CameraManager::calculate(graphics);
+		CameraManager::calculate();
 		LightingManager::calculate();
 	}
 
-	void PipelineBuildin::onRender(BaseGraphics* graphics)
+	void PipelineBuildin::onRender()
 	{
 		if (!mReplacedPipePassArray.empty())
 		{
@@ -357,7 +357,7 @@ namespace tezcat::Tiny
 				}
 				else
 				{
-					pass->preCalculate(graphics);
+					pass->preCalculate();
 					it++;
 				}
 			}
@@ -385,15 +385,15 @@ namespace tezcat::Tiny
 			}
 			else
 			{
-				pass->beginRender(graphics);
-				pass->render(graphics);
-				pass->endRender(graphics);
+				pass->beginRender();
+				pass->render();
+				pass->endRender();
 				it++;
 			}
 		}
 	}
 
-	void PipelineBuildin::postRender(BaseGraphics* graphics)
+	void PipelineBuildin::postRender()
 	{
 		sFrameCount++;
 	}

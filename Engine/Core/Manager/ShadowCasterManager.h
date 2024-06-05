@@ -8,7 +8,6 @@ namespace tezcat::Tiny
 {
 	class ShadowCaster;
 	class Shader;
-	class BaseGraphics;
 
 	/*
 	* @brief 阴影投射器管理器
@@ -21,7 +20,7 @@ namespace tezcat::Tiny
 	public:
 		static std::list<TinyWeakRef<ShadowCaster>>& getAllCaster() { return mCasterAry; }
 		static void init();
-		static void submit(BaseGraphics* graphics, Shader* mShader);
+		static void submit(Shader* mShader);
 
 	private:
 		static bool mAdded;

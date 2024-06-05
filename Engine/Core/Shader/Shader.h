@@ -25,7 +25,7 @@ namespace tezcat::Tiny
 		virtual ~Shader();
 
 		void generate();
-		void apply(uint32_t pid);
+		void apply(uint32 pid);
 
 		const std::string& getName() const { return mName; }
 		const std::string& getFilePath() const { return mPath; }
@@ -35,17 +35,17 @@ namespace tezcat::Tiny
 		void setName(const std::string& name) { mName = name; }
 		void setName(std::string& name) { mName.assign(name); }
 
-		int getProgramID() const { return mProgramID; }
-		int getOrderID() const { return mOrderID; }
-		void setOrderID(int orderID) { mOrderID = orderID; }
-		int getUID() const { return mUID; }
-		int getVersion() const { return mVersion; }
-		void setVersion(int val) { mVersion = val; }
+		int32 getProgramID() const { return mProgramID; }
+		int32 getOrderID() const { return mOrderID; }
+		void setOrderID(int32 orderID) { mOrderID = orderID; }
+		int32 getUID() const { return mUID; }
+		int32 getVersion() const { return mVersion; }
+		void setVersion(int32 val) { mVersion = val; }
 		void setLightMode(LightMode lightMode) { mLightMode = lightMode; }
 		LightMode getLightMode() const { return mLightMode; }
 		bool isShadowReceiver() const { return mIsShadowReceiver; }
 
-		int32_t getPropertyID(const std::string& name)
+		int32 getPropertyID(const std::string& name)
 		{
 			auto it = mUserUniformUMap.find(name);
 			TINY_ASSERT(it != mUserUniformUMap.end());
@@ -67,7 +67,7 @@ namespace tezcat::Tiny
 			return it->second;
 		}
 
-		UniformInfo* getUniformInfo(const uint32_t& index) const
+		UniformInfo* getUniformInfo(const uint32& index) const
 		{
 			return mUserUniformAry[index];
 		}
@@ -84,12 +84,12 @@ namespace tezcat::Tiny
 			return outShaderID > -1;
 		}
 
-		int32_t getTinyUniformShaderID(const UniformID& id)
+		int32 getTinyUniformShaderID(const UniformID& id)
 		{
 			return mTinyUniformList[id.getUID()]->shaderID;
 		}
 
-		uint32_t getTextureIndex()
+		uint32 getTextureIndex()
 		{
 			return mGlobalTexture + mLocalTexure;
 		}
@@ -135,18 +135,18 @@ namespace tezcat::Tiny
 			return mUserUniformAry;
 		}
 
-		void setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex = -1);
-		void resizeTinyUniformAry(uint64_t size);
+		void setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32& index, const int& shaderID, const int& arrayIndex = -1);
+		void resizeTinyUniformAry(uint64 size);
 
 		void setupUserUniformID(ArgMetaData* metaData, const std::string& name, const int& shaderID, const int& arrayIndex = -1);
-		void resizeUserUniformAry(uint64_t size);
+		void resizeUserUniformAry(uint64 size);
 
 	public:
 		void setZWrite(bool val) { mEnableZWrite = val; }
 
 		void setCullFace(const CullFace& value)
 		{
-			mCullFace = ContextMap::CullFaceArray[(uint32_t)value];
+			mCullFace = ContextMap::CullFaceArray[(uint32)value];
 		}
 
 		void setCullFace(const CullFaceWrapper& value)
@@ -158,8 +158,8 @@ namespace tezcat::Tiny
 
 		void setBlendFunction(const Blend& source, const Blend& target)
 		{
-			mBlendSource = ContextMap::BlendArray[(uint32_t)source];
-			mBlendTarget = ContextMap::BlendArray[(uint32_t)target];
+			mBlendSource = ContextMap::BlendArray[(uint32)source];
+			mBlendTarget = ContextMap::BlendArray[(uint32)target];
 		}
 
 		void setBlendFunction(const BlendWrapper& source, const BlendWrapper& target)
@@ -175,29 +175,29 @@ namespace tezcat::Tiny
 
 		void setDepthTest(const DepthTest& value)
 		{
-			mDepthTest = ContextMap::DepthTestArray[(uint32_t)value];
+			mDepthTest = ContextMap::DepthTestArray[(uint32)value];
 		}
 
 	public:
 		CullFaceWrapper& getCullFaceWrapper() { return mCullFace; }
 
-		bool isEnableBlend() { return mEnableBlend; }
-		BlendWrapper& getBlendSourceWrapper() { return mBlendSource; }
-		BlendWrapper& getBlendTargetWrapper() { return mBlendTarget; }
+		bool isEnableBlend() const { return mEnableBlend; }
+		const BlendWrapper& getBlendSourceWrapper() const { return mBlendSource; }
+		const BlendWrapper& getBlendTargetWrapper() const { return mBlendTarget; }
 
-		bool isEnableZWrite() { return mEnableZWrite; }
-		DepthTestWrapper& getDepthTestWrapper() { return mDepthTest; }
+		bool isEnableZWrite() const { return mEnableZWrite; }
+		const DepthTestWrapper& getDepthTestWrapper() const { return mDepthTest; }
 
 	protected:
 		std::string mName;
 		std::string mPath;
-		int mUID;
-		int mOrderID;
-		int mVersion;
-		int mProgramID;
+		int32 mUID;
+		int32 mOrderID;
+		int32 mVersion;
+		int32 mProgramID;
 		Queue mRenderQueue;
-		uint8_t mLocalTexure;
-		uint8_t mGlobalTexture;
+		uint8 mLocalTexure;
+		uint8 mGlobalTexture;
 	protected:
 
 		bool mIsShadowReceiver;

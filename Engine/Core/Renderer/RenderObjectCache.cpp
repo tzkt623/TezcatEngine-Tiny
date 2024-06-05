@@ -39,7 +39,7 @@ namespace tezcat::Tiny
 		sLayerAry[index]->mRenderObjectList.push_back(renderAgent);
 	}
 
-	void RenderObjectCache::culling(int layerIndex, BaseGraphics* graphics, PipelinePass* pass)
+	void RenderObjectCache::culling(int layerIndex,  PipelinePass* pass)
 	{
 		auto& render_object_list = sLayerAry[layerIndex]->mRenderObjectList;
 		if (render_object_list.empty())
@@ -53,7 +53,7 @@ namespace tezcat::Tiny
 		{
 			if (auto renderer = (*it).lock())
 			{
-				renderer->makeRenderCommand(graphics, pass);
+				renderer->makeRenderCommand(pass);
 				it++;
 			}
 			else
@@ -64,7 +64,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void RenderObjectCache::culling(int layerIndex, BaseGraphics* graphics, BaseRenderObserver* renderObserver)
+	void RenderObjectCache::culling(int layerIndex, BaseRenderObserver* renderObserver)
 	{
 		auto& render_object_list = sLayerAry[layerIndex]->mRenderObjectList;
 		if (render_object_list.empty())
@@ -78,7 +78,7 @@ namespace tezcat::Tiny
 		{
 			if (auto renderer = (*it).lock())
 			{
-				renderer->makeRenderCommand(graphics, renderObserver);
+				renderer->makeRenderCommand(renderObserver);
 				it++;
 			}
 			else
