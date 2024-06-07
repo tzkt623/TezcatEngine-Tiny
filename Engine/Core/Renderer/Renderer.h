@@ -131,6 +131,7 @@ namespace tezcat::Tiny
 		virtual void makeRenderCommand(PipelinePass* pass) override;
 
 		void setTransform(Transform* value) { mTransform = value; }
+		Transform* getTransform() const { return mTransform; }
 
 	protected:
 		bool mIsShadowReciever;

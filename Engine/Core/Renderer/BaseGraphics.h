@@ -96,7 +96,7 @@ namespace tezcat::Tiny
 	public:
 		virtual RenderCommand* createDrawVertexCMD(Vertex* vertex) = 0;
 		virtual RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform) = 0;
-		virtual RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material) = 0;
+		virtual RenderCommand* createDrawCMD(Vertex* vertex, Transform* transform, Material* material) = 0;
 		virtual RenderCommand* createDrawSkyboxCMD(Vertex* vertex
 												 , TextureCube* cube
 												 , float lod = 0
@@ -279,7 +279,7 @@ namespace tezcat::Tiny
 		}
 		static RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material)
 		{
-			mAgent->createDrawMeshCMD(vertex, transform, material);
+			mAgent->createDrawCMD(vertex, transform, material);
 		}
 
 		static RenderCommand* createDrawSkyboxCMD(Vertex* vertex

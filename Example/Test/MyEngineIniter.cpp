@@ -37,8 +37,7 @@ namespace tezcat::Editor
 	{
 		EngineIniter::prepareResource(engine);
 
-		TextureManager::loadResource("/Image");
-
+		//TextureManager::loadResource("/Image");
 		//ModelMgr::getInstance()->loadModel("./Resource/Model/Tree04.fbx");
 	}
 

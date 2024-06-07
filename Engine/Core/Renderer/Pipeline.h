@@ -78,10 +78,10 @@ namespace tezcat::Tiny
 		void setContinuedMode() { mMode = Mode::Continued; }
 		void setOnceMode() { mMode = Mode::Once; }
 
-		uint32 getOrderID() const { return mOrderID; }
+		uint32 getOrderID() const { return mType2.userID; }
 		void setOrderID(uint16 value)
 		{
-			mOrderID = value;
+			mType2.userID = value;
 		}
 
 		void setName(std::string name)
@@ -98,7 +98,7 @@ namespace tezcat::Tiny
 		* 2.再排相机中的队列
 		* 3.再排队列中的通道
 		*/
-		uint32 getPipelineOrderID() const;
+		uint64 getPipelineOrderID() const { return mPipelineOrderID; }
 		uint32 getUID() const;
 
 		void addCommand(RenderCommand* cmd);
@@ -111,6 +111,9 @@ namespace tezcat::Tiny
 		bool isExited() const { return mExited; }
 
 	protected:
+		void setObserver(BaseRenderObserver* observer);
+		void setShader(Shader* shader);
+
 		virtual void onClose() override;
 
 	protected:
@@ -118,12 +121,35 @@ namespace tezcat::Tiny
 		Mode mMode;
 		bool mExited;
 		bool mNeedRemoved;
-		uint32 mOrderID;
 		Shader* mShader;
 		BaseRenderObserver* mRenderObserver;
 		FrameBuffer* mFrameBuffer;
 		std::vector<RenderCommand*> mCommandArray;
 		std::vector<std::function<void(Shader*)>> mGlobalSubmitArray;
+
+		union
+		{
+			uint64 mPipelineOrderID;
+
+			struct Type1
+			{
+				uint64 renderType : 8;
+				uint64 observerOrder : 8;
+				uint64 frameBufferOrder : 16;
+				uint64 shaderQueueID : 8;
+				uint64 userID : 16;
+			} mCombineOrderID;
+
+
+			struct Type2
+			{
+				uint64 temp : 32;
+				uint64 userID : 16;
+				uint64 shaderQueueID : 8;
+				uint64 observerOrder : 8;
+			} mType2;
+		};
+
 	};
 
 	/*
@@ -175,6 +201,23 @@ namespace tezcat::Tiny
 		std::function<void(ReplacedPipelinePass*)> mPreFunction;
 	};
 
+#pragma region PipeQueue
+
+	class TINY_API PipelineQueue : public TinyObject
+	{
+	public:
+
+
+	private:
+		std::vector<PipelinePass*> mPass;
+	};
+
+#pragma endregion
+
+
+
+
+#pragma region Pipeline
 	/*
 	* 渲染管线
 	*/
@@ -252,4 +295,5 @@ namespace tezcat::Tiny
 	private:
 		static Pipeline* sPipeline;
 	};
+#pragma endregion
 }

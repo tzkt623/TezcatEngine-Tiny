@@ -26,25 +26,30 @@ namespace tezcat::Tiny
 	};
 
 
+	class BaseRenderCommand
+	{
+
+	};
+
 	class RenderCommand
 	{
 	public:
 		union
 		{
-			uint64_t mOrderID;
+			uint64 mOrderID;
 
 			struct
 			{
-				uint64_t shaderID : 16;
-				uint64_t priority : 32;
-				uint64_t userID : 16;
+				uint64 shaderID : 16;
+				uint64 priority : 32;
+				uint64 userID : 16;
 			} mBase;
 
 			struct
 			{
-				uint64_t shaderID : 16;
-				uint64_t distanceFromCamera : 32;
-				uint64_t userID : 16;
+				uint64 shaderID : 16;
+				uint64 distanceFromCamera : 32;
+				uint64 userID : 16;
 			} mTransparent;
 		};
 

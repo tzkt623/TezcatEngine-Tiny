@@ -36,7 +36,7 @@ namespace tezcat::Tiny
 	PipelinePass::PipelinePass(uint32 globalFunctionMask)
 		: mShader(nullptr)
 		, mRenderObserver(nullptr)
-		, mOrderID(0)
+		, mPipelineOrderID(0)
 		, mFrameBuffer(nullptr)
 		, mNeedRemoved(false)
 		, mExited(true)
@@ -54,10 +54,10 @@ namespace tezcat::Tiny
 		}
 	}
 
-	uint32 PipelinePass::getPipelineOrderID() const
-	{
-		return ((mRenderObserver->getOrderID() + 127) << 24) | ((uint32)mShader->getRenderQueue() << 16) | mOrderID;
-	}
+// 	uint32 PipelinePass::getPipelineOrderID() const
+// 	{
+// 		return ((mRenderObserver->getOrderID() + 127) << 24) | ((uint32)mShader->getRenderQueue() << 16) | mOrderID;
+// 	}
 
 	void PipelinePass::beginRender()
 	{
@@ -206,6 +206,18 @@ namespace tezcat::Tiny
 		mNeedRemoved = false;
 	}
 
+	void PipelinePass::setObserver(BaseRenderObserver* observer)
+	{
+		mRenderObserver = observer;
+		mType2.observerOrder = mRenderObserver->getOrderID() + 127;
+	}
+
+	void PipelinePass::setShader(Shader* shader)
+	{
+		mShader = shader;
+		mType2.shaderQueueID = (uint16)mShader->getRenderQueue();
+	}
+
 #pragma region ObserverPipePass
 	TINY_OBJECT_CPP(ObserverPipelinePass, PipelinePass)
 
@@ -215,8 +227,8 @@ namespace tezcat::Tiny
 		: PipelinePass(globalFunctionMask)
 
 	{
-		mRenderObserver = renderObserver;
-		mShader = shader;
+		this->setObserver(renderObserver);
+		this->setShader(shader);
 		mName = shader->getName();
 	}
 
@@ -239,10 +251,10 @@ namespace tezcat::Tiny
 		, mUseCullLayer(false)
 		, mPreFunction()
 	{
-		mRenderObserver = renderObserver;
+		this->setObserver(renderObserver);
 		mRenderObserver->saveObject();
 
-		mShader = shader;
+		this->setShader(shader);
 		mName = shader->getName();
 	}
 

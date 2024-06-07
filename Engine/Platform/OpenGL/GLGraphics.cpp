@@ -938,7 +938,7 @@ namespace tezcat::Tiny::GL
 		return new GLRenderCMD_Shadow(vertex, transform);
 	}
 
-	RenderCommand* GLGraphics::createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material)
+	RenderCommand* GLGraphics::createDrawCMD(Vertex* vertex, Transform* transform, Material* material)
 	{
 		return new GLRenderCMD_Mesh(vertex, transform, material);
 	}

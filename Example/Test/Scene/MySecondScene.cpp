@@ -33,7 +33,7 @@ void MySeconedScene::onEnter()
 		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 
 		go->addComponent<Transform>();
-		go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		go->getTransform()->setPosition(float3(0.0f, 0.0f, 0.0f));
 
 	}
 
@@ -62,8 +62,8 @@ void MySeconedScene::onEnter()
 			auto go = GameObject::create();
 			go->setLayerMaskIndex(0);
 			go->addComponent<Transform>();
-			go->getTransform()->setPosition(glm::vec3(dis(gen), dis(gen), dis(gen)));
-			go->getTransform()->setScale(glm::vec3(10.0f));
+			go->getTransform()->setPosition(float3(dis(gen), dis(gen), dis(gen)));
+			go->getTransform()->setScale(float3(10.0f));
 
 			auto mr = go->addComponent<MeshRenderer>();
 			mr->setMesh("Sphere");

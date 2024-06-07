@@ -114,9 +114,9 @@ pass->addToPipeline();
 pass = ReplacedPipelinePass::create(CameraManager::getMainCamera()->getRenderObserver(), ShaderManager::find("Unlit/Skybox"));
 pass->saveObject();
 //not use RenderObject data in layer but custom function to rendering
-pass->setPreFunction([=](BaseGraphics* graphics, ReplacedPipelinePass* pass)
+pass->setPreFunction([=](ReplacedPipelinePass* pass)
 {
-    auto cmd = graphics->createDrawSkyboxCMD(sSkyboxVertex
+    auto cmd = Graphics::getInstance()->createDrawSkyboxCMD(sSkyboxVertex
         , sCurrentCubeMap
         , sSkyboxLod
         , sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float
@@ -132,7 +132,7 @@ pass->addToPipeline();
 auto shader = ShaderManager::find("Tutorial/t01");
 pass = ReplacedPipelinePass::create(observer, shader);
 //not use RenderObject data in layer but custom function to rendering
-pass->setPreFunction([=](BaseGraphics* graphics, ReplacedPipelinePass* pass)
+pass->setPreFunction([=](BReplacedPipelinePass* pass)
 {
     pass->addCommand(Graphics::getInstance()->createDrawVertexCMD(shader, mVertex));
 });
@@ -476,7 +476,7 @@ Attention! The .exe file must be in the same directory as the resource folder
         //注意,不同文件夹下面的图片文件也不能重名
         //Set ImageFolder to auto load all images
         //Note that the image files under different folders also must not have the same name
-        TextureMgr::getInstance()->loadResource("/Image");
+        TextureMgr::loadResource("/Image");
     }
     ```
 

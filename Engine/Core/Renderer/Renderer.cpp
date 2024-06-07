@@ -85,7 +85,7 @@ namespace tezcat::Tiny
 	void BaseMeshRenderer::makeRenderCommand(BaseRenderObserver* renderObserver)
 	{
 		auto pass = renderObserver->createOrGetPass(mMaterial->getShader());
-		auto cmd = Graphics::getInstance()->createDrawMeshCMD(mVertex, mTransform, mMaterial);
+		auto cmd = Graphics::getInstance()->createDrawCMD(mVertex, mTransform, mMaterial);
 
 		//new RenderCommand(mVertex, mTransform, mMaterial);
 

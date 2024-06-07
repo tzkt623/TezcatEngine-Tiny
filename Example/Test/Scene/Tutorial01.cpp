@@ -25,7 +25,7 @@ void Tutorial01::onEnter()
 	mesh->mName = "Triangle";
 	mesh->mVertices.emplace_back(-0.5f, -0.5f, 0.0f);	// left
 	mesh->mVertices.emplace_back(0.5f, -0.5f, 0.0f);	// right
-	mesh->mVertices.emplace_back(0.0f, 0.5f, 0.0f);	// top
+	mesh->mVertices.emplace_back(0.0f, 0.5f, 0.0f);		// top
 	mesh->apply();
 
 	mVertex = Vertex::create();

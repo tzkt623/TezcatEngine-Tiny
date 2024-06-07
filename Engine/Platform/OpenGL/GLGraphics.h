@@ -37,7 +37,7 @@ namespace tezcat::Tiny::GL
 	public:
 		RenderCommand* createDrawVertexCMD(Vertex* vertex) override;
 		RenderCommand* createDrawShadowCMD(Vertex* vertex, Transform* transform) override;
-		RenderCommand* createDrawMeshCMD(Vertex* vertex, Transform* transform, Material* material) override;
+		RenderCommand* createDrawCMD(Vertex* vertex, Transform* transform, Material* material) override;
 		RenderCommand* createDrawSkyboxCMD(Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false, float exposure = 1) override;
 		RenderCommand* createDrawHDRToCubeCMD(Vertex* vertex, Texture2D* hdr, TextureCube* cube) override;
 		RenderCommand* createDrawEnvMakeIrradiance(Vertex* vertex, TextureCube* cube, TextureCube* irradiance) override;
