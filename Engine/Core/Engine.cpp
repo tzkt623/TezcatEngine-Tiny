@@ -52,7 +52,7 @@ namespace tezcat::Tiny
 
 	bool Engine::init(EngineIniter* loader)
 	{
-		EngineEvent::get()->init(EngineEventID::EE_IDCount);
+		EngineEvent::getInstance()->init(EngineEventID::EE_IDCount);
 		mResourceLoader = loader;
 
 		mPipeline = new PipelineBuildin();

@@ -27,7 +27,7 @@ namespace tezcat::Editor
 	{
 		outDisplaySize = inWindowSize;
 
-		//按照视图比例 得到符合当前视图的诊室窗口大小
+		//按照视图比例 得到符合当前视图的窗口大小
 		float ratio_xDy = inTextureSize.x / inTextureSize.y;
 		float ratio_yDx = inTextureSize.y / inTextureSize.x;
 
@@ -51,7 +51,7 @@ namespace tezcat::Editor
 			outDisplaySize.y = inWindowSize.x * ratio_yDx;
 		}
 
-		//计算当前显示大小于视图的比值
+		//计算当前显示大小与视图的比值
 		//
 		outUV0 = ImVec2(0, outDisplaySize.y / inTextureSize.y);
 		outUV1 = ImVec2(outDisplaySize.x / inTextureSize.x, 0);

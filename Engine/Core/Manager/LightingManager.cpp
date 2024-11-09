@@ -58,7 +58,7 @@ namespace tezcat::Tiny
 
 	void LightingManager::init()
 	{
-		EngineEvent::get()->addListener(EngineEventID::EE_ChangeEnvImage
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_ChangeEnvImage
 			, &sLocker
 			, [](const EventData& data)
 			{
@@ -66,14 +66,14 @@ namespace tezcat::Tiny
 				sCalculateEnvLighting = true;
 			});
 
-		EngineEvent::get()->addListener(EngineEventID::EE_OnPushScene
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPushScene
 			, &sLocker
 			, [](const EventData& data)
 			{
 				sLocker = false;
 			});
 
-		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPopScene
 			, &sLocker
 			, [](const EventData& data)
 			{
@@ -110,7 +110,7 @@ namespace tezcat::Tiny
 
 	void LightingManager::close()
 	{
-		EngineEvent::get()->removeListener(&sLocker);
+		EngineEvent::getInstance()->removeListener(&sLocker);
 	}
 
 	void LightingManager::calculate()

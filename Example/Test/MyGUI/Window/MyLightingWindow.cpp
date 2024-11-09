@@ -73,7 +73,7 @@ namespace tezcat::Editor
 				img->openFile(path, true);
 				delete[] path;
 				mCurrentHDR = nullptr;
-				EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
 			}
 			ImGui::EndDragDropTarget();
 		}

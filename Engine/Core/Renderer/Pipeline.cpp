@@ -322,7 +322,7 @@ namespace tezcat::Tiny
 	PipelineBuildin::PipelineBuildin()
 		: mDirty(true)
 	{
-		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene, this
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPopScene, this
 			, [this](const EventData& data)
 			{
 				for (auto pass : mReplacedPipePassArray)
@@ -342,7 +342,7 @@ namespace tezcat::Tiny
 
 	PipelineBuildin::~PipelineBuildin()
 	{
-		EngineEvent::get()->removeListener(this);
+		EngineEvent::getInstance()->removeListener(this);
 	}
 
 	void PipelineBuildin::preRender()

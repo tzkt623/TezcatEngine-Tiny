@@ -26,7 +26,6 @@ namespace tezcat::Tiny
 	* @brief 渲染观察者
 	* @brief 观察者可以用它的视角来观察整个场景,并提供观察视角的数据
 	* @brief 观察者可以指定它看到的图元被渲染到哪个帧缓存上
-	* @brief 每个渲染观察者都拥有一套完整[Shader-Pass]缓存系统
 	*/
 	class TINY_API BaseRenderObserver : public TinyObject
 	{

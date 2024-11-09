@@ -10,7 +10,7 @@ namespace tezcat::Tiny
 		~EngineEvent() = delete;
 
 	public:
-		static Event* get() { return mEvent; }
+		static Event* getInstance() { return mEvent; }
 
 	private:
 		static Event* mEvent;

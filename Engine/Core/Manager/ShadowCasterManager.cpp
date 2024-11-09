@@ -18,7 +18,7 @@ namespace tezcat::Tiny
 
 	void ShadowCasterManager::init()
 	{
-		EngineEvent::get()->addListener(EngineEventID::EE_OnPopScene, &mCasterAry, [](const EventData& data)
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPopScene, &mCasterAry, [](const EventData& data)
 		{
 			mCasterAry.clear();
 		});

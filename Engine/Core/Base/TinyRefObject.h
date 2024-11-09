@@ -344,6 +344,7 @@ namespace tezcat::Tiny
 
 		TinyWeakRef(const TinyWeakRef& other)
 		{
+			mGCInfo = TinyGC::getDefaultGCInfo();
 			this->bind(other);
 		}
 

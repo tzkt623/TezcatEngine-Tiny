@@ -108,7 +108,7 @@ namespace tezcat::Editor
 			{
 				if (ImGui::MenuItem("关闭当前场景(Close Current Scene)"))
 				{
-					EngineEvent::get()->dispatch({ EngineEventID::EE_PopScene });
+					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
 				}
 
 				ImGui::Separator();
@@ -118,8 +118,8 @@ namespace tezcat::Editor
 				{
 					if (ImGui::MenuItem(it.first.data()))
 					{
-						EngineEvent::get()->dispatch({ EngineEventID::EE_PopScene });
-						EngineEvent::get()->dispatch({ EngineEventID::EE_PushScene, it.second });
+						EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
+						EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PushScene, it.second });
 					}
 				}
 

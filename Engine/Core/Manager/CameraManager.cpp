@@ -100,7 +100,7 @@ namespace tezcat::Tiny
 		}
 
 		mMain = camera;
-		EngineEvent::get()->dispatch({ EngineEventID::EE_SetMainCamera, mMain });
+		EngineEvent::getInstance()->dispatch({ EngineEventID::EE_SetMainCamera, mMain });
 	}
 
 	void CameraData::setMain(const std::string& name)

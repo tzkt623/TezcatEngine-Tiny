@@ -52,28 +52,28 @@ void MyMainScene::onEnter()
 	this->createDirectionLight();
 	this->createPaintings();
 	this->createPlane();
-	this->createTransparentObject();
-	this->createPBR();
-	this->createCubes0();
+	//this->createTransparentObject();
+	//this->createPBR();
+	//this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
 	auto img = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
-	EngineEvent::get()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+	EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
 	//Resource::unload(img);
 
-	{
-		std::array<Image*, 6> imgs
-		{
-			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_R.jpg"),
-			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_L.jpg"),
-			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_U.jpg"),
-			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_D.jpg"),
-			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_F.jpg"),
-			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_B.jpg")
-		};
+//	{
+// 		std::array<Image*, 6> imgs
+// 		{
+// 			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_R.jpg"),
+// 			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_L.jpg"),
+// 			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_U.jpg"),
+// 			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_D.jpg"),
+// 			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_F.jpg"),
+// 			Resource::loadOnly<Image>("Image/SkyBox/skybox_1_B.jpg")
+// 		};
 
 		//LightingManager::setSkyBox(imgs);
-	}
+//	}
 
 	//  	auto model = Resource::load<Model>("Model/Cerberus_LP.fbx");
 	//  	model->generate();
