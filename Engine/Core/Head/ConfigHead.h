@@ -3,11 +3,11 @@
 #ifdef TINY_PLATFORM_WINDOWS
 
 #ifdef TINY_DYNAMIC_LIB
-#define TINY_API __declspec(dllexport)
+#define TINY_API __declspec(dllimport)
 #elif TINY_STATIC_LIB
 #define TINY_API
 #else 
-#define TINY_API __declspec(dllimport)
+#define TINY_API __declspec(dllexport)
 #endif
 
 

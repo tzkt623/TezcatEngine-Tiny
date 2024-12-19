@@ -1,4 +1,4 @@
-#include "CppHead.h"
+﻿#include "CppHead.h"
 #include "../Profiler.h"
 
 

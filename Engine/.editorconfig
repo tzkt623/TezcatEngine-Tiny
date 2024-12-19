@@ -1,4 +1,4 @@
-# Visual Studio 生成了具有 C++ 设置的 .editorconfig 文件。
+﻿# Visual Studio 生成了具有 C++ 设置的 .editorconfig 文件。
 root = true
 
 [*]
