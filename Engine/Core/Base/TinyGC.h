@@ -18,6 +18,7 @@
 */
 
 #include "TinyGCInfo.h"
+#include "SmartPointer.h"
 
 namespace tezcat::Tiny
 {

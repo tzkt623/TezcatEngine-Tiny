@@ -21,7 +21,8 @@ namespace tezcat::Tiny
 		void run();
 		BaseGraphics* getGraphics() { return mGraphics; }
 		EngineIniter* getResourceLoader() { return mResourceLoader; }
-		void setEnableMultiThread() {
+		void setEnableMultiThread()
+		{
 			sMultiThread = true;
 		}
 

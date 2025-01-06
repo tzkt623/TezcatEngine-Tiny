@@ -48,6 +48,4 @@ namespace tezcat::Tiny
 	{
 		this->pointer = nullptr;
 	}
-
-
 }

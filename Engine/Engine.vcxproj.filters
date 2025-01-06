@@ -1332,6 +1332,7 @@
     <ClInclude Include="Core\Renderer\CameraAgent.h" />
     <ClInclude Include="Core\Renderer\RenderObserver.h" />
     <ClInclude Include="Core\Renderer\GraphicsAgent.h" />
+    <ClInclude Include="Core\Base\SmartPointer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

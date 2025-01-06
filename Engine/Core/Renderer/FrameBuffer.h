@@ -17,6 +17,7 @@ namespace tezcat::Tiny
 		FrameBuffer();
 		FrameBuffer(std::string name);
 		TINY_OBJECT_H(FrameBuffer, TinyObject)
+
 	public:
 		virtual ~FrameBuffer();
 		void generate();

@@ -37,6 +37,4 @@
 
 # dic
 /.vs
-/x64
-/bin
-/bin-int
+/build
