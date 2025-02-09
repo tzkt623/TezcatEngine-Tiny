@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 
-#include "Tiny.h"
+#include "include/Tiny.h"
 
 class MyController : public ComponentT<MyController>
 {

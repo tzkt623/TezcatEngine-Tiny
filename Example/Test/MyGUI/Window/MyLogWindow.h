@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "../MyGUIContext.h"
-#include "Core/Tool/Log.h"
+#include "include/Tiny.h"
 namespace tezcat::Editor
 {
 	class MyLogWindow : public GUIWindow

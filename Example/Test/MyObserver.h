@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Tiny.h"
+#include "include/Tiny.h"
 
 
 class MyObserver : public BaseRenderObserver

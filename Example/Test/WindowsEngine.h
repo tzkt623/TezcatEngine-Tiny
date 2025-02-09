@@ -1,4 +1,4 @@
-﻿#include "Tiny.h"
+﻿#include "include/Tiny.h"
 
 struct GLFWwindow;
 

@@ -1,0 +1,61 @@
+﻿/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "Core/Base/TinyRefObject.h"
+#include "Core/Base/TinyGC.h"
+
+namespace tezcat::Tiny
+{
+	//-----------------------------------------------------------------
+	//
+	//	TinyRefObject
+	//
+	uint32 TinyRefObject::__ClassID = 1;
+	const std::string TinyRefObject::Empty = "TinyRefObject";
+	const TinyRTTI TinyRefObject::__TINY__RTTI__453{ nullptr, "TinyRefObject", typeid(TinyRefObject), 0 };
+
+	TinyRefObject::TinyRefObject()
+		: mGCInfo(nullptr)
+	{
+	}
+
+	TinyRefObject::~TinyRefObject()
+	{
+		mGCInfo = nullptr;
+	}
+
+	void TinyRefObject::deleteObject()
+	{
+		if (--(mGCInfo->strongRef) < 1)
+		{
+			if (mGCInfo->weakRef < 1)
+			{
+				TinyGC::recycle(mGCInfo);
+			}
+
+			this->onClose();
+			delete this;
+		}
+	}
+
+	void TinyRefObject::autoGC()
+	{
+		mGCInfo = TinyGC::getNextGCInfo(this);
+		TinyGC::manage(this);
+	}
+}
+

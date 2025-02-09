@@ -42,7 +42,7 @@ void Tutorial01::onEnter()
 	mPass = ReplacedPipelinePass::create(observer, shader);
 	mPass->setPreFunction([=](ReplacedPipelinePass* pass)
 	{
-		pass->addCommand(Graphics::getInstance()->createDrawVertexCMD(mVertex));
+		pass->addCommand<RenderCMD_DrawVertex>(mVertex);
 	});
 	mPass->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 	mPass->addToPipeline();

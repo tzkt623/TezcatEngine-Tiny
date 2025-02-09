@@ -1,5 +1,5 @@
-#pragma once
-#include "Tiny.h"
+﻿#pragma once
+#include "include/Tiny.h"
 
 class MyEvent
 {

@@ -41,7 +41,7 @@
         out float4 myFinalColor;
 
         uniform float myRoughness;
-        uniform float myResolution;
+        uniform int myResolution;
 
         void main()
         {       

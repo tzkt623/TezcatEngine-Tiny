@@ -1,0 +1,139 @@
+﻿/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include "Core/Renderer/Vertex.h"
+#include "Core/Renderer/VertexBuffer.h"
+#include "Core/Renderer/BaseGraphics.h"
+#include "Core/Renderer/RenderCommand.h"
+
+#include "Core/Data/MeshData.h"
+#include "Core/Manager/VertexBufferManager.h"
+#include "Core/Tool/Tool.h"
+
+
+namespace tezcat::Tiny
+{
+	TINY_OBJECT_CPP(Vertex, TinyObject)
+	Vertex::Vertex()
+		: Vertex("##ErrorVAO")
+	{
+
+	}
+
+	Vertex::Vertex(std::string name)
+		: mName(std::move(name))
+		, mChildren(nullptr)
+		, mIndexBuffer(nullptr)
+	{
+
+	}
+
+	Vertex::~Vertex()
+	{
+
+	}
+
+	void Vertex::setMesh(MeshData* meshData)
+	{
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32)meshData->mDrawMode];
+		mVertexCount = (uint32)meshData->mVertices.size();
+		mName = meshData->getName();
+
+		for (auto& position : meshData->mLayoutPositions)
+		{
+			auto [size, data] = meshData->getVertexData(position);
+			auto buffer = VertexBuffer::create();
+			buffer->init(size, data);
+			buffer->setLayoutData(position, VertexLayout::getLayoutType(position));
+			this->setVertexBuffer(buffer);
+		}
+
+		auto [size, data] = meshData->getIndexData();
+		if (size > 0)
+		{
+			mIndexCount = (uint32)meshData->mIndices.size();
+			auto index = IndexBuffer::create();
+			index->init(size, data);
+			this->setIndexBuffer(index);
+		}
+	}
+
+	void Vertex::setMesh(const std::string& name, const uint32& vertexCount, const DrawMode& drawMode)
+	{
+		mName = name;
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32)drawMode];
+		mVertexCount = vertexCount;
+	}
+
+	void Vertex::addChild(Vertex* vertex)
+	{
+		if (mChildren == nullptr)
+		{
+			mChildren = new std::vector<Vertex*>();
+		}
+
+		mChildren->emplace_back(vertex);
+	}
+
+	void Vertex::setVertexBuffer(VertexBuffer* buffer)
+	{
+		buffer->saveObject();
+		mVertexBuffers.push_back(buffer);
+	}
+
+	void Vertex::setIndexBuffer(IndexBuffer* buffer)
+	{
+		mIndexBuffer = buffer;
+		mIndexBuffer->saveObject();
+	}
+
+	void Vertex::generate()
+	{
+		//Graphics::getInstance()->cmdCreateVertex(this);
+
+		//Graphics::getInstance()->createVertex(this);
+
+		Graphics::getInstance()->addCommand(new RenderCMD_CreateVertex(this));
+	}
+
+	void Vertex::onClose()
+	{
+		Graphics::getInstance()->deleteVertex(this);
+
+		for (auto buffer : mVertexBuffers)
+		{
+			buffer->deleteObject();
+		}
+		mVertexBuffers.clear();
+
+		if (mIndexBuffer)
+		{
+			mIndexBuffer->deleteObject();
+		}
+
+		if (mChildren)
+		{
+			for (auto child : *mChildren)
+			{
+				child->deleteObject();
+			}
+
+			delete mChildren;
+		}
+	}
+}
+
