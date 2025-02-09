@@ -26,7 +26,7 @@ namespace tezcat::Editor
 		//engine->setEnableMultiThread();
 
 		mResourceFolderName = "Resource";
-		mGameName = u8"V0.2(没有黄金树之影玩我要死了)";
+		mGameName = u8"V0.3(没有黑夜君临玩我要死了)";
 		mWindowWidth = 1920;
 		mWindowHeight = 1080;
 		mEnableVsync = true;

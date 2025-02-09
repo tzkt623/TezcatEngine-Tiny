@@ -116,12 +116,11 @@ pass->saveObject();
 //not use RenderObject data in layer but custom function to rendering
 pass->setPreFunction([=](ReplacedPipelinePass* pass)
 {
-    auto cmd = Graphics::getInstance()->createDrawSkyboxCMD(sSkyboxVertex
+    pass->addCommand<RenderCMD_DrawSkybox>(sSkyboxVertex
         , sCurrentCubeMap
         , sSkyboxLod
         , sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float
         , sExposure);
-    pass->addCommand(cmd);
 });
 pass->addToPipeline();
 
@@ -134,7 +133,7 @@ pass = ReplacedPipelinePass::create(observer, shader);
 //not use RenderObject data in layer but custom function to rendering
 pass->setPreFunction([=](BReplacedPipelinePass* pass)
 {
-    pass->addCommand(Graphics::getInstance()->createDrawVertexCMD(shader, mVertex));
+    pass->addCommand<RenderCMD_DrawVertex>(mVertex);
 });
 pass->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 pass->saveObject();

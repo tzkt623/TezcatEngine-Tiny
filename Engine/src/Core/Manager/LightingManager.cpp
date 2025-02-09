@@ -176,14 +176,11 @@ namespace tezcat::Tiny
 // 						material->setUniform<UniformI1>(is_hdr_index, sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float);
 // 						material->setUniform<UniformF1>(exposure_index, sExposure);
 
-						auto cmd = new RenderCMD_DrawSkybox(sSkyboxVertex
+						pass->addCommand<RenderCMD_DrawSkybox>(sSkyboxVertex
 							, sCurrentCubeMap
 							, sSkyboxLod
 							, sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float
 							, sExposure);
-
-						//new RenderCommand(sSkyboxVertex, nullptr, material);
-						pass->addCommand(cmd);
 					});
 				}
 			}
