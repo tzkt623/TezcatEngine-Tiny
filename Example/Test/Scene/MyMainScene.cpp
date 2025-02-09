@@ -52,9 +52,9 @@ void MyMainScene::onEnter()
 	this->createDirectionLight();
 	this->createPaintings();
 	this->createPlane();
-	//this->createTransparentObject();
-	//this->createPBR();
-	//this->createCubes0();
+	this->createTransparentObject();
+	this->createPBR();
+	this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
 	auto img = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
