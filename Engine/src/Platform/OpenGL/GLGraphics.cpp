@@ -21,13 +21,13 @@
 #include "Platform/OpenGL/GLFunction.h"
 
 #include "Core/Head/CppHead.h"
-#include "Core/Head/RenderConfig.h"
 
 #include "Core/Component/MeshRenderer.h"
 #include "Core/Component/Camera.h"
 
 #include "Core/Engine.h"
-#include "Core/Profiler.h"
+#include "Core/Debug/Debug.h"
+
 #include "Core/Shader/ShaderPackage.h"
 #include "Core/Shader/Shader.h"
 
@@ -36,8 +36,12 @@
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/Vertex.h"
 #include "Core/Renderer/VertexBuffer.h"
+#include "Core/Renderer/RenderConfig.h"
+
 
 #include "Core/EngineIniter.h"
+
+#include "Core/Manager/LightingManager.h"
 
 namespace tezcat::Tiny::GL
 {
@@ -66,7 +70,7 @@ namespace tezcat::Tiny::GL
 		if (mWindow == nullptr)
 		{
 			//std::cout << "Failed to create GLFW window" << std::endl;
-			Log_Error("Failed to create GLFW window");
+			TINY_LOG_ERROR("Failed to create GLFW window");
 			glfwTerminate();
 			return;
 		}
@@ -75,14 +79,14 @@ namespace tezcat::Tiny::GL
 		glfwSwapInterval(engine->getResourceLoader()->isEnabelVsync() ? 1 : 0);
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
-			Log_Error("Failed to initialize GLAD");
+			TINY_LOG_ERROR("Failed to initialize GLAD");
 			TINY_THROW_LOGIC("Failed to initialize GLAD");
 		}
 
 		GLint max;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		Log_Engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
+		TINY_LOG_ENGINE(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
 
 		auto get_default_color_buffer = [&](GLint id)
 			{
@@ -90,43 +94,43 @@ namespace tezcat::Tiny::GL
 				{
 				case GL_NONE:
 					//std::cout << "Default ColorBuffer: GL_NONE" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_NONE");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_NONE");
 					break;
 				case GL_FRONT_LEFT:
 					//std::cout << "Default ColorBuffer: GL_FRONT_LEFT" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_FRONT_LEFT");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_FRONT_LEFT");
 					break;
 				case GL_FRONT_RIGHT:
 					//std::cout << "Default ColorBuffer: GL_FRONT_RIGHT" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_FRONT_RIGHT");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_FRONT_RIGHT");
 					break;
 				case GL_BACK_LEFT:
 					//std::cout << "Default ColorBuffer: GL_BACK_LEFT" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_BACK_LEFT");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_BACK_LEFT");
 					break;
 				case GL_BACK_RIGHT:
 					//std::cout << "Default ColorBuffer: GL_BACK_RIGHT" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_BACK_RIGHT");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_BACK_RIGHT");
 					break;
 				case GL_FRONT:
 					//std::cout << "Default ColorBuffer: GL_FRONT" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_FRONT");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_FRONT");
 					break;
 				case GL_BACK:
 					//std::cout << "Default ColorBuffer: GL_BACK" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_BACK");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_BACK");
 					break;
 				case GL_LEFT:
 					//std::cout << "Default ColorBuffer: GL_LEFT" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_LEFT");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_LEFT");
 					break;
 				case GL_RIGHT:
 					//std::cout << "Default ColorBuffer: GL_RIGHT" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_RIGHT");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_RIGHT");
 					break;
 				case GL_FRONT_AND_BACK:
 					//std::cout << "Default ColorBuffer: GL_FRONT_AND_BACK" << std::endl;
-					Log_Engine("Default ColorBuffer: GL_FRONT_AND_BACK");
+					TINY_LOG_ENGINE("Default ColorBuffer: GL_FRONT_AND_BACK");
 					break;
 				default:
 					break;
@@ -135,7 +139,7 @@ namespace tezcat::Tiny::GL
 
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		Log_Engine(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
+		TINY_LOG_ENGINE(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
 
 		glGetIntegerv(GL_DRAW_BUFFER, &max);
 		get_default_color_buffer(max);
@@ -382,12 +386,19 @@ namespace tezcat::Tiny::GL
 
 	void GLGraphics::bind(Shader* shader)
 	{
-		glUseProgram(shader->getProgramID());
+		TINY_GL_CHECK(glUseProgram(shader->getProgramID()));
 	}
 
 	void GLGraphics::bind(FrameBuffer* frameBuffer)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->getFrameBufferID());
+		TINY_GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->getFrameBufferID()));
+	}
+
+	void GLGraphics::bind(UniformBuffer* uniformBuffer)
+	{
+		TINY_GL_CHECK(glBindBufferBase(GL_UNIFORM_BUFFER
+			, uniformBuffer->getLayout()->mBindingIndex
+			, uniformBuffer->getBufferID()));
 	}
 
 	void GLGraphics::clear(const ClearOption& option)
@@ -466,22 +477,46 @@ namespace tezcat::Tiny::GL
 	//
 	void GLGraphics::createVertex(Vertex* vertex)
 	{
-		GLFunction::FuncVertex.build(vertex);
+		GLFunction::FuncBuffer.build(vertex);
 	}
 
 	void GLGraphics::createBuffer(VertexBuffer* buffer)
 	{
-		GLFunction::FuncVertex.build(buffer);
+		GLFunction::FuncBuffer.build(buffer);
 	}
 
 	void GLGraphics::createBuffer(IndexBuffer* buffer)
 	{
-		GLFunction::FuncVertex.build(buffer);
+		GLFunction::FuncBuffer.build(buffer);
 	}
 
 	void GLGraphics::createBuffer(FrameBuffer* buffer)
 	{
 		GLFunction::FuncFrameBuffer.build(buffer);
+	}
+
+	void GLGraphics::createUniformBuffer(UniformBuffer* uniformBuffer, int32_t bindingIndex)
+	{
+		if (uniformBuffer->getBufferID() > 0)
+		{
+			TINY_GL_CHECK(glDeleteBuffers(1, &uniformBuffer->getBufferID()));
+		}
+
+		GLuint ubo;
+		TINY_GL_CHECK(glGenBuffers(1, &ubo));
+		TINY_GL_CHECK(glBindBuffer(GL_UNIFORM_BUFFER, ubo));
+		TINY_GL_CHECK(glBufferData(GL_UNIFORM_BUFFER
+			, uniformBuffer->getDataSize()
+			, uniformBuffer->getData()
+			, GL_STATIC_DRAW));
+
+		if (bindingIndex > -1)
+		{
+			TINY_GL_CHECK(glBindBufferBase(GL_UNIFORM_BUFFER, bindingIndex, ubo));
+		}
+
+		uniformBuffer->apply(ubo);
+		TINY_GL_CHECK(glBindBuffer(GL_UNIFORM_BUFFER, 0));
 	}
 
 	void GLGraphics::createShader(Shader* shader)
@@ -509,6 +544,7 @@ namespace tezcat::Tiny::GL
 	void GLGraphics::deleteShader(Shader* shader)
 	{
 		glDeleteProgram(shader->getProgramID());
+		//shader->apply(0);
 	}
 
 	void GLGraphics::deleteVertex(Vertex* vertex)
@@ -545,414 +581,580 @@ namespace tezcat::Tiny::GL
 
 
 #pragma region Draw
-	void GLGraphics::makeHDR2Cube(Shader* shader, Vertex* vertex, Texture2D* texHDR, TextureCube* skybox)
+	void GLGraphics::makeHDR2Cube(Shader* shader
+		, BaseRenderObserver* observer
+		, Vertex* vertex
+		, Texture2D* texHDR
+		, TextureCube* skybox)
 	{
-		GLFunction::FuncPBR.makeHDR2Cube(shader, vertex, texHDR, skybox);
+		shader->resetLocalState();
+		auto uniform_config = shader->getUniformValueConfig("myTexHDR2D");
+		this->setTexture2D(shader, uniform_config->valueID, texHDR);
+
+		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
+		Texture2D** array = LightingManager::getCubeMapTextureArray();
+
+		//auto id1 = glGetUniformBlockIndex(shader->getProgramID(), "SkyboxUBO");
+		//GLint index1;
+		//glGetActiveUniformBlockiv(shader->getProgramID(), id1, GL_UNIFORM_BLOCK_BINDING, &index1);
+		//auto id2 = glGetUniformBlockIndex(shader->getProgramID(), "CameraUBO");
+		//GLint index2;
+		//glGetActiveUniformBlockiv(shader->getProgramID(), id2, GL_UNIFORM_BLOCK_BINDING, &index2);
+
+		//TINY_GL_CHECK(glBindBufferBase(GL_UNIFORM_BUFFER
+		//	, uniform_buffer->getLayout()->mBindingIndex
+		//	, uniform_buffer->getBufferID()));
+
+		for (uint32 i = 0; i < 6; i++)
+		{
+			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
+			this->setUniformBuffer(uniform_buffer);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER
+				 , GL_COLOR_ATTACHMENT0
+				 , GL_TEXTURE_2D
+				 , array[i]->getTextureID()
+				 , 0);
+			
+			this->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+			this->draw(vertex);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER
+				, GL_COLOR_ATTACHMENT0
+				, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
+				, skybox->getTextureID()
+				, 0);
+
+			this->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+			this->draw(vertex);
+
+
+			//因为这里的原因
+			//texture的ID与槽的自动绑定系统要重新设计
+			//因为如果在中途改变一次tex
+			//那么以前绑定的就会失效
+			//大概率因为默认会绑定到0号贴图槽上
+			{
+				//glFinish();
+				//auto tex = array[i];
+				//glBindTexture(GL_TEXTURE_2D, tex->getTextureID());
+				//glCopyTexSubImage2D(GL_TEXTURE_2D, 0,
+				//	0, 0,
+				//	0, 0,
+				//	tex->getWidth(), tex->getHeight());
+				//glBindTexture(GL_TEXTURE_2D, 0);
+			}
+		}
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->getTextureID());
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 5);
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
-	void GLGraphics::makeEnvIrradiance(Shader* shader, Vertex* vertex, TextureCube* skybox, TextureCube* irradiance)
+	void GLGraphics::makeEnvIrradiance(Shader* shader
+		, BaseRenderObserver* observer
+		, Vertex* vertex
+		, TextureCube* skybox
+		, TextureCube* irradiance)
 	{
-		GLFunction::FuncPBR.makeEnvIrradiance(shader, vertex, skybox, irradiance);
+		shader->resetLocalState();
+		this->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
+		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
+		//TINY_GL_CHECK(glBindBufferBase(GL_UNIFORM_BUFFER
+		//	, uniform_buffer->getLayout()->mBindingIndex
+		//	, uniform_buffer->getBufferID()));
+
+		for (uint32 i = 0; i < 6; i++)
+		{
+			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
+			this->setUniformBuffer(uniform_buffer);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER
+								 , GL_COLOR_ATTACHMENT0
+								 , GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
+								 , irradiance->getTextureID()
+								 , 0);
+
+
+			this->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+			this->draw(vertex);
+		}
 	}
 
-	void GLGraphics::makeEnvPrefilter(Shader* shader, Vertex* vertex, TextureCube* skybox, TextureCube* prefitler, uint32 mipMaxLevel, uint32 mipWidth, uint32 mipHeight, int32 resolution)
+	void GLGraphics::makeEnvPrefilter(Shader* shader
+		, BaseRenderObserver* observer
+		, Vertex* vertex
+		, TextureCube* skybox
+		, TextureCube* prefitler
+		, uint32 mipMaxLevel
+		, uint32 mipWidth
+		, uint32 mipHeight
+		, int32 resolution)
 	{
-		GLFunction::FuncPBR.makeEnvPrefilter(shader, vertex, skybox, prefitler, mipMaxLevel, mipWidth, mipHeight, resolution);
+		shader->resetLocalState();
+		this->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
+		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
+
+		//TINY_GL_CHECK(glBindBufferBase(GL_UNIFORM_BUFFER
+		//	, uniform_buffer->getLayout()->mBindingIndex
+		//	, uniform_buffer->getBufferID()))
+
+		for (uint32 mip = 0; mip < mipMaxLevel; ++mip)
+		{
+			uint32 mip_width = static_cast<uint32>(mipWidth * std::pow(0.5, mip));
+			uint32 mip_height = static_cast<uint32>(mipHeight * std::pow(0.5, mip));
+			this->setViewport(ViewportInfo(0, 0, mip_width, mip_height));
+
+			float roughness = (float)mip / (float)(mipMaxLevel - 1);
+
+			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::Roughness>(&roughness);
+			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::Resolution>(&resolution);
+
+			for (uint32 i = 0; i < 6; ++i)
+			{
+				uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
+				this->setUniformBuffer(uniform_buffer);
+
+				glFramebufferTexture2D(GL_FRAMEBUFFER
+									 , GL_COLOR_ATTACHMENT0
+									 , GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
+									 , prefitler->getTextureID()
+									 , mip);
+
+
+				this->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+				this->draw(vertex);
+			}
+		}
 	}
 #pragma endregion
 
 
 	void GLGraphics::setGlobalTexture2D(Shader* shader, UniformID& uniform, Texture2D* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
 
-		glUniform1i(shader_id, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
-	void GLGraphics::setGlobalTexture2D(Shader* shader, const int& shaderID, Texture2D* data)
+	void GLGraphics::setGlobalTexture2D(Shader* shader, const int& valueID, Texture2D* data)
 	{
-		glUniform1i(shaderID, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
 	void GLGraphics::setTexture2D(Shader* shader, UniformID& uniform, Texture2D* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
 
-		glUniform1i(shader_id, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addLocalTextureIndex();
 	}
 
-	void GLGraphics::setTexture2D(Shader* shader, const int& shaderID, Texture2D* data)
+	void GLGraphics::setTexture2D(Shader* shader, const int& valueID, Texture2D* data)
 	{
-		glUniform1i(shaderID, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_2D, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		shader->addLocalTextureIndex();
 	}
 
 	void GLGraphics::setGlobalTextureCube(Shader* shader, UniformID& uniform, TextureCube* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
 
-		glUniform1i(shader_id, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
-	void GLGraphics::setGlobalTextureCube(Shader* shader, const int& shaderID, TextureCube* data)
+	void GLGraphics::setGlobalTextureCube(Shader* shader, const int& valueID, TextureCube* data)
 	{
-		glUniform1i(shaderID, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
 	void GLGraphics::setTextureCube(Shader* shader, UniformID& uniform, TextureCube* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
 
-		glUniform1i(shader_id, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addLocalTextureIndex();
 	}
 
-	void GLGraphics::setTextureCube(Shader* shader, const int& shaderID, TextureCube* data)
+	void GLGraphics::setTextureCube(Shader* shader, const int& valueID, TextureCube* data)
 	{
-		glUniform1i(shaderID, shader->getTextureIndex());
-		glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex());
-		glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID());
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		shader->addLocalTextureIndex();
 	}
 
 	void GLGraphics::setBool(Shader* shader, const char* name, const bool& data)
 	{
-		auto id = glGetUniformLocation(shader->getProgramID(), name);
-		glUniform1i(id, data);
+		TINY_GL_CHECK_RETURN(glGetUniformLocation(shader->getProgramID(), name), id);
+		TINY_GL_CHECK(glUniform1i(id, data));
 	}
-
 
 	void GLGraphics::setFloat1(Shader* shader, UniformID& uniform, float* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform1fv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform1fv(value_id, 1, data));
 	}
 
 	void GLGraphics::setFloat1(Shader* shader, const char* name, float* data)
 	{
-		auto id = TINY_GL_CHECK(glGetUniformLocation(shader->getProgramID(), name));
+		TINY_GL_CHECK_RETURN(glGetUniformLocation(shader->getProgramID(), name), id);
 		TINY_GL_CHECK(glUniform1fv(id, 1, data));
 	}
 
-	void GLGraphics::setFloat1(Shader* shader, const int& shaderID, const float* data)
+	void GLGraphics::setFloat1(Shader* shader, const int& valueID, const float* data)
 	{
-		TINY_GL_CHECK(glUniform1fv(shaderID, 1, data));
+		TINY_GL_CHECK(glUniform1fv(valueID, 1, data));
 	}
 
 	void GLGraphics::setFloat1(Shader* shader, const char* name, const float& data)
 	{
-		auto id = TINY_GL_CHECK(glGetUniformLocation(shader->getProgramID(), name));
+		TINY_GL_CHECK_RETURN(glGetUniformLocation(shader->getProgramID(), name), id);
 		TINY_GL_CHECK(glUniform1f(id, data));
 	}
 
-	void GLGraphics::setFloat1(Shader* shader, const int& shaderID, const float& data)
+	void GLGraphics::setFloat1(Shader* shader, const int& valueID, const float& data)
 	{
-		glUniform1f(shaderID, data);
+		TINY_GL_CHECK(glUniform1f(valueID, data));
 	}
 
 	void GLGraphics::setFloat2(Shader* shader, UniformID& uniform, float* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform2fv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform2fv(value_id, 1, data));
 	}
 
 	void GLGraphics::setFloat2(Shader* shader, UniformID& uniform, const glm::vec2& data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform2f(shader_id, data.x, data.y);
+		TINY_GL_CHECK(glUniform2f(value_id, data.x, data.y));
 	}
 
 	void GLGraphics::setFloat2(Shader* shader, const char* name, float* data)
 	{
-		auto id = glGetUniformLocation(shader->getProgramID(), name);
-		glUniform2fv(id, 1, data);
+		TINY_GL_CHECK_RETURN(glGetUniformLocation(shader->getProgramID(), name), id);
+		TINY_GL_CHECK(glUniform2fv(id, 1, data));
 	}
 
-	void GLGraphics::setFloat2(Shader* shader, const int& shaderID, const float* data)
+	void GLGraphics::setFloat2(Shader* shader, const int& valueID, const float* data)
 	{
-		glUniform2fv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform2fv(valueID, 1, data));
 	}
 
 	void GLGraphics::setFloat3(Shader* shader, UniformID& uniform, float* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform3fv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform3fv(value_id, 1, data));
 	}
 
 	void GLGraphics::setFloat3(Shader* shader, UniformID& uniform, const glm::vec3& data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform3f(shader_id, data.x, data.y, data.z);
+		TINY_GL_CHECK(glUniform3f(value_id, data.x, data.y, data.z));
 	}
 
 	void GLGraphics::setFloat3(Shader* shader, const char* name, float* data)
 	{
-		glUniform3fv(glGetUniformLocation(shader->getProgramID(), name), 1, data);
+		TINY_GL_CHECK(glUniform3fv(glGetUniformLocation(shader->getProgramID(), name), 1, data));
 	}
 
-	void GLGraphics::setFloat3(Shader* shader, const int& shaderID, const float* data)
+	void GLGraphics::setFloat3(Shader* shader, const int& valueID, const float* data)
 	{
-		TINY_GL_CHECK(glUniform3fv(shaderID, 1, data));
+		TINY_GL_CHECK(glUniform3fv(valueID, 1, data));
 	}
 
 	void GLGraphics::setFloat4(Shader* shader, UniformID& uniform, float* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform4fv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform4fv(value_id, 1, data));
 	}
 
 	void GLGraphics::setFloat4(Shader* shader, const char* name, float* data)
 	{
-		glUniform4fv(glGetUniformLocation(shader->getProgramID(), name), 1, data);
+		TINY_GL_CHECK(glUniform4fv(glGetUniformLocation(shader->getProgramID(), name), 1, data));
 	}
 
-	void GLGraphics::setFloat4(Shader* shader, const int& shaderID, const float* data)
+	void GLGraphics::setFloat4(Shader* shader, const int& valueID, const float* data)
 	{
-		glUniform4fv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform4fv(valueID, 1, data));
 	}
 
 	void GLGraphics::setInt1(Shader* shader, UniformID& uniform, const int& data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform1i(shader_id, data);
+		TINY_GL_CHECK(glUniform1i(value_id, data));
 	}
 
 	void GLGraphics::setInt1(Shader* shader, UniformID& uniform, int* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform1iv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform1iv(value_id, 1, data));
 	}
 
 	void GLGraphics::setInt1(Shader* shader, const char* name, int* data)
 	{
-		glUniform1iv(glGetUniformLocation(shader->getProgramID(), name), 1, data);
+		TINY_GL_CHECK(glUniform1iv(glGetUniformLocation(shader->getProgramID(), name), 1, data));
 	}
 
-	void GLGraphics::setInt1(Shader* shader, const int& shaderID, int* data)
+	void GLGraphics::setInt1(Shader* shader, const int& valueID, int* data)
 	{
-		glUniform1iv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform1iv(valueID, 1, data));
 	}
 
 	void GLGraphics::setInt1(Shader* shader, const char* name, const int& data)
 	{
-		glUniform1i(glGetUniformLocation(shader->getProgramID(), name), data);
+		TINY_GL_CHECK(glUniform1i(glGetUniformLocation(shader->getProgramID(), name), data));
 	}
 
-	void GLGraphics::setInt1(Shader* shader, const int& shaderID, const int& data)
+	void GLGraphics::setInt1(Shader* shader, const int& valueID, const int& data)
 	{
-		glUniform1i(shaderID, data);
+		TINY_GL_CHECK(glUniform1i(valueID, data));
 	}
 
 	void GLGraphics::setInt2(Shader* shader, UniformID& uniform, int* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform2iv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform2iv(value_id, 1, data));
 	}
 
 	void GLGraphics::setInt2(Shader* shader, const char* name, int* data)
 	{
-		glUniform2iv(glGetUniformLocation(shader->getProgramID(), name), 1, data);
+		TINY_GL_CHECK(glUniform2iv(glGetUniformLocation(shader->getProgramID(), name), 1, data));
 	}
 
-	void GLGraphics::setInt2(Shader* shader, const int& shaderID, int* data)
+	void GLGraphics::setInt2(Shader* shader, const int& valueID, int* data)
 	{
-		glUniform2iv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform2iv(valueID, 1, data));
 	}
 
 	void GLGraphics::setInt3(Shader* shader, UniformID& uniform, int* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform3iv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform3iv(value_id, 1, data));
 	}
 
 	void GLGraphics::setInt3(Shader* shader, const char* name, int* data)
 	{
-		glUniform3iv(glGetUniformLocation(shader->getProgramID(), name), 1, data);
+		TINY_GL_CHECK(glUniform3iv(glGetUniformLocation(shader->getProgramID(), name), 1, data));
 	}
 
-	void GLGraphics::setInt3(Shader* shader, const int& shaderID, int* data)
+	void GLGraphics::setInt3(Shader* shader, const int& valueID, int* data)
 	{
-		glUniform3iv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform3iv(valueID, 1, data));
 	}
 
 	void GLGraphics::setInt4(Shader* shader, UniformID& uniform, int* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniform4iv(shader_id, 1, data);
+		TINY_GL_CHECK(glUniform4iv(value_id, 1, data));
 	}
 
 	void GLGraphics::setInt4(Shader* shader, const char* name, int* data)
 	{
-		glUniform4iv(glGetUniformLocation(shader->getProgramID(), name), 1, data);
+		TINY_GL_CHECK(glUniform4iv(glGetUniformLocation(shader->getProgramID(), name), 1, data));
 	}
 
-	void GLGraphics::setInt4(Shader* shader, const int& shaderID, int* data)
+	void GLGraphics::setInt4(Shader* shader, const int& valueID, int* data)
 	{
-		glUniform4iv(shaderID, 1, data);
+		TINY_GL_CHECK(glUniform4iv(valueID, 1, data));
 	}
 
 	void GLGraphics::setMat3(Shader* shader, UniformID& uniform, float* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniformMatrix3fv(shader_id, 1, GL_FALSE, data);
+		TINY_GL_CHECK(glUniformMatrix3fv(value_id, 1, GL_FALSE, data));
 	}
 
 	void GLGraphics::setMat3(Shader* shader, UniformID& uniform, const float3x3& mat3)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniformMatrix3fv(shader_id, 1, GL_FALSE, glm::value_ptr(mat3));
+		TINY_GL_CHECK(glUniformMatrix3fv(value_id, 1, GL_FALSE, glm::value_ptr(mat3)));
 	}
 
 	void GLGraphics::setMat3(Shader* shader, const char* name, float* data)
 	{
-		glUniformMatrix3fv(glGetUniformLocation(shader->getProgramID(), name), 1, GL_FALSE, data);
+		TINY_GL_CHECK(glUniformMatrix3fv(glGetUniformLocation(shader->getProgramID(), name), 1, GL_FALSE, data));
 	}
 
-	void GLGraphics::setMat3(Shader* shader, const int& shaderID, const float* data)
+	void GLGraphics::setMat3(Shader* shader, const int& valueID, const float* data)
 	{
-		glUniformMatrix3fv(shaderID, 1, GL_FALSE, data);
+		TINY_GL_CHECK(glUniformMatrix3fv(valueID, 1, GL_FALSE, data));
 	}
 
-	void GLGraphics::setMat3(Shader* shader, const int& shaderID, const float3x3& mat3)
+	void GLGraphics::setMat3(Shader* shader, const int& valueID, const float3x3& mat3)
 	{
-		glUniformMatrix3fv(shaderID, 1, GL_FALSE, glm::value_ptr(mat3));
+		TINY_GL_CHECK(glUniformMatrix3fv(valueID, 1, GL_FALSE, glm::value_ptr(mat3)));
 	}
 
 	void GLGraphics::setMat4(Shader* shader, UniformID& uniform, const float* data)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniformMatrix4fv(shader_id, 1, GL_FALSE, data);
+		TINY_GL_CHECK(glUniformMatrix4fv(value_id, 1, GL_FALSE, data));
 	}
 
 	void GLGraphics::setMat4(Shader* shader, UniformID& uniform, const float4x4& mat4)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniformMatrix4fv(shader_id, 1, GL_FALSE, glm::value_ptr(mat4));
+		TINY_GL_CHECK(glUniformMatrix4fv(value_id, 1, GL_FALSE, glm::value_ptr(mat4)));
 	}
 
 	void GLGraphics::setMat4(Shader* shader, UniformID& uniform, float4x4 data[], int count)
 	{
-		int shader_id;
-		if (!shader->checkTinyUniform(uniform, shader_id))
+		int value_id;
+		if (!shader->checkTinyUniform(uniform, value_id))
 		{
 			return;
 		}
-		glUniformMatrix4fv(shader_id, count, GL_FALSE, glm::value_ptr(data[0]));
+		TINY_GL_CHECK(glUniformMatrix4fv(value_id, count, GL_FALSE, glm::value_ptr(data[0])));
 	}
 
 	void GLGraphics::setMat4(Shader* shader, const char* name, const float* data)
 	{
-		glUniformMatrix4fv(glGetUniformLocation(shader->getProgramID(), name), 1, GL_FALSE, data);
+		TINY_GL_CHECK(glUniformMatrix4fv(glGetUniformLocation(shader->getProgramID(), name), 1, GL_FALSE, data));
 	}
 
-	void GLGraphics::setMat4(Shader* shader, const int& shaderID, const float* data)
+	void GLGraphics::setMat4(Shader* shader, const int& valueID, const float* data)
 	{
-		glUniformMatrix4fv(shaderID, 1, GL_FALSE, data);
+		TINY_GL_CHECK(glUniformMatrix4fv(valueID, 1, GL_FALSE, data));
 	}
 
-	void GLGraphics::setMat4(Shader* shader, const int& shaderID, const float4x4& mat4)
+	void GLGraphics::setMat4(Shader* shader, const int& valueID, const float4x4& mat4)
 	{
-		glUniformMatrix4fv(shaderID, 1, GL_FALSE, glm::value_ptr(mat4));
+		TINY_GL_CHECK(glUniformMatrix4fv(valueID, 1, GL_FALSE, glm::value_ptr(mat4)));
 	}
 
-	void GLGraphics::setMat4(Shader* shader, const int& shaderID, float4x4 data[], int count)
+	void GLGraphics::setMat4(Shader* shader, const int& valueID, float4x4 data[], int count)
 	{
-		glUniformMatrix4fv(shaderID, count, GL_FALSE, glm::value_ptr(data[0]));
+		TINY_GL_CHECK(glUniformMatrix4fv(valueID, count, GL_FALSE, glm::value_ptr(data[0])));
 	}
 
+	void GLGraphics::setUniformBuffer(UniformBuffer* uniformBuffer)
+	{
+		TINY_GL_CHECK(glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer->getBufferID()));
+		TINY_GL_CHECK(glBufferSubData(GL_UNIFORM_BUFFER, 0, uniformBuffer->getDataSize(), uniformBuffer->getData()));
+		//TINY_GL_CHECK(glBindBuffer(GL_UNIFORM_BUFFER, 0));
+	}
+
+	void GLGraphics::setFrameBufferColorTexture2D(Texture2D* tex, int32_t index)
+	{
+		TINY_GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER
+			, GL_COLOR_ATTACHMENT0 + index
+			, GL_TEXTURE_2D
+			, tex->getTextureID()
+			, 0));
+	}
+
+	void GLGraphics::setFrameBufferColorTextureCube(TextureCube* tex, int32_t index, int32_t cubeFace)
+	{
+		TINY_GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER
+			, GL_COLOR_ATTACHMENT0 + index
+			, GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace
+			, tex->getTextureID()
+			, 0));
+	}
+
+	void GLGraphics::createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel)
+	{
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texCube->getTextureID());
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, minLevel);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, maxLevel);
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
 }

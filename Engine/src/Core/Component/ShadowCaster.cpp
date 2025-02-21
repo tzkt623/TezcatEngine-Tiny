@@ -32,6 +32,8 @@
 #include "Core/Renderer/Pipeline.h"
 
 #include "Core/Manager/ShadowCasterManager.h"
+#include "Core/Renderer/RenderObserver.h"
+
 
 namespace tezcat::Tiny
 {
@@ -56,7 +58,7 @@ namespace tezcat::Tiny
 	{
 		Base::init();
 
-		mShadowObserver = RenderObserver::create();
+		mShadowObserver = ShadowObserver::create();
 		mShadowObserver->saveObject();
 		mShadowObserver->setOrderID(-126);
 
@@ -125,5 +127,4 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixLightVP, pv);
 		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexDepth, mShadowTexture);
 	}
-
 }

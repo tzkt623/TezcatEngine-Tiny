@@ -22,7 +22,7 @@ namespace tezcat::Tiny
 
 	class TINY_API ILight : public BaseRenderer
 	{
-		TINY_ABSTRACT_OBJECT_H(ILight, BaseRenderer)
+		TINY_ABSTRACT_OBJECT_H(ILight, BaseRenderer);
 	public:
 		virtual ~ILight() = default;
 		virtual LightType getLightType() = 0;
@@ -33,7 +33,7 @@ namespace tezcat::Tiny
 	class TINY_API DirectionalLightAgent : public ILight
 	{
 		DirectionalLightAgent();
-		TINY_OBJECT_H(DirectionalLightAgent, ILight)
+		TINY_OBJECT_H(DirectionalLightAgent, ILight);
 
 	public:
 		virtual ~DirectionalLightAgent() {}
@@ -72,7 +72,7 @@ namespace tezcat::Tiny
 
 	class TINY_API LightComponent : public ComponentT<LightComponent>
 	{
-		TINY_ABSTRACT_OBJECT_H(LightComponent, ComponentT<LightComponent>)
+		TINY_ABSTRACT_OBJECT_H(LightComponent, ComponentT<LightComponent>);
 
 	protected:
 		LightComponent() = default;
@@ -88,7 +88,7 @@ namespace tezcat::Tiny
 		DirectionalLight();
 		DirectionalLight(const float3& direction, const float3& ambient, const float3& diffuse, const float3& specular);
 	public:
-		TINY_OBJECT_H(DirectionalLight, LightComponent)
+		TINY_OBJECT_H(DirectionalLight, LightComponent);
 
 	public:
 		virtual ~DirectionalLight();

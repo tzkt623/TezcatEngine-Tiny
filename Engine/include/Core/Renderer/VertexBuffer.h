@@ -20,8 +20,8 @@
 #include "VertexConfig.h"
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "../Head/RenderConfig.h"
 #include "../Head/GLMHead.h"
+#include "../Renderer/RenderConfig.h"
 #include "../Base/TinyObject.h"
 
 namespace tezcat::Tiny
@@ -39,50 +39,34 @@ namespace tezcat::Tiny
 	public:
 		virtual ~IBuffer();
 
-		void init(const size_t& dataSize, const void* data = nullptr)
+		void init(const size_t& dataSize, const void* data = nullptr);
+
+		void updateData(const void* data, const size_t& dataSize);
+
+		void resetSize(size_t size);
+
+		void copy(const void* data, const size_t& dataSize, const size_t& offset);
+
+		void apply(uint32 id)
 		{
-			auto temp = realloc(mData, dataSize);
-			if (temp)
-			{
-				mDataSize = dataSize;
-				mData = temp;
-				memcpy_s(mData, dataSize, data, dataSize);
-			}
+			mBufferID = id;
+			mGenerated = true;
 		}
+		const uint32& getBufferID() const { return mBufferID; }
 
-		void updateData(const void* data, const size_t& dataSize)
-		{
-			auto temp = realloc(mData, dataSize);
-			if (temp)
-			{
-				mDataSize = dataSize;
-				mData = temp;
-				memcpy_s(mData, dataSize, data, dataSize);
-			}
-		}
+		const void* getData() const { return mData; }
 
-		void apply(uint32 id) { mBufferID = id; }
-		const uint32 &getBufferID() const { return mBufferID; }
+		uint64 getDataSize() const { return mDataSize; }
 
-		const void* getData() const
-		{
-			return mData;
-		};
+		void release() { free(mData); }
 
-		uint64 getDataSize() const
-		{
-			return mDataSize;
-		};
-
-		void apply()
-		{
-			free(mData);
-		}
+		const bool isGenerated() const { return mGenerated; }
 
 	protected:
 		uint32 mBufferID = 0;
-		void* mData;
 		uint64 mDataSize;
+		void* mData;
+		bool mGenerated;
 	};
 
 	/// <summary>
@@ -95,7 +79,6 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~VertexBuffer();
-
 
 		void setLayoutData(VertexPosition position, VertexLayoutType type);
 		const VertexLayoutData& getLayoutData() const { return mLayoutData; }
@@ -112,5 +95,66 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~IndexBuffer();
+	};
+
+
+	/// <summary>
+	/// UniformBuffer的使用场景
+	///
+	/// 1.Camera的数据
+	/// 保存投影矩阵,视图矩阵,相机远近平面,相机世界坐标
+	///
+	/// 2.Skybox的数据
+	/// 投影矩阵,6个视图矩阵,贴图
+	/// 
+	/// </summary>
+	class TINY_API UniformBuffer : public IBuffer
+	{
+		UniformBuffer();
+		TINY_OBJECT_H(UniformBuffer, IBuffer)
+
+	public:
+		virtual ~UniformBuffer();
+
+		template<class Config>
+		void setLayout(const std::function<void(UniformBufferLayout*)>& function)
+		{
+			this->setLayout(Config::Name, function);
+		}
+
+		/*
+		* 设置一个Layout
+		* 如果已经设置过的,将跳过设置函数
+		*/
+		void setLayout(const std::string_view& layoutName, const std::function<void(UniformBufferLayout*)>& function);
+
+		void update(const uint32_t& index, const void* data, const size_t& dataSize);
+
+		/*
+		* 真实要填充的数据大小
+		* 不用管对齐内容
+		*/
+		template<class Data>
+		void update(const uint32_t& index, const void* data)
+		{
+			this->update(index, data, sizeof(Data));
+		}
+
+		template<class Config>
+		void updateWithConfig(const void* data)
+		{
+			this->update(Config::Index, data, sizeof(Config::TrueSize));
+		}
+
+		const std::shared_ptr<UniformBufferLayout> &getLayout() { return mLayout; }
+
+		void updateLayoutData();
+
+	private:
+		std::shared_ptr<UniformBufferLayout> mLayout;
+
+	public:
+		std::string mName;
+		std::function<void(UniformBuffer*)> mOnLayoutDataUpdated;
 	};
 }

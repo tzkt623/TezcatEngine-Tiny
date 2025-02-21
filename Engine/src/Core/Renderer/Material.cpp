@@ -17,7 +17,7 @@
 
 #include "Core/Renderer/Material.h"
 #include "Core/Tool/Tool.h"
-#include "Core/Head/RenderConfig.h"
+#include "Core/Renderer/RenderConfig.h"
 		 
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Shader/Shader.h"
@@ -83,72 +83,72 @@ namespace tezcat::Tiny
 			{
 			case UniformType::Bool:
 			{
-				uniform = new UniformI1(&info->shaderID);
+				uniform = new UniformI1(&info->valueID);
 				break;
 			}
 			case UniformType::Int:
 			{
-				uniform = new UniformI1(&info->shaderID);
+				uniform = new UniformI1(&info->valueID);
 				break;
 			}
 			case UniformType::Int2:
 			{
-				uniform = new UniformI2(&info->shaderID);
+				uniform = new UniformI2(&info->valueID);
 				break;
 			}
 			case UniformType::Int3:
 			{
-				uniform = new UniformI3(&info->shaderID);
+				uniform = new UniformI3(&info->valueID);
 				break;
 			}
 			case UniformType::Int4:
 			{
-				uniform = new UniformI4(&info->shaderID);
+				uniform = new UniformI4(&info->valueID);
 				break;
 			}
 			case UniformType::Float:
 			{
-				uniform = new UniformF1(&info->shaderID);
+				uniform = new UniformF1(&info->valueID);
 				break;
 			}
 			case UniformType::Float2:
 			{
-				uniform = new UniformF2(&info->shaderID);
+				uniform = new UniformF2(&info->valueID);
 				break;
 			}
 			case UniformType::Float3:
 			{
-				uniform = new UniformF3(&info->shaderID);
+				uniform = new UniformF3(&info->valueID);
 				break;
 			}
 			case UniformType::Float4:
 			{
-				uniform = new UniformF4(&info->shaderID);
+				uniform = new UniformF4(&info->valueID);
 				break;
 			}
 			case UniformType::Mat3:
 			{
-				uniform = new UniformMat3(&info->shaderID);
+				uniform = new UniformMat3(&info->valueID);
 				break;
 			}
 			case UniformType::Mat4:
 			{
-				uniform = new UniformMat4(&info->shaderID);
+				uniform = new UniformMat4(&info->valueID);
 				break;
 			}
 			case UniformType::Tex2D:
 			{
-				uniform = new UniformTex2D(&info->shaderID);
+				uniform = new UniformTex2D(&info->valueID);
 				break;
 			}
 			case UniformType::Tex3D:
 			{
-				//uniform = new UniformTex3D(&info->shaderID);
+				//uniform = new UniformTex3D(&info->valueID);
 				break;
 			}
 			case UniformType::TexCube:
 			{
-				uniform = new UniformTexCube(&info->shaderID);
+				uniform = new UniformTexCube(&info->valueID);
 				break;
 			}
 			default:

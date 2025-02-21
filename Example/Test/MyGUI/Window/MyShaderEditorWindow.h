@@ -5,6 +5,11 @@ namespace tezcat::Editor
 {
 	class MyShaderEditorWindow : public GUIWindow
 	{
+		struct ShaderFileData
+		{
+			Shader* mSelected = nullptr;
+		};
+
 		MyShaderEditorWindow();
 	public:
 		virtual ~MyShaderEditorWindow();
@@ -19,12 +24,13 @@ namespace tezcat::Editor
 		void onRender() override;
 
 	private:
-		TextEditor* mShaderEditor;
+		std::unique_ptr<TextEditor> mShaderEditor;
 		std::filesystem::path mFilePath;
 		bool mIsShader;
 
+		ShaderFileData mShaderFileData;
+
 		static std::unordered_map<std::filesystem::path, MyShaderEditorWindow*> sShaderEditorRegister;
 	};
-
 
 }

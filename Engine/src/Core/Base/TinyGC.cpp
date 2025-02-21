@@ -18,7 +18,7 @@
 #include "Core/Base/TinyGC.h"
 #include "Core/Base/TinyRefObject.h"
 #include "Core/Base/TinyObject.h"
-#include "Core/Tool/Log.h"
+#include "Core/Debug/Debug.h"
 #include "Core/Tool/StringTool.h"
 
 namespace tezcat::Tiny

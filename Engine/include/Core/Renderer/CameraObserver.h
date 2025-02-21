@@ -1,4 +1,6 @@
-﻿/*
+﻿#pragma once
+
+/*
 	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
@@ -15,18 +17,21 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Core/Renderer/CameraAgent.h"
+#include "RenderObserver.h"
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(CameraAgent, RenderObserver)
-	CameraAgent::CameraAgent()
+	class CameraObserver : public RenderObserver
 	{
+		CameraObserver();
+		TINY_OBJECT_H(CameraObserver, RenderObserver)
+	public:
+		virtual ~CameraObserver();
 
-	}
+		virtual void submit(Shader* shader) override;
+		virtual void prepareRender() override;
 
-	CameraAgent::~CameraAgent()
-	{
+	private:
 
-	}
+	};
 }

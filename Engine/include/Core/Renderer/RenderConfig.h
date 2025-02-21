@@ -1,11 +1,14 @@
 ﻿#pragma once
 
-#include "CppHead.h"
-#include "ConfigHead.h"
+#include "../Head/CppHead.h"
+#include "../Head/ConfigHead.h"
+#include "../Head/GLMHead.h"
+
+#include "UniformBufferConfig.h"
 
 namespace tezcat::Tiny
 {
-	enum class TINY_API UniformType : int8
+	enum class TINY_API UniformType : int8_t
 	{
 		Error = -1,
 		Bool,
@@ -19,7 +22,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API DataMemFormat : uint8
+	enum class TINY_API DataMemFormat : uint8_t
 	{
 		Byte = 0,
 		UByte,
@@ -36,7 +39,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureType : uint8
+	enum class TINY_API TextureType : uint8_t
 	{
 		Texture1D = 0,
 		Texture2D,
@@ -49,7 +52,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureWrap : uint8
+	enum class TINY_API TextureWrap : uint8_t
 	{
 		Repeat = 0,
 		Mirrored_Repeat,
@@ -59,7 +62,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureFilter : uint8
+	enum class TINY_API TextureFilter : uint8_t
 	{
 		Nearest = 0,
 		Linear,
@@ -67,7 +70,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureInternalFormat : uint8
+	enum class TINY_API TextureInternalFormat : uint8_t
 	{
 		None = 0,
 		//Base
@@ -98,7 +101,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureFormat : uint8
+	enum class TINY_API TextureFormat : uint8_t
 	{
 		None = 0,
 		Depth,
@@ -113,7 +116,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API TextureAttachPosition : uint8
+	enum class TINY_API TextureAttachPosition : uint8_t
 	{
 		None = 0,
 		ColorComponent,
@@ -123,7 +126,7 @@ namespace tezcat::Tiny
 	};
 
 	//颜色缓冲区
-	enum class TINY_API ColorBuffer : uint8
+	enum class TINY_API ColorBuffer : uint8_t
 	{
 		None = 0,
 		A0,
@@ -139,7 +142,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API DrawMode : uint8
+	enum class TINY_API DrawMode : uint8_t
 	{
 		Points = 0,
 		Lines,
@@ -152,7 +155,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API CullFace : uint8
+	enum class TINY_API CullFace : uint8_t
 	{
 		Off = 0,
 		Back,
@@ -162,7 +165,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API DepthTest : uint8
+	enum class TINY_API DepthTest : uint8_t
 	{
 		Off = 0,
 		Always,
@@ -177,7 +180,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API Blend : uint8
+	enum class TINY_API Blend : uint8_t
 	{
 		Zero = 0,
 		One,
@@ -197,7 +200,7 @@ namespace tezcat::Tiny
 		Count
 	};
 
-	enum class TINY_API LightMode : uint8
+	enum class TINY_API LightMode : uint8_t
 	{
 		Unlit,
 		Forward,
@@ -205,7 +208,7 @@ namespace tezcat::Tiny
 		Deferred
 	};
 
-	enum class TINY_API Queue : uint8
+	enum class TINY_API Queue : uint8_t
 	{
 		None = 0,
 		Prepare,
@@ -229,7 +232,7 @@ namespace tezcat::Tiny
 	};
 
 
-	enum class TINY_API RenderPhase : int
+	enum class TINY_API RenderPhase : int32_t
 	{
 		Error = -1,
 		Shadow,
@@ -405,4 +408,8 @@ namespace tezcat::Tiny
 		PrimitiveDrawType drawType;
 		PrimitiveDataMode dataMode;
 	};
+
+
+
+
 }

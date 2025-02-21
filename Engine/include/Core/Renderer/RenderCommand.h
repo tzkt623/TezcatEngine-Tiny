@@ -1,5 +1,20 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "../Head/TinyCpp.h"
 
 namespace tezcat::Tiny
@@ -7,12 +22,14 @@ namespace tezcat::Tiny
 	class BaseGraphics;
 	class Shader;
 	class FrameBuffer;
+	class UniformBuffer;
 	class Texture2D;
 	class TextureCube;
 	class TextureRender2D;
 	class Vertex;
 	class Material;
 	class Transform;
+	class PipelinePass;
 	
 	enum class CMDLife
 	{
@@ -62,7 +79,7 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~RenderCommand();
-		virtual void execute(Shader* shader) = 0;
+		virtual void execute(PipelinePass* pass = nullptr, Shader* shader = nullptr) = 0;
 		virtual RenderCommandType getType() const { return RenderCommandType::Normal; }
 	};
 
@@ -75,15 +92,13 @@ namespace tezcat::Tiny
 		RenderCommandType getType() const final { return RenderCommandType::Build; }
 	};
 
-
-
 	class RenderCMD_CreateVertex : public RenderCommadBuild
 	{
 	public:
 		RenderCMD_CreateVertex(Vertex* vertex);
 		virtual ~RenderCMD_CreateVertex();
 
-		void execute(Shader* shader) override;
+		void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
@@ -95,7 +110,7 @@ namespace tezcat::Tiny
 		RenderCMD_CreateShader(Shader* shader);
 		virtual ~RenderCMD_CreateShader();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Shader* mShader;
@@ -107,7 +122,7 @@ namespace tezcat::Tiny
 		RenderCMD_DeleteShader(Shader* shader);
 		virtual ~RenderCMD_DeleteShader();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Shader* mShader;
@@ -119,7 +134,7 @@ namespace tezcat::Tiny
 		RenderCMD_RebuildShader(Shader* shader);
 		virtual ~RenderCMD_RebuildShader();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Shader* mShader;
@@ -131,10 +146,23 @@ namespace tezcat::Tiny
 		RenderCMD_CreateFrameBuffer(FrameBuffer* buffer);
 		virtual ~RenderCMD_CreateFrameBuffer();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		FrameBuffer* mBuffer;
+	};
+
+	class RenderCMD_CreateUniformBuffer : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_CreateUniformBuffer(UniformBuffer* buffer, int32_t index);
+		virtual ~RenderCMD_CreateUniformBuffer();
+
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		UniformBuffer* mBuffer;
+		int32_t mIndex;
 	};
 
 	class RenderCMD_CreateTexture2D : public RenderCommadBuild
@@ -143,7 +171,7 @@ namespace tezcat::Tiny
 		RenderCMD_CreateTexture2D(Texture2D* tex);
 		virtual ~RenderCMD_CreateTexture2D();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Texture2D* mTex;
@@ -155,7 +183,7 @@ namespace tezcat::Tiny
 		RenderCMD_DeleteTexture2D(Texture2D* tex);
 		virtual ~RenderCMD_DeleteTexture2D();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		uint32 mID;
@@ -167,7 +195,7 @@ namespace tezcat::Tiny
 		RenderCMD_CreateTextureRender2D(TextureRender2D* tex);
 		virtual ~RenderCMD_CreateTextureRender2D();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		TextureRender2D* mTex;
@@ -179,7 +207,7 @@ namespace tezcat::Tiny
 		RenderCMD_DeleteTextureRender2D(TextureRender2D* tex);
 		virtual ~RenderCMD_DeleteTextureRender2D();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		uint32 mID;
@@ -191,7 +219,7 @@ namespace tezcat::Tiny
 		RenderCMD_CreateTextureCube(TextureCube* tex);
 		virtual ~RenderCMD_CreateTextureCube();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		TextureCube* mTex;
@@ -203,7 +231,7 @@ namespace tezcat::Tiny
 		RenderCMD_DeleteTextureCube(TextureCube* tex);
 		virtual ~RenderCMD_DeleteTextureCube();
 
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		uint32 mID;
@@ -225,7 +253,7 @@ namespace tezcat::Tiny
 	public:
 		RenderCMD_DrawVertex(Vertex* vertex);
 		virtual ~RenderCMD_DrawVertex();
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
@@ -237,7 +265,7 @@ namespace tezcat::Tiny
 	public:
 		RenderCMD_DrawMesh(Vertex* vertex, Transform* transform, Material* material);
 		virtual ~RenderCMD_DrawMesh();
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
@@ -251,7 +279,7 @@ namespace tezcat::Tiny
 	public:
 		RenderCMD_DrawShadow(Vertex* vertex, Transform* transform);
 		virtual ~RenderCMD_DrawShadow();
-		virtual void execute(Shader* shader) override;
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
@@ -265,7 +293,7 @@ namespace tezcat::Tiny
 		RenderCMD_DrawSkybox(Vertex* vertex, TextureCube* cube, float lod = 0, bool isHdr = false, float exposure = 1);
 		virtual ~RenderCMD_DrawSkybox();
 
-		void execute(Shader* shader) override;
+		void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
@@ -283,7 +311,7 @@ namespace tezcat::Tiny
 			, TextureCube* skybox);
 		virtual ~RenderCMD_MakeHDR2Cube();
 
-		void execute(Shader* shader) override;
+		void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
@@ -299,7 +327,7 @@ namespace tezcat::Tiny
 			, TextureCube* irradiance);
 		virtual ~RenderCMD_MakeEnvIrradiance();
 
-		void execute(Shader* shader) override;
+		void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;
@@ -319,7 +347,7 @@ namespace tezcat::Tiny
 			, int32 resolution);
 		virtual ~RenderCMD_MakeEnvPrefilter();
 
-		void execute(Shader* shader) override;
+		void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
 		Vertex* mVertex;

@@ -44,6 +44,7 @@ namespace tezcat::Tiny
 		virtual ~Shader();
 
 		void generate();
+		void rebuild();
 		void apply(uint32 pid);
 
 		const std::string& getName() const { return mName; }
@@ -67,48 +68,47 @@ namespace tezcat::Tiny
 		LightMode getLightMode() const { return mLightMode; }
 		bool isShadowReceiver() const { return mIsShadowReceiver; }
 
-		int32 getPropertyID(const std::string& name)
+		int32 getPropertyID(const std::string_view& name)
 		{
-			auto it = mUserUniformUMap.find(name);
-			TINY_ASSERT(it != mUserUniformUMap.end());
+			auto it = mUserUniformValueConfigMap.find(name);
+			TINY_THROW_RUNTIME(it != mUserUniformValueConfigMap.end(), name);
 			return it->second->index;
 		}
 
-
-		int getUniformIndex(const std::string& name)
+		int getUniformIndex(const std::string_view& name)
 		{
-			auto it = mUserUniformUMap.find(name);
-			TINY_THROW_RUNTIME(it == mUserUniformUMap.end(), name);
+			auto it = mUserUniformValueConfigMap.find(name);
+			TINY_THROW_RUNTIME(it == mUserUniformValueConfigMap.end(), name);
 			return it->second->index;
 		}
 
-		UniformInfo* getUniformInfo(const std::string& name) const
+		UniformValueConfig* getUniformValueConfig(const std::string_view& name) const
 		{
-			auto it = mUserUniformUMap.find(name);
-			TINY_THROW_RUNTIME(it == mUserUniformUMap.end(), name);
+			auto it = mUserUniformValueConfigMap.find(name);
+			TINY_THROW_RUNTIME(it == mUserUniformValueConfigMap.end(), name);
 			return it->second;
 		}
 
-		UniformInfo* getUniformInfo(const uint32& index) const
+		UniformValueConfig* getUniformValueConfig(const uint32& index) const
 		{
-			return mUserUniformAry[index];
+			return mUserUniformValueConfigAry[index];
 		}
 
 	public:
 		bool checkUniform(const UniformID& id)
 		{
-			return mTinyUniformList[id.getUID()]->shaderID > -1;
+			return mTinyUniformList[id.getUID()]->valueID > -1;
 		}
 
-		bool checkTinyUniform(const UniformID& id, int& outShaderID)
+		bool checkTinyUniform(const UniformID& id, int& outValueID)
 		{
-			outShaderID = mTinyUniformList[id.getUID()]->shaderID;
-			return outShaderID > -1;
+			outValueID = mTinyUniformList[id.getUID()]->valueID;
+			return outValueID > -1;
 		}
 
 		int32 getTinyUniformShaderID(const UniformID& id)
 		{
-			return mTinyUniformList[id.getUID()]->shaderID;
+			return mTinyUniformList[id.getUID()]->valueID;
 		}
 
 		uint32 getTextureIndex()
@@ -149,12 +149,12 @@ namespace tezcat::Tiny
 
 		const auto& getUniformMap() const
 		{
-			return mUserUniformUMap;
+			return mUserUniformValueConfigMap;
 		}
 
 		const auto& getUniformAry() const
 		{
-			return mUserUniformAry;
+			return mUserUniformValueConfigAry;
 		}
 
 		void setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32& index, const int& shaderID, const int& arrayIndex = -1);
@@ -214,11 +214,11 @@ namespace tezcat::Tiny
 
 	public:
 		std::unique_ptr<ShaderParser> mParser;
+		std::string mContent;
 
 	protected:
 		std::string mName;
 		std::string mPath;
-		std::string mContent;
 
 	private:
 		int32 mUID;
@@ -248,9 +248,8 @@ namespace tezcat::Tiny
 		DepthTestWrapper mDepthTest;
 
 	protected:
-		std::vector<UniformInfo*> mTinyUniformList;
-
-		std::vector<UniformInfo*> mUserUniformAry;
-		std::unordered_map<std::string_view, UniformInfo*> mUserUniformUMap;
+		std::vector<UniformValueConfig*> mTinyUniformList;
+		std::vector<UniformValueConfig*> mUserUniformValueConfigAry;
+		std::unordered_map<std::string_view, UniformValueConfig*> mUserUniformValueConfigMap;
 	};
 }

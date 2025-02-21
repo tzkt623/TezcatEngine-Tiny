@@ -8,7 +8,6 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Unlit/EnvMakeCube;
         int Version = 330;
         int OrderID = 50;
         str Queue = Prepare;
@@ -28,7 +27,7 @@
         void main()
         {
             myWorldPosition = aPos;
-            gl_Position = TINY_MatrixP * TINY_MatrixV * float4(aPos, 1.0);
+            gl_Position = TINY_SkyBox_MatrixP * TINY_SkyBox_MatrixV[TINY_SkyBox_ViewIndex] * float4(aPos, 1.0);
         }
     }
     #TINY_VS_END
@@ -55,12 +54,28 @@
             float2 uv = sampleSphericalMap(normalize(myWorldPosition));
             float3 color = textureLod(myTexHDR2D, uv, 0).rgb;
             myFinalColor = float4(color, 1.0f);
+            //if(TINY_SkyBox_ViewIndex == 0)
+            //{
+            //	myFinalColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
+            //}
+            //if(TINY_SkyBox_ViewIndex == 2)
+            //{
+            //	myFinalColor = float4(0.0f, 1.0f, 0.0f, 1.0f);
+            //}
+            //if(TINY_SkyBox_ViewIndex == 3)
+            //{
+            //	myFinalColor = float4(0.0f, 0.0f, 1.0f, 1.0f);
+            //}
+            
+            
             //myFinalColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
         }
     }
     #TINY_FS_END
 }
 #TINY_PASS_END
+
+
 
 
 

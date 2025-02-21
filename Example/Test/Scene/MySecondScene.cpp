@@ -2,7 +2,7 @@
 #include "../MyInputer.h"
 #include "../MyController.h"
 
-TINY_OBJECT_CPP(MySeconedScene, Scene)
+TINY_OBJECT_CPP(MySeconedScene, Scene);
 
 MySeconedScene::MySeconedScene(const std::string& name)
 	: Scene(name)

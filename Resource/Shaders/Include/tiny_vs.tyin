@@ -1,11 +1,11 @@
 #include "tiny_config.tyin"
 
 //base
-uniform float4x4 TINY_MatrixP;
-uniform float4x4 TINY_MatrixV;
+//uniform float4x4 TINY_MatrixP;
+//uniform float4x4 TINY_MatrixV;
 uniform float4x4 TINY_MatrixM;
 uniform float4x4 TINY_MatrixMV;
-uniform float4x4 TINY_MatrixVP;
+//uniform float4x4 TINY_MatrixVP;
 uniform float4x4 TINY_MatrixMVP;
 uniform float3x3 TINY_MatrixN;
 

@@ -19,6 +19,7 @@
 #include "Core/EngineIniter.h"
 
 #include "Core/Manager/SceneManager.h"
+#include "Core/Manager/VertexBufferManager.h"
 
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/LayerMask.h"
@@ -105,6 +106,7 @@ namespace tezcat::Tiny
 		LayerMask::init();
 		Resource::init(mResourceLoader->getResourceFolderName());
 		FileTool::init(mResourceLoader->getResourceFolderName());
+		VertexBufferManager::init();
 		return true;
 	}
 

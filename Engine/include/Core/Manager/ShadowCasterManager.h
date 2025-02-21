@@ -15,7 +15,7 @@ namespace tezcat::Tiny
 	class TINY_API ShadowCasterManager
 	{
 		friend class ShadowCaster;
-		static uint32 add(ShadowCaster* caster);
+		static uint32_t add(ShadowCaster* caster);
 		static void recycle(ShadowCaster* caster);
 	public:
 		static std::list<TinyWeakRef<ShadowCaster>>& getAllCaster() { return mCasterAry; }
@@ -25,7 +25,7 @@ namespace tezcat::Tiny
 	private:
 		static bool mAdded;
 		static std::list<TinyWeakRef<ShadowCaster>> mCasterAry;
-		static std::queue<uint32> mFreeIDs;
+		static std::queue<uint32_t> mFreeIDs;
 		static Shader* mShader;
 	};
 }

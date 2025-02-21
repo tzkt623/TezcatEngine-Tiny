@@ -158,7 +158,7 @@ namespace tezcat::Editor
 					auto& uniforms = mt->getUniforms();
 					for (uint32_t i = 0; i < uniforms.size(); i++)
 					{
-						auto info = shader->getUniformInfo(i);
+						auto info = shader->getUniformValueConfig(i);
 						auto uniform = uniforms[i];
 
 						switch (uniform->getType())

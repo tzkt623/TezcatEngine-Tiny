@@ -53,7 +53,8 @@ namespace tezcat::Tiny
 		auto it = mShaderUMap.find(shaderName);
 		if (it != mShaderUMap.end())
 		{
-			Graphics::getInstance()->addCommand(new RenderCMD_RebuildShader(it->second));
+			it->second->mContent = std::move(data);
+			Graphics::getInstance()->addCommand<RenderCMD_RebuildShader>(it->second);
 		}
 	}
 
@@ -83,7 +84,5 @@ namespace tezcat::Tiny
 			shader->saveObject();
 		}
 	}
-
-
 }
 

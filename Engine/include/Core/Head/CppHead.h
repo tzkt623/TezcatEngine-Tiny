@@ -85,12 +85,14 @@ namespace tezcat::Tiny
 		}
 	}
 
+#define TINY_BIND_THIS(func) std::bind_front(&func, this)
 #define TINY_BIND_THIS0(func) std::bind(&func, this)
 #define TINY_BIND_THIS1(func) std::bind(&func, this, std::placeholders::_1)
 #define TINY_BIND_THIS2(func) std::bind(&func, this, std::placeholders::_1, std::placeholders::_2)
 #define TINY_BIND_THIS3(func) std::bind(&func, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
 #define TINY_BIND_THIS4(func) std::bind(&func, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)
 
+#define TINY_BIND(func) std::bind_front(&func)
 #define TINY_BIND0(func) std::bind(&func)
 #define TINY_BIND1(func) std::bind(&func, std::placeholders::_1)
 #define TINY_BIND2(func) std::bind(&func, std::placeholders::_1, std::placeholders::_2)
@@ -102,8 +104,9 @@ namespace tezcat::Tiny
 #ifndef TINY_RELEASE
 #define TINY_THROW(x) throw x
 #define TINY_THROW_LOGIC(x) throw std::logic_error(x)
-#define TINY_THROW_RUNTIME(condition, message) if(condition) { fmt::print("=======RuntimeError=======\nFile:{1}\nLine:{2}\n{0}\n==========================\n", message, __FILE__, __LINE__); abort(); }
-#define TINY_ASSERT(x) assert(x)
+#define TINY_THROW_RUNTIME(condition, message) if(condition) { fmt::print("=======RuntimeError=======\nFile:{1}\nLine:{2}\n{0}\n==========================\n", message, __FILE__, __LINE__); __debugbreak(); }
+#define TINY_ASSERT(x) assert(x);
+#define TINY_BREAK(x) if(!(x)) { __debugbreak(); }
 #else
 #define TINY_THROW(x)
 #define TINY_THROW_LOGIC(x)

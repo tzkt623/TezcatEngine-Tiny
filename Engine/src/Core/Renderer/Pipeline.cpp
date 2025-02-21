@@ -34,7 +34,8 @@
 #include "Core/Manager/ShadowCasterManager.h"
 #include "Core/Manager/LightingManager.h"
 
-#include "Core/Profiler.h"
+#include "Core/Debug/Debug.h"
+
 #include "Core/Event/EngineEvent.h"
 
 
@@ -48,7 +49,7 @@ namespace tezcat::Tiny
 	//
 	// PipelinePass
 	//
-	TINY_OBJECT_CPP(PipelinePass, TinyObject)
+	TINY_OBJECT_CPP(PipelinePass, TinyObject);
 
 	PipelinePass::PipelinePass(uint32 globalFunctionMask)
 		: mShader(nullptr)
@@ -56,8 +57,9 @@ namespace tezcat::Tiny
 		, mPipelineOrderID(0)
 		, mFrameBuffer(nullptr)
 		, mNeedRemoved(false)
-		, mExited(true)
+		, mIsInPipeline(false)
 		, mMode(Mode::Continued)
+		, mIsOnceModeExecuted(false)
 	{
 		this->resetGlobalFunction(globalFunctionMask);
 	}
@@ -100,8 +102,9 @@ namespace tezcat::Tiny
 		{
 			frame_buffer->updateCurrentFrame(Pipeline::getFrameCount());
 			Graphics::getInstance()->clear(mRenderObserver->getClearOption());
-			Graphics::getInstance()->setViewport(mRenderObserver->getViewportInfo());
 		}
+
+		Graphics::getInstance()->setViewport(mRenderObserver->getViewportInfo());
 	}
 
 	void PipelinePass::render()
@@ -109,7 +112,7 @@ namespace tezcat::Tiny
 		mShader->resetGlobalState();
 		Graphics::getInstance()->bind(mShader);
 		Graphics::getInstance()->setPassState(mShader);
-		mRenderObserver->submitViewMatrix(mShader);
+		mRenderObserver->submit(mShader);
 
 		for (auto& fun : mGlobalSubmitArray)
 		{
@@ -118,7 +121,7 @@ namespace tezcat::Tiny
 
 		for (auto cmd : mCommandArray)
 		{
-			cmd->execute(mShader);
+			cmd->execute(this, mShader);
 			delete cmd;
 		}
 
@@ -153,17 +156,17 @@ namespace tezcat::Tiny
 
 		if (TINY_MASK_NONE_OF(globalFunctionMask, GlobalSubmit::NO_SHADOW))
 		{
-			mGlobalSubmitArray.emplace_back(TINY_BIND1(ShadowCasterManager::submit));
+			mGlobalSubmitArray.emplace_back(TINY_BIND(ShadowCasterManager::submit));
 		}
 
 		if (TINY_MASK_NONE_OF(globalFunctionMask, GlobalSubmit::NO_LIGHTING))
 		{
-			mGlobalSubmitArray.emplace_back(TINY_BIND1(LightingManager::submitLighting));
+			mGlobalSubmitArray.emplace_back(TINY_BIND(LightingManager::submitLighting));
 		}
 
 		if (TINY_MASK_NONE_OF(globalFunctionMask, GlobalSubmit::NO_ENVLIGHTING))
 		{
-			mGlobalSubmitArray.emplace_back(TINY_BIND1(LightingManager::submitEnvLighting));
+			mGlobalSubmitArray.emplace_back(TINY_BIND(LightingManager::submitEnvLighting));
 		}
 	}
 
@@ -174,28 +177,53 @@ namespace tezcat::Tiny
 
 	void PipelinePass::addToPipeline()
 	{
-		if (mExited)
+		//如果某些系统每帧都要计算管线是否需要生效
+		//就需要保护好管线状态
+
+		switch (mMode)
 		{
-			PipelineHelper::addPipePass(this);
-		}
-		else
-		{
-			//因为Pass的删除是在下一帧进行的
-			//所以如果没有退出,并且是Once模式时
-			//调用此函数说明这一帧需要保留此Pass
-			if (mMode == Mode::Once)
+		case Mode::Continued:
+			//如果已经在管线中了,就不需要添加
+			if (mIsInPipeline)
 			{
-				mNeedRemoved = false;
-				mExited = false;
+				return;
 			}
+
+			PipelineHelper::addPipePass(this);
+			break;
+		case Mode::Once:
+			if (!mIsOnceModeExecuted)
+			{
+				mIsOnceModeExecuted = true;
+				PipelineHelper::addPipePass(this);
+			}
+			break;
+		default:
+			break;
 		}
+
+		//if (mExited)
+		//{
+		//	PipelineHelper::addPipePass(this);
+		//}
+		//else
+		//{
+		//	//因为Pass的删除是在下一帧进行的
+		//	//所以如果没有退出,并且是Once模式时
+		//	//调用此函数说明这一帧需要保留此Pass
+		//	if (mMode == Mode::Once)
+		//	{
+		//		mNeedRemoved = false;
+		//		mExited = false;
+		//	}
+		//}
 	}
 
 	void PipelinePass::removeFromPipeline()
 	{
 		//如果已经退出了
 		//就不能被移除
-		if (mExited)
+		if (!mIsInPipeline)
 		{
 			return;
 		}
@@ -216,26 +244,26 @@ namespace tezcat::Tiny
 
 	void PipelinePass::onEnterPipeline()
 	{
-		mExited = false;
+		mIsInPipeline = true;
 		mNeedRemoved = false;
 	}
 
 	void PipelinePass::onExitPipeline()
 	{
-		mExited = true;
+		mIsInPipeline = false;
 		mNeedRemoved = false;
 	}
 
 	void PipelinePass::setObserver(BaseRenderObserver* observer)
 	{
 		mRenderObserver = observer;
-		mType2.observerOrder = mRenderObserver->getOrderID() + 127;
+		mType2.observerOrder = (uint8_t)(mRenderObserver->getOrderID() + 127);
 	}
 
 	void PipelinePass::setShader(Shader* shader)
 	{
 		mShader = shader;
-		mType2.shaderQueueID = (uint16)mShader->getRenderQueue();
+		mType2.shaderQueueID = (uint8_t)mShader->getRenderQueue();
 	}
 
 #pragma region ObserverPipePass
@@ -262,7 +290,7 @@ namespace tezcat::Tiny
 
 
 #pragma region ReplacedPipePass
-	TINY_OBJECT_CPP(ReplacedPipelinePass, PipelinePass)
+	TINY_OBJECT_CPP(ReplacedPipelinePass, PipelinePass);
 
 	ReplacedPipelinePass::ReplacedPipelinePass(BaseRenderObserver* renderObserver
 			, Shader* shader
@@ -287,6 +315,8 @@ namespace tezcat::Tiny
 
 	void ReplacedPipelinePass::preCalculate()
 	{
+		mRenderObserver->prepareRender();
+
 		if (mUseCullLayer)
 		{
 			//先剔除
@@ -370,14 +400,11 @@ namespace tezcat::Tiny
 		TINY_PROFILER_RESET_DRAWCALL();
 		TINY_PROFILER_RESET_PASSCOUNT();
 
+		Graphics::getInstance()->buildCommand();
+
 		CameraManager::calculate();
 		LightingManager::calculate();
 
-		Graphics::getInstance()->buildCommand();
-	}
-
-	void PipelineBuildin::onRender()
-	{
 		//自定义pass预计算
 		//这个结构可能要优化
 		if (!mReplacedPipePassArray.empty())
@@ -386,7 +413,7 @@ namespace tezcat::Tiny
 			while (it != mReplacedPipePassArray.end())
 			{
 				auto pass = *it;
-				if (pass->isExited())
+				if (pass->isNeedRemoved())
 				{
 					pass->deleteObject();
 					it = mReplacedPipePassArray.erase(it);
@@ -399,6 +426,8 @@ namespace tezcat::Tiny
 			}
 		}
 
+		Graphics::getInstance()->buildCommand();
+
 		//对queue进行排序
 		if (mDirty)
 		{
@@ -408,7 +437,10 @@ namespace tezcat::Tiny
 				return a->getPipelineOrderID() < b->getPipelineOrderID();
 			});
 		}
+	}
 
+	void PipelineBuildin::onRender()
+	{
 		auto it = mPassArray.begin();
 		while (it != mPassArray.end())
 		{

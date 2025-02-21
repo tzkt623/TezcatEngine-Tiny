@@ -17,9 +17,9 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Head/GLMHead.h"
-#include "Head/ConfigHead.h"
-#include "Head/CppHead.h"
+#include "../Head/GLMHead.h"
+#include "../Head/ConfigHead.h"
+#include "../Head/CppHead.h"
 
 namespace tezcat::Tiny
 {

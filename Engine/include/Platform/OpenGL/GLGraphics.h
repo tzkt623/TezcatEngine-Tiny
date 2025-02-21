@@ -1,5 +1,20 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Head/ConfigHead.h"
 
@@ -29,6 +44,7 @@ namespace tezcat::Tiny::GL
 		void setPassState(Shader* shader) override;
 		void bind(Shader* shader) override;
 		void bind(FrameBuffer* frameBuffer) override;
+		void bind(UniformBuffer* uniformBuffer) override;
 
 		void draw(Vertex* vertex) override;
 		void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f)) override;
@@ -39,10 +55,12 @@ namespace tezcat::Tiny::GL
 		void createBuffer(VertexBuffer* buffer) override;
 		void createBuffer(IndexBuffer* buffer) override;
 		void createBuffer(FrameBuffer* buffer) override;
+		void createUniformBuffer(UniformBuffer* buffer, int32_t bindingIndex) override;
 		void createShader(Shader* shader) override;
 		void createTexture(Texture2D* tex2D) override;
 		void createTexture(TextureCube* texCube) override;
 		void createTexture(TextureRender2D* render2D) override;
+		virtual void createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel) override;
 
 		virtual void deleteVertex(Vertex* vertex) override;
 		virtual void deleteBuffer(VertexBuffer* vertexBuffer) override;
@@ -53,14 +71,17 @@ namespace tezcat::Tiny::GL
 		virtual void deleteRender2D(const uint32& id) override;
 
 		virtual void makeHDR2Cube(Shader* shader
+			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, Texture2D* texHDR
 			, TextureCube* skybox) override;
 		virtual void makeEnvIrradiance(Shader* shader
+			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* irradiance) override;
 		virtual void makeEnvPrefilter(Shader* shader
+			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* prefitler
@@ -68,6 +89,11 @@ namespace tezcat::Tiny::GL
 			, uint32 mipWidth
 			, uint32 mipHeight
 			, int32 resolution) override;
+
+	public:
+		virtual void setUniformBuffer(UniformBuffer* uniformBuffer) override;
+		virtual void setFrameBufferColorTexture2D(Texture2D* tex, int32_t index) override;
+		virtual void setFrameBufferColorTextureCube(TextureCube* tex, int32_t index, int32_t cubeFace) override;
 
 	public:
 		//RenderCommand* createDrawVertexCMD(Vertex* vertex) override;
@@ -122,28 +148,28 @@ namespace tezcat::Tiny::GL
 
 
 	public:
-		void setFloat1(Shader* shader, const int& shaderID, const float& data) override;
-		void setFloat1(Shader* shader, const int& shaderID, const float* data) override;
-		void setFloat2(Shader* shader, const int& shaderID, const float* data) override;
-		void setFloat3(Shader* shader, const int& shaderID, const float* data) override;
-		void setFloat4(Shader* shader, const int& shaderID, const float* data) override;
+		void setFloat1(Shader* shader, const int& valueID, const float& data) override;
+		void setFloat1(Shader* shader, const int& valueID, const float* data) override;
+		void setFloat2(Shader* shader, const int& valueID, const float* data) override;
+		void setFloat3(Shader* shader, const int& valueID, const float* data) override;
+		void setFloat4(Shader* shader, const int& valueID, const float* data) override;
 
-		void setInt1(Shader* shader, const int& shaderID, const int& data) override;
-		void setInt1(Shader* shader, const int& shaderID, int* data) override;
-		void setInt2(Shader* shader, const int& shaderID, int* data) override;
-		void setInt3(Shader* shader, const int& shaderID, int* data) override;
-		void setInt4(Shader* shader, const int& shaderID, int* data) override;
+		void setInt1(Shader* shader, const int& valueID, const int& data) override;
+		void setInt1(Shader* shader, const int& valueID, int* data) override;
+		void setInt2(Shader* shader, const int& valueID, int* data) override;
+		void setInt3(Shader* shader, const int& valueID, int* data) override;
+		void setInt4(Shader* shader, const int& valueID, int* data) override;
 
-		void setMat3(Shader* shader, const int& shaderID, const float* data) override;
-		void setMat3(Shader* shader, const int& shaderID, const float3x3& mat3) override;
-		void setMat4(Shader* shader, const int& shaderID, const float* data) override;
-		void setMat4(Shader* shader, const int& shaderID, const float4x4& mat4) override;
-		void setMat4(Shader* shader, const int& shaderID, float4x4 data[], int count) override;
+		void setMat3(Shader* shader, const int& valueID, const float* data) override;
+		void setMat3(Shader* shader, const int& valueID, const float3x3& mat3) override;
+		void setMat4(Shader* shader, const int& valueID, const float* data) override;
+		void setMat4(Shader* shader, const int& valueID, const float4x4& mat4) override;
+		void setMat4(Shader* shader, const int& valueID, float4x4 data[], int count) override;
 
-		void setGlobalTexture2D(Shader* shader, const int& shaderID, Texture2D* data) override;
-		void setTexture2D(Shader* shader, const int& shaderID, Texture2D* data) override;
-		void setGlobalTextureCube(Shader* shader, const int& shaderID, TextureCube* data) override;
-		void setTextureCube(Shader* shader, const int& shaderID, TextureCube* data) override;
+		void setGlobalTexture2D(Shader* shader, const int& valueID, Texture2D* data) override;
+		void setTexture2D(Shader* shader, const int& valueID, Texture2D* data) override;
+		void setGlobalTextureCube(Shader* shader, const int& valueID, TextureCube* data) override;
+		void setTextureCube(Shader* shader, const int& valueID, TextureCube* data) override;
 
 	public:
 		void cmdUpdateTexture2D(Texture2D* tex2d) override;

@@ -1,5 +1,12 @@
 # TezcatEngine-Tiny
 
+![Static Badge](https://img.shields.io/badge/License-GPL3.0-brightgreen)
+
+![Static Badge](https://img.shields.io/badge/Language-C%2B%2B-blue)
+![Static Badge](https://img.shields.io/badge/C%2B%2B-20-gold)
+
+![Static Badge](https://img.shields.io/badge/IDE-VS2022-red)
+
 ## **引擎二周目进行中**
 
 ![logo1](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/1faf72c8-36e8-4bb3-9e40-2b87a0656dfc)
@@ -10,6 +17,9 @@
 
 ## **Update**
 
+- [x] 添加了UnfiormBuffer(add UniformBuffer)
+- [x] 一些Shader内建变量被UniformBuffer代替(now uniformbuffer values instead of Some Buildin shader values)
+- [x] Shader编辑器有点问题(ShaderEditor has issue now)
 - [x] 全新的渲染流程架构,更加的合理好用(New Pipeline)
 - [x] 暂时取消多线程模式(Disabled multithreading mode for now)
 - [x] 一个简单的帧缓存查看器(A Sample Frames Viewer)

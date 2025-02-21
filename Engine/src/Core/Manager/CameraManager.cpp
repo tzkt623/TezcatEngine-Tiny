@@ -157,6 +157,8 @@ namespace tezcat::Tiny
 					continue;
 				}
 
+				observer->prepareRender();
+
 				if (observer->isNeedRemove())
 				{
 					observer->onExitPipeline();

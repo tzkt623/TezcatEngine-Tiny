@@ -8,7 +8,6 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Standard/PBRTest1;
         int Version = 330;
         int OrderID = 50;
         str LightMode = Forward;
@@ -139,6 +138,7 @@
     #TINY_FS_END
 }
 #TINY_PASS_END
+
 
 
 

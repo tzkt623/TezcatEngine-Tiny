@@ -1,7 +1,7 @@
 ﻿#include "Tutorial01.h"
 #include "../MyObserver.h"
 
-TINY_OBJECT_CPP(Tutorial01, Scene)
+TINY_OBJECT_CPP(Tutorial01, Scene);
 
 Tutorial01::Tutorial01(const std::string& name)
 	: Base(name)

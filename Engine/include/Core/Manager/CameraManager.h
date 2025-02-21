@@ -45,6 +45,7 @@ namespace tezcat::Tiny
 		static void setMainCamera(Camera* camera);
 		static void setMainCamera(const std::string& name);
 		static Camera* getMainCamera() { return mCurrentData->getMainCamera(); }
+		static bool isDataValied() { return mCurrentData != nullptr; }
 
 		static Camera* findCamera(const std::string& name);
 		static void addCamera(Camera* camera);

@@ -17,7 +17,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "../Head/RenderConfig.h"
+#include "../Renderer/RenderConfig.h"
 
 namespace tezcat::Tiny
 {
@@ -138,12 +138,12 @@ namespace tezcat::Tiny
 	};
 
 
-	struct TINY_API UniformInfo
+	struct TINY_API UniformValueConfig
 	{
-		int index;
+		int32_t index;
 		std::string name;
 		UniformType type;
-		int shaderID;
+		int32_t valueID;
 		ShaderConstraint constraint;
 		std::string editorName;
 

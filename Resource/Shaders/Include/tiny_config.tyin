@@ -10,3 +10,24 @@
 #define texCube samplerCube
 
 const float TINY_PI = 3.14159265359;
+
+//ubo
+[Binding = 0]
+layout(std140) uniform CameraUBO        //224
+{
+    float4x4 TINY_MatrixP;              //0
+    float4x4 TINY_MatrixV;              //64
+    float4x4 TINY_MatrixVP;             //128
+    float3 TINY_CameraWorldPosition;    //192
+    float2 TINY_CameraNearFar;          //208
+};
+
+[Binding = 1]
+layout(std140) uniform SkyboxUBO        //464
+{
+    float4x4 TINY_SkyBox_MatrixP;       //0     64
+    float4x4 TINY_SkyBox_MatrixV[6];    //64    64*6 = 384  384+64 = 448
+    int TINY_SkyBox_ViewIndex;          //448
+    int TINY_SkyBox_Resolution;         //452
+    float TINY_SkyBox_Roughness;        //456
+};

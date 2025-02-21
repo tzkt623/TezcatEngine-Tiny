@@ -28,20 +28,37 @@ namespace tezcat::Tiny
 	class ShaderParser
 	{
 	private:
-
+		//移除约束条件
+		std::regex regex_remove_constraint;
+		//移除注释
+		std::regex regex_comment;
+		//结束位置
+		std::sregex_iterator end;
 
 	public:
-		void parseHeader(std::string& content);
-		void parseShaders(std::string& content, std::string& rootPath);
+		ShaderParser();
+
+		void parse(const std::string& path);
+		void parse(std::string& content, const std::string& path);
 		void updateShaderConfig(Shader* shader);
 
 	private:
+		void parseHeader(std::string& content);
+		void parseShaders(std::string& content, std::string& rootPath);
+
+	private:
 		void parseShader(std::string& content, std::string& rootPath, const char* regex, std::string& outContent);
+		void removeComment(std::string& content);
+		void splitInclude(std::string& content, const std::string& rootPath);
+		void splitUniformBuffer(std::string& content);
+		void splitStruct(std::string& content);
+		void writeShaderHead(std::string& content);
 
 	public:
 		static bool splitValue(std::string& content, std::unordered_map<std::string, Any>& map);
 		static bool splitConfig(const std::string& content, std::string& config, std::string& suffix, const char* regex);
 		static void splitPasses(std::string& content, std::vector<std::string>& passArray);
+		static std::string getName(const std::string& textToSave);
 
 	public:
 		std::unordered_map<std::string, Any> mConfigUMap;
@@ -56,5 +73,7 @@ namespace tezcat::Tiny
 
 		std::string mVertexShader;
 		std::string mFragShader;
+
+		std::unordered_map<std::string, int32_t> mUBOMap;
 	};
 }

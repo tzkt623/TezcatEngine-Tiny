@@ -8,7 +8,6 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Utility/InfiniteGrid;
         int Version = 330;
         int OrderID = 600;
         str Queue = Transparent;

@@ -1,15 +1,31 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "../Base/TinyObject.h"
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
-#include "../Head/RenderConfig.h"
+#include "../Renderer/RenderConfig.h"
 
 namespace tezcat::Tiny
 {
 	class Shader;
 	class Transform;
 	class FrameBuffer;
+	class UniformBuffer;
 	class ObserverPipelinePass;
 	class GameObject;
 
@@ -35,9 +51,13 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~BaseRenderObserver();
-		virtual void submitViewMatrix(Shader* shader) = 0;
+		virtual void submit(Shader* shader) = 0;
 
 	public:
+		virtual void prepareRender() {}
+		void createUniformBuffer();
+		UniformBuffer* getUniformBuffer() const { return mUniformBuffer; }
+
 		virtual bool culling(GameObject* gameObject) { return true; }
 
 		bool isDataMode() const { return mCullLayerList.empty(); }
@@ -139,7 +159,7 @@ namespace tezcat::Tiny
 		uint32 getUID() const { return mUID; }
 
 	public:
-		void updateObserverMatrix();
+		bool updateObserverMatrix();
 
 	protected:
 		virtual void onClose() override;
@@ -168,12 +188,33 @@ namespace tezcat::Tiny
 
 	protected:
 		FrameBuffer* mFrameBuffer;
+		UniformBuffer* mUniformBuffer;
 
 	protected:
 		std::vector<ObserverPipelinePass*> mPassCache;
 		std::vector<ObserverPipelinePass*> mPassArray;
 	};
 
+	class TINY_API ShadowObserver : public BaseRenderObserver
+	{
+		TINY_OBJECT_H(ShadowObserver, BaseRenderObserver)
+	protected:
+		ShadowObserver();
+	public:
+		virtual ~ShadowObserver();
+
+	public:
+		virtual void prepareRender() override;
+		virtual void submit(Shader* shader) override;
+		virtual float4x4& getViewMatrix() { return mViewMatrix; }
+
+		virtual float4x4& getViewMatrix(int32 index) const final { TINY_THROW("Fatal Error!"); }
+		virtual float4x4* getViewMatrixAry() const final { TINY_THROW("Fatal Error!"); }
+		virtual int32 getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
+
+	private:
+		float4x4 mViewMatrix;
+	};
 
 	class TINY_API RenderObserver : public BaseRenderObserver
 	{
@@ -184,7 +225,8 @@ namespace tezcat::Tiny
 		virtual ~RenderObserver();
 
 	public:
-		virtual void submitViewMatrix(Shader* shader) override;
+		virtual void prepareRender() override;
+		virtual void submit(Shader* shader) override;
 		virtual float4x4& getViewMatrix() { return mViewMatrix; }
 
 		virtual float4x4& getViewMatrix(int32 index) const final { TINY_THROW("Fatal Error!"); }
@@ -202,9 +244,11 @@ namespace tezcat::Tiny
 		RenderObserverMultView();
 	public:
 		virtual ~RenderObserverMultView();
+
 		void setViewMartixArray(float4x4* array, int32 size);
 
-		virtual void submitViewMatrix(Shader* shader) override;
+		virtual void submit(Shader* shader) override;
+		virtual void prepareRender() override;
 
 	public:
 		virtual float4x4& getViewMatrix() override final { TINY_THROW("Fatal Error!"); }
@@ -221,7 +265,7 @@ namespace tezcat::Tiny
 #define TINY_RENDER_OBSERVER_FUNCTION(memberName)\
 public:\
 	BaseRenderObserver* getRenderObserver() { return memberName; }\
-	const std::vector<uint32>& getCullLayerList() const { return memberName->getCullLayerList(); }\
+	const std::vector<uint32_t>& getCullLayerList() const { return memberName->getCullLayerList(); }\
 	float getFOV() const { return memberName->getFOV(); }\
 	float getNear() const { return memberName->getNear(); }\
 	float getFar() const { return memberName->getFar(); }\

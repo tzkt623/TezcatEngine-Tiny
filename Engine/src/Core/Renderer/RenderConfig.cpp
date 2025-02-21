@@ -15,7 +15,8 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Core/Head/RenderConfig.h"
+#include "Core/Renderer/RenderConfig.h"
+#include "Core/Renderer/VertexBuffer.h"
 
 namespace tezcat::Tiny
 {
@@ -253,5 +254,13 @@ namespace tezcat::Tiny
 		{ "tex3D",		UniformType::Tex3D },
 		{ "texCube",	UniformType::TexCube }
 	};
+
+	void UniformBufferLayout::notifyHolderUpdateData()
+	{
+		for (auto& holder : mBufferSet)
+		{
+			holder->updateLayoutData();
+		}
+	}
 
 }

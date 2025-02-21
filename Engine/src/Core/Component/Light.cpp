@@ -27,9 +27,9 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(ILight, BaseRenderer)
+	TINY_OBJECT_CPP(ILight, BaseRenderer);
 
-	TINY_OBJECT_CPP(DirectionalLightAgent, ILight)
+	TINY_OBJECT_CPP(DirectionalLightAgent, ILight);
 	DirectionalLightAgent::DirectionalLightAgent()
 		: mDirection()
 		, mAmbient()
@@ -56,11 +56,11 @@ namespace tezcat::Tiny
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	TINY_OBJECT_CPP(LightComponent, ComponentT<LightComponent>)
+	TINY_OBJECT_CPP(LightComponent, ComponentT<LightComponent>);
 
 		//------------------------------------------------------------------------
-		TINY_OBJECT_CPP(DirectionalLight, LightComponent)
-		DirectionalLight::DirectionalLight()
+	TINY_OBJECT_CPP(DirectionalLight, LightComponent);
+	DirectionalLight::DirectionalLight()
 		: mLightAgent(nullptr)
 	{
 		mLightAgent = DirectionalLightAgent::create();
@@ -106,8 +106,8 @@ namespace tezcat::Tiny
 	}
 
 	//------------------------------------------------------------------------
-	TINY_OBJECT_CPP(PointLight, LightComponent)
-		PointLight::PointLight()
+	TINY_OBJECT_CPP(PointLight, LightComponent);
+	PointLight::PointLight()
 		: mAmbient(0.2f)
 		, mDiffuse(0.5f)
 		, mSpecular(1.0f)
@@ -141,7 +141,7 @@ namespace tezcat::Tiny
 	}
 
 	//------------------------------------------------------------------------
-	TINY_OBJECT_CPP(SpotLight, LightComponent)
+	TINY_OBJECT_CPP(SpotLight, LightComponent);
 	SpotLight::SpotLight()
 	{
 

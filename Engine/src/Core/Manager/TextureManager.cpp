@@ -19,7 +19,7 @@
 #include "Core/Renderer/Texture.h"
 #include "Core/Tool/Tool.h"
 #include "Core/Data/Image.h"
-#include "Core/Head/RenderConfig.h"
+#include "Core/Renderer/RenderConfig.h"
 
 namespace tezcat::Tiny
 {

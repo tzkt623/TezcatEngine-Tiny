@@ -216,8 +216,5 @@ namespace tezcat::Tiny
 
 		return meshData;
 	}
-
-
-
 }
 

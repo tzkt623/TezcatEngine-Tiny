@@ -10,7 +10,6 @@ namespace tezcat::Tiny
 	class Texture2D;
 	class ReplacedPipelinePass;
 	class Shader;
-	class RenderObserver;
 
 	class TINY_API ShadowCaster : public ComponentT<ShadowCaster>
 	{
@@ -38,7 +37,7 @@ namespace tezcat::Tiny
 	private:
 		uint32 mUID;
 		Texture2D* mShadowTexture;
-		RenderObserver* mShadowObserver;
+		ShadowObserver* mShadowObserver;
 		ReplacedPipelinePass* mPipePass;
 		FrameBuffer* mFrameBuffer;
 	};

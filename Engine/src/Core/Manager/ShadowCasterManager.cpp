@@ -29,7 +29,7 @@
 namespace tezcat::Tiny
 {
 	Shader* ShadowCasterManager::mShader = nullptr;
-	std::queue<uint32> ShadowCasterManager::mFreeIDs;
+	std::queue<uint32_t> ShadowCasterManager::mFreeIDs;
 	std::list<TinyWeakRef<ShadowCaster>> ShadowCasterManager::mCasterAry;
 	bool ShadowCasterManager::mAdded = false;
 
@@ -41,7 +41,7 @@ namespace tezcat::Tiny
 		});
 	}
 
-	uint32 ShadowCasterManager::add(ShadowCaster* caster)
+	uint32_t ShadowCasterManager::add(ShadowCaster* caster)
 	{
 		mCasterAry.push_back(caster);
 
@@ -51,7 +51,7 @@ namespace tezcat::Tiny
 			return id;
 		}
 
-		return int32(mCasterAry.size() - 1);
+		return int32_t(mCasterAry.size() - 1);
 	}
 
 	void ShadowCasterManager::recycle(ShadowCaster* caster)

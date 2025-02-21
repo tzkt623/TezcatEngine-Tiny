@@ -25,12 +25,13 @@
 #include "Core/Component/Transform.h"
 #include "Core/Component/Light.h"
 #include "Core/Component/Camera.h"
-	
+
 #include "Core/Renderer/RenderObserver.h"
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/Texture.h"
 #include "Core/Renderer/RenderCommand.h"
 #include "Core/Renderer/Vertex.h"
+#include "Core/Renderer/VertexBuffer.h"
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/Pipeline.h"
 #include "Core/Renderer/Material.h"
@@ -48,8 +49,9 @@ namespace tezcat::Tiny
 	ReplacedPipelinePass* LightingManager::sBRDFLUTPass = nullptr;
 	ReplacedPipelinePass* LightingManager::sPrefilterPass = nullptr;
 	ReplacedPipelinePass* LightingManager::sIrradiancePass = nullptr;
-	ReplacedPipelinePass* LightingManager::sTexturePass = nullptr;
+	ReplacedPipelinePass* LightingManager::sMakeCubeTexPass = nullptr;
 	ReplacedPipelinePass* LightingManager::sSkyBoxPass = nullptr;
+	std::vector<std::function<void()>> LightingManager::mEnvPassArray;
 
 	Texture2D* LightingManager::sTexHDR = nullptr;
 	Texture2D* LightingManager::sBRDFLUTMap = nullptr;
@@ -70,32 +72,38 @@ namespace tezcat::Tiny
 	uint32 LightingManager::sIrrSize = 32;
 	bool LightingManager::sCalculateEnvLighting = false;
 	bool LightingManager::sEnableSkyBox = false;
-	bool LightingManager::sLocker = true;
+	bool LightingManager::sIsSceneExited = true;
 	float LightingManager::sExposure = 1;
 	std::function<void()> LightingManager::sRemovePassFromPipeline = nullptr;
 
 	void LightingManager::init()
 	{
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_ChangeEnvImage
-			, &sLocker
+			, &sIsSceneExited
 			, [](const EventData& data)
 			{
 				setSkyBoxHDRTexture(static_cast<Image*>(data.userData));
 				sCalculateEnvLighting = true;
+				sMakeCubeTexPass->resetOnceMode();
+				sIrradiancePass->resetOnceMode();
+				sPrefilterPass->resetOnceMode();
+				//sBRDFLUTPass->resetOnceMode();
 			});
 
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPushScene
-			, &sLocker
+			, &sIsSceneExited
 			, [](const EventData& data)
 			{
-				sLocker = false;
+				sIsSceneExited = false;
 			});
 
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPopScene
-			, &sLocker
+			, &sIsSceneExited
 			, [](const EventData& data)
 			{
-				sLocker = true;
+				sIsSceneExited = true;
+				sEnableSkyBox = false;
+				sCalculateEnvLighting = false;
 
 				if (sTexHDR)
 				{
@@ -103,10 +111,10 @@ namespace tezcat::Tiny
 					sTexHDR = nullptr;
 				}
 
-				sTexturePass->removeFromPipeline();
+				sMakeCubeTexPass->removeFromPipeline();
 				sIrradiancePass->removeFromPipeline();
 				sPrefilterPass->removeFromPipeline();
-				sBRDFLUTPass->removeFromPipeline();
+				//sBRDFLUTPass->removeFromPipeline();
 
 				if (sSkyBoxPass)
 				{
@@ -120,38 +128,54 @@ namespace tezcat::Tiny
 
 		sSkyboxVertex = VertexBufferManager::create("Skybox");
 		sHDRVertex = VertexBufferManager::create("Cube");
-		createCube();
+		createHDR2Cube();
 		createIrradiance();
 		createPrefilter();
 		createBRDF_LUT();
+
+		mEnvPassArray.push_back([]()
+			{
+				sBRDFLUTPass->addToPipeline();
+			});
 	}
 
 	void LightingManager::close()
 	{
-		EngineEvent::getInstance()->removeListener(&sLocker);
+		EngineEvent::getInstance()->removeListener(&sIsSceneExited);
 	}
 
 	void LightingManager::calculate()
 	{
-		if (sLocker)
+		if (sIsSceneExited)
 		{
 			return;
 		}
 
-		if (sCalculateEnvLighting)
+		if (!mEnvPassArray.empty())
 		{
-			sCalculateEnvLighting = false;
-			sTexturePass->addToPipeline();
-			sIrradiancePass->addToPipeline();
-			sPrefilterPass->addToPipeline();
-			sBRDFLUTPass->addToPipeline();
+			for (auto& func : mEnvPassArray)
+			{
+				func();
+			}
+			mEnvPassArray.clear();
 		}
 
+		//如果启用环境光照,就需要计算环境光
+		if (sCalculateEnvLighting)
+		{
+			sMakeCubeTexPass->addToPipeline();
+			sIrradiancePass->addToPipeline();
+			sPrefilterPass->addToPipeline();
+			//sBRDFLUTPass->addToPipeline();
+		}
+
+		//如果启用天空盒
 		if (sEnableSkyBox)
 		{
+			//生成天空盒Pass
 			if (sSkyBoxPass == nullptr)
 			{
-				if (CameraManager::getMainCamera())
+				if (CameraManager::isDataValied())
 				{
 					auto shader = ShaderManager::find("Unlit/Skybox");
 					sSkyBoxPass = ReplacedPipelinePass::create(CameraManager::getMainCamera()->getRenderObserver()
@@ -162,20 +186,8 @@ namespace tezcat::Tiny
 						sCurrentCubeMap = sCubeTextureMap;
 					}
 
-// 					auto material = Material::create(shader);
-// 					material->saveObject();
-// 
-// 					auto skybox_lod_index = shader->getUniformIndex("mySkyboxLod");
-// 					auto is_hdr_index = shader->getUniformIndex("myIsHDR");
-// 					auto exposure_index = shader->getUniformIndex("myExposure");
-
 					sSkyBoxPass->setPreFunction([=](ReplacedPipelinePass* pass)
 					{
-// 						material->setTinyUniform<UniformTexCube>(ShaderParam::TexSkybox, sCurrentCubeMap);
-// 						material->setUniform<UniformI1>(skybox_lod_index, sSkyboxLod);
-// 						material->setUniform<UniformI1>(is_hdr_index, sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float);
-// 						material->setUniform<UniformF1>(exposure_index, sExposure);
-
 						pass->addCommand<RenderCMD_DrawSkybox>(sSkyboxVertex
 							, sCurrentCubeMap
 							, sSkyboxLod
@@ -187,7 +199,7 @@ namespace tezcat::Tiny
 
 			if (sSkyBoxPass)
 			{
-				sTexturePass->addToPipeline();
+				//把天空盒加入渲染
 				sSkyBoxPass->addToPipeline();
 			}
 		}
@@ -207,7 +219,7 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexBRDFLUT, sBRDFLUTMap);
 	}
 
-	void LightingManager::createCube()
+	void LightingManager::createHDR2Cube()
 	{
 		int cube_size = sCubeSize;
 
@@ -216,7 +228,7 @@ namespace tezcat::Tiny
 		{
 			for (uint32 i = 0; i < 6; i++)
 			{
-				sCubeTextures[i] = Texture2D::create("CubeTexture" + std::to_string(i));
+				sCubeTextures[i] = Texture2D::create(std::format("CubeTexture{}", i));
 				sCubeTextures[i]->setConfig(cube_size, cube_size
 					, TextureInternalFormat::RGB16F
 					, TextureFormat::RGB
@@ -253,15 +265,15 @@ namespace tezcat::Tiny
 		observer->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 		observer->setOrderID(-127);
 
-		sTexturePass = ReplacedPipelinePass::create(observer, ShaderManager::find("Unlit/EnvMakeCube"));
-		sTexturePass->setOnceMode();
-		sTexturePass->setFrameBuffer(frame_buffer);
-		sTexturePass->setPreFunction([=](ReplacedPipelinePass* pass)
+		sMakeCubeTexPass = ReplacedPipelinePass::create(observer, ShaderManager::find("Unlit/EnvMakeCube"));
+		sMakeCubeTexPass->setOnceMode();
+		sMakeCubeTexPass->setFrameBuffer(frame_buffer);
+		sMakeCubeTexPass->setPreFunction([=](ReplacedPipelinePass* pass)
 		{
 			pass->addCommand<RenderCMD_MakeHDR2Cube>(sHDRVertex, sTexHDR, sCubeTextureMap);
 		});
-		sTexturePass->setOrderID(0);
-		sTexturePass->saveObject();
+		sMakeCubeTexPass->setOrderID(0);
+		sMakeCubeTexPass->saveObject();
 	}
 
 	void LightingManager::createIrradiance()
@@ -302,8 +314,6 @@ namespace tezcat::Tiny
 		sIrradiancePass->setPreFunction([=](ReplacedPipelinePass* pass)
 		{
 			pass->addCommand(new RenderCMD_MakeEnvIrradiance(sHDRVertex, sCubeTextureMap, sIrradianceMap));
-			
-			//pass->addCommand(Graphics::getInstance()->createDrawEnvMakeIrradiance(sHDRVertex, sCubeTextureMap, sIrradianceMap));
 		});
 		sIrradiancePass->setOrderID(1);
 		sIrradiancePass->saveObject();
@@ -333,7 +343,6 @@ namespace tezcat::Tiny
 			frame_buffer->addAttachment(texture);
 			frame_buffer->generate();
 		}
-
 
 		auto render_observer = createObserver();
 		render_observer->setPerspective(90.0f, 0.1f, 10.0f);
@@ -389,7 +398,7 @@ namespace tezcat::Tiny
 			, ShaderManager::find("Unlit/EnvMakeBRDFLut"));
 		sBRDFLUTPass->setOnceMode();
 		sBRDFLUTPass->setFrameBuffer(frame_buffer);
-		sBRDFLUTPass->setPreFunction([=](ReplacedPipelinePass* pass)
+		sBRDFLUTPass->setPreFunction([](ReplacedPipelinePass* pass)
 		{
 			auto rect_vertex = VertexBufferManager::create("Rect");
 			pass->addCommand(new RenderCMD_DrawVertex(rect_vertex));
@@ -437,8 +446,7 @@ namespace tezcat::Tiny
 
 	RenderObserverMultView* LightingManager::createObserver()
 	{
-		RenderObserverMultView* p = RenderObserverMultView::create();
-		auto array = new float4x4[6]
+		float4x4 ary[6]
 		{
 			glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(1.0f,  0.0f,  0.0f), float3(0.0f, -1.0f,  0.0f)),
 			glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(-1.0f, 0.0f,  0.0f), float3(0.0f, -1.0f,  0.0f)),
@@ -447,7 +455,24 @@ namespace tezcat::Tiny
 			glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  0.0f,  1.0f), float3(0.0f, -1.0f,  0.0f)),
 			glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  0.0f, -1.0f), float3(0.0f, -1.0f,  0.0f))
 		};
-		p->setViewMartixArray(array, 6);
+
+		RenderObserverMultView* p = RenderObserverMultView::create();
+		p->createUniformBuffer();
+		auto ub = p->getUniformBuffer();
+		ub->setLayout<UniformBufferBinding::SkyBox>([](UniformBufferLayout* layout)
+			{
+				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::MatrixP>();
+				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::MatrixV6>();
+				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::ViewIndex>();
+				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::Roughness>();
+				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::Resolution>();
+			});
+		ub->mOnLayoutDataUpdated = [ary](UniformBuffer *buffer)
+			{
+				buffer->updateWithConfig<UniformBufferBinding::SkyBox::MatrixV6>(ary);
+			};
+
+		ub->updateWithConfig<UniformBufferBinding::SkyBox::MatrixV6>(ary);
 
 		return p;
 	}
@@ -498,7 +523,7 @@ namespace tezcat::Tiny
 	}
 
 
-	TINY_OBJECT_CPP(LightData, TinyObject)
+	TINY_OBJECT_CPP(LightData, TinyObject);
 	LightData::LightData()
 		: directionalLight(nullptr)
 	{

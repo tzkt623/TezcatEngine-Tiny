@@ -3,7 +3,7 @@
 
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
-#include "../Renderer/CameraAgent.h"
+#include "../Renderer/CameraObserver.h"
 
 namespace tezcat::Tiny
 {
@@ -11,7 +11,7 @@ namespace tezcat::Tiny
 	class Renderer;
 	class BaseGraphics;
 	class Pipeline;
-	class CameraAgent;
+	class CameraObserver;
 	class FrameBuffer;
 
 	/*
@@ -44,7 +44,7 @@ namespace tezcat::Tiny
 		void onDisable() override;
 
 	private:
-		CameraAgent* mCameraAgent;
+		CameraObserver* mCameraAgent;
 
 		bool mIsMain;
 		uint32 mUID;

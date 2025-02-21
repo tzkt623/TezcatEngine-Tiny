@@ -28,7 +28,8 @@
 
 #include "Core/Renderer/RenderObjectCache.h"
 
-#include "Core/Tool/Log.h"
+#include "Core/Debug/Debug.h"
+
 
 namespace tezcat::Tiny
 {
@@ -50,7 +51,7 @@ namespace tezcat::Tiny
 
 	void Scene::onEnter()
 	{
-		Log_Info(StringTool::stringFormat("Enter Scene: %s", mName.c_str()));
+		TINY_LOG_INFO(std::format("Enter Scene: {}", mName));
 
 		mCameraData = CameraData::create();
 		mCameraData->saveObject();
@@ -77,7 +78,7 @@ namespace tezcat::Tiny
 		CameraManager::setData(nullptr);
 		LightingManager::setLightData(nullptr);
 
-		Log_Info(StringTool::stringFormat("Exit Scene: %s", mName.c_str()));
+		TINY_LOG_INFO(std::format("Exit Scene: {}", mName));
 	}
 
 	void Scene::onPause()

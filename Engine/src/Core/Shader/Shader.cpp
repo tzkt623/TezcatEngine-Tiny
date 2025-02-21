@@ -23,11 +23,13 @@
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/RenderCommand.h"
 
+#include "Core/Debug/Debug.h"
+
 namespace tezcat::Tiny
 {
 	TINY_OBJECT_CPP(Shader, TinyObject)
 
-	Shader::Shader(const std::string& filePath)
+		Shader::Shader(const std::string& filePath)
 		: mProgramID(-1)
 		, mName()
 		, mPath(filePath)
@@ -45,7 +47,7 @@ namespace tezcat::Tiny
 	{
 		for (uint32 i = 0; i < mTinyUniformList.size(); i++)
 		{
-			mTinyUniformList[i] = new UniformInfo{ -1, "", UniformType::Error, -1 };
+			mTinyUniformList[i] = new UniformValueConfig{ -1, "", UniformType::Error, -1 };
 		}
 
 	}
@@ -57,7 +59,7 @@ namespace tezcat::Tiny
 			delete u;
 		}
 
-		for (auto u : mUserUniformAry)
+		for (auto u : mUserUniformValueConfigAry)
 		{
 			delete u;
 		}
@@ -74,18 +76,12 @@ namespace tezcat::Tiny
 	{
 		mParser = std::make_unique<ShaderParser>();
 
-		this->checkAndLoadContent();
-
-		auto root = std::filesystem::path(mPath).parent_path().string();
-		mParser->parseHeader(mContent);
-		mParser->parseShaders(mContent, root);
+		mParser->parse(mPath);
 		mParser->updateShaderConfig(this);
-
 		mContent.clear();
 
 		ShaderManager::registerShader(this);
-		//Graphics::getInstance()->cmdCreateShader(this);
-		
+
 		Graphics::getInstance()->addCommand(new RenderCMD_CreateShader(this));
 	}
 
@@ -93,7 +89,7 @@ namespace tezcat::Tiny
 	{
 		if (shaderID < 0)
 		{
-			Log_Warning(fmt::format("{}--{} ID is -1"
+			TINY_LOG_WARNING(fmt::format("{}--{} ID is -1"
 				, mPath, name));
 		}
 
@@ -109,9 +105,9 @@ namespace tezcat::Tiny
 			editor_name = member_info->editorName.empty() ? name : fmt::format("{}[{}]", member_info->editorName, arrayIndex);
 		}
 
-		auto info = new UniformInfo
+		auto info = new UniformValueConfig
 		{
-			(int)mUserUniformAry.size()
+			(int)mUserUniformValueConfigAry.size()
 			, name
 			, metaData->valueType
 			, shaderID
@@ -120,8 +116,8 @@ namespace tezcat::Tiny
 			, member_info->range
 		};
 
-		mUserUniformAry.emplace_back(info);
-		mUserUniformUMap.try_emplace(info->name, info);
+		mUserUniformValueConfigAry.emplace_back(info);
+		mUserUniformValueConfigMap.try_emplace(info->name, info);
 	}
 
 	void Shader::setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32& index, const int& shaderID, const int& arrayIndex)
@@ -140,7 +136,7 @@ namespace tezcat::Tiny
 
 		mTinyUniformList[index]->name = name;
 		mTinyUniformList[index]->type = metaData->valueType;
-		mTinyUniformList[index]->shaderID = shaderID;
+		mTinyUniformList[index]->valueID = shaderID;
 		mTinyUniformList[index]->index = index;
 		mTinyUniformList[index]->constraint = member_info->constraint;
 		mTinyUniformList[index]->editorName = editor_name;
@@ -154,7 +150,7 @@ namespace tezcat::Tiny
 
 	void Shader::resizeUserUniformAry(uint64 size)
 	{
-		mUserUniformUMap.reserve(size);
+		mUserUniformValueConfigMap.reserve(size);
 	}
 
 	bool Shader::checkAndLoadContent()
@@ -171,5 +167,11 @@ namespace tezcat::Tiny
 		return true;
 	}
 
+	void Shader::rebuild()
+	{
+		mParser = std::make_unique<ShaderParser>();
+		mParser->parse(mContent, mPath);
+		mContent.clear();
+	}
 }
 

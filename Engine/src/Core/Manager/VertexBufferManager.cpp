@@ -20,6 +20,7 @@
 #include "Core/Renderer/VertexBuffer.h"
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Data/MeshData.h"
+#include "Core/Shader/ShaderConfig.h"
 
 #include "ThirdParty/Hash/city.h"
 
@@ -28,6 +29,7 @@ namespace tezcat::Tiny
 	std::vector<Vertex*> VertexBufferManager::mVertexAry;
 	std::unordered_map<std::string_view, MeshData*> VertexBufferManager::mMeshDataUMap;
 	std::unordered_map<std::string_view, Vertex*> VertexBufferManager::mVertexUMap;
+	std::unordered_map<std::string, std::shared_ptr<UniformBufferLayout>> VertexBufferManager::mUniformBufferMap;
 
 	void VertexBufferManager::add(MeshData* meshData)
 	{
@@ -106,5 +108,32 @@ namespace tezcat::Tiny
 	Vertex* VertexBufferManager::create(MeshData* mesh)
 	{
 		return nullptr;
+	}
+
+	std::tuple<bool, std::shared_ptr<UniformBufferLayout>> VertexBufferManager::createUniformBufferLayout(const std::string& name)
+	{
+		auto result = mUniformBufferMap.try_emplace(name, nullptr);
+		if (result.second)
+		{
+			result.first->second = std::make_shared<UniformBufferLayout>();
+		}
+
+		return { result.second, result.first->second };
+	}
+
+	std::shared_ptr<UniformBufferLayout> VertexBufferManager::getUniformBufferLayout(const std::string& name)
+	{
+		auto result_pair = mUniformBufferMap.find(name);
+		if (result_pair != mUniformBufferMap.end())
+		{
+			return result_pair->second;
+		}
+
+		return std::shared_ptr<UniformBufferLayout>();
+	}
+
+	void VertexBufferManager::init()
+	{
+
 	}
 }

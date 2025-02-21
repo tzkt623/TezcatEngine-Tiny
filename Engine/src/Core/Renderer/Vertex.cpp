@@ -27,7 +27,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(Vertex, TinyObject)
+	TINY_OBJECT_CPP(Vertex, TinyObject);
 	Vertex::Vertex()
 		: Vertex("##ErrorVAO")
 	{
@@ -103,10 +103,6 @@ namespace tezcat::Tiny
 
 	void Vertex::generate()
 	{
-		//Graphics::getInstance()->cmdCreateVertex(this);
-
-		//Graphics::getInstance()->createVertex(this);
-
 		Graphics::getInstance()->addCommand(new RenderCMD_CreateVertex(this));
 	}
 

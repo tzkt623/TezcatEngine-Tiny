@@ -16,10 +16,10 @@
 */
 
 #include "Core/Head/CppHead.h"
-#include "Core/Profiler.h"
+#include "Core/Debug/Debug.h"
 
 
-#ifndef TINY_Release
+#ifndef TINY_RELEASE
 using namespace tezcat::Tiny;
 
 void* operator new(std::size_t size)
@@ -45,4 +45,4 @@ void operator delete[](void* memory, std::size_t size)
 	Profiler::MemoryAlloc -= size;
 	free(memory);
 }
-#endif // !TINY_Release
+#endif // !TINY_RELEASE

@@ -8,7 +8,6 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Standard/PBRStd1;
         int Version = 330;
         int OrderID = 50;
         str LightMode = Forward;

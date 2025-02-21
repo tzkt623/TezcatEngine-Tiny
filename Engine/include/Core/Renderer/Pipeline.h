@@ -1,5 +1,20 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "../Base/TinyObject.h"
 #include "../Tool/Tool.h"
 
@@ -74,10 +89,14 @@ namespace tezcat::Tiny
 
 		void resetGlobalFunction(uint32 globalSubmitMask);
 
+		//Mode
 	public:
 		void setContinuedMode() { mMode = Mode::Continued; }
 		void setOnceMode() { mMode = Mode::Once; }
+		const Mode getMode() const { return mMode; }
+		void resetOnceMode() { mIsOnceModeExecuted = false; }
 
+	public:
 		uint32 getOrderID() const { return mType2.userID; }
 		void setOrderID(uint16 value)
 		{
@@ -113,8 +132,9 @@ namespace tezcat::Tiny
 
 		void addToPipeline();
 		void removeFromPipeline();
-		bool isNeedRemoved() const { return mNeedRemoved; }
-		bool isExited() const { return mExited; }
+
+		bool isNeedRemoved() const { return mNeedRemoved && mIsInPipeline; }
+		BaseRenderObserver* getObserver() const { return mRenderObserver; }
 
 	protected:
 		void setObserver(BaseRenderObserver* observer);
@@ -125,7 +145,8 @@ namespace tezcat::Tiny
 	protected:
 		std::string mName;
 		Mode mMode;
-		bool mExited;
+		bool mIsOnceModeExecuted;
+		bool mIsInPipeline;
 		bool mNeedRemoved;
 		Shader* mShader;
 		BaseRenderObserver* mRenderObserver;

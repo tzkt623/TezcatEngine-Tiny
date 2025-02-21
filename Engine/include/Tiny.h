@@ -18,9 +18,10 @@
 
 #include "Core/Head/TinyCpp.h"
 
+#include "Core/Debug/Debug.h"
+
 #include "Core/Engine.h"
 #include "Core/EngineIniter.h"
-#include "Core/Profiler.h"
 
 #include "Core/Base/TinyObject.h"
 
@@ -64,6 +65,7 @@
 #include "Core/Shader/ShaderParam.h"
 #include "Core/Shader/ShaderPackage.h"
 #include "Core/Shader/Shader.h"
+#include "Core/Shader/ShaderParser.h"
 
 #include "Core/Tool/Tool.h"
 #include "Core/Event/EngineEvent.h"

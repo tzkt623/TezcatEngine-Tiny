@@ -52,7 +52,7 @@ namespace tezcat::Editor
 				if (ImGui::SetDragDropPayload("ObjectMove", &s, sizeof(int), ImGuiCond_Once))
 				{
 					mDragedTransform = transform.get();
-					Log_Info("!!!!");
+					TINY_LOG_INFO("!!!!");
 				}
 				ImGui::EndDragDropSource();
 			}

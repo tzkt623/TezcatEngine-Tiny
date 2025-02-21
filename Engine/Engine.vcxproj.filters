@@ -28,7 +28,7 @@
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp">
       <Filter>Engine\Thirdparty\glm</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Profiler.cpp">
+    <ClCompile Include="src\Core\Debug\Profiler.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Tool\StringTool.cpp">
@@ -96,7 +96,7 @@
     <ClCompile Include="src\Core\Renderer\RenderObjectCache.cpp" />
     <ClCompile Include="src\Core\Head\ConfigHead.cpp" />
     <ClCompile Include="src\Core\Head\CppHead.cpp" />
-    <ClCompile Include="src\Core\Head\RenderConfig.cpp" />
+    <ClCompile Include="src\Core\Renderer\RenderConfig.cpp" />
     <ClCompile Include="src\Core\Shader\Uniform.cpp" />
     <ClCompile Include="src\Core\Manager\TextureManager.cpp" />
     <ClCompile Include="src\Core\LightLayer.cpp" />
@@ -106,7 +106,7 @@
     <ClCompile Include="src\Core\Manager\FrameBufferManager.cpp" />
     <ClCompile Include="src\Core\Tool\FileTool.cpp" />
     <ClCompile Include="src\Core\Component\FlyController.cpp" />
-    <ClCompile Include="src\Core\Tool\Log.cpp" />
+    <ClCompile Include="src\Core\Debug\Log.cpp" />
     <ClCompile Include="src\Core\Tool\Event.cpp" />
     <ClCompile Include="src\Core\Event\EngineEvent.cpp" />
     <ClCompile Include="src\Core\Renderer\VertexConfig.cpp" />
@@ -129,12 +129,13 @@
     <ClCompile Include="src\Core\Data\Text.cpp" />
     <ClCompile Include="src\Core\Renderer\Pipeline.cpp" />
     <ClCompile Include="src\Core\Renderer\MeshRenderAgent.cpp" />
-    <ClCompile Include="src\Core\Renderer\CameraAgent.cpp" />
+    <ClCompile Include="src\Core\Renderer\CameraObserver.cpp" />
     <ClCompile Include="src\Core\Renderer\RenderObserver.cpp" />
     <ClCompile Include="src\Core\Base\TinyObject.cpp" />
     <ClCompile Include="src\Platform\OpenGL\GLHead.cpp" />
     <ClCompile Include="src\Core\Renderer\GraphicsAgent.cpp" />
     <ClCompile Include="src\Core\Shader\ShaderParser.cpp" />
+    <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1099,7 +1100,7 @@
     <ClInclude Include="include\Core\Tool\Tool.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Profiler.h">
+    <ClInclude Include="include\Core\Debug\Profiler.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Data\Image.h">
@@ -1182,7 +1183,7 @@
     <ClInclude Include="include\Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="include\Core\Layer.h" />
     <ClInclude Include="include\Core\Renderer\RenderObjectCache.h" />
-    <ClInclude Include="include\Core\Head\RenderConfig.h" />
+    <ClInclude Include="include\Core\Renderer\RenderConfig.h" />
     <ClInclude Include="include\Core\Tool\IDString.h" />
     <ClInclude Include="include\Core\Shader\Uniform.h" />
     <ClInclude Include="include\Core\Tool\Any.h" />
@@ -1200,7 +1201,7 @@
     <ClInclude Include="include\Core\Manager\FrameBufferManager.h" />
     <ClInclude Include="include\Core\Tool\FileTool.h" />
     <ClInclude Include="include\Core\Component\FlyController.h" />
-    <ClInclude Include="include\Core\Tool\Log.h" />
+    <ClInclude Include="include\Core\Debug\Log.h" />
     <ClInclude Include="include\Core\Event\EngineEvent.h" />
     <ClInclude Include="include\Core\Renderer\VertexConfig.h" />
     <ClInclude Include="include\Core\Base\TinyRefObject.h" />
@@ -1320,11 +1321,14 @@
     <ClInclude Include="include\Core\Shader\ShaderConfig.h" />
     <ClInclude Include="include\Core\Renderer\Pipeline.h" />
     <ClInclude Include="include\Core\Renderer\MeshRenderAgent.h" />
-    <ClInclude Include="include\Core\Renderer\CameraAgent.h" />
+    <ClInclude Include="include\Core\Renderer\CameraObserver.h" />
     <ClInclude Include="include\Core\Renderer\RenderObserver.h" />
     <ClInclude Include="include\Core\Renderer\GraphicsAgent.h" />
     <ClInclude Include="include\Core\Base\SmartPointer.h" />
     <ClInclude Include="include\Core\Shader\ShaderParser.h" />
+    <ClInclude Include="include\Core\Debug\Debug.h" />
+    <ClInclude Include="include\Core\Manager\UniformBufferManager.h" />
+    <ClInclude Include="include\Core\Renderer\UniformBufferConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

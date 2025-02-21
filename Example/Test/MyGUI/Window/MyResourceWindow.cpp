@@ -179,7 +179,7 @@ namespace tezcat::Editor
 			}
 			else if (ImGui::GetDragDropPayload() == nullptr && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
 			{
-				Log_Info(path.string().c_str());
+				TINY_LOG_INFO(path.string().c_str());
 				this->itemDrag(path);
 			}
 		}

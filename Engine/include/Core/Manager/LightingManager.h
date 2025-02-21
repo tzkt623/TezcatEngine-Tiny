@@ -86,17 +86,17 @@ namespace tezcat::Tiny
 
 		static void enableEnvLighting()
 		{
-			sCloseEnvLighting = false;
+			sCalculateEnvLighting = true;
 		}
 
 		static void disableEnvLighting()
 		{
-			sCloseEnvLighting = true;
+			sCalculateEnvLighting = false;
 		}
 
 	private:
 		static RenderObserverMultView* createObserver();
-		static void createCube();
+		static void createHDR2Cube();
 		static void createIrradiance();
 		static void createPrefilter();
 		static void createBRDF_LUT();
@@ -126,17 +126,19 @@ namespace tezcat::Tiny
 		static bool sCalculateEnvLighting;
 		static bool sCloseEnvLighting;
 		static bool sEnableSkyBox;
-		static bool sLocker;
+		static bool sIsSceneExited;
 
 	private:
-		static ReplacedPipelinePass* sTexturePass;
+		static ReplacedPipelinePass* sMakeCubeTexPass;
 		static ReplacedPipelinePass* sIrradiancePass;
 		static ReplacedPipelinePass* sPrefilterPass;
 		static ReplacedPipelinePass* sBRDFLUTPass;
 		static ReplacedPipelinePass* sSkyBoxPass;
+		static std::vector<std::function<void()>> mEnvPassArray;
 
 	private:
 		static LightData* sLightData;
 		static std::function<void()> sRemovePassFromPipeline;
+
 	};
 }

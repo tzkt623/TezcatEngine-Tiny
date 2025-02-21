@@ -18,7 +18,8 @@
 #include "Core/Manager/SceneManager.h"
 
 #include "Core/Scene.h"
-#include "Core/Profiler.h"
+#include "Core/Debug/Debug.h"
+
 
 #include "Core/Tool/Tool.h"
 #include "Core/Event/EngineEvent.h"

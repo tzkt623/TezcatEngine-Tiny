@@ -15,7 +15,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Core/Tool/Log.h"
+#include "Core/Debug/Log.h"
 
 namespace tezcat::Tiny
 {
@@ -45,44 +45,49 @@ namespace tezcat::Tiny
 		{
 		case LogTypeID::LT_Engine:
 			data->str.insert(0, "[Engine]");
+			TINY_LOG_CONSOLO(TINY_LOG_COLOR_GREEN, data->str);
 			break;
 		case LogTypeID::LT_Info:
 			data->str.insert(0, "[Info]");
+			TINY_LOG_CONSOLO(TINY_LOG_COLOR_WHITE, data->str);
 			break;
 		case LogTypeID::LT_Error:
 			data->str.insert(0, "[Error]");
+			TINY_LOG_CONSOLO(TINY_LOG_COLOR_RED, data->str);
 			break;
 		case LogTypeID::LT_Warning:
 			data->str.insert(0, "[Warning]");
+			TINY_LOG_CONSOLO(TINY_LOG_COLOR_YELLOW, data->str);
 			break;
 		default:
 			break;
 		}
+
 
 		return data;
 	}
 
 	void Log::info(std::string&& info)
 	{
-		auto result = createString(LogTypeID::LT_Info, std::forward<std::string>(info));
+		auto result = createString(LogTypeID::LT_Info, TINY_FWD(info));
 		push(result);
 	}
 
 	void Log::error(std::string&& info)
 	{
-		auto result = createString(LogTypeID::LT_Error, std::forward<std::string>(info));
+		auto result = createString(LogTypeID::LT_Error, TINY_FWD(info));
 		push(result);
 	}
 
 	void Log::warning(std::string&& info)
 	{
-		auto result = createString(LogTypeID::LT_Warning, std::forward<std::string>(info));
+		auto result = createString(LogTypeID::LT_Warning, TINY_FWD(info));
 		push(result);
 	}
 
 	void Log::engine(std::string&& info)
 	{
-		auto result = createString(LogTypeID::LT_Engine, std::forward<std::string>(info));
+		auto result = createString(LogTypeID::LT_Engine, TINY_FWD(info));
 		push(result);
 	}
 

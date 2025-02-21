@@ -169,6 +169,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
     <ClCompile Include="src\Core\Shader\ShaderParser.cpp" />
     <ClCompile Include="src\Core\Base\TinyGC.cpp" />
     <ClCompile Include="src\Core\Base\TinyGCInfo.cpp" />
@@ -180,7 +181,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="src\Core\Data\Resource.cpp" />
     <ClCompile Include="src\Core\Data\Text.cpp" />
     <ClCompile Include="src\Core\Head\ConfigHead.cpp" />
-    <ClCompile Include="src\Core\Head\RenderConfig.cpp" />
+    <ClCompile Include="src\Core\Renderer\RenderConfig.cpp" />
     <ClCompile Include="src\Core\Head\CppHead.cpp" />
     <ClCompile Include="src\Core\LightLayer.cpp" />
     <ClCompile Include="src\Core\Manager\CameraManager.cpp" />
@@ -191,7 +192,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="src\Core\Manager\ShadowCasterManager.cpp" />
     <ClCompile Include="src\Core\Manager\TextureManager.cpp" />
     <ClCompile Include="src\Core\Manager\LightingManager.cpp" />
-    <ClCompile Include="src\Core\Renderer\CameraAgent.cpp" />
+    <ClCompile Include="src\Core\Renderer\CameraObserver.cpp" />
     <ClCompile Include="src\Core\Renderer\GraphicsAgent.cpp" />
     <ClCompile Include="src\Core\Renderer\MeshRenderAgent.cpp" />
     <ClCompile Include="src\Core\Renderer\Pipeline.cpp" />
@@ -219,7 +220,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="src\Core\Tool\Collision\BoundingBox.cpp" />
     <ClCompile Include="src\Core\Tool\Collision\OBB.cpp" />
     <ClCompile Include="src\Core\Tool\Collision\FrustumCulling.cpp" />
-    <ClCompile Include="src\Core\Tool\Log.cpp" />
+    <ClCompile Include="src\Core\Debug\Log.cpp" />
     <ClCompile Include="src\Core\Event\EngineEvent.cpp" />
     <ClCompile Include="src\Core\Tool\Event.cpp" />
     <ClCompile Include="src\Core\Tool\FileTool.cpp" />
@@ -234,7 +235,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="src\Core\Manager\ShaderManager.cpp" />
     <ClCompile Include="src\Core\Component\Transform.cpp" />
     <ClCompile Include="src\Core\Renderer\Vertex.cpp" />
-    <ClCompile Include="src\Core\Profiler.cpp" />
+    <ClCompile Include="src\Core\Debug\Profiler.cpp" />
     <ClCompile Include="src\Core\Renderer\Texture.cpp" />
     <ClCompile Include="src\Core\Manager\VertexBufferManager.cpp" />
     <ClCompile Include="src\Core\Shader\ShaderPackage.cpp" />
@@ -252,18 +253,20 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Component\ShadowCaster.h" />
     <ClInclude Include="include\Core\Data\Resource.h" />
     <ClInclude Include="include\Core\Data\Text.h" />
+    <ClInclude Include="include\Core\Debug\Debug.h" />
     <ClInclude Include="include\Core\Head\TinyCpp.h" />
     <ClInclude Include="include\Core\Base\TinyGC.h" />
     <ClInclude Include="include\Core\Base\TinyRefObject.h" />
     <ClInclude Include="include\Core\Component\Camera.h" />
     <ClInclude Include="include\Core\Component\FlyController.h" />
     <ClInclude Include="include\Core\Head\ConfigHead.h" />
-    <ClInclude Include="include\Core\Head\RenderConfig.h" />
+    <ClInclude Include="include\Core\Renderer\RenderConfig.h" />
     <ClInclude Include="include\Core\LightLayer.h" />
     <ClInclude Include="include\Core\Manager\ModelManager.h" />
     <ClInclude Include="include\Core\Manager\ShadowCasterManager.h" />
     <ClInclude Include="include\Core\Manager\LightingManager.h" />
-    <ClInclude Include="include\Core\Renderer\CameraAgent.h" />
+    <ClInclude Include="include\Core\Manager\UniformBufferManager.h" />
+    <ClInclude Include="include\Core\Renderer\CameraObserver.h" />
     <ClInclude Include="include\Core\Renderer\GraphicsAgent.h" />
     <ClInclude Include="include\Core\Renderer\MeshRenderAgent.h" />
     <ClInclude Include="include\Core\Renderer\Pipeline.h" />
@@ -275,6 +278,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Renderer\FrameBuffer.h" />
     <ClInclude Include="include\Core\Manager\FrameBufferManager.h" />
     <ClInclude Include="include\Core\Renderer\RenderObserver.h" />
+    <ClInclude Include="include\Core\Renderer\UniformBufferConfig.h" />
     <ClInclude Include="include\Core\Renderer\VertexBuffer.h" />
     <ClInclude Include="include\Core\Base\TinyObject.h" />
     <ClInclude Include="include\Core\Component\GameObject.h" />
@@ -285,7 +289,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Tool\Collision\BoundingBox.h" />
     <ClInclude Include="include\Core\Tool\Collision\OBB.h" />
     <ClInclude Include="include\Core\Tool\GaussianMatrix.h" />
-    <ClInclude Include="include\Core\Tool\Log.h" />
+    <ClInclude Include="include\Core\Debug\Log.h" />
     <ClInclude Include="include\Core\Event\EngineEvent.h" />
     <ClInclude Include="include\Core\Tool\DelegateCreator.h" />
     <ClInclude Include="include\Core\Tool\Collision\FrustumCulling.h" />
@@ -317,7 +321,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Manager\ShaderManager.h" />
     <ClInclude Include="include\Core\Component\Transform.h" />
     <ClInclude Include="include\Core\Renderer\Vertex.h" />
-    <ClInclude Include="include\Core\Profiler.h" />
+    <ClInclude Include="include\Core\Debug\Profiler.h" />
     <ClInclude Include="include\Core\Renderer\Texture.h" />
     <ClInclude Include="include\Core\Manager\VertexBufferManager.h" />
     <ClInclude Include="include\Core\Shader\ShaderPackage.h" />

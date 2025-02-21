@@ -28,13 +28,13 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(BaseRenderer, TinyObject)
+	TINY_OBJECT_CPP(BaseRenderer, TinyObject);
 
 	//---------------------------------------------------------------
 	//
 	// IRenderMesh
 	//
-	TINY_OBJECT_CPP(BaseMeshRenderer, BaseRenderer)
+	TINY_OBJECT_CPP(BaseMeshRenderer, BaseRenderer);
 	BaseMeshRenderer::BaseMeshRenderer()
 		: mMaterial(nullptr)
 		, mVertex(nullptr)
@@ -102,20 +102,12 @@ namespace tezcat::Tiny
 
 	void BaseMeshRenderer::makeRenderCommand(BaseRenderObserver* renderObserver)
 	{
-		auto cmd2 = new RenderCMD_DrawMesh(mVertex, mTransform, mMaterial);
-
 		auto pass = renderObserver->createOrGetPass(mMaterial->getShader());
-		//auto cmd = Graphics::getInstance()->createDrawCMD(mVertex, mTransform, mMaterial);
-
-
-		//new RenderCommand(mVertex, mTransform, mMaterial);
-
-		//pass->addCommand(cmd);
-		pass->addCommand(cmd2);
+		pass->addCommand<RenderCMD_DrawMesh>(mVertex, mTransform, mMaterial);
 	}
 
 	void BaseMeshRenderer::makeRenderCommand(PipelinePass* pass)
 	{
-		pass->addCommand(new RenderCMD_DrawShadow(mVertex, mTransform));
+		pass->addCommand<RenderCMD_DrawShadow>(mVertex, mTransform);
 	}
 }

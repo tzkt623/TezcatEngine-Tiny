@@ -30,7 +30,7 @@ namespace tezcat::Editor
 		mWindowWidth = 1920;
 		mWindowHeight = 1080;
 		mEnableVsync = true;
-		this->setGLVersion(3, 3);
+		this->setGLVersion(4, 3);
 	}
 
 	void MyEngineIniter::prepareResource(Engine* engine)

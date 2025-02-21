@@ -36,7 +36,8 @@
 #include "Core/Data/MeshData.h"
 #include "Core/Event/EngineEvent.h"
 		
-#include "Core/Profiler.h"
+#include "Core/Debug/Debug.h"
+
 #include "Core/Engine.h"
 
 
@@ -59,11 +60,20 @@ namespace tezcat::Tiny
 
 	void BaseGraphics::buildCommand()
 	{
-		for (auto cmd : mBuildCommandList)
+		if (mBuildCommandList.empty())
 		{
-			cmd->execute(nullptr);
-			delete cmd;
+			return;
 		}
+
+		uint32_t index = 0;
+		while (index < mBuildCommandList.size())
+		{
+			auto& cmd = mBuildCommandList[index];
+			cmd->execute();
+			delete cmd;
+			index++;
+		}
+
 		mBuildCommandList.clear();
 	}
 

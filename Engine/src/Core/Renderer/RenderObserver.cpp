@@ -20,12 +20,13 @@
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/Pipeline.h"
+#include "Core/Renderer/VertexBuffer.h"
 
 #include "Core/Shader/Shader.h"
 #include "Core/Shader/ShaderParam.h"
-		  
+
 #include "Core/Component/Transform.h"
-		  
+
 #include "Core/Manager/CameraManager.h"
 
 namespace tezcat::Tiny
@@ -48,13 +49,18 @@ namespace tezcat::Tiny
 		, mEnable(true)
 		, mNeedRemove(false)
 		, mUID(0)
+		, mUniformBuffer(nullptr)
 	{
 		mCullLayerList.reserve(32);
 	}
 
 	BaseRenderObserver::~BaseRenderObserver()
 	{
-
+		if (mUniformBuffer)
+		{
+			mUniformBuffer->deleteObject();
+			mUniformBuffer = nullptr;
+		}
 	}
 
 	void BaseRenderObserver::setOrtho(float near, float far)
@@ -92,7 +98,7 @@ namespace tezcat::Tiny
 		mDirty = true;
 	}
 
-	void BaseRenderObserver::updateObserverMatrix()
+	bool BaseRenderObserver::updateObserverMatrix()
 	{
 		if (mDirty)
 		{
@@ -120,7 +126,11 @@ namespace tezcat::Tiny
 			default:
 				break;
 			}
+
+			return true;
 		}
+
+		return false;
 	}
 
 	void BaseRenderObserver::setFrameBuffer(FrameBuffer* frameBuffer)
@@ -217,7 +227,8 @@ namespace tezcat::Tiny
 	void BaseRenderObserver::addToPipeline()
 	{
 		CameraManager::addRenderObserver(this);
-;	}
+		;
+	}
 
 	void BaseRenderObserver::removeFromPipeline()
 	{
@@ -228,11 +239,23 @@ namespace tezcat::Tiny
 	{
 		mNeedRemove = false;
 	}
+
+	void BaseRenderObserver::createUniformBuffer()
+	{
+		if (mUniformBuffer != nullptr)
+		{
+			return;
+		}
+
+		mUniformBuffer = UniformBuffer::create();
+		mUniformBuffer->saveObject();
+	}
+
 #pragma endregion
 
 
 #pragma region RenderObserver
-	TINY_OBJECT_CPP(RenderObserver, BaseRenderObserver)
+	TINY_OBJECT_CPP(RenderObserver, BaseRenderObserver);
 
 	RenderObserver::RenderObserver()
 		: mViewMatrix(1.0f)
@@ -245,7 +268,7 @@ namespace tezcat::Tiny
 
 	}
 
-	void RenderObserver::submitViewMatrix(Shader* shader)
+	void RenderObserver::submit(Shader* shader)
 	{
 		if (!mTransform)
 		{
@@ -255,18 +278,56 @@ namespace tezcat::Tiny
 		this->updateObserverMatrix();
 
 		mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
-								, mTransform->getWorldPosition() + mTransform->getForward()
-								, mTransform->getUp());
+			, mTransform->getWorldPosition() + mTransform->getForward()
+			, mTransform->getUp());
 
 		auto VP = mProjectionMatrix * mViewMatrix;
 
-		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
-		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
-		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixVP, VP);
+		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
+		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
+		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixVP, VP);
 		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixMV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
 
 		Graphics::getInstance()->setFloat3(shader, ShaderParam::CameraWorldPosition, mTransform->getWorldPosition());
 		Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
+
+
+
+		//auto of_mat = sizeof(float4x4) / sizeof(float) * 3;
+		//float3 *p1 = (float3*)((float*)mUniformBuffer->getData() + of_mat);
+		//float2 *p2 = (float2*)((float*)mUniformBuffer->getData() + of_mat + sizeof(float3) / sizeof(float));
+		//
+		//auto c = (*p1).x;
+
+		if (mUniformBuffer)
+		{
+			Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
+		}
+	}
+
+	void RenderObserver::prepareRender()
+	{
+		if (!mTransform)
+		{
+			return;
+		}
+
+		this->updateObserverMatrix();
+
+		mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
+			, mTransform->getWorldPosition() + mTransform->getForward()
+			, mTransform->getUp());
+
+		auto VP = mProjectionMatrix * mViewMatrix;
+
+		if (mUniformBuffer)
+		{
+			mUniformBuffer->update<float4x4>(0, glm::value_ptr(mProjectionMatrix));
+			mUniformBuffer->update<float4x4>(1, glm::value_ptr(mViewMatrix));
+			mUniformBuffer->update<float4x4>(2, glm::value_ptr(VP));
+			mUniformBuffer->update<float3>(3, glm::value_ptr(mTransform->getWorldPosition()));
+			mUniformBuffer->update<float2>(4, glm::value_ptr(float2(mNearFace, mFarFace)));
+		}
 	}
 
 #pragma endregion
@@ -274,9 +335,9 @@ namespace tezcat::Tiny
 
 
 #pragma region RenderObserverMultView
-	TINY_OBJECT_CPP(RenderObserverMultView, BaseRenderObserver)
+	TINY_OBJECT_CPP(RenderObserverMultView, BaseRenderObserver);
 
-		RenderObserverMultView::RenderObserverMultView()
+	RenderObserverMultView::RenderObserverMultView()
 		: mArraySize(-1)
 		, mViewMatrixArray(nullptr)
 	{
@@ -294,12 +355,70 @@ namespace tezcat::Tiny
 		mArraySize = size;
 	}
 
-	void RenderObserverMultView::submitViewMatrix(Shader* shader)
+	void RenderObserverMultView::submit(Shader* shader)
 	{
-		this->updateObserverMatrix();
-		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
-		Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
+		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
+		//Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
+		if (mUniformBuffer)
+		{
+			Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
+			Graphics::getInstance()->bind(mUniformBuffer);
+		}
+	}
+
+	void RenderObserverMultView::prepareRender()
+	{
+		if (this->updateObserverMatrix())
+		{
+			if (mUniformBuffer)
+			{
+				mUniformBuffer->updateWithConfig<UniformBufferBinding::SkyBox::MatrixP>(glm::value_ptr(mProjectionMatrix));
+			}
+		}
 	}
 
 #pragma endregion
+	TINY_OBJECT_CPP(ShadowObserver, BaseRenderObserver);
+	ShadowObserver::ShadowObserver()
+	{
+		this->createUniformBuffer();
+		mUniformBuffer->setLayout("CameraUBO"
+			, [](UniformBufferLayout* layout)
+			{
+				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::MatrixP>();			//P
+				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::MatrixV>();			//V
+				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::MatrixVP>();		//VP
+				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::WorldPosition>();	//Position
+				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::NearFar>();			//NearFar
+			});
+	}
+
+	ShadowObserver::~ShadowObserver()
+	{
+
+	}
+
+	void ShadowObserver::prepareRender()
+	{
+		if (!mTransform)
+		{
+			return;
+		}
+
+		this->updateObserverMatrix();
+
+		mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
+			, mTransform->getWorldPosition() + mTransform->getForward()
+			, mTransform->getUp());
+
+		auto vp = mProjectionMatrix * mViewMatrix;
+		//mUniformBuffer->updateWithConfig<UniformBufferBinding::Camera::MatrixP>(glm::value_ptr(mProjectionMatrix));
+		mUniformBuffer->updateWithConfig<UniformBufferBinding::Camera::MatrixVP>(glm::value_ptr(vp));
+	}
+
+	void ShadowObserver::submit(Shader* shader)
+	{
+		Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
+		Graphics::getInstance()->bind(mUniformBuffer);
+	}
 }

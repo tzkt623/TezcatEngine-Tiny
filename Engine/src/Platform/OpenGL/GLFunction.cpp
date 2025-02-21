@@ -26,16 +26,18 @@
 #include "Core/Renderer/VertexBuffer.h"
 
 #include "Core/Head/TinyCpp.h"
-#include "Core/Tool/Log.h"
+#include "Core/Debug/Debug.h"
+
 
 #include "Core/Shader/Shader.h"
 #include "core/Shader/ShaderParser.h"
 
 #include "Core/Manager/LightingManager.h"
+#include "Core/Manager/VertexBufferManager.h"
 
 namespace tezcat::Tiny::GL
 {
-	GLFunction_Vertex GLFunction::FuncVertex;
+	GLFunction_Buffer GLFunction::FuncBuffer;
 	GLFunction_FrameBuffer GLFunction::FuncFrameBuffer;
 	GLFunction_Shader GLFunction::FuncShader;
 	GLFunction_Texture GLFunction::FuncTexture;
@@ -45,7 +47,7 @@ namespace tezcat::Tiny::GL
 	//
 	//	Create Vertex
 	//
-	void GLFunction_Vertex::build(Vertex* vertex)
+	void GLFunction_Buffer::build(Vertex* vertex)
 	{
 		GLuint vao;
 		glGenVertexArrays(1, &vao);
@@ -100,7 +102,7 @@ namespace tezcat::Tiny::GL
 		vertex->apply(vao);
 	}
 
-	void GLFunction_Vertex::build(VertexBuffer* vertexBuffer)
+	void GLFunction_Buffer::build(VertexBuffer* vertexBuffer)
 	{
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
@@ -113,7 +115,7 @@ namespace tezcat::Tiny::GL
 		vertexBuffer->apply(vbo);
 	}
 
-	void GLFunction_Vertex::build(IndexBuffer* indexBuffer)
+	void GLFunction_Buffer::build(IndexBuffer* indexBuffer)
 	{
 		GLuint ebo;
 		glGenBuffers(1, &ebo);
@@ -122,7 +124,26 @@ namespace tezcat::Tiny::GL
 			, indexBuffer->getDataSize()
 			, indexBuffer->getData()
 			, indexBuffer->getData() == nullptr ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+
 		indexBuffer->apply(ebo);
+	}
+
+	void GLFunction_Buffer::build(UniformBuffer* uniformBuffer, int32_t bindingIndex)
+	{
+		GLuint ubo;
+		glGenBuffers(1, &ubo);
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+		glBufferData(GL_UNIFORM_BUFFER
+			, uniformBuffer->getDataSize()
+			, uniformBuffer->getData()
+			, GL_STATIC_DRAW);
+
+		if (bindingIndex > -1)
+		{
+			glBindBufferBase(GL_UNIFORM_BUFFER, bindingIndex, ubo);
+		}
+
+		uniformBuffer->apply(ubo);
 	}
 
 	//---------------------------------------
@@ -310,10 +331,10 @@ namespace tezcat::Tiny::GL
 	{
 		mColorCount = 1;
 		TINY_GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER
-							 , GL_COLOR_ATTACHMENT0 + colorIndex
-							 , GL_TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex
-							 , tex->getTextureID()
-							 , level));
+			, GL_COLOR_ATTACHMENT0 + colorIndex
+			, GL_TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex
+			, tex->getTextureID()
+			, level));
 	}
 
 
@@ -340,12 +361,14 @@ namespace tezcat::Tiny::GL
 		if (!success)
 		{
 			glGetProgramInfoLog(pid, 512, nullptr, infoLog);
-			Log_Error(shader->getName() + "|" + infoLog);
+			TINY_LOG_ERROR(shader->getName() + "|" + infoLog);
+			std::cout << shader->getName() + "|" + infoLog + "\n";
+			TINY_ASSERT(false);
 			return;
 		}
 
 		std::function<void(ArgMetaData*, const std::string&)> progress_tiny =
-			[this, &progress_tiny, &pid, &shader](ArgMetaData* metaData, const std::string& parentName)
+			[&progress_tiny, &pid, &shader](ArgMetaData* metaData, const std::string& parentName)
 			{
 				auto& name = metaData->valueName;
 				auto array_size = metaData->valueCount;
@@ -390,7 +413,7 @@ namespace tezcat::Tiny::GL
 							}
 							else
 							{
-								Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
+								TINY_LOG_ERROR(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
 							}
 						}
 					}
@@ -404,14 +427,14 @@ namespace tezcat::Tiny::GL
 						}
 						else
 						{
-							Log_Error(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
+							TINY_LOG_ERROR(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
 						}
 					}
 				}
 			};
 
 		std::function<void(ArgMetaData*, const std::string&)> progress_user =
-			[this, &progress_user, &pid, &shader](ArgMetaData* metaData, const std::string& parentName)
+			[&progress_user, &pid, &shader](ArgMetaData* metaData, const std::string& parentName)
 			{
 				auto& name = metaData->valueName;
 				auto array_size = metaData->valueCount;
@@ -471,10 +494,41 @@ namespace tezcat::Tiny::GL
 			progress_user(pair.second.get(), "");
 		}
 
+		//把shader连接到UBO槽上
+		for (auto& pair : parser->mUBOMap)
+		{
+			auto info = VertexBufferManager::getUniformBufferLayout(pair.first);
+
+			TINY_GL_CHECK_RETURN(glGetUniformBlockIndex(pid, pair.first.c_str()), ubID);
+			TINY_GL_CHECK(glUniformBlockBinding(pid, ubID, info->mBindingIndex));
+
+			if (!info->isGPUChecked())
+			{
+				int32_t block_size = 0;
+				TINY_GL_CHECK(glGetActiveUniformBlockiv(pid, ubID, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size));
+				TINY_LOG_ENGINE(pair.first + std::to_string(block_size));
+				info->mSize = block_size;
+				
+				for (auto& slot : info->mSlot)
+				{
+					uint32_t index;
+					int32_t offset;
+					auto name = slot.name.c_str();
+					TINY_GL_CHECK(glGetUniformIndices(pid, 1, &name, &index));
+					TINY_GL_CHECK(glGetActiveUniformsiv(pid, 1, &index, GL_UNIFORM_OFFSET, &offset));
+
+					slot.offset = offset;
+				}
+
+				info->gpuCheckComplete();
+
+				info->notifyHolderUpdateData();
+			}
+		}
 
 		shader->apply(pid);
 
-		Log_Engine(fmt::format("Shader[{}] Build Complete[{}] ({})"
+		TINY_LOG_ENGINE(fmt::format("Shader[{}] Build Complete[{}] ({})"
 			, shader->getName()
 			, shader->getProgramID()
 			, shader->getFilePath()));
@@ -496,11 +550,11 @@ namespace tezcat::Tiny::GL
 			{
 			case GL_VERTEX_SHADER:
 				std::cout << "GLShader [" + shader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log_Error(fmt::format("GLShader[{}]: [VERTEX] COMPILATION_FAILED > {})", shader->getName(), infoLog));
+				TINY_LOG_ERROR(fmt::format("GLShader[{}]: [VERTEX] COMPILATION_FAILED > {})", shader->getName(), infoLog));
 				break;
 			case GL_FRAGMENT_SHADER:
 				std::cout << "GLShader [" + shader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
-				Log_Error(fmt::format("GLShader[{}]: [FRAGMENT] COMPILATION_FAILED > {})", shader->getName(), infoLog));
+				TINY_LOG_ERROR(fmt::format("GLShader[{}]: [FRAGMENT] COMPILATION_FAILED > {})", shader->getName(), infoLog));
 				break;
 			default:
 				break;
@@ -519,7 +573,7 @@ namespace tezcat::Tiny::GL
 	void GLFunction_Texture::build(Texture2D* tex2D)
 	{
 		GLuint tex_id;
-		glGenTextures(1, &tex_id);
+		TINY_GL_CHECK(glGenTextures(1, &tex_id));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, tex_id));
 		TINY_GL_CHECK(glTexImage2D(GL_TEXTURE_2D
 			, 0
@@ -620,31 +674,34 @@ namespace tezcat::Tiny::GL
 	}
 
 
+	GLFunction_PBR::GLFunction_PBR()
+	{
+		mCaptureViews[0] = glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 0.0f, 0.0f), float3(0.0f, -1.0f, 0.0f));
+		mCaptureViews[1] = glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(-1.0f, 0.0f, 0.0f), float3(0.0f, -1.0f, 0.0f));
+		mCaptureViews[2] = glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), float3(0.0f, 0.0f, 1.0f));
+		mCaptureViews[3] = glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f, -1.0f, 0.0f), float3(0.0f, 0.0f, -1.0f));
+		mCaptureViews[4] = glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), float3(0.0f, -1.0f, 0.0f));
+		mCaptureViews[5] = glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, -1.0f), float3(0.0f, -1.0f, 0.0f));
+	}
+
 	//-------------------------------------------------------
 	//
 	//	RenderCMD_HDRToCube
 	//
-	void GLFunction_PBR::makeHDR2Cube(Shader* shader, Vertex* vertex, Texture2D* texHDR, TextureCube* skybox)
+	void GLFunction_PBR::makeHDR2Cube(Shader* shader
+		, Vertex* vertex
+		, Texture2D* texHDR
+		, TextureCube* skybox) const
 	{
-		float4x4 captureViews[] =
-		{
-		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(1.0f,  0.0f,  0.0f), float3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(-1.0f, 0.0f,  0.0f), float3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  1.0f,  0.0f), float3(0.0f,  0.0f,  1.0f)),
-		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f, -1.0f,  0.0f), float3(0.0f,  0.0f, -1.0f)),
-		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  0.0f,  1.0f), float3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(float3(0.0f, 0.0f, 0.0f), float3(0.0f,  0.0f, -1.0f), float3(0.0f, -1.0f,  0.0f))
-		};
-
 		shader->resetLocalState();
-		auto uinfo = shader->getUniformInfo("myTexHDR2D");
-		Graphics::getInstance()->setTexture2D(shader, uinfo->shaderID, texHDR);
+		auto uniform_config = shader->getUniformValueConfig("myTexHDR2D");
+		Graphics::getInstance()->setTexture2D(shader, uniform_config->valueID, texHDR);
 
-		Texture2D** array = LightingManager::getCubeMapTextureArray();
+		auto array = LightingManager::getCubeMapTextureArray();
 
 		for (uint32 i = 0; i < 6; i++)
 		{
-			Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, captureViews[i]);
+			Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mCaptureViews[i]);
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 				 , GL_COLOR_ATTACHMENT0
@@ -672,18 +729,11 @@ namespace tezcat::Tiny::GL
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
-	void GLFunction_PBR::makeEnvIrradiance(Shader* shader, Vertex* vertex, TextureCube* skybox, TextureCube* irradiance)
+	void GLFunction_PBR::makeEnvIrradiance(Shader* shader
+		, Vertex* vertex
+		, TextureCube* skybox
+		, TextureCube* irradiance) const
 	{
-		glm::mat4 captureViews[] =
-		{
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
-		};
-
 		shader->resetLocalState();
 		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
 
@@ -696,7 +746,7 @@ namespace tezcat::Tiny::GL
 								 , irradiance->getTextureID()
 								 , 0);
 
-			Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, captureViews[i]);
+			Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mCaptureViews[i]);
 			//shader->setViewMatrix(captureViews[i]);
 
 			Graphics::getInstance()->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
@@ -711,18 +761,8 @@ namespace tezcat::Tiny::GL
 		, uint32 mipMaxLevel
 		, uint32 mipWidth
 		, uint32 mipHeight
-		, int32 resolution)
+		, int32 resolution) const
 	{
-		glm::mat4 captureViews[] =
-		{
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
-		};
-
 		shader->resetLocalState();
 		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
 
@@ -745,7 +785,7 @@ namespace tezcat::Tiny::GL
 									 , prefitler->getTextureID()
 									 , mip);
 
-				Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, captureViews[i]);
+				Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mCaptureViews[i]);
 
 				Graphics::getInstance()->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 				Graphics::getInstance()->draw(vertex);

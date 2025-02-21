@@ -9,6 +9,8 @@ namespace tezcat::Tiny
 	class VertexBuffer;
 	class IndexBuffer;
 	class MeshData;
+	class UniformBuffer;
+	class UniformBufferLayout;
 
 	class TINY_API VertexBufferManager
 	{
@@ -25,9 +27,19 @@ namespace tezcat::Tiny
 		static MeshData* findMeshData(const std::string& name);
 		static Vertex* findVertex(const std::string& name);
 
+		static void init();
+
 	private:
 		static std::unordered_map<std::string_view, Vertex*> mVertexUMap;
 		static std::unordered_map<std::string_view, MeshData*> mMeshDataUMap;
 		static std::vector<Vertex*> mVertexAry;
+
+
+	public:
+		static std::tuple<bool, std::shared_ptr<UniformBufferLayout>> createUniformBufferLayout(const std::string& name);
+		static std::shared_ptr<UniformBufferLayout> getUniformBufferLayout(const std::string& name);
+
+	private:
+		static std::unordered_map<std::string, std::shared_ptr<UniformBufferLayout>> mUniformBufferMap;
 	};
 }

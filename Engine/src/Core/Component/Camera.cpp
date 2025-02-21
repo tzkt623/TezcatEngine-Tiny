@@ -27,7 +27,7 @@ namespace tezcat::Tiny
 	TINY_OBJECT_CPP(Camera, ComponentT<Camera>)
 
 	Camera::Camera(bool mainCamera)
-		: mCameraAgent(CameraAgent::create())
+		: mCameraAgent(CameraObserver::create())
 		, mIsMain(mainCamera)
 	{
 		mCameraAgent->saveObject();

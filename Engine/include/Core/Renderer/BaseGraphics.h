@@ -1,7 +1,25 @@
 ﻿#pragma once
+
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "../Head/ConfigHead.h"
-#include "../Head/RenderConfig.h"
 #include "../Head/GLMHead.h"
+#include "../Renderer/RenderConfig.h"
 
 #include "../Shader/Uniform.h"
 #include "../Tool/Tool.h"
@@ -14,6 +32,7 @@ namespace tezcat::Tiny
 	class RenderObjectCache;
 	class BaseRenderer;
 	class BaseMeshRenderer;
+	class BaseRenderObserver;
 	class Camera;
 	class Pipeline;
 	class TextureRender2D;
@@ -21,6 +40,7 @@ namespace tezcat::Tiny
 	class Vertex;
 	class VertexBuffer;
 	class IndexBuffer;
+	class UniformBuffer;
 	class Image;
 	class TextureCube;
 	class Texture2D;
@@ -68,9 +88,12 @@ namespace tezcat::Tiny
 		virtual void createBuffer(VertexBuffer* buffer) {}
 		virtual void createBuffer(IndexBuffer* buffer) {}
 		virtual void createBuffer(FrameBuffer* buffer) {}
+		virtual void createUniformBuffer(UniformBuffer* buffer, int32_t bindingIndex) {}
 		virtual void createTexture(Texture2D* tex2D) {}
 		virtual void createTexture(TextureCube* texCube) {}
 		virtual void createTexture(TextureRender2D* render2D) {}
+
+		virtual void createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel) {}
 
 	public:
 		virtual void deleteVertex(Vertex* vertex) {}
@@ -84,14 +107,17 @@ namespace tezcat::Tiny
 
 	public:
 		virtual void makeHDR2Cube(Shader* shader
+			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, Texture2D* texHDR
 			, TextureCube* skybox) {}
 		virtual void makeEnvIrradiance(Shader* shader
+			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* irradiance) {}
 		virtual void makeEnvPrefilter(Shader* shader
+			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* prefitler
@@ -99,6 +125,12 @@ namespace tezcat::Tiny
 			, uint32 mipWidth
 			, uint32 mipHeight
 			, int32 resolution) {}
+
+	public:
+		virtual void setUniformBuffer(UniformBuffer* uniformBuffer) {}
+		virtual void setFrameBufferColorTexture2D(Texture2D* tex, int32_t index) {}
+		virtual void setFrameBufferColorTextureCube(TextureCube* tex, int32_t index, int32_t cubeFace) {}
+
 
 		//----------------------------------------------------
 		//
@@ -165,29 +197,29 @@ namespace tezcat::Tiny
 		//	User Interface
 		//
 	public:
-		virtual void setFloat1(Shader* shader, const int& shaderID, const float& data) = 0;
-		virtual void setFloat1(Shader* shader, const int& shaderID, const float* data) = 0;
-		virtual void setFloat2(Shader* shader, const int& shaderID, const float* data) = 0;
-		virtual void setFloat3(Shader* shader, const int& shaderID, const float* data) = 0;
-		virtual void setFloat4(Shader* shader, const int& shaderID, const float* data) = 0;
+		virtual void setFloat1(Shader* shader, const int& valueID, const float& data) = 0;
+		virtual void setFloat1(Shader* shader, const int& valueID, const float* data) = 0;
+		virtual void setFloat2(Shader* shader, const int& valueID, const float* data) = 0;
+		virtual void setFloat3(Shader* shader, const int& valueID, const float* data) = 0;
+		virtual void setFloat4(Shader* shader, const int& valueID, const float* data) = 0;
 
-		virtual void setInt1(Shader* shader, const int& shaderID, const int& data) = 0;
-		virtual void setInt1(Shader* shader, const int& shaderID, int* data) = 0;
-		virtual void setInt2(Shader* shader, const int& shaderID, int* data) = 0;
-		virtual void setInt3(Shader* shader, const int& shaderID, int* data) = 0;
-		virtual void setInt4(Shader* shader, const int& shaderID, int* data) = 0;
+		virtual void setInt1(Shader* shader, const int& valueID, const int& data) = 0;
+		virtual void setInt1(Shader* shader, const int& valueID, int* data) = 0;
+		virtual void setInt2(Shader* shader, const int& valueID, int* data) = 0;
+		virtual void setInt3(Shader* shader, const int& valueID, int* data) = 0;
+		virtual void setInt4(Shader* shader, const int& valueID, int* data) = 0;
 
-		virtual void setMat3(Shader* shader, const int& shaderID, const float* data) = 0;
-		virtual void setMat3(Shader* shader, const int& shaderID, const float3x3& mat3) = 0;
-		virtual void setMat4(Shader* shader, const int& shaderID, const float* data) = 0;
-		virtual void setMat4(Shader* shader, const int& shaderID, const float4x4& mat4) = 0;
-		virtual void setMat4(Shader* shader, const int& shaderID, float4x4 data[], int count) = 0;
+		virtual void setMat3(Shader* shader, const int& valueID, const float* data) = 0;
+		virtual void setMat3(Shader* shader, const int& valueID, const float3x3& mat3) = 0;
+		virtual void setMat4(Shader* shader, const int& valueID, const float* data) = 0;
+		virtual void setMat4(Shader* shader, const int& valueID, const float4x4& mat4) = 0;
+		virtual void setMat4(Shader* shader, const int& valueID, float4x4 data[], int count) = 0;
 
-		virtual void setGlobalTexture2D(Shader* shader, const int& shaderID, Texture2D* data) = 0;
-		virtual void setTexture2D(Shader* shader, const int& shaderID, Texture2D* data) = 0;
+		virtual void setGlobalTexture2D(Shader* shader, const int& valueID, Texture2D* data) = 0;
+		virtual void setTexture2D(Shader* shader, const int& valueID, Texture2D* data) = 0;
 
-		virtual void setGlobalTextureCube(Shader* shader, const int& shaderID, TextureCube* data) = 0;
-		virtual void setTextureCube(Shader* shader, const int& shaderID, TextureCube* data) = 0;
+		virtual void setGlobalTextureCube(Shader* shader, const int& valueID, TextureCube* data) = 0;
+		virtual void setTextureCube(Shader* shader, const int& valueID, TextureCube* data) = 0;
 
 		//----------------------------------------------------
 		//
@@ -199,6 +231,7 @@ namespace tezcat::Tiny
 		virtual void setPassState(Shader* shader) = 0;
 		virtual void bind(Shader* shader) = 0;
 		virtual void bind(FrameBuffer* frameBuffer) = 0;
+		virtual void bind(UniformBuffer* uniformBuffer) = 0;
 
 		//----------------------------------------------------
 		//
@@ -219,6 +252,7 @@ namespace tezcat::Tiny
 
 	private:
 		std::vector<RenderCommadBuild*> mBuildCommandList;
+		std::queue<RenderCommadBuild*> mBuildCommandQueue;
 	};
 
 	using Graphics = SG<BaseGraphics>;

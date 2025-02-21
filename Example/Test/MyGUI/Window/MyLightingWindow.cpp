@@ -48,7 +48,7 @@ namespace tezcat::Editor
 			auto width = mCurrentHDR->getWidth();
 			auto height = mCurrentHDR->getHeight();
 			auto rate = (float)height / (float)width;
-			const int WIDTH = 256;
+			const float WIDTH = 256.0f;
 
 			ImGui::Image((ImTextureID)mCurrentHDR->getTextureID()
 				, ImVec2(WIDTH, WIDTH * rate)

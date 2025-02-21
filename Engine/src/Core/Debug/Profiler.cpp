@@ -15,7 +15,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Core/Profiler.h"
+#include "Core/Debug/Profiler.h"
 
 namespace tezcat::Tiny
 {

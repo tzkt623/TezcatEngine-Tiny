@@ -19,7 +19,7 @@ namespace tezcat::Editor
 		uniforms.push_back("gl_FragColor");
 		uniforms.push_back("gl_FragDepth");
 
-		mShaderEditor = new TextEditor();
+		mShaderEditor = std::make_unique<TextEditor>();
 		mShaderEditor->setFontScale(1.5f);
 		mShaderEditor->SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL_TINY(
 			{
@@ -34,7 +34,6 @@ namespace tezcat::Editor
 	MyShaderEditorWindow::~MyShaderEditorWindow()
 	{
 		sShaderEditorRegister.erase(mFilePath);
-		delete mShaderEditor;
 	}
 
 	void MyShaderEditorWindow::loadFile(std::filesystem::path& file)
@@ -80,8 +79,8 @@ namespace tezcat::Editor
 	{
 		GUIWindow::onRender();
 
-		auto cpos = mShaderEditor->GetCursorPosition();
-		ImGui::SetWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
+		//ImGui::SetWindowPos(ImGui::GetWindowPos(), ImGuiCond_Always);
+		//ImGui::SetWindowSize(ImGui::GetWindowSize(), ImGuiCond_Always);
 
 		if (ImGui::BeginMenuBar())
 		{
@@ -144,10 +143,11 @@ namespace tezcat::Editor
 					auto textToSave = mShaderEditor->GetText();
 					FileTool::saveFile(mFilePath.string(), textToSave);
 
-					std::regex rg_find_name(R"(#TINY_CFG_BEGIN[\s\S]*\{[\s\S]*str\s*Name\s*=\s*(.*);[\s\S]*\}[\s\S]*#TINY_CFG_END)");
-					std::sregex_iterator it(textToSave.begin(), textToSave.end(), rg_find_name);
-					std::string name = (*it)[1];
+					//std::regex rg_find_name(R"(#TINY_CFG_BEGIN[\s\S]*\{[\s\S]*str\s*Name\s*=\s*(.*);[\s\S]*\}[\s\S]*#TINY_CFG_END)");
+					//std::sregex_iterator it(textToSave.begin(), textToSave.end(), rg_find_name);
+					//std::string name = (*it)[1];
 
+					std::string name = ShaderParser::getName(textToSave);
 					ShaderManager::rebuild(name, textToSave);
 				}
 			}
@@ -186,18 +186,43 @@ namespace tezcat::Editor
 			ImGui::EndMenuBar();
 		}
 
+		ImGui::BeginChild("##ShaderList", ImVec2(240, ImGui::GetContentRegionAvail().y), true);
+		for (auto& pair : ShaderManager::getAllShaders())
+		{
+			bool flag = false;
+			ImGui::Selectable(pair.first.data(), mShaderFileData.mSelected == pair.second);
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("DoubleClicked To Open");
+				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				{
+					mShaderFileData.mSelected = pair.second;
+					std::filesystem::path path(mShaderFileData.mSelected->getFilePath());
+					this->loadFile(path);
+				}
+			}
+		}
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+
+		ImGui::BeginChild("##ShaderEditor", ImGui::GetContentRegionAvail(), true);
+
+		auto cpos = mShaderEditor->GetCursorPosition();
 		ImGui::Text("%6d/%-6d %6d 行(lines)  | %s | %s | %s | %s"
-		, cpos.mLine + 1, cpos.mColumn + 1
-		, mShaderEditor->GetTotalLines()
-		, mShaderEditor->IsOverwrite() ? "Ovr" : "Ins"
-		, mShaderEditor->CanUndo() ? "*" : "X"
-		, mShaderEditor->GetLanguageDefinition().mName.c_str()
-		, mFilePath.string().c_str());
+			, cpos.mLine + 1, cpos.mColumn + 1
+			, mShaderEditor->GetTotalLines()
+			, mShaderEditor->IsOverwrite() ? "Ovr" : "Ins"
+			, mShaderEditor->CanUndo() ? "*" : "X"
+			, mShaderEditor->GetLanguageDefinition().mName.c_str()
+			, mFilePath.string().c_str());
 
 		ImGui::Separator();
 
 		mShaderEditor->Render("TextEditor");
 
-		//ImGui::GetFont()->FontSize = font_size;
+		ImGui::EndChild();
 	}
+
+	//ImGui::GetFont()->FontSize = font_size;
 }

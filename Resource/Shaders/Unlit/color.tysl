@@ -8,7 +8,6 @@
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Unlit/Color;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;

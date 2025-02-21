@@ -25,7 +25,6 @@ namespace tezcat::Tiny
 
 	private:
 		static std::unordered_map<std::string_view, Shader*> mShaderUMap;
-	public:
 	};
 }
 

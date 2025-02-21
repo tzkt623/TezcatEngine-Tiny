@@ -1,7 +1,22 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "../Head/GLMHead.h"
-#include "../Head/RenderConfig.h"
+#include "../Renderer/RenderConfig.h"
 #include "../Tool/Tool.h"
 
 namespace tezcat::Tiny
@@ -22,14 +37,14 @@ namespace tezcat::Tiny
 		* @brief 传指针是为了避免shader的创建和生成不同步的情况
 		* @brief 直接使用id地址可以动态生成
 		*/
-		Uniform(int* shaderID) : mShaderID(shaderID) {}
+		Uniform(int32_t* valueID) : mValueID(valueID) {}
 
 		virtual ~Uniform() {}
 
 		virtual UniformType getType() = 0;
 		virtual void submit(Shader* shader) = 0;
 
-		int* mShaderID;
+		int32_t* mValueID;
 	};
 
 
@@ -38,8 +53,8 @@ namespace tezcat::Tiny
 	{
 		using ValueType = UniformValue;
 
-		UniformT(int* shaderID)
-			: Uniform(shaderID)
+		UniformT(int32_t* valueID)
+			: Uniform(valueID)
 			, value()
 		{}
 		virtual ~UniformT() {}
@@ -65,9 +80,9 @@ namespace tezcat::Tiny
 		virtual void endSetValue() {}
 	};
 
-	struct TINY_API UniformI1 : public UniformT<int>
+	struct TINY_API UniformI1 : public UniformT<int32_t>
 	{
-		using UniformT<int>::UniformT;
+		using UniformT<int32_t>::UniformT;
 
 		UniformType getType() final { return UniformType::Int; }
 		void submit(Shader* shader) override;
