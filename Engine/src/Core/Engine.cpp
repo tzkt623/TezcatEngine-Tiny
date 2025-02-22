@@ -20,6 +20,7 @@
 
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/VertexBufferManager.h"
+#include "Core/Manager/ResourceManager.h"
 
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/LayerMask.h"
@@ -27,7 +28,6 @@
 
 #include "Core/Component/GameObject.h"
 #include "Core/Shader/ShaderParam.h"
-#include "Core/Data/Resource.h"
 
 #include "Core/Tool/Tool.h"
 #include "Core/Event/EngineEvent.h"
@@ -104,7 +104,7 @@ namespace tezcat::Tiny
 		ShaderParam::initAllParam(std::bind(&EngineIniter::initYourShaderParam, mResourceLoader));
 
 		LayerMask::init();
-		Resource::init(mResourceLoader->getResourceFolderName());
+		ResourceManager::init(mResourceLoader->getResourceFolderName());
 		FileTool::init(mResourceLoader->getResourceFolderName());
 		VertexBufferManager::init();
 		return true;

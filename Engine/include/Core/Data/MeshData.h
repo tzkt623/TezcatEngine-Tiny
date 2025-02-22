@@ -1,4 +1,21 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
@@ -9,9 +26,12 @@
 struct aiMesh;
 struct aiNode;
 struct aiScene;
+struct aiMaterial;
 
 namespace tezcat::Tiny
 {
+
+	class GameObject;
 	/// <summary>
 	/// mesh数据
 	/// 只有父节点会被保存到管理器中
@@ -110,10 +130,9 @@ namespace tezcat::Tiny
 		uint32 mIndex;
 		ModelNode** mChildren;
 		uint32 mChildrenCount;
+		int32_t mParentIndex;
 	};
 
-
-	class Transform;
 	class Model : public TinyObject
 	{
 		Model();
@@ -122,16 +141,25 @@ namespace tezcat::Tiny
 		virtual ~Model();
 
 		void load(const std::string& path);
-		void generate();
-		void foreachNode(const std::function<Transform*(ModelNode*)>& func);
+		GameObject* generate();
+
+		void setPath(const std::string& path) { mPath = path; }
+		std::string_view getPath() { return mPath; }
 
 	private:
-		void foreachNode(const std::function<Transform*(ModelNode*)>& func, ModelNode* node, Transform* parent);
-		ModelNode* createModelNode(const aiScene* aiscene, aiNode* ainode);
-		MeshData* createMesh(aiMesh* aimesh, const aiNode* node);
+		void createModelNode(const aiScene* aiscene, aiNode* ainode, int32_t parentIndex);
+		MeshData* createMesh(aiMesh* aimesh, const aiScene* aiscene, const aiNode* node);
+		void setMaterial(ModelNode* child, aiMaterial* aiMaterial);
+
 	private:
 		std::string mName;
-		ModelNode* mRoot;
+		std::string_view mPath;
+
+		std::vector<ModelNode*> mChildren;
+		
+
+		//ModelNode* mRoot;
+		//std::vector<ModelNode> mChildren;
 	};
 }
 

@@ -44,6 +44,7 @@
 #include "Core/Manager/VertexBufferManager.h"
 #include "Core/Manager/ModelManager.h"
 #include "Core/Manager/ShadowCasterManager.h"
+#include "Core/Manager/ResourceManager.h"
 
 #include "Core/Scene.h"
 
@@ -57,7 +58,6 @@
 
 #include "Core/Data/Image.h"
 #include "Core/Data/MeshData.h"
-#include "Core/Data/Resource.h"
 
 #include "Core/Input/Inputer.h"
 #include "Core/Input/InputSystem.h"

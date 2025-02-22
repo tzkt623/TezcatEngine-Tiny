@@ -54,10 +54,12 @@ void MyMainScene::onEnter()
 	this->createPlane();
 	this->createTransparentObject();
 	this->createPBR();
+	this->createModel();
 	this->createCubes0();
 	//this->createGates(gateWidth, gateHigh);
 
-	auto img = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
+
+	auto img = ResourceManager::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
 	EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
 	//Resource::unload(img);
 
@@ -80,6 +82,9 @@ void MyMainScene::onEnter()
 
 	// 	model = Resource::load<Model>("Model/School.fbx");
 	// 	model->generate();
+
+
+
 
 	/*
 	int radius = 3;
@@ -114,6 +119,20 @@ void MyMainScene::onEnter()
 void MyMainScene::onExit()
 {
 	Base::onExit();
+}
+
+void MyMainScene::createModel()
+{
+	auto model = ResourceManager::loadAndSave<Model>("Model/szb.fbx");
+	auto go_gundum_szb = model->generate();
+	go_gundum_szb->getTransform()->setPosition(157.74f, 106.560f, 150.780f);
+	go_gundum_szb->getTransform()->setRotation(-90.0f, 0.0f, 0.0f);
+	go_gundum_szb->getTransform()->setScale(10.0f, 10.0f, 10.0f);
+
+	model = ResourceManager::loadAndSave<Model>("Model/209790.fbx");
+	auto go_dasd = model->generate();
+	go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
+	go_dasd->getTransform()->setRotation(0.0f, -90.0f, 0.0f);
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
@@ -175,7 +194,7 @@ void MyMainScene::createPaintings()
 	auto wife_material2 = Material::create("Unlit/Texture");
 	auto shader = wife_material2->getShader();
 	auto my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
-	auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
+	auto tex = ResourceManager::loadOnly<Texture2D>("Image/wife.jpg");
 	wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 	mr2->setMaterial(wife_material2);
 
@@ -195,7 +214,7 @@ void MyMainScene::createPaintings()
 	mre1->setMaterial(elden_ring1_material);
 	mre1->setMesh("Square");
 
-	tex = Resource::loadOnly<Texture2D>("Image/eldenring1.jpg");
+	tex = ResourceManager::loadOnly<Texture2D>("Image/eldenring1.jpg");
 	elden_ring1_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 
 
@@ -211,11 +230,11 @@ void MyMainScene::createPaintings()
 	mre2->setMaterial(elden_ring2_material);
 	mre2->setMesh("Square");
 
-	tex = Resource::loadOnly<Texture2D>("Image/eldenring2.jpg");
+	tex = ResourceManager::loadOnly<Texture2D>("Image/eldenring2.jpg");
 	elden_ring2_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 
 
-	auto img = Resource::loadOnly<Image>("Image/solitude_night_2k.hdr");
+	auto img = ResourceManager::loadOnly<Image>("Image/solitude_night_2k.hdr");
 	auto hdr = Texture2D::create();
 	hdr->setImage(img);
 	hdr->setMinFilter(TextureFilter::Linear_Mipmap_Linear);
@@ -256,8 +275,8 @@ void MyMainScene::createPlane()
 	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
 	auto index_shininess = shader->getUniformIndex("myShininess");
 
-	auto tex_diff = Resource::loadOnly<Texture2D>("Image/stone_wall_diff.jpg");
-	auto tex_spec = Resource::loadOnly<Texture2D>("Image/stone_wall_ao.jpg");
+	auto tex_diff = ResourceManager::loadOnly<Texture2D>("Image/stone_wall_diff.jpg");
+	auto tex_spec = ResourceManager::loadOnly<Texture2D>("Image/stone_wall_ao.jpg");
 
 	plane_material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
 	plane_material->setUniform<UniformTex2D>(index_specular, tex_spec);
@@ -281,8 +300,8 @@ void MyMainScene::createCubes0()
 	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
 	auto index_shininess = shader->getUniformIndex("myShininess");
 
-	auto tex_diff = Resource::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
-	auto tex_spec = Resource::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");
+	auto tex_diff = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
+	auto tex_spec = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");
 
 	for (int i = 0; i < 1000; i++)
 	{
@@ -330,7 +349,7 @@ void MyMainScene::createTransparentObject()
 
 		auto shader = material->getShader();
 		auto index_color = shader->getUniformIndex("myTexColor2D");
-		auto tex = Resource::loadOnly<Texture2D>("Image/transparent_window.png");
+		auto tex = ResourceManager::loadOnly<Texture2D>("Image/transparent_window.png");
 		material->setUniform<UniformTex2D>(index_color, tex);
 	}
 }

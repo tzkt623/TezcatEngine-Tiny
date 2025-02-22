@@ -169,6 +169,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Component\ModeAgent.cpp" />
     <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
     <ClCompile Include="src\Core\Shader\ShaderParser.cpp" />
     <ClCompile Include="src\Core\Base\TinyGC.cpp" />
@@ -178,7 +179,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="src\Core\Component\Camera.cpp" />
     <ClCompile Include="src\Core\Component\FlyController.cpp" />
     <ClCompile Include="src\Core\Component\ShadowCaster.cpp" />
-    <ClCompile Include="src\Core\Data\Resource.cpp" />
+    <ClCompile Include="src\Core\Manager\ResourceManager.cpp" />
     <ClCompile Include="src\Core\Data\Text.cpp" />
     <ClCompile Include="src\Core\Head\ConfigHead.cpp" />
     <ClCompile Include="src\Core\Renderer\RenderConfig.cpp" />
@@ -250,8 +251,9 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
   <ItemGroup>
     <ClInclude Include="include\Core\Base\SmartPointer.h" />
     <ClInclude Include="include\Core\Base\TinyGCInfo.h" />
+    <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="include\Core\Component\ShadowCaster.h" />
-    <ClInclude Include="include\Core\Data\Resource.h" />
+    <ClInclude Include="include\Core\Manager\ResourceManager.h" />
     <ClInclude Include="include\Core\Data\Text.h" />
     <ClInclude Include="include\Core\Debug\Debug.h" />
     <ClInclude Include="include\Core\Head\TinyCpp.h" />

@@ -34,7 +34,7 @@ namespace tezcat::Editor
 
 	uint32_t MyResourceWindow::loadIcon(const std::string& filePath)
 	{
-		auto tex = Resource::loadOnly<Texture2D>(filePath);
+		auto tex = ResourceManager::loadOnly<Texture2D>(filePath);
 		tex->saveObject();
 		mIconAry.push_back(tex);
 		return mIconAry.size() - 1;

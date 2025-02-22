@@ -16,6 +16,7 @@ public:
 	void createInfinitePlane();
 	void createDirectionLight();
 	void createPBR();
+	void createModel();
 
 protected:
 	virtual void onEnter() override;
@@ -23,5 +24,6 @@ protected:
 
 private:
 	GameObject* mController;
+public:
 };
 

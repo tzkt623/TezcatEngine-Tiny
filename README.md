@@ -15,8 +15,11 @@
 
 <img width="1280" alt="屏幕截图 2024-06-03 144114" src="https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/52484691-2753-4d82-8995-cba8439866ff">
 
+![Image](https://github.com/user-attachments/assets/87e58d80-1cd6-43f6-8afa-afa1f5f6e9d7)
+
 ## **Update**
 
+- [ ] 更新模型加载(update model load)
 - [x] 添加了UnfiormBuffer(add UniformBuffer)
 - [x] 一些Shader内建变量被UniformBuffer代替(now uniformbuffer values instead of Some Buildin shader values)
 - [x] Shader编辑器有点问题(ShaderEditor has issue now)
@@ -348,11 +351,19 @@ auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
 wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 ```
 
-- Load A Model
+- 加载模型 Load A Model
 
 ```cpp
-auto model = Resource::loadAndSave<Model>("Model/Cerberus_LP.fbx");
-model->generate();
+auto model = ResourceManager::loadAndSave<Model>("Model/szb.fbx");
+auto go_gundum_szb = model->generate();
+go_gundum_szb->getTransform()->setPosition(157.74f, 106.560f, 150.780f);
+go_gundum_szb->getTransform()->setRotation(-90.0f, 0.0f, 0.0f);
+go_gundum_szb->getTransform()->setScale(10.0f, 10.0f, 10.0f);
+
+model = ResourceManager::loadAndSave<Model>("Model/209790.fbx");
+auto go_dasd = model->generate();
+go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
+go_dasd->getTransform()->setRotation(0.0f, -90.0f, 0.0f);
 ```
 
 - 创建一个帧缓冲

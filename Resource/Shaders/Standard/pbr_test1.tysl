@@ -32,7 +32,7 @@
         out float2 myUV;
         out float3 myNormal;
         out float3 myWorldPosition;
-        out float4 myLightSpacePosition;
+        out float4 myLightPosition;
 
         void main()
         {
@@ -42,7 +42,7 @@
             myUV = aUV;
             myNormal = TINY_MatrixN * aNormal;
             myWorldPosition = float3(position);
-            myLightSpacePosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
+            myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
 
             gl_Position = TINY_MatrixP * TINY_MatrixV * position;
         }
@@ -57,7 +57,7 @@
         in float2 myUV;
         in float3 myNormal;
         in float3 myWorldPosition;
-        in float4 myLightSpacePosition;
+        in float4 myLightPosition;
         
         out float4 myFinalColor;
 
@@ -120,7 +120,6 @@
             float3 ambient = (kD * diffuse + specular) * ao;
 
             //float3 ambient = (kD * diffuse) * ao;
-            //float shadow = calcShadow(myLightSpacePosition, N, normalize(-TINY_LitDir.direction), TINY_TexDepth);
 
             float3 color = ambient + Lo;
 
@@ -129,7 +128,9 @@
 
             //color = (1 - shadow) * color;
 
-            myFinalColor = float4(color, 1.0);
+            float shadow = calcShadow(myLightPosition, N, normalize(-TINY_LitDir.direction), TINY_TexDepth);
+
+            myFinalColor = float4(color, 1.0) * myColor * (1.0 - shadow);
             //myFinalColor = float4(specular, 1.0);
             //myFinalColor = float4(R, 1.0);
             //myFinalColor = float4(brdf.x, brdf.y, 0.0, 1.0);     

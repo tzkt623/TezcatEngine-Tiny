@@ -123,7 +123,7 @@
     <ClCompile Include="src\Core\Tool\Collision\BoundingBox.cpp" />
     <ClCompile Include="src\Core\Manager\LightingManager.cpp" />
     <ClCompile Include="src\Core\Manager\ModelManager.cpp" />
-    <ClCompile Include="src\Core\Data\Resource.cpp" />
+    <ClCompile Include="src\Core\Manager\ResourceManager.cpp" />
     <ClCompile Include="ThirdParty\Hash\city.cc" />
     <ClCompile Include="src\Platform\OpenGL\GLFunction.cpp" />
     <ClCompile Include="src\Core\Data\Text.cpp" />
@@ -136,6 +136,7 @@
     <ClCompile Include="src\Core\Renderer\GraphicsAgent.cpp" />
     <ClCompile Include="src\Core\Shader\ShaderParser.cpp" />
     <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
+    <ClCompile Include="src\Core\Component\ModeAgent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1300,7 +1301,7 @@
     <ClInclude Include="ThirdParty\assimp\XMLTools.h" />
     <ClInclude Include="ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="include\Core\Manager\ModelManager.h" />
-    <ClInclude Include="include\Core\Data\Resource.h" />
+    <ClInclude Include="include\Core\Manager\ResourceManager.h" />
     <ClInclude Include="ThirdParty\Hash\city.h" />
     <ClInclude Include="include\Platform\OpenGL\GLFunction.h" />
     <ClInclude Include="include\Core\Data\Text.h" />
@@ -1329,6 +1330,7 @@
     <ClInclude Include="include\Core\Debug\Debug.h" />
     <ClInclude Include="include\Core\Manager\UniformBufferManager.h" />
     <ClInclude Include="include\Core\Renderer\UniformBufferConfig.h" />
+    <ClInclude Include="include\Core\Component\ModeAgent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

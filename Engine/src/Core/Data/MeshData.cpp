@@ -30,7 +30,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(MeshData, TinyObject)
+	TINY_OBJECT_CPP(MeshData, TinyObject);
 	MeshData::MeshData()
 		: MeshData("")
 	{
@@ -172,7 +172,7 @@ namespace tezcat::Tiny
 
 		if (mChildren)
 		{
-			for (uint32 i = 0; i < mChildrenCount; i++)
+			for (uint32_t i = 0; i < mChildrenCount; i++)
 			{
 				delete mChildren[i];
 			}
@@ -191,7 +191,7 @@ namespace tezcat::Tiny
 		mVertex->saveObject();
 	}
 
-	void ModelNode::init(uint32 meshCount, uint32 childCount)
+	void ModelNode::init(uint32_t meshCount, uint32_t childCount)
 	{
 		if (mInited)
 		{
@@ -212,57 +212,36 @@ namespace tezcat::Tiny
 	}
 
 
-	TINY_OBJECT_CPP(Model, TinyObject)
+	TINY_OBJECT_CPP(Model, TinyObject);
 	Model::Model()
 		: mName()
-		, mRoot(nullptr)
 	{
 
 	}
 
 	Model::~Model()
 	{
-		delete mRoot;
-	}
 
-	void Model::foreachNode(const std::function<Transform* (ModelNode*)>& func)
-	{
-		auto transform = func(mRoot);
-		if (mRoot->mChildrenCount > 0)
-		{
-			for (uint32 i = 0; i < mRoot->mChildrenCount; i++)
-			{
-				this->foreachNode(func, mRoot->mChildren[i], transform);
-			}
-		}
-	}
-
-	void Model::foreachNode(const std::function<Transform* (ModelNode*)>& func, ModelNode* node, Transform* parent)
-	{
-		auto transform = func(node);
-		transform->setParent(parent);
-		if (node->mChildrenCount > 0)
-		{
-			for (uint32 i = 0; i < node->mChildrenCount; i++)
-			{
-				this->foreachNode(func, node->mChildren[i], transform);
-			}
-		}
 	}
 
 	void Model::load(const std::string& path)
 	{
-		if (mRoot)
-		{
-			return;
-		}
+		uint32_t load_flag = aiProcess_CalcTangentSpace
+			| aiProcess_Triangulate
+			| aiProcess_JoinIdenticalVertices
+			| aiProcess_SortByPType
+			| aiProcess_GenSmoothNormals
+			| aiProcess_FlipUVs
+			| aiProcess_RemoveComponent
+			//| aiProcess_OptimizeMeshes //当前参数执行后会自动优化mesh个数
+			| aiProcess_OptimizeGraph
+			| aiProcess_SplitLargeMeshes
+			;
 
-		uint32 load_flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate
-			| aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
-			| aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_RemoveComponent
-			| aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_SplitLargeMeshes;
-
-		uint32 remove_flag = aiComponent_LIGHTS | aiComponent_CAMERAS | aiComponent_MATERIALS;
+		uint32_t remove_flag = aiComponent_LIGHTS
+			| aiComponent_CAMERAS
+			//| aiComponent_MATERIALS
+			;
 
 		Assimp::Importer importer;
 
@@ -276,83 +255,81 @@ namespace tezcat::Tiny
 			return;
 		}
 
-		std::function<void(const aiScene*, aiNode*, ModelNode*, uint32 index)> func =
-			[this, &func](const aiScene* aiscene, aiNode* ainode, ModelNode* parent, uint32 index)
-		{
-			auto mnode = this->createModelNode(aiscene, ainode);
-			if (parent != nullptr)
-			{
-				parent->addChild(mnode);
-			}
-
-			if (ainode->mNumChildren > 0)
-			{
-				for (uint32 i = 0; i < ainode->mNumChildren; i++)
-				{
-					func(aiscene, ainode->mChildren[i], mnode, i);
-				}
-			}
-		};
-
-		auto ai_node = ai_scene->mRootNode;
-		mRoot = this->createModelNode(ai_scene, ai_node);
-		if (ai_node->mNumChildren > 0)
-		{
-			for (uint32 i = 0; i < ai_node->mNumChildren; i++)
-			{
-				func(ai_scene, ai_node->mChildren[i], mRoot, i);
-			}
-		}
+		mChildren.reserve(ai_scene->mNumMeshes);
+		this->createModelNode(ai_scene, ai_scene->mRootNode, -1);
 	}
 
-	ModelNode* Model::createModelNode(const aiScene* aiscene, aiNode* ainode)
+	void Model::createModelNode(const aiScene* aiscene, aiNode* ainode, int32_t parentIndex)
 	{
-		ModelNode* mode_node = new ModelNode();
-		mode_node->mName = ainode->mName.C_Str();
-		mode_node->init(ainode->mNumMeshes, ainode->mNumChildren);
+		ModelNode* this_layer = nullptr;
 
-		auto& transform = ainode->mTransformation;
-
-		//如果只有一个mesh,说明自身是mesh
-		if (ainode->mNumMeshes == 1)
+		//如果这一层有多个mesh
+		//说明需要分割这一层让其变成父节点
+		//他其中的mesh分别作为子节点链接至此层
+		if (ainode->mNumMeshes > 1)
 		{
-			auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[0]];
-			auto mesh_data = this->createMesh(ai_mesh, ainode);
+			this_layer = new ModelNode();
+			this_layer->mParentIndex = parentIndex;
+			this_layer->mIndex = mChildren.size();
+			this_layer->mName = ainode->mName.C_Str();
+			mChildren.push_back(this_layer);
 
-			auto vertex = Vertex::create();
-			vertex->setMesh(mesh_data);
-			vertex->generate();
-			mode_node->setVertex(vertex);
-		}
-		else if (ainode->mNumMeshes > 1)
-		{
-			//如果不止一个mesh
-			//把此层提升成父级
-			//把meshes和children合并成一层
-			//单独的mesh没有children
-			for (uint32 i = 0; i < ainode->mNumMeshes; i++)
+			for (uint32_t i = 0; i < ainode->mNumMeshes; i++)
 			{
-				auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[i]];
-				auto mesh_data = this->createMesh(ai_mesh, ainode);
+				auto child_mesh = aiscene->mMeshes[ainode->mMeshes[i]];
+				auto mesh_data = this->createMesh(child_mesh, aiscene, ainode);
 
 				auto vertex = Vertex::create();
 				vertex->setMesh(mesh_data);
 				vertex->generate();
 
 				ModelNode* child = new ModelNode();
-				child->mName = ai_mesh->mName.C_Str();
-				child->init(1, 0);
+				child->mName = child_mesh->mName.C_Str();
+				child->mParentIndex = this_layer->mIndex;
 				child->setVertex(vertex);
+				this->setMaterial(child, aiscene->mMaterials[child_mesh->mMaterialIndex]);
 
-				mode_node->addChild(child);
+				child->mIndex = mChildren.size();
+				mChildren.push_back(child);
 			}
 		}
+		//说明当前层本身就是mesh
+		else if (ainode->mNumMeshes == 1)
+		{
+			auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[0]];
+			auto mesh_data = this->createMesh(ai_mesh, aiscene, ainode);
 
-		return mode_node;
+			auto vertex = Vertex::create();
+			vertex->setMesh(mesh_data);
+			vertex->generate();
+
+			this_layer = new ModelNode();
+			this_layer->mName = ai_mesh->mName.C_Str();
+			this_layer->mParentIndex = parentIndex;
+			this_layer->setVertex(vertex);
+
+			this_layer->mIndex = mChildren.size();
+			mChildren.push_back(this_layer);
+		}
+		else
+		{
+			this_layer = new ModelNode();
+			this_layer->mParentIndex = parentIndex;
+			this_layer->mIndex = mChildren.size();
+			this_layer->mName = ainode->mName.C_Str();
+			mChildren.push_back(this_layer);
+		}
+
+		for (uint32_t i = 0; i < ainode->mNumChildren; i++)
+		{
+			this->createModelNode(aiscene, ainode->mChildren[i], this_layer->mIndex);
+		}
 	}
 
-	MeshData* Model::createMesh(aiMesh* aimesh, const aiNode* node)
+	MeshData* Model::createMesh(aiMesh* aimesh, const aiScene* aiscene, const aiNode* node)
 	{
+		auto material = aiscene->mMaterials[aimesh->mMaterialIndex];
+
 		MeshData* meshData = MeshData::create(aimesh->mName.C_Str());
 
 		meshData->mVertices.reserve(aimesh->mNumVertices);
@@ -368,7 +345,9 @@ namespace tezcat::Tiny
 		bool has_tangents = aimesh->HasTangentsAndBitangents();
 		auto& transform = node->mTransformation;
 
-		for (uint32 ver_i = 0; ver_i < aimesh->mNumVertices; ver_i++)
+		aiColor4D diffuseColor(0.f, 0.f, 0.f, 1.f);
+
+		for (uint32_t ver_i = 0; ver_i < aimesh->mNumVertices; ver_i++)
 		{
 			auto& ai_vertex = aimesh->mVertices[ver_i];
 			auto v = transform * ai_vertex;
@@ -388,7 +367,14 @@ namespace tezcat::Tiny
 				meshData->mUVs.emplace_back(ai_uv.x, ai_uv.y);
 			}
 
-			if (has_color0)
+			if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
+			{
+				meshData->mColors.emplace_back(diffuseColor.r
+					, diffuseColor.g
+					, diffuseColor.b
+					, diffuseColor.a);
+			}
+			else if (has_color0)
 			{
 				auto& ai_color = aimesh->mColors[0][ver_i];
 				meshData->mColors.emplace_back(ai_color.r
@@ -413,10 +399,10 @@ namespace tezcat::Tiny
 
 		if (aimesh->HasFaces())
 		{
-			for (uint32 face_i = 0; face_i < aimesh->mNumFaces; face_i++)
+			for (uint32_t face_i = 0; face_i < aimesh->mNumFaces; face_i++)
 			{
 				auto& ai_face = aimesh->mFaces[face_i];
-				for (uint32 index_i = 0; index_i < ai_face.mNumIndices; index_i++)
+				for (uint32_t index_i = 0; index_i < ai_face.mNumIndices; index_i++)
 				{
 					meshData->mIndices.emplace_back(ai_face.mIndices[index_i]);
 				}
@@ -427,7 +413,7 @@ namespace tezcat::Tiny
 		return meshData;
 	}
 
-	void Model::generate()
+	GameObject* Model::generate()
 	{
 		auto shader = ShaderManager::find("Standard/PBRTest1");
 		auto index_albedo = shader->getUniformIndex("myPBR.albedo");
@@ -435,8 +421,13 @@ namespace tezcat::Tiny
 		auto index_roughness = shader->getUniformIndex("myPBR.roughness");
 		auto index_ao = shader->getUniformIndex("myPBR.ao");
 
-		this->foreachNode([=](ModelNode* node)
+		std::vector<GameObject*> go_array;
+		go_array.reserve(mChildren.size());
+
+		//创建所有go
+		for (uint32_t i = 0; i < mChildren.size(); i++)
 		{
+			auto node = mChildren[i];
 			auto go = GameObject::create(node->mName);
 			auto transform = go->addComponent<Transform>();
 			if (node->mVertex)
@@ -453,8 +444,30 @@ namespace tezcat::Tiny
 				material->setUniform<UniformF1>(index_ao, 1.0f);
 			}
 
-			return transform;
-		});
+			go_array.push_back(go);
+		}
+
+		//链接go
+		for (uint32_t i = 0; i < mChildren.size(); i++)
+		{
+			auto node = mChildren[i];
+			if (node->mParentIndex != -1)
+			{
+				go_array[i]->getTransform()->setParent(go_array[node->mParentIndex]->getTransform());
+			}
+		}
+
+		return go_array[0];
 	}
 
+	void Model::setMaterial(ModelNode* node, aiMaterial* aiMaterial)
+	{
+		aiString texturePath;
+		aiMaterial->GetTexture(aiTextureType_AMBIENT, 0, &texturePath);
+		aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+		aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
+
+		aiColor3D diffuseColor(0.f, 0.f, 0.f);
+		aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+	}
 }

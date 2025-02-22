@@ -53,8 +53,8 @@ void MySeconedScene::onEnter()
 		auto index_specular = shader->getUniformIndex("myTex2DSpecular");
 		auto index_shininess = shader->getUniformIndex("myShininess");
 
-		auto tex_diff = Resource::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
-		auto tex_spec = Resource::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");
+		auto tex_diff = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
+		auto tex_spec = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");
 
 
 		for (int i = 0; i < 1000; i++)

@@ -1,7 +1,7 @@
 ﻿#pragma once
+#include "../Head/ConfigHead.h"
 
 #include "../Renderer/RenderConfig.h"
-#include "../Head/ConfigHead.h"
 #include "../Renderer/MeshRenderAgent.h"
 
 

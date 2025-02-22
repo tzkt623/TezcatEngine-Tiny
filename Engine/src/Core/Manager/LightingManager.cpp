@@ -21,6 +21,7 @@
 #include "Core/Manager/VertexBufferManager.h"
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Manager/CameraManager.h"
+#include "Core/Manager/ResourceManager.h"
 
 #include "Core/Component/Transform.h"
 #include "Core/Component/Light.h"
@@ -42,7 +43,6 @@
 #include "Core/Event/EngineEvent.h"
 
 #include "Core/Data/Image.h"
-#include "Core/Data/Resource.h"
 
 namespace tezcat::Tiny
 {
