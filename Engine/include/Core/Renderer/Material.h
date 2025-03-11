@@ -27,6 +27,7 @@
 namespace tezcat::Tiny
 {
 	class Shader;
+	class ModelNode;
 	class TINY_API Material : public TinyObject
 	{
 		TINY_OBJECT_H(Material, TinyObject)
@@ -63,7 +64,7 @@ namespace tezcat::Tiny
 			}
 			else
 			{
-				TINY_THROW_LOGIC(StringTool::stringFormat("Material : This uniform [%s] not found!", uniformID.getStringData()));
+				TINY_THROW_LOGIC(StringTool::stringFormat("Material : This uniform [%s] not found!", uniformID.toData()));
 			}
 		}
 

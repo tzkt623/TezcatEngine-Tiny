@@ -26,6 +26,7 @@ namespace tezcat::Tiny
 	class LightManager;
 	class RenderPass;
 	class BaseRenderObserver;
+	class BaseMeshRenderer;
 	class RenderCommand;
 	class Shader;
 	class FrameBuffer;
@@ -58,18 +59,18 @@ namespace tezcat::Tiny
 			Once
 		};
 
-		enum GlobalSubmit : uint32
+		enum GlobalSubmit : uint32_t
 		{
 			GLOBAL_ALL = 0,
 			NO_SHADOW = 1 << 0,
 			NO_LIGHTING = 1 << 1,
 			NO_ENVLIGHTING = 1 << 2,
-			GLOBAL_NONE = std::numeric_limits<uint32>::max()
+			GLOBAL_NONE = std::numeric_limits<uint32_t>::max()
 		};
 
 		TINY_ABSTRACT_OBJECT_H(PipelinePass, TinyObject)
 	protected:
-		PipelinePass(uint32 globalSubmitMask);
+		PipelinePass(uint32_t globalSubmitMask);
 
 	public:
 
@@ -87,7 +88,7 @@ namespace tezcat::Tiny
 			mGlobalSubmitArray.emplace_back(function);
 		}
 
-		void resetGlobalFunction(uint32 globalSubmitMask);
+		void resetGlobalFunction(uint32_t globalSubmitMask);
 
 		//Mode
 	public:
@@ -95,9 +96,15 @@ namespace tezcat::Tiny
 		void setOnceMode() { mMode = Mode::Once; }
 		const Mode getMode() const { return mMode; }
 		void resetOnceMode() { mIsOnceModeExecuted = false; }
+		std::string getMemoryInfo() override;
 
 	public:
-		uint32 getOrderID() const { return mType2.userID; }
+		uint32_t getOrderID() const { return mType2.userID; }
+
+		/*
+		* User Set Custom OrderID
+		* Range [0, 65535]
+		*/
 		void setOrderID(uint16 value)
 		{
 			mType2.userID = value;
@@ -109,7 +116,7 @@ namespace tezcat::Tiny
 		}
 
 		/*
-		* PipelineID: uint32(8-8-16)
+		* PipelineID: uint32_t(8-8-16)
 		* 相机OrderID(-128-127)-队列OrderID(0-255)-PassOrderID(0-65535)
 		*
 		* 排序时:
@@ -118,7 +125,7 @@ namespace tezcat::Tiny
 		* 3.再排队列中的通道
 		*/
 		uint64 getPipelineOrderID() const { return mPipelineOrderID; }
-		uint32 getUID() const;
+		uint32_t getUID() const;
 
 		void addCommand(RenderCommand* cmd);
 
@@ -156,24 +163,24 @@ namespace tezcat::Tiny
 
 		union
 		{
-			uint64 mPipelineOrderID;
+			uint64_t mPipelineOrderID;
 
 			struct Type1
 			{
-				uint64 renderType : 8;
-				uint64 observerOrder : 8;
-				uint64 frameBufferOrder : 16;
-				uint64 shaderQueueID : 8;
-				uint64 userID : 16;
+				uint64_t renderType : 8;
+				uint64_t observerOrder : 8;
+				uint64_t frameBufferOrder : 16;
+				uint64_t shaderQueueID : 8;
+				uint64_t userID : 16;
 			} mCombineOrderID;
 
 
 			struct Type2
 			{
-				uint64 temp : 32;
-				uint64 userID : 16;
-				uint64 shaderQueueID : 8;
-				uint64 observerOrder : 8;
+				uint64_t temp : 32;
+				uint64_t userID : 16;
+				uint64_t shaderQueueID : 8;
+				uint64_t observerOrder : 8;
 			} mType2;
 		};
 
@@ -193,7 +200,9 @@ namespace tezcat::Tiny
 	private:
 		ObserverPipelinePass(BaseRenderObserver* renderObserver
 			, Shader* shader
-			, uint32 globalFunction = GLOBAL_ALL);
+			, uint32_t globalFunction = GLOBAL_ALL);
+
+
 
 	public:
 		virtual ~ObserverPipelinePass();
@@ -201,10 +210,16 @@ namespace tezcat::Tiny
 
 	/*
 	* 代替通道
-	* 1.Pass让其中的Observer进行遍历,然后进入正常流程
-	* 2.此通道默认不使用Layer中的Renderer进行渲染,如果需要请调用setUseCullLayerData函数
+	* 1.此通道可以代替当前Mesh使用的Shader来渲染
+	*	例如.渲染阴影.渲染ID
+	* 2.此通道可以自定义渲染方式
+	*	例如,渲染没有Mesh的特殊Shader,体积云等特效
+	* 
+	* 注意:此通道会管理其中Observer的生命周期
+	* 
+	* 屏幕空间特效
 	*
-	* 注意:此通道中Observer生命周期归Pass管
+	* 
 	*/
 	class TINY_API ReplacedPipelinePass : public PipelinePass
 	{
@@ -212,20 +227,33 @@ namespace tezcat::Tiny
 	protected:
 		ReplacedPipelinePass(BaseRenderObserver* renderObserver
 			, Shader* shader
-			, uint32 globalFunction = GLOBAL_NONE);
+			, uint32_t globalFunction = GLOBAL_NONE);
+
+		ReplacedPipelinePass(Shader* shader
+			, uint32_t globalFunction = GLOBAL_NONE);
 
 	public:
 		virtual ~ReplacedPipelinePass();
 		void preCalculate();
-		void setUseCullLayerData(bool val) { mUseCullLayer = val; }
-		void setPreFunction(const std::function<void(ReplacedPipelinePass*)>& preFunction)
+		void setCustomCulling(const std::function<void(ReplacedPipelinePass*)>& func)
 		{
-			mPreFunction = preFunction;
+			mCustomCulling = func;
 		}
 
+		void pushCommand(BaseMeshRenderer* meshRenderer);
+
+		void setCommandCreator(const std::function<RenderCommand*(BaseMeshRenderer*)>& func)
+		{
+			mCreateFunction = func;
+		}
+
+
 	private:
-		bool mUseCullLayer;
-		std::function<void(ReplacedPipelinePass*)> mPreFunction;
+		RenderCommand* createCommand(BaseMeshRenderer* renderer);
+
+	private:
+		std::function<void(ReplacedPipelinePass*)> mCustomCulling;
+		std::function<RenderCommand*(BaseMeshRenderer*)> mCreateFunction;
 	};
 
 #pragma region PipeQueue
@@ -258,7 +286,7 @@ namespace tezcat::Tiny
 		virtual void render();
 		virtual void addPipePass(PipelinePass* pass) = 0;
 
-		static uint32 getFrameCount() { return sFrameCount; }
+		static uint32_t getFrameCount() { return sFrameCount; }
 
 	protected:
 		virtual void preRender() = 0;
@@ -266,7 +294,7 @@ namespace tezcat::Tiny
 		virtual void postRender() = 0;
 
 	protected:
-		static uint32 sFrameCount;
+		static uint32_t sFrameCount;
 	};
 
 	/*

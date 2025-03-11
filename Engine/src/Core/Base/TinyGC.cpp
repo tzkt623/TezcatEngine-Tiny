@@ -34,6 +34,13 @@ namespace tezcat::Tiny
 	{
 		if (!mMemoryPool.empty())
 		{
+			//auto size = mMemoryPool.size();
+			//for (auto i = 0; i < size; i++)
+			//{
+			//	std::cerr << i << ":" << mMemoryPool[i]->getClassName() << "\n";
+			//	mMemoryPool[i]->deleteObject();
+			//}
+			
 			for (auto p : mMemoryPool)
 			{
 				//Log::engine(StringTool::stringFormat("Memory: {%s} RefSub: %d", s->getClassName().c_str(), s->getRefCount()));

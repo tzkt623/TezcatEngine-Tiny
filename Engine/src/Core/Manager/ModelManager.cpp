@@ -71,19 +71,7 @@ namespace tezcat::Tiny
 			std::function<void(const aiScene*, aiNode*, ModelNode*, uint32_t index)> func =
 				[func](const aiScene* aiscene, aiNode* ainode, ModelNode* parent, uint32_t index)
 			{
-				auto mnode = createModelNode(aiscene, ainode);
-				if (parent != nullptr)
-				{
-					parent->addChild(mnode);
-				}
 
-				if (ainode->mNumChildren > 0)
-				{
-					for (uint32_t i = 0; i < ainode->mNumChildren; i++)
-					{
-						func(aiscene, ainode->mChildren[i], mnode, i);
-					}
-				}
 			};
 
 			auto ai_node = ai_scene->mRootNode;

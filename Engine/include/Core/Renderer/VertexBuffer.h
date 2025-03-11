@@ -150,6 +150,9 @@ namespace tezcat::Tiny
 
 		void updateLayoutData();
 
+	protected:
+		void onClose() override;
+
 	private:
 		std::shared_ptr<UniformBufferLayout> mLayout;
 

@@ -28,7 +28,15 @@
 #include "Core/Shader/Shader.h"
 
 #include "Core/Component/Transform.h"
+#include "Core/Component/GameObject.h"
+
 #include "Core/Manager/LightingManager.h"
+#include "Core/Manager/FrameBufferManager.h"
+#include "Core/Manager/GameObjectManager.h"
+
+#include "Core/Event/EngineEvent.h"
+
+#include "Core/Debug/Debug.h"
 
 namespace tezcat::Tiny
 {
@@ -93,9 +101,27 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->createShader(mShader);
 	}
 #pragma endregion
+	RenderCMD_DrawID::RenderCMD_DrawID(Vertex* vertex, Transform* transform)
+		: mVertex(vertex)
+		, mTransform(transform)
+	{
 
+	}
 
-	RenderCMD_DrawMesh::RenderCMD_DrawMesh(Vertex* vertex, Transform* transform, Material* material)
+	RenderCMD_DrawID::~RenderCMD_DrawID()
+	{
+		mVertex = nullptr;
+		mTransform = nullptr;
+	}
+
+	void RenderCMD_DrawID::execute(PipelinePass* pass, Shader* shader)
+	{
+		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, mTransform->getModelMatrix());
+		Graphics::getInstance()->setUInt1(shader, "myObjectID", mTransform->getGameObject()->getUID());
+		Graphics::getInstance()->draw(mVertex);
+	}
+
+	RenderCMD_DrawMeshWithMaterial::RenderCMD_DrawMeshWithMaterial(Vertex* vertex, Transform* transform, Material* material)
 		: mVertex(vertex)
 		, mTransform(transform)
 		, mMaterial(material)
@@ -103,14 +129,14 @@ namespace tezcat::Tiny
 
 	}
 
-	RenderCMD_DrawMesh::~RenderCMD_DrawMesh()
+	RenderCMD_DrawMeshWithMaterial::~RenderCMD_DrawMeshWithMaterial()
 	{
 		mVertex = nullptr;
 		mTransform = nullptr;
 		mMaterial = nullptr;
 	}
 
-	void RenderCMD_DrawMesh::execute(PipelinePass* pass, Shader* shader)
+	void RenderCMD_DrawMeshWithMaterial::execute(PipelinePass* pass, Shader* shader)
 	{
 		auto& model_mat4 = mTransform->getModelMatrix();
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, model_mat4);
@@ -208,20 +234,20 @@ namespace tezcat::Tiny
 
 
 
-	RenderCMD_DrawShadow::RenderCMD_DrawShadow(Vertex* vertex, Transform* transform)
+	RenderCMD_DrawMeshWithOutMaterial::RenderCMD_DrawMeshWithOutMaterial(Vertex* vertex, Transform* transform)
 		: mVertex(vertex)
 		, mTransform(transform)
 	{
 
 	}
 
-	RenderCMD_DrawShadow::~RenderCMD_DrawShadow()
+	RenderCMD_DrawMeshWithOutMaterial::~RenderCMD_DrawMeshWithOutMaterial()
 	{
 		mVertex = nullptr;
 		mTransform = nullptr;
 	}
 
-	void RenderCMD_DrawShadow::execute(PipelinePass* pass, Shader* shader)
+	void RenderCMD_DrawMeshWithOutMaterial::execute(PipelinePass* pass, Shader* shader)
 	{
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, mTransform->getModelMatrix());
 		Graphics::getInstance()->draw(mVertex);
@@ -437,4 +463,31 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->createUniformBuffer(mBuffer, mIndex);
 	}
 
+
+
+	RenderCMD_ReadObjectID::RenderCMD_ReadObjectID(int x, int y, FrameBuffer* fb)
+		: mX(x)
+		, mY(y)
+		, mFrameBuffer(fb)
+	{
+
+	}
+
+	RenderCMD_ReadObjectID::~RenderCMD_ReadObjectID()
+	{
+
+	}
+
+	void RenderCMD_ReadObjectID::execute(PipelinePass* pass, Shader* shader)
+	{
+		int32_t id;
+		FrameBufferManager::bind(mFrameBuffer);
+		Graphics::getInstance()->readObjectID(mX, mY, id);
+		FrameBufferManager::unbind(mFrameBuffer);
+		if (id > 0)
+		{
+			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_SelectObject, GameObjectManager::getObject(id) });
+		}
+		TINY_LOG_INFO(std::format("Pick ObjectID {}", id));
+	}
 }

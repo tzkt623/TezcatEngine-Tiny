@@ -236,6 +236,18 @@ namespace tezcat::Tiny
 	private:
 		uint32 mID;
 	};
+
+	class RenderCMD_ReadObjectID : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_ReadObjectID(int x, int y, FrameBuffer* fb);
+		virtual ~RenderCMD_ReadObjectID();
+		void execute(PipelinePass* pass, Shader* shader) override;
+	private:
+		int mX;
+		int mY;
+		FrameBuffer* mFrameBuffer;
+	};
 #pragma endregion Build
 
 
@@ -259,12 +271,12 @@ namespace tezcat::Tiny
 		Vertex* mVertex;
 	};
 
-	class RenderCMD_DrawMesh : public RenderCommadDraw
+	class RenderCMD_DrawMeshWithMaterial : public RenderCommadDraw
 	{
 		/*此命令可以合并,优化DrawCall*/
 	public:
-		RenderCMD_DrawMesh(Vertex* vertex, Transform* transform, Material* material);
-		virtual ~RenderCMD_DrawMesh();
+		RenderCMD_DrawMeshWithMaterial(Vertex* vertex, Transform* transform, Material* material);
+		virtual ~RenderCMD_DrawMeshWithMaterial();
 		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
@@ -273,12 +285,25 @@ namespace tezcat::Tiny
 		Material* mMaterial;
 	};
 
-	class RenderCMD_DrawShadow : public RenderCommadDraw
+	class RenderCMD_DrawMeshWithOutMaterial : public RenderCommadDraw
 	{
 		/*此命令可以合并,优化DrawCall*/
 	public:
-		RenderCMD_DrawShadow(Vertex* vertex, Transform* transform);
-		virtual ~RenderCMD_DrawShadow();
+		RenderCMD_DrawMeshWithOutMaterial(Vertex* vertex, Transform* transform);
+		virtual ~RenderCMD_DrawMeshWithOutMaterial();
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		Vertex* mVertex;
+		Transform* mTransform;
+	};
+
+	class RenderCMD_DrawID : public RenderCommadDraw
+	{
+		/*此命令可以合并,优化DrawCall*/
+	public:
+		RenderCMD_DrawID(Vertex* vertex, Transform* transform);
+		virtual ~RenderCMD_DrawID();
 		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:

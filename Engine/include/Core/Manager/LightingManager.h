@@ -1,5 +1,20 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "../Tool/Tool.h"
 #include "../Base/TinyObject.h"
 
@@ -17,6 +32,7 @@ namespace tezcat::Tiny
 	class Vertex;
 	class Shader;
 	class ReplacedPipelinePass;
+	class RenderObserver;
 	class RenderObserverMultView;
 
 	class DirectionalLight;
@@ -24,12 +40,19 @@ namespace tezcat::Tiny
 	class SpotLight;
 	class ILight;
 
+	/*
+	* LightData
+	* 此类并不负责其中对象的生命周期管理
+	*/
 	class TINY_API LightData : public TinyObject
 	{
 		LightData();
 		TINY_OBJECT_H(LightData, TinyObject)
 	public:
 		virtual ~LightData();
+
+	protected:
+		void onClose() override;
 
 	public:
 		DirectionalLight* directionalLight;
@@ -135,6 +158,11 @@ namespace tezcat::Tiny
 		static ReplacedPipelinePass* sBRDFLUTPass;
 		static ReplacedPipelinePass* sSkyBoxPass;
 		static std::vector<std::function<void()>> mEnvPassArray;
+
+		static RenderObserverMultView* sObserverHDR;
+		static RenderObserverMultView* sObserverIrradiance;
+		static RenderObserverMultView* sObserverPrefilter;
+		static RenderObserver* sObserverBRDF_LUT;
 
 	private:
 		static LightData* sLightData;

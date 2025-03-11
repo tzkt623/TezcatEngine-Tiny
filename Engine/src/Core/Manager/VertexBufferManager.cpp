@@ -70,7 +70,7 @@ namespace tezcat::Tiny
 
 	void VertexBufferManager::add(Vertex* vertex)
 	{
-		auto result = mVertexUMap.try_emplace(vertex->getName(), nullptr);
+		auto result = mVertexUMap.try_emplace(vertex->getEngineName().toView(), nullptr);
 		if (result.second)
 		{
 			result.first->second = vertex;
@@ -85,24 +85,38 @@ namespace tezcat::Tiny
 			return nullptr;
 		}
 
-		auto hash_id = CityHash64(name.data(), name.size());
+		//auto hash_id = CityHash64(name.data(), name.size());
 
 		if (!mMeshDataUMap.contains(name))
 		{
 			return nullptr;
 		}
 
-		auto result = mVertexUMap.try_emplace(name, nullptr);
-		if (result.second)
+		auto it = mVertexUMap.find(name);
+		if (it == mVertexUMap.end())
 		{
-			auto vertex = Vertex::create();
+			auto vertex = Vertex::create(name);
 			vertex->setMesh(mMeshDataUMap[name]);
 			vertex->generate();
 			vertex->saveObject();
-			result.first->second = vertex;
+
+			mVertexUMap.emplace(vertex->getEngineName().toView(), vertex);
+			return vertex;
 		}
 
-		return result.first->second;
+		return it->second;
+
+		//auto result = mVertexUMap.try_emplace(mesh_data->getName(), nullptr);
+		//if (result.second)
+		//{
+		//	auto vertex = Vertex::create(name);
+		//	vertex->setMesh(mMeshDataUMap[name]);
+		//	vertex->generate();
+		//	vertex->saveObject();
+		//	result.first->second = vertex;
+		//}
+		//
+		//return result.first->second;
 	}
 
 	Vertex* VertexBufferManager::create(MeshData* mesh)

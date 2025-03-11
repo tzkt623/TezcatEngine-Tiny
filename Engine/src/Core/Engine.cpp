@@ -59,10 +59,14 @@ namespace tezcat::Tiny
 		, mGraphics(nullptr)
 		, mIsRunning(true)
 	{
+
 	}
 
 	Engine::~Engine()
 	{
+		TinyString::deleteAllString();
+		UniformID::deleteAllString();
+
 		delete mInputSystem;
 		delete mGraphics;
 		delete mResourceLoader;

@@ -49,7 +49,6 @@ namespace tezcat::Tiny
 		{
 			mTinyUniformList[i] = new UniformValueConfig{ -1, "", UniformType::Error, -1 };
 		}
-
 	}
 
 	Shader::~Shader()
@@ -82,7 +81,7 @@ namespace tezcat::Tiny
 
 		ShaderManager::registerShader(this);
 
-		Graphics::getInstance()->addCommand(new RenderCMD_CreateShader(this));
+		Graphics::getInstance()->addCommand<RenderCMD_CreateShader>(this);
 	}
 
 	void Shader::setupUserUniformID(ArgMetaData* metaData, const std::string& name, const int& shaderID, const int& arrayIndex)
@@ -173,5 +172,11 @@ namespace tezcat::Tiny
 		mParser->parse(mContent, mPath);
 		mContent.clear();
 	}
+
+	std::string Shader::getMemoryInfo()
+	{
+		return TINY_OBJECT_MEMORY_INFO();
+	}
+
 }
 

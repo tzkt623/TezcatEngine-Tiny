@@ -27,8 +27,7 @@ namespace tezcat::Tiny
 	class Shader;
 	class Transform;
 
-	struct TINY_API UniformIDDef {};
-	using UniformID = IDString<UniformIDDef>;
+	//struct TINY_API UniformIDDef {};
 
 
 	struct TINY_API Uniform
@@ -47,144 +46,185 @@ namespace tezcat::Tiny
 		int32_t* mValueID;
 	};
 
+	using UniformID = IDString<Uniform>;
 
 	template<typename UniformValue>
-	struct TINY_API UniformT : public Uniform
+	struct TINY_API UniformValueT : public Uniform
 	{
 		using ValueType = UniformValue;
 
-		UniformT(int32_t* valueID)
+		UniformValueT(int32_t* valueID)
 			: Uniform(valueID)
 			, value()
 		{}
-		virtual ~UniformT() {}
+		virtual ~UniformValueT() {}
+
+		void set(ValueType& value)
+		{
+			this->value = value;
+		}
 
 		void set(ValueType&& value)
 		{
-			this->beginSetValue();
-			this->value = std::forward<ValueType>(value);
-			this->endSetValue();
+			this->value = TINY_FWD(value);
+		}
+
+		ValueType value;
+	};
+
+	template<typename UniformTinyObject>
+	struct TINY_API UniformTinyObjectT : public Uniform
+	{
+		using ValueType = UniformTinyObject;
+
+		UniformTinyObjectT(int32_t* valueID)
+			: Uniform(valueID)
+			, value()
+		{}
+		virtual ~UniformTinyObjectT() {}
+
+		void set(ValueType&& value)
+		{
+			if (this->value)
+			{
+				this->value->deleteObject();
+			}
+			this->value = TINY_FWD(value);
+			this->value->saveObject();
 		}
 
 		void set(ValueType& value)
 		{
-			this->beginSetValue();
+			if (this->value)
+			{
+				this->value->deleteObject();
+			}
 			this->value = value;
-			this->endSetValue();
+			this->value->saveObject();
 		}
 
 		ValueType value;
-
-	protected:
-		virtual void beginSetValue() {}
-		virtual void endSetValue() {}
 	};
 
-	struct TINY_API UniformI1 : public UniformT<int32_t>
+
+	//------------------------------
+	//
+	//	Values
+	//
+	struct TINY_API UniformI1 : public UniformValueT<int32_t>
 	{
-		using UniformT<int32_t>::UniformT;
+		using UniformValueT<int32_t>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Int; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformF1 : public UniformT<float>
+	struct TINY_API UniformF1 : public UniformValueT<float>
 	{
-		using UniformT<float>::UniformT;
+		using UniformValueT<float>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Float; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformI2 : public UniformT<int2>
+	struct TINY_API UniformI2 : public UniformValueT<int2>
 	{
-		using UniformT<int2>::UniformT;
+		using UniformValueT<int2>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Int2; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformF2 : public UniformT<float2>
+	struct TINY_API UniformF2 : public UniformValueT<float2>
 	{
-		using UniformT<float2>::UniformT;
+		using UniformValueT<float2>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Float2; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformI3 : public UniformT<int3>
+	struct TINY_API UniformI3 : public UniformValueT<int3>
 	{
-		using UniformT<int3>::UniformT;
+		using UniformValueT<int3>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Int3; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformF3 : public UniformT<float3>
+	struct TINY_API UniformF3 : public UniformValueT<float3>
 	{
-		using UniformT<float3>::UniformT;
+		using UniformValueT<float3>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Float3; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformI4 : public UniformT<int4>
+	struct TINY_API UniformI4 : public UniformValueT<int4>
 	{
-		using UniformT<int4>::UniformT;
+		using UniformValueT<int4>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Int4; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformF4 : public UniformT<float4>
+	struct TINY_API UniformF4 : public UniformValueT<float4>
 	{
-		using UniformT<float4>::UniformT;
+		using UniformValueT<float4>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Float4; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformMat3 : public UniformT<float3x3>
+	struct TINY_API UniformMat3 : public UniformValueT<float3x3>
 	{
-		using UniformT<float3x3>::UniformT;
+		using UniformValueT<float3x3>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Mat3; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformMat4 : public UniformT<float4x4>
+	struct TINY_API UniformMat4 : public UniformValueT<float4x4>
 	{
-		using UniformT<float4x4>::UniformT;
+		using UniformValueT<float4x4>::UniformValueT;
 
 		UniformType getType() final { return UniformType::Mat4; }
 		void submit(Shader* shader) override;
 	};
 
-	struct TINY_API UniformTex2D : public UniformT<Texture2D*>
+	//------------------------------
+	//
+	//	Objects
+	//
+	struct TINY_API UniformTex2D : public UniformTinyObjectT<Texture2D*>
 	{
-		using UniformT<Texture2D*>::UniformT;
+		using UniformTinyObjectT<Texture2D*>::UniformTinyObjectT;
 		virtual ~UniformTex2D();
 
 
 		UniformType getType() final { return UniformType::Tex2D; }
 		void submit(Shader* shader) override;
-
-	protected:
-		void beginSetValue() override;
-		void endSetValue() override;
 	};
 
-	struct TINY_API UniformTexCube : public UniformT<TextureCube*>
+	struct TINY_API UniformTexCube : public UniformTinyObjectT<TextureCube*>
 	{
-		using UniformT<TextureCube*>::UniformT;
+		using UniformTinyObjectT<TextureCube*>::UniformTinyObjectT;
 		virtual ~UniformTexCube();
 
 
 		UniformType getType() final { return UniformType::TexCube; }
 		void submit(Shader* shader) override;
+	};
 
-	protected:
-		void beginSetValue() override;
-		void endSetValue() override;
+	template<class TName, uint32_t TIndex>
+	struct U
+	{
+		constexpr static uint32_t TypeIndex = TIndex;
+		void* data = nullptr;
+	};
+
+
+	struct UF1 : U<float, 0>
+	{
+
 	};
 }

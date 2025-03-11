@@ -26,8 +26,8 @@
 namespace tezcat::Tiny
 {
 	FrameBuffer* FrameBufferManager::sDefaultBuffer = nullptr;
-	uint32 FrameBufferManager::sID = 0;
-	std::queue<uint32> FrameBufferManager::sFreeIDs;
+	uint32_t FrameBufferManager::sID = 0;
+	std::queue<uint32_t> FrameBufferManager::sFreeIDs;
 	std::stack<FrameBuffer*> FrameBufferManager::sFrameBufferStack;
 	std::unordered_map<std::string_view, FrameBuffer*> FrameBufferManager::sUMap;
 	FrameBuffer* FrameBufferManager::sMainBuffer = nullptr;
@@ -47,10 +47,9 @@ namespace tezcat::Tiny
 			return { false, result->second };
 		}
 
-		auto frame_buffer = FrameBuffer::create();
-		frame_buffer->setName(name);
+		auto frame_buffer = FrameBuffer::create(name);
 		frame_buffer->saveObject();
-		sUMap.emplace(frame_buffer->getName(), frame_buffer);
+		sUMap.emplace(frame_buffer->getEngineName().toView(), frame_buffer);
 		return { true, frame_buffer };
 	}
 
@@ -113,5 +112,34 @@ namespace tezcat::Tiny
 
 		return sMainBuffer;
 	}
+
+	FrameBuffer* FrameBufferManager::find(const std::string& name)
+	{
+		auto result = sUMap.find(name);
+		if (result != sUMap.end())
+		{
+			return (*result).second;
+		}
+
+		return nullptr;
+	}
+
+	uint32_t FrameBufferManager::giveID()
+	{
+		uint32_t id = -1;
+
+		if (sFreeIDs.size() > 0)
+		{
+			id = sFreeIDs.front();
+			sFreeIDs.pop();
+		}
+		else
+		{
+			id = sID++;
+		}
+
+		return id;
+	}
+
 }
 

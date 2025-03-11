@@ -24,59 +24,77 @@ namespace tezcat::Editor
 	{
 		GUIWindow::onRender();
 
-		static ImVec2 size(128, 128);
+		static ImVec2 size(512, 512);
 		static ImVec2 uv0(0, 1);
 		static ImVec2 uv1(1, 0);
-		auto& buffers = FrameBufferManager::getAllFrameBuffer();
-		static auto flags = ImGuiTableFlags_BordersInner
-			| ImGuiTableFlags_BordersOuter
-			| ImGuiTableFlags_Resizable;
-		if (ImGui::BeginTable("##FrameBufferViewerWindow", 2, flags))
-		{		
-			for (auto& pair : buffers)
+		static ImVec2 offset;
+
+		ImGui::BeginChild("##FrameBufferViewerWindow", ImVec2(240, ImGui::GetContentRegionAvail().y), true);
+
+		auto& frame_buffers = FrameBufferManager::getAllFrameBuffer();
+
+		ImGuiListClipper clipper;
+		clipper.Begin(frame_buffers.size(), ImGui::GetTextLineHeightWithSpacing());
+		while (clipper.Step())
+		{
+			for (auto& pair : frame_buffers)
 			{
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::Text(pair.first.data());
-
-				ImGui::TableNextColumn();
-				auto frame = pair.second;
-				auto& attachments = frame->getAttachmentes();
-				for (uint32 i = 0; i < attachments.size(); i++)
+				ImGui::Selectable(pair.first.data(), mSelectBuffer == pair.second);
+				if (ImGui::IsItemHovered())
 				{
-					ImGui::BeginGroup();
-					auto tex = attachments[i];
-					//auto [w, h, l] = tex->getSizeWHL();
-
-					switch (tex->getTextureType())
+					if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 					{
-					case TextureType::TextureRender2D:
-						break;
-					case TextureType::Texture2D:
-					{
-						ImGui::Image((ImTextureID)tex->getTextureID(), size, uv0, uv1);
-						break;
-					}
-					//不能直接显示cube,否则会爆炸
-					case TextureType::TextureCube:
-						//ImGui::Image((ImTextureID)tex->getTextureID(), size, uv0, uv1);
-						break;
-					default:
-						//ImGui::Image(nullptr, size);
-						break;
-					}
-					ImGui::Text(tex->getName().c_str());
-					ImGui::EndGroup();
-					if (i != attachments.size() - 1)
-					{
-						ImGui::SameLine();
+						mSelectBuffer = pair.second;
 					}
 				}
-				
 			}
-			
-
-			ImGui::EndTable();
 		}
+		clipper.End();
+
+
+		ImGui::EndChild();
+
+		ImGui::SameLine();
+
+		ImGui::BeginChild("##FrameBufferTextureWindow", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+		if (mSelectBuffer)
+		{
+			auto& attachments = mSelectBuffer->getAttachmentes();
+			for (uint32 i = 0; i < attachments.size(); i++)
+			{
+				ImGui::BeginGroup();
+				auto tex = attachments[i];
+				auto [w, h, l] = tex->getSizeWHL();
+
+				switch (tex->getTextureType())
+				{
+				case TextureType::TextureRender2D:
+					break;
+				case TextureType::Texture2D:
+				{
+					ImVec2 display_size, uv00, uv01, tex_size(w, h);
+					MyTextureSizeHelper::fitImageToRect(size, tex_size, display_size, offset);
+					ImGui::Image((ImTextureID)tex->getTextureID(), display_size, uv0, uv1);
+					//ImGui::SetCursorPos(offset);
+					break;
+				}
+				//不能直接显示cube,否则会爆炸
+				case TextureType::TextureCube:
+					//ImGui::Image((ImTextureID)tex->getTextureID(), size, uv0, uv1);
+					break;
+				default:
+					//ImGui::Image(nullptr, size);
+					break;
+				}
+				ImGui::Text(tex->getName().c_str());
+				ImGui::EndGroup();
+				//if (i != attachments.size() - 1)
+				//{
+				//	ImGui::SameLine();
+				//}
+			}
+		}
+
+		ImGui::EndChild();
 	}
 }

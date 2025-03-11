@@ -20,6 +20,7 @@ public:
 private:
 	Vertex* mVertex = nullptr;
 	ReplacedPipelinePass* mPass = nullptr;
+	RenderObserver* mObserver = nullptr;
 };
 
 

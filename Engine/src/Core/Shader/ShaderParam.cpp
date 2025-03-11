@@ -35,6 +35,7 @@ namespace tezcat::Tiny
 	UniformID ShaderParam::LightWorldPosition;
 
 	UniformID ShaderParam::TexDepth;
+	UniformID ShaderParam::TexShadow;
 	UniformID ShaderParam::TexSkybox;
 	UniformID ShaderParam::TexIrradiance;
 	UniformID ShaderParam::TexPrefilter;
@@ -81,6 +82,7 @@ namespace tezcat::Tiny
 
 		//3
 		ShaderParam::TexDepth = "TINY_TexDepth";
+		ShaderParam::TexShadow = "TINY_TexShadow";
 		ShaderParam::TexSkybox = "TINY_TexSkybox";
 		ShaderParam::TexIrradiance = "TINY_TexIrradiance";
 		ShaderParam::TexPrefilter = "TINY_TexPrefilter";

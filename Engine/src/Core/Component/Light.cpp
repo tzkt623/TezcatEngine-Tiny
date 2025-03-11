@@ -51,7 +51,7 @@ namespace tezcat::Tiny
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	void DirectionalLightAgent::makeRenderCommand(PipelinePass* pass)
+	void DirectionalLightAgent::makeRenderCommand(ReplacedPipelinePass* pass)
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
@@ -61,21 +61,20 @@ namespace tezcat::Tiny
 		//------------------------------------------------------------------------
 	TINY_OBJECT_CPP(DirectionalLight, LightComponent);
 	DirectionalLight::DirectionalLight()
-		: mLightAgent(nullptr)
+		: mLightAgent(DirectionalLightAgent::create())
 	{
-		mLightAgent = DirectionalLightAgent::create();
 		mLightAgent->saveObject();
 	}
 
 	DirectionalLight::DirectionalLight(const float3& direction, const float3& ambient, const float3& diffuse, const float3& specular)
-		: mLightAgent(nullptr)
+		: mLightAgent(DirectionalLightAgent::create())
 	{
-		mLightAgent->deleteObject();
+		mLightAgent->saveObject();
 	}
 
 	DirectionalLight::~DirectionalLight()
 	{
-
+		mLightAgent->deleteObject();
 	}
 
 	void DirectionalLight::submit(Shader* shader)
@@ -87,12 +86,15 @@ namespace tezcat::Tiny
 
 	void DirectionalLight::onEnable()
 	{
-
+		if (mGameObject->getScene())
+		{
+			LightingManager::setDirectionalLight(this);
+		}
 	}
 
 	void DirectionalLight::onDisable()
 	{
-
+		LightingManager::setDirectionalLight(nullptr);
 	}
 
 	void DirectionalLight::render(BaseGraphics* graphics)

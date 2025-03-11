@@ -157,10 +157,9 @@ namespace tezcat::Tiny
 			return { false, (Texture2D*)result->second };
 		}
 
-		auto t = Texture2D::create();
-		t->setName(name);
+		auto t = Texture2D::create(name);
 		t->saveObject();
-		mTextureMap.emplace(t->getName(), t);
+		mTextureMap.emplace(t->getEngineName().toView(), t);
 		return { true, t };
 
 	}
@@ -173,10 +172,9 @@ namespace tezcat::Tiny
 			return { false, (TextureCube*)result->second };
 		}
 
-		auto t = TextureCube::create();
-		t->setName(name);
+		auto t = TextureCube::create(name);
 		t->saveObject();
-		mTextureMap.emplace(t->getName(), t);
+		mTextureMap.emplace(t->getEngineName().toView(), t);
 		return { true, t };
 	}
 
@@ -188,10 +186,9 @@ namespace tezcat::Tiny
 			return { false, (TextureRender2D*)result->second };
 		}
 
-		auto t = TextureRender2D::create();
-		t->setName(name);
+		auto t = TextureRender2D::create(name);
 		t->saveObject();
-		mTextureMap.emplace(t->getName(), t);
+		mTextureMap.emplace(t->getEngineName().toView(), t);
 		return { true, t };
 	}
 }

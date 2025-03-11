@@ -22,7 +22,7 @@
 namespace tezcat::Tiny
 {
 	class GameObject;
-	class GameObjectData;
+	class GameObjectManager;
 	class Camera;
 	class CameraData;
 	class LightData;
@@ -68,8 +68,7 @@ namespace tezcat::Tiny
 		TinyWeakRef<Transform> findTransform(const std::string& name);
 
 	private:
-		int32 addGameObject(GameObject* gameObject);
-		void removeGameObject(GameObject* gameObject);
+		void addGameObject(GameObject* gameObject);
 
 	private:
 		std::string mName;
@@ -84,7 +83,7 @@ namespace tezcat::Tiny
 		//相机数据
 		CameraData* mCameraData;
 		//
-		GameObjectData* mGameObjectData;
+		GameObjectManager* mGameObjectData;
 	};
 }
 

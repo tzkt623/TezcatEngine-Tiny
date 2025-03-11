@@ -62,19 +62,20 @@ namespace tezcat::Editor
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			auto payload = ImGui::AcceptDragDropPayload("Drag Image");
-			if (payload)
+			auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
+			if (flag)
 			{
-				char* path = new char[payload->DataSize + 1];
-				memcpy_s(path, payload->DataSize, payload->Data, payload->DataSize);
-				path[payload->DataSize] = '\0';
+				auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
+				if (payload)
+				{
+					Image* img = Image::create();
+					img->openFile(MyGUIContext::DragDropController.getFilePath(), true);
 
-				Image* img = Image::create();
-				img->openFile(path, true);
-				delete[] path;
-				mCurrentHDR = nullptr;
-				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+					mCurrentHDR = nullptr;
+					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+				}
 			}
+
 			ImGui::EndDragDropTarget();
 		}
 

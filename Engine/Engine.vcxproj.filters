@@ -137,6 +137,7 @@
     <ClCompile Include="src\Core\Shader\ShaderParser.cpp" />
     <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
     <ClCompile Include="src\Core\Component\ModeAgent.cpp" />
+    <ClCompile Include="src\Core\Manager\GameObjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1331,6 +1332,8 @@
     <ClInclude Include="include\Core\Manager\UniformBufferManager.h" />
     <ClInclude Include="include\Core\Renderer\UniformBufferConfig.h" />
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
+    <ClInclude Include="ThirdParty\assimp\revision.h" />
+    <ClInclude Include="include\Core\Manager\GameObjectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

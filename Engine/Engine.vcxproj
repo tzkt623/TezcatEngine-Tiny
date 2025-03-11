@@ -170,6 +170,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Component\ModeAgent.cpp" />
+    <ClCompile Include="src\Core\Manager\GameObjectManager.cpp" />
     <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
     <ClCompile Include="src\Core\Shader\ShaderParser.cpp" />
     <ClCompile Include="src\Core\Base\TinyGC.cpp" />
@@ -253,6 +254,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Base\TinyGCInfo.h" />
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="include\Core\Component\ShadowCaster.h" />
+    <ClInclude Include="include\Core\Manager\GameObjectManager.h" />
     <ClInclude Include="include\Core\Manager\ResourceManager.h" />
     <ClInclude Include="include\Core\Data\Text.h" />
     <ClInclude Include="include\Core\Debug\Debug.h" />
@@ -393,6 +395,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="ThirdParty\assimp\qnan.h" />
     <ClInclude Include="ThirdParty\assimp\quaternion.h" />
     <ClInclude Include="ThirdParty\assimp\RemoveComments.h" />
+    <ClInclude Include="ThirdParty\assimp\revision.h" />
     <ClInclude Include="ThirdParty\assimp\scene.h" />
     <ClInclude Include="ThirdParty\assimp\SceneCombiner.h" />
     <ClInclude Include="ThirdParty\assimp\SGSpatialSort.h" />

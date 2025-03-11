@@ -2,7 +2,7 @@
 #include "../MyInputer.h"
 #include "../MyController.h"
 
-TINY_OBJECT_CPP(MyMainScene, Scene)
+TINY_OBJECT_CPP(MyMainScene, Scene);
 
 MyMainScene::MyMainScene(const std::string& name)
 	: Base(name)
@@ -11,16 +11,12 @@ MyMainScene::MyMainScene(const std::string& name)
 
 }
 
-
 void MyMainScene::onEnter()
 {
 	Base::onEnter();
 	LightingManager::enableSkyBox();
 
 	InputSys::getInstance()->push(MyInputer::getInstance());
-
-	float gateWidth = 1920.0f / 4;
-	float gateHigh = 1080.0f / 4;
 
 	// 	mController = GameObject::create("Controller");
 	// 	mController->addComponent<Transform>();
@@ -40,8 +36,8 @@ void MyMainScene::onEnter()
 		camera->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 
 		go->addComponent<Transform>();
-		go->getTransform()->setPosition(float3(0.0f, 0.0f, 10.0f));
-		go->getTransform()->setRotation(float3(0.0f, 0.0f, 0.0f));
+		go->getTransform()->setPosition(float3(-41.715f, 174.206f, 382.644f));
+		go->getTransform()->setRotation(float3(-13.093f, -27.649f, 0.0f));
 		//go->getTransform()->setParent(mController->getTransform());
 		MyInputer::getInstance()->setController(go->addComponent<FlyController>());
 	}
@@ -126,17 +122,20 @@ void MyMainScene::createModel()
 	auto model = ResourceManager::loadAndSave<Model>("Model/szb.fbx");
 	auto go_gundum_szb = model->generate();
 	go_gundum_szb->getTransform()->setPosition(157.74f, 106.560f, 150.780f);
-	go_gundum_szb->getTransform()->setRotation(-90.0f, 0.0f, 0.0f);
-	go_gundum_szb->getTransform()->setScale(10.0f, 10.0f, 10.0f);
+	go_gundum_szb->getTransform()->setRotation(0.0f, 0.0f, 0.0f);
+	go_gundum_szb->getTransform()->setScale(50.0f, 50.0f, 50.0f);
 
-	model = ResourceManager::loadAndSave<Model>("Model/209790.fbx");
-	auto go_dasd = model->generate();
-	go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
-	go_dasd->getTransform()->setRotation(0.0f, -90.0f, 0.0f);
+ 	model = ResourceManager::loadAndSave<Model>("Model/NekomiyaMana.pmx");
+ 	auto go_dasd = model->generate();
+ 	go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
+ 	go_dasd->getTransform()->setScale(10.0f, 10.0f, 10.0f);
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
 {
+// 	float gateWidth = 1920.0f / 4;
+// 	float gateHigh = 1080.0f / 4;
+
 	auto world1 = GameObject::create("World1_Gate");
 	world1->setLayerMaskIndex(1);
 
@@ -273,14 +272,14 @@ void MyMainScene::createPlane()
 	auto shader = plane_material->getShader();
 	auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
 	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
-	auto index_shininess = shader->getUniformIndex("myShininess");
+	auto index_shininess = shader->getUniformIndex("myTexShininess2D");
 
 	auto tex_diff = ResourceManager::loadOnly<Texture2D>("Image/stone_wall_diff.jpg");
 	auto tex_spec = ResourceManager::loadOnly<Texture2D>("Image/stone_wall_ao.jpg");
 
 	plane_material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
 	plane_material->setUniform<UniformTex2D>(index_specular, tex_spec);
-	plane_material->setUniform<UniformF1>(index_shininess, 64.0f);
+	plane_material->setUniform<UniformTex2D>(index_shininess, tex_spec);
 
 
 	//plane_material->addUniform<UniformTex2D>(ShaderParam::TexDepth, "Shadow");
@@ -291,19 +290,19 @@ void MyMainScene::createCubes0()
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dis(-520, 520);
+	std::uniform_int_distribution<> dis(-200, 200);
 	std::uniform_int_distribution<> dis_ro(0, 359);
 
 	auto shader = ShaderManager::find("Standard/Std1");
 
 	auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
 	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
-	auto index_shininess = shader->getUniformIndex("myShininess");
+	auto index_shininess = shader->getUniformIndex("myTexShininess2D");
 
 	auto tex_diff = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
 	auto tex_spec = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");
 
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		auto go = GameObject::create();
 		go->addComponent<Transform>();
@@ -319,7 +318,8 @@ void MyMainScene::createCubes0()
 
 		material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
 		material->setUniform<UniformTex2D>(index_specular, tex_spec);
-		material->setUniform<UniformF1>(index_shininess, 64.0f);
+		//material->setUniform<UniformF1>(index_shininess, 64.0f);
+		material->setUniform<UniformTex2D>(index_shininess, tex_spec);
 	}
 }
 
@@ -417,7 +417,7 @@ void MyMainScene::createPBR()
 	{
 		for (int x = 0; x <= number; x++)
 		{
-			go = GameObject::create(StringTool::stringFormat("PBRBall_%d_%d", x, y));
+			go = GameObject::create(std::format("PBRBall_{}_{}", x, y));
 			go->addComponent<Transform>();
 			go->getTransform()->setPosition(float3(x * 25.0f, y * 25.0f, -60.0f));
 			go->getTransform()->setScale(float3(10.0f));

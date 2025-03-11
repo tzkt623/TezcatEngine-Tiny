@@ -91,19 +91,6 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->setTexture2D(shader, *mValueID, this->value);
 	}
 
-	void UniformTex2D::beginSetValue()
-	{
-		if (this->value)
-		{
-			this->value->deleteObject();
-		}
-	}
-
-	void UniformTex2D::endSetValue()
-	{
-		this->value->saveObject();
-	}
-
 	UniformTexCube::~UniformTexCube()
 	{
 		this->value->deleteObject();
@@ -113,18 +100,4 @@ namespace tezcat::Tiny
 	{
 		Graphics::getInstance()->setTextureCube(shader, *mValueID, this->value);
 	}
-
-	void UniformTexCube::beginSetValue()
-	{
-		if (this->value)
-		{
-			this->value->deleteObject();
-		}
-	}
-
-	void UniformTexCube::endSetValue()
-	{
-		this->value->saveObject();
-	}
-
 }

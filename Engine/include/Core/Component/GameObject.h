@@ -41,12 +41,13 @@ namespace tezcat::Tiny
 		void enterScene(Scene* scene);
 		void exitScene();
 
-		uint32 getLayerMask() const { return 1 << mLayerMaskIndex; }
-		uint32 getLayerIndex() const { return mLayerMaskIndex; }
-		void setLayerMaskIndex(uint32 maskIndex) { mLayerMaskIndex = maskIndex; }
+		uint32_t getLayerMask() const { return 1 << mLayerMaskIndex; }
+		uint32_t getLayerIndex() const { return mLayerMaskIndex; }
+		void setLayerMaskIndex(uint32_t maskIndex) { mLayerMaskIndex = maskIndex; }
+		std::string getMemoryInfo() override;
 
 	public:
-		int32 getUID() const { return mUID; }
+		int32_t getUID() const { return mUID; }
 
 		Transform* getTransform()
 		{
@@ -114,29 +115,12 @@ namespace tezcat::Tiny
 	private:
 		bool mIsLogic;
 		std::string mName;
-		int32 mUID;
-		uint32 mLayerMaskIndex;
+		int32_t mUID;
+		uint32_t mLayerMaskIndex;
 
 	private:
 		Scene* mScene;
 		std::vector<Component*> mComponentList;
-	};
-
-	class GameObjectData : public TinyObject
-	{
-		TINY_OBJECT_H(GameObjectData, TinyObject)
-	private:
-		GameObjectData();
-
-	public:
-		virtual ~GameObjectData();
-
-		int32 addGameObject(GameObject* gameObject);
-		void removeGameObject(GameObject* gameObject);
-
-	private:
-		std::vector<GameObject*> mArray;
-		std::queue<int32> mFreeIDQueue;
 	};
 }
 

@@ -1,4 +1,20 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "../Data/Image.h"
 
 #include "../Head/TinyCpp.h"
@@ -16,6 +32,7 @@ namespace tezcat::Tiny
 	class TinyObject;
 	class Texture2D;
 	class Mode;
+	class Image;
 
 	template<typename T>
 	struct ResourceSelector
@@ -53,108 +70,135 @@ namespace tezcat::Tiny
 		static const std::string& getRelativeResDir() { return sRelativeResDir; }
 
 		template<class Data>
-		static Data* loadAndSave(const std::string& path)
+		static Data* loadAndSave(const file_path& relativePath)
 		{
 			TINY_THROW_LOGIC("");
 			return nullptr;
 		}
 
 		template<class Data>
-		static Data* loadOnly(const std::string& path)
+		static Data* loadOnly(const file_path& relativePath)
 		{
 			TINY_THROW_LOGIC("");
 			return nullptr;
 		}
 
 		template<>
-		static Texture2D* loadAndSave<>(const std::string& path)
+		static Texture2D* loadAndSave<>(const file_path& relativePath)
 		{
-			std::filesystem::path file_path(sRelativeResDir + "/" + path);
+			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+
+			auto it = mTexture2DUMap.find(generic_relative_path);
+			if (it == mTexture2DUMap.end())
+			{
+				auto image = loadAndSave<Image>(generic_relative_path);
+				if (image)
+				{
+					file_path file_path(sRelativeResDir / generic_relative_path);
+
+					Texture2D* t2d = Texture2D::create(file_path.filename().string());
+					t2d->setImage(image);
+					t2d->generate();
+					t2d->saveObject();
+
+					mTexture2DUMap.emplace(generic_relative_path, t2d);
+					return t2d;
+				}
+
+				return nullptr;
+			}
+			else
+			{
+				return it->second;
+			}
+		}
+
+		template<>
+		static Texture2D* loadOnly<>(const file_path& relativePath)
+		{
+			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+
+			file_path file_path(sRelativeResDir / generic_relative_path);
 			Image* img = Image::create();
 			if (img->openFile(file_path.string(), true))
 			{
-				Texture2D* t2d = Texture2D::create(file_path.filename().string());
+				Texture2D* t2d = Texture2D::create(generic_relative_path.filename().string());
 				t2d->setImage(img);
 				t2d->generate();
-				t2d->saveObject();
-
-				mDataUSet.emplace(t2d);
 				return t2d;
 			}
 
 			return nullptr;
 		}
 
+		//template<>
+		//static Shader* loadAndSave<>(const file_path& path)
+		//{
+		//	Shader* shader = Shader::create(std::format("{}/{}", sRelativeResDir, path));
+		//	shader->generate();
+		//	shader->saveObject();
+		//
+		//	mDataUSet.emplace(shader);
+		//	return shader;
+		//}
+		//
+		//template<>
+		//static Shader* loadOnly<>(const file_path& path)
+		//{
+		//	Shader* shader = Shader::create(std::format("{}/{}", sRelativeResDir, path));
+		//	shader->generate();
+		//	return shader;
+		//}
+
 		template<>
-		static Texture2D* loadOnly<>(const std::string& path)
+		static Image* loadAndSave<>(const file_path& relativePath)
 		{
-			std::filesystem::path file_path(sRelativeResDir + "/" + path);
-			Image* img = Image::create();
-			if (img->openFile(file_path.string(), true))
+			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+
+			auto result = mImageMap.try_emplace(generic_relative_path, nullptr);
+			if (result.second)
 			{
-				Texture2D* t2d = Texture2D::create(file_path.filename().string());
-				t2d->setImage(img);
-				t2d->generate();
-				return t2d;
+				Image* image = Image::create();
+				if (image->openFile(sRelativeResDir / generic_relative_path, true))
+				{
+					image->saveObject();
+					result.first->second = image;
+					return image;
+				}
+				else
+				{
+					return nullptr;
+				}
 			}
 
-			return nullptr;
+			return result.first->second;
 		}
 
 		template<>
-		static Shader* loadAndSave<>(const std::string& path)
+		static Image* loadOnly<>(const file_path& relativePath)
 		{
-			Shader* shader = Shader::create(sRelativeResDir + "/" + path);
-			shader->generate();
-			shader->saveObject();
+			file_path generic_relative_path = file_sys_helper::generic(relativePath);
 
-			mDataUSet.emplace(shader);
-			return shader;
-		}
-
-		template<>
-		static Shader* loadOnly<>(const std::string& path)
-		{
-			Shader* shader = Shader::create(sRelativeResDir + "/" + path);
-			shader->generate();
-			return shader;
-		}
-
-		template<>
-		static Image* loadAndSave<>(const std::string& path)
-		{
 			Image* image = Image::create();
-			if (image->openFile(sRelativeResDir + "/" + path, true))
+			if (image->openFile(sRelativeResDir / generic_relative_path, true))
 			{
-				image->saveObject();
-				mDataUSet.emplace(image);
 				return image;
 			}
 
 			return nullptr;
 		}
 
-		template<>
-		static Image* loadOnly<>(const std::string& path)
-		{
-			Image* image = Image::create();
-			if (image->openFile(sRelativeResDir + "/" + path, true))
-			{
-				return image;
-			}
-
-			return nullptr;
-		}
-
 
 		template<>
-		static Model* loadAndSave<>(const std::string& path)
+		static Model* loadAndSave<>(const file_path& relativePath)
 		{
-			auto result = mModelMap.try_emplace(path, nullptr);
+			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+
+			auto result = mModelMap.try_emplace(generic_relative_path, nullptr);
 			if (result.second)
 			{
 				Model* model = Model::create();
-				model->load(std::format("{}/{}", sRelativeResDir, path));
+				model->load(sRelativeResDir / generic_relative_path);
 				model->saveObject();
 				model->setPath(result.first->first);
 				result.first->second = model;
@@ -164,11 +208,45 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Model* loadOnly<>(const std::string& path)
+		static Model* loadOnly<>(const file_path& relativePath)
 		{
+			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+
 			Model* model = Model::create();
-			model->load(sRelativeResDir + "/" + path);
+			model->load(sRelativeResDir / generic_relative_path);
 			return model;
+		}
+
+		template<class Data>
+		static Data* loadDefault(const file_path& path)
+		{
+			throw std::runtime_error("Resource Error");
+		}
+
+		template<>
+		static Image* loadDefault<Image>(const file_path& relativePath)
+		{
+			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+
+			auto result = mTinyImageMap.try_emplace(generic_relative_path, nullptr);
+			if (result.second)
+			{
+				Image* image = Image::create();
+				if (image->openFile(sRelativeResDir / generic_relative_path, true))
+				{
+					image->saveObject();
+					result.first->second = image;
+					return image;
+				}
+			}
+
+			return result.first->second;
+		}
+
+		template<>
+		static Texture2D* loadDefault<Texture2D>(const file_path& relativePath)
+		{
+			return loadAndSave<Texture2D>(relativePath);
 		}
 
 #pragma region Unload
@@ -210,14 +288,23 @@ namespace tezcat::Tiny
 
 		static void unloadUnused()
 		{
-			auto it = mDataUSet.begin();
-			auto end = mDataUSet.end();
-			while (it != mDataUSet.end())
+			unloadUnusedSet(mDataUSet);
+			unloadUnusedMap(mModelMap);
+			unloadUnusedMap(mImageMap);
+			unloadUnusedMap(mTexture2DUMap);
+		}
+
+	private:
+		template<class Set>
+		static void unloadUnusedSet(Set& container)
+		{
+			auto it = container.begin();
+			while (it != container.end())
 			{
 				if ((*it)->getRefCount() == 1)
 				{
 					(*it)->deleteObject();
-					it = mDataUSet.erase(it);
+					it = container.erase(it);
 				}
 				else
 				{
@@ -225,15 +312,39 @@ namespace tezcat::Tiny
 				}
 			}
 		}
+
+
+		template<class Map>
+		static void unloadUnusedMap(Map& container)
+		{
+			auto it = container.begin();
+			while (it != container.end())
+			{
+				auto ptr = it->second;
+				if (ptr->getRefCount() == 1)
+				{
+					ptr->deleteObject();
+					it = container.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+			}
+		}
+
 #pragma endregion
 
 	private:
 		static std::unordered_set<TinyObject*> mDataUSet;
-		static std::unordered_map<std::string_view, Texture2D*> mTexture2DUSet;
 		static std::unordered_map<std::string_view, Shader*> mShaderUSet;
-		static std::unordered_map<std::string_view, Image*> mImageUSet;
 
-		static std::unordered_map<std::string, Model*> mModelMap;
+		static std::unordered_map<file_path, Texture2D*> mTexture2DUMap;
+		static std::unordered_map<file_path, Image*> mImageMap;
+		static std::unordered_map<file_path, Model*> mModelMap;
+
+		static std::unordered_map<file_path, Image*> mTinyImageMap;
+
 
 	private:
 		static std::string sEngineDir;

@@ -128,12 +128,16 @@ namespace tezcat::Tiny
 
 	UniformBuffer::~UniformBuffer()
 	{
-		mLayout->removeHolder(this);
+
 	}
 
 	void UniformBuffer::update(const uint32_t& index, const void* data, const size_t& dataSize)
 	{
 		auto& layout = mLayout->mSlot[index];
+		if (layout.offset < 0)
+		{
+			return;
+		}
 		memcpy((uint8_t*)mData + layout.offset, data, dataSize);
 	}
 
@@ -172,5 +176,10 @@ namespace tezcat::Tiny
 			}
 			Graphics::getInstance()->addCommand<RenderCMD_CreateUniformBuffer>(this, mLayout->mBindingIndex);
 		}
+	}
+
+	void UniformBuffer::onClose()
+	{
+		mLayout->removeHolder(this);
 	}
 }

@@ -20,7 +20,9 @@
 #include "../Head/CppHead.h"
 #include "../Head/GLMHead.h"
 #include "../Head/ConfigHead.h"
+
 #include "../Renderer/VertexConfig.h"
+
 #include "../Base/TinyObject.h"
 
 struct aiMesh;
@@ -109,28 +111,60 @@ namespace tezcat::Tiny
 
 	class Texture;
 	class Vertex;
+	class Shader;
 	class ModelNode
 	{
 	public:
+		union Value
+		{
+			struct Color
+			{
+				float r;
+				float g;
+				float b;
+				float a;
+			} color;
+
+			float v1;
+			float v2;
+			float v3;
+			float v4;
+		};
+
 		ModelNode();
 		~ModelNode();
 
-		bool hasChildren() const { return mChildrenCount != 0; }
-		bool hasMesh() const { return mVertex != nullptr; }
-
-		void init(uint32 meshCount, uint32 childCount);
-		void addChild(ModelNode* node);
 		void setVertex(Vertex* vertex);
 
+		std::tuple<bool, std::string_view> getTextureMap(MaterialTextureSlot slot);
+		std::tuple<bool, Value> getValueMap(MaterialTextureSlot slot);
 
-		std::string mName;
+
+		std::unordered_map<MaterialTextureSlot, std::string>& getTextureMap();
+		std::unordered_map<MaterialTextureSlot, Value>& getValueMap();
+
+		std::string* tryGetTexture(MaterialTextureSlot slot);
+		Value* tryGetValue(MaterialTextureSlot slot);
+
+		void setBlend(Blend source, Blend target);
+
+	public:
 		Vertex* mVertex;
-
-		bool mInited;
+		std::string mName;
 		uint32 mIndex;
-		ModelNode** mChildren;
-		uint32 mChildrenCount;
 		int32_t mParentIndex;
+		Shader* mShader;
+
+		bool mIsEnableBlend;
+		bool mIsPBR;
+		bool mHasTexture;
+		Blend mSource;
+		Blend mTarget;
+
+
+	private:
+		std::unordered_map<MaterialTextureSlot, std::string>* mTextureMap;
+		std::unordered_map<MaterialTextureSlot, Value> *mValueMap;
 	};
 
 	class Model : public TinyObject
@@ -140,12 +174,15 @@ namespace tezcat::Tiny
 	public:
 		virtual ~Model();
 
-		void load(const std::string& path);
+		bool load(const file_path& path);
 		GameObject* generate();
 
-		void setPath(const std::string& path) { mPath = path; }
-		std::string_view getPath() { return mPath; }
+		void setPath(const file_path& path) { mPath = path; }
+		const file_path& getPath() { return mPath; }
 
+	private:
+		void setShading(ModelNode* node, aiMaterial* aiMaterial);
+		void setBlend(ModelNode* node, aiMaterial* aiMaterial);
 	private:
 		void createModelNode(const aiScene* aiscene, aiNode* ainode, int32_t parentIndex);
 		MeshData* createMesh(aiMesh* aimesh, const aiScene* aiscene, const aiNode* node);
@@ -153,13 +190,15 @@ namespace tezcat::Tiny
 
 	private:
 		std::string mName;
-		std::string_view mPath;
-
+		file_path mPath;
 		std::vector<ModelNode*> mChildren;
-		
+	};
 
-		//ModelNode* mRoot;
-		//std::vector<ModelNode> mChildren;
+	class AssimpHelper
+	{
+	public:
+		static bool isPBRValue(aiMaterial* material);
+		static bool isPBRTexture(aiMaterial* material);
 	};
 }
 

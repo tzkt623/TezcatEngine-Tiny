@@ -31,15 +31,15 @@ namespace tezcat::Tiny
 	public:
 		virtual ~Image();
 
-		bool openFile(const std::string& path, bool flip = false);
-		bool openFile(const FileInfo& info, bool flip = false);
+		bool openFile(const file_path& path, bool flip = true);
+		bool openFile(const FileInfo& info, bool flip = true);
 
-		const int& getWidth() const { return mWidth; }
-		const int& getHeight() const { return mHeight; }
-		const int& getChannels() const { return mChannels; }
-		uint64 getDataSize() const
+		const int32_t& getWidth() const { return mWidth; }
+		const int32_t& getHeight() const { return mHeight; }
+		const int32_t& getChannels() const { return mChannels; }
+		uint64_t getDataSize() const
 		{
-			return mWidth * mHeight * mChannels * uint64(mIsHDR ? sizeof(float) : sizeof(uint8));
+			return mWidth * mHeight * mChannels * uint64_t(mIsHDR ? sizeof(float) : sizeof(uint8));
 		}
 		void* getData() const { return mData; }
 		void* moveData()
@@ -51,9 +51,9 @@ namespace tezcat::Tiny
 		bool isHDR() const { return mIsHDR; }
 
 	private:
-		int mWidth;
-		int mHeight;
-		int mChannels;
+		int32_t mWidth;
+		int32_t mHeight;
+		int32_t mChannels;
 		void* mData;
 		bool mIsHDR;
 	};

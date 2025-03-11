@@ -19,6 +19,11 @@ namespace tezcat::Editor
 		Texture2D* mColorBuffer;
 		std::vector<float> mFrameTimeBuffer;
 		bool mIsPlaying;
+		ImVec2 mViewPortPos;
+		ImVec2 mMousePos;
+		ImVec2 mFramePos;
+
+	public:
 	};
 
 

@@ -10,7 +10,7 @@ namespace tezcat::Editor
 	uint32_t Icon_Fbx = 0;
 
 	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyResourceWindow)
-	MyResourceWindow::MyResourceWindow()
+		MyResourceWindow::MyResourceWindow()
 		: GUIWindow("资源(Resource)")
 		, mFileItemSize(64)
 		, mUVx(0, 1)
@@ -274,54 +274,8 @@ namespace tezcat::Editor
 	{
 		if (ImGui::BeginDragDropSource())
 		{
-			MyGUIContext::beginDragResource();
-			auto ext = path.filename().extension().string();
-			std::transform(ext.begin()
-				, ext.end()
-				, ext.begin()
-				, [](unsigned char c) { return std::tolower(c); });
-
-			auto type = FileTool::getFileType(ext);
-
-			switch (type)
-			{
-			case FileType::FT_None:
-				break;
-			case FileType::FT_Text_Begin:
-				break;
-			case FileType::FT_Text:
-			{
-				break;
-			}
-			case FileType::FT_Tysl:
-			{
-				break;
-			}
-			case FileType::FT_Tyin:
-			{
-				break;
-			}
-			case FileType::FT_Text_End:
-				break;
-			case FileType::FT_Img_Begin:
-				break;
-			case FileType::FT_Jpg:
-			case FileType::FT_Png:
-			case FileType::FT_Hdr:
-			{
-				auto p = path.string();
-				ImGui::SetDragDropPayload("Drag Image", p.data(), p.size(), ImGuiCond_Once);
-
-				break;
-			}
-			case FileType::FT_Img_End:
-				break;
-			case FileType::FT_Unknown:
-				break;
-			default:
-				break;
-			}
-
+			auto drag_name = MyGUIContext::DragDropController.dragData(path);
+			ImGui::SetDragDropPayload(drag_name.data(), nullptr, 0);
 			ImGui::EndDragDropSource();
 		}
 	}

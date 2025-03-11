@@ -51,12 +51,22 @@ namespace tezcat::Tiny
 		const std::string& getFilePath() const { return mPath; }
 		bool checkAndLoadContent();
 
+		std::string getMemoryInfo() override;
+
 	public:
 
 		Queue getRenderQueue() const { return mRenderQueue; }
 		void setRenderQueue(Queue val) { mRenderQueue = val; }
-		void setName(const std::string& name) { mName = name; }
-		void setName(std::string& name) { mName.assign(name); }
+		void setName(const std::string& name)
+		{
+			mName = name;
+			mEngineName = mName;
+		}
+		void setName(std::string& name)
+		{
+			mName.assign(name);
+			mEngineName = mName;
+		}
 
 		int32 getProgramID() const { return mProgramID; }
 		int32 getOrderID() const { return mOrderID; }
@@ -97,18 +107,20 @@ namespace tezcat::Tiny
 	public:
 		bool checkUniform(const UniformID& id)
 		{
-			return mTinyUniformList[id.getUID()]->valueID > -1;
+			TINY_THROW_RUNTIME(id.toUID() < 0, "UID must >= 0");
+			return mTinyUniformList[id.toUID()]->valueID > -1;
 		}
 
 		bool checkTinyUniform(const UniformID& id, int& outValueID)
 		{
-			outValueID = mTinyUniformList[id.getUID()]->valueID;
+			TINY_THROW_RUNTIME(id.toUID() < 0, "UID must >= 0");
+			outValueID = mTinyUniformList[id.toUID()]->valueID;
 			return outValueID > -1;
 		}
 
 		int32 getTinyUniformShaderID(const UniformID& id)
 		{
-			return mTinyUniformList[id.getUID()]->valueID;
+			return mTinyUniformList[id.toUID()]->valueID;
 		}
 
 		uint32 getTextureIndex()

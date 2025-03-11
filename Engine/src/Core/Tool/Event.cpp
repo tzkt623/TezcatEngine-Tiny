@@ -19,28 +19,52 @@
 
 namespace tezcat::Tiny
 {
-	void Event::addListener(const EventID& eventID, void* master, const std::function<void(const EventData&)>& function)
+	std::queue<Event::Listener*> Event::mListenerPool;
+
+	Event::Event()
 	{
-		auto& root = mListenerList[eventID];
-		if (!root)
+
+	}
+
+	Event::~Event()
+	{
+		for (auto list : mListenerListArray)
 		{
-			root = TinyUnique<ListenerList>();
+			delete list;
 		}
 
-		auto listener = TinyShared<Listener>();
+		mListenerWithOwnerUMap.clear();
+		mListenerListArray.clear();
+	}
+
+	void Event::init(int eventCount)
+	{
+		mListenerListArray.resize(eventCount, nullptr);
+
+		for (int i = 0; i < eventCount; i++)
+		{
+			mListenerListArray[i] = new ListenerList();
+		}
+	}
+
+
+	void Event::addListener(const EventID& eventID, void* master, const std::function<void(const EventData&)>& function)
+	{
+		auto& root = mListenerListArray[eventID];
+		auto listener = createLisenter();
 		listener->callback = function;
 		root->push(listener);
 
 		auto result2 = mListenerWithOwnerUMap.find(master);
 		if (result2 == mListenerWithOwnerUMap.end())
 		{
-			auto vector = TinyUnique<std::vector<std::shared_ptr<Listener>>>();
-			vector->emplace_back(listener);
+			std::vector<Listener*> vector;
+			vector.emplace_back(listener);
 			mListenerWithOwnerUMap.emplace(master, std::move(vector));
 		}
 		else
 		{
-			result2->second->emplace_back(listener);
+			result2->second.emplace_back(listener);
 		}
 	}
 
@@ -50,10 +74,12 @@ namespace tezcat::Tiny
 		if (it != mListenerWithOwnerUMap.end())
 		{
 			auto& vector = it->second;
-			for (auto& l : *vector)
+			for (auto& l : vector)
 			{
 				l->removeSelf();
+				mListenerPool.push(l);
 			}
+			vector.clear();
 
 			mListenerWithOwnerUMap.erase(it);
 			return true;
@@ -64,33 +90,114 @@ namespace tezcat::Tiny
 
 	void Event::dispatch(const EventData& eventData)
 	{
-		auto& ptr = mListenerList[eventData.eventID];
-		if (ptr)
+		auto& ptr = mListenerListArray[eventData.eventID];
+		auto root = ptr->mRoot;
+		while (root)
 		{
-			auto root = ptr->mRoot;
-			while (root)
+			root->callback(eventData);
+			root = root->nextData;
+		}
+	}
+
+	Event::Listener* Event::createLisenter()
+	{
+		if (!mListenerPool.empty())
+		{
+			auto listener = mListenerPool.front();
+			mListenerPool.pop();
+			return listener;
+		}
+
+		return new Event::Listener();
+	}
+
+
+	void Event::Listener::removeSelf()
+	{
+		if (this->preData)
+		{
+			//------------------------------------------
+			//	删除的不是第一个
+			//	如果后一个有值
+			//	先设置后一个的前一个
+			if (this->nextData)
 			{
-				root->callback(eventData);
-				root = root->nextData;
+				this->nextData->preData = this->preData;
+			}
+			this->preData->nextData = this->nextData;
+		}
+		else
+		{
+			//-----------------------
+			//	删除的是第一个
+			if (this->nextData)
+			{
+				this->nextData->preData = nullptr;
+				//如果前面没有值,说明它是第一个
+				//把下一个装到头上来
+				list->mRoot = this->nextData;
+			}
+			else
+			{
+				list->mRoot = nullptr;
 			}
 		}
+
+		this->preData = nullptr;
+		this->nextData = nullptr;
+		this->list = nullptr;
+		mListenerPool.push(this);
 	}
 
-	void Event::init(int eventCount)
+	Event::Listener::~Listener()
 	{
-		//mListenerList.resize(eventCount, TinyMove(TinyUnique<ListenerList>()));
-		mListenerList.resize(eventCount);
+		this->preData = nullptr;
+		this->nextData = nullptr;
+		this->list = nullptr;
+	}
 
-		for (int i = 0; i < eventCount; i++)
+	Event::Listener::Listener()
+		: preData(nullptr)
+		, nextData(nullptr)
+		, list(nullptr)
+	{
+
+	}
+
+	Event::ListenerList::~ListenerList()
+	{
+		while (mRoot)
 		{
-
+			auto next = mRoot->nextData;
+			delete mRoot;
+			mRoot = next;
 		}
 	}
 
-	Event::~Event()
+	Event::ListenerList::ListenerList() : mRoot(nullptr)
 	{
-		mListenerWithOwnerUMap.clear();
-		mListenerList.clear();
+
+	}
+
+	Event::ListenerList::ListenerList(const ListenerList& other) : mRoot(other.mRoot)
+	{
+
+	}
+
+	void Event::ListenerList::push(Listener* listener)
+	{
+		listener->list = this;
+
+		if (mRoot)
+		{
+			mRoot->preData = listener;
+			listener->nextData = mRoot;
+			mRoot = listener;
+		}
+		else
+		{
+			mRoot = listener;
+		}
 	}
 
 }

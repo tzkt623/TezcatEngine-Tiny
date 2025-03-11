@@ -21,12 +21,16 @@
 #include "Core/Manager/CameraManager.h"
 #include "Core/Manager/SceneManager.h"
 #include "Core/Manager/LightingManager.h"
+#include "Core/Manager/ResourceManager.h"
+#include "Core/Manager/GameObjectManager.h"
 
 #include "Core/Component/Camera.h"
 #include "Core/Component/Light.h"
 #include "Core/Component/Transform.h"
 
 #include "Core/Renderer/RenderObjectCache.h"
+
+#include "Core/Event/EngineEvent.h"
 
 #include "Core/Debug/Debug.h"
 
@@ -46,12 +50,23 @@ namespace tezcat::Tiny
 
 	Scene::~Scene()
 	{
-
 	}
 
 	void Scene::onEnter()
 	{
 		TINY_LOG_INFO(std::format("Enter Scene: {}", mName));
+
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_LoadModel, this,
+			[](const EventData& evt)
+			{
+				std::string* path = (std::string*)evt.userData;
+				Model* model = Model::create();
+				if (model->load(*path))
+				{
+					model->setPath(*path);
+					model->generate();
+				}
+			});
 
 		mCameraData = CameraData::create();
 		mCameraData->saveObject();
@@ -59,24 +74,29 @@ namespace tezcat::Tiny
 		mLightData = LightData::create();
 		mLightData->saveObject();
 
-		mGameObjectData = GameObjectData::create();
-		mGameObjectData->saveObject();
-
 		CameraManager::setData(mCameraData);
 		LightingManager::setLightData(mLightData);
+		GameObjectManager::enterScene();
 	}
 
 	void Scene::onExit()
 	{
+		for (auto& tran : mTransformList)
+		{
+			tran->getGameObject()->deleteObject();
+		}
+
 		mLightData->deleteObject();
 		mCameraData->deleteObject();
-		mGameObjectData->deleteObject();
 
 		mLogicList.clear();
 		mTransformList.clear();
 
 		CameraManager::setData(nullptr);
 		LightingManager::setLightData(nullptr);
+		GameObjectManager::exitScene();
+
+		EngineEvent::getInstance()->removeListener(this);
 
 		TINY_LOG_INFO(std::format("Exit Scene: {}", mName));
 	}
@@ -116,7 +136,7 @@ namespace tezcat::Tiny
 		//#InitNewObjects
 		if (!mNewGameObjectList.empty())
 		{
-			for (auto go : mNewGameObjectList)
+			for (auto& go : mNewGameObjectList)
 			{
 				go->enterScene(this);
 				if (go->getTransform()->getParent() == nullptr)
@@ -204,15 +224,8 @@ namespace tezcat::Tiny
 		SceneManager::prepareScene(this);
 	}
 
-	int32 Scene::addGameObject(GameObject* gameObject)
+	void Scene::addGameObject(GameObject* gameObject)
 	{
 		mNewGameObjectList.push_back(gameObject);
-		return mGameObjectData->addGameObject(gameObject);
 	}
-
-	void Scene::removeGameObject(GameObject* gameObject)
-	{
-		mGameObjectData->removeGameObject(gameObject);
-	}
-
 }

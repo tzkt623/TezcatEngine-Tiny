@@ -18,9 +18,11 @@
 #include "Core/Component/Camera.h"
 #include "Core/Component/Component.h"
 #include "Core/Component/Transform.h"
+#include "Core/Component/GameObject.h"
 
 #include "Core/Manager/CameraManager.h"
-#include "Core/Component/GameObject.h"
+#include "Core/Manager/GameObjectManager.h"
+
 
 namespace tezcat::Tiny
 {
@@ -62,6 +64,13 @@ namespace tezcat::Tiny
 	void Camera::setMain()
 	{
 		mIsMain = true;
+		GameObjectManager::setIDObserver(mCameraAgent);
 		CameraManager::setMainCamera(this);
+	}
+
+	void Camera::clearMain()
+	{
+		mIsMain = false;
+		GameObjectManager::setIDObserver(nullptr);
 	}
 }

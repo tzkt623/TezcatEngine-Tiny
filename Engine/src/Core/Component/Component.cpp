@@ -80,5 +80,11 @@ namespace tezcat::Tiny
 			this->onDisable();
 		}
 	}
+
+	std::string Component::getMemoryInfo()
+	{
+		return TINY_OBJECT_MEMORY_INFO_WTIH_NAME(mGameObject->getEngineName());
+	}
+
 }
 

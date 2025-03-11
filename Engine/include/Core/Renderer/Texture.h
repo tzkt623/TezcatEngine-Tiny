@@ -69,22 +69,30 @@ namespace tezcat::Tiny
 		virtual void update() {};
 		virtual TextureType getTextureType() const = 0;
 
-		virtual std::tuple<uint32, uint32, uint32> getSizeWHL() = 0;
+		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() = 0;
 
-		const uint32& getTextureID() const { return mTextureID; }
-		virtual void apply(uint32 id) { mTextureID = id; }
+		const uint32_t& getTextureID() const { return mTextureID; }
+		virtual void apply(uint32_t id) { mTextureID = id; }
 
-		const uint32 getUID() const { return mUID; }
+		const uint32_t getUID() const { return mUID; }
 		const std::string_view getNameView() const { return mName; }
 		const std::string& getName() const { return mName; }
-		void setName(std::string& name) { mName.assign(std::move(name)); }
-		void setName(const std::string& name) { mName = name; }
+		void setName(std::string& name)
+		{
+			mName.assign(std::move(name));
+			mEngineName = mName;
+		}
+		void setName(const std::string& name)
+		{
+			mName = name;
+		}
+		std::string getMemoryInfo() override;
 
 	public:
 		const DataMemFormatWrapper& getDataMemFormat() const { return mDataMemFormat; }
 		void setDataMemFormat(const DataMemFormat& memFormat)
 		{
-			mDataMemFormat = ContextMap::DataMemFormatArray[(uint32)memFormat];
+			mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)memFormat];
 		}
 
 		const TextureAttachPosition& getAttachPosition() const { return mAttachPosition; }
@@ -96,18 +104,18 @@ namespace tezcat::Tiny
 
 		void setMinFilter(const TextureFilter& filter)
 		{
-			mMinFilter = ContextMap::TextureFilterArray[(uint32)filter];
+			mMinFilter = ContextMap::TextureFilterArray[(uint32_t)filter];
 		}
 
 		void setMagFilter(const TextureFilter& filter)
 		{
-			mMagFilter = ContextMap::TextureFilterArray[(uint32)filter];
+			mMagFilter = ContextMap::TextureFilterArray[(uint32_t)filter];
 		}
 
 		void setFilter(const TextureFilter& min, const TextureFilter& mag)
 		{
-			mMinFilter = ContextMap::TextureFilterArray[(uint32)min];
-			mMagFilter = ContextMap::TextureFilterArray[(uint32)mag];
+			mMinFilter = ContextMap::TextureFilterArray[(uint32_t)min];
+			mMagFilter = ContextMap::TextureFilterArray[(uint32_t)mag];
 		}
 
 	public:
@@ -116,18 +124,18 @@ namespace tezcat::Tiny
 
 		void setTexFormat(const TextureFormat& channel)
 		{
-			mFormat = ContextMap::TextureFormatArray[(uint32)channel];
+			mFormat = ContextMap::TextureFormatArray[(uint32_t)channel];
 		}
 
 		void setInternalFormat(const TextureInternalFormat& channel)
 		{
-			mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32)channel];
+			mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)channel];
 		}
 
 		void setFormat(const TextureInternalFormat& internalChannel, const TextureFormat& channel)
 		{
-			mFormat = ContextMap::TextureFormatArray[(uint32)channel];
-			mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32)internalChannel];
+			mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)internalChannel];
+			mFormat = ContextMap::TextureFormatArray[(uint32_t)channel];
 		}
 
 	public:
@@ -136,8 +144,8 @@ namespace tezcat::Tiny
 
 	protected:
 		std::string mName;
-		uint32 mUID;
-		uint32 mTextureID;
+		uint32_t mUID;
+		uint32_t mTextureID;
 		TextureAttachPosition mAttachPosition;
 		TexFilterWrapper mMinFilter;
 		TexFilterWrapper mMagFilter;
@@ -146,9 +154,9 @@ namespace tezcat::Tiny
 		DataMemFormatWrapper mDataMemFormat;
 
 	private:
-		static uint32 sUIDGiver;
-		static std::deque<uint32> sFreeUIDs;
-		static uint32 giveUID();
+		static uint32_t sUIDGiver;
+		static std::deque<uint32_t> sFreeUIDs;
+		static uint32_t giveUID();
 	};
 
 	class TINY_API Texture2D : public Texture
@@ -164,7 +172,7 @@ namespace tezcat::Tiny
 		virtual void setImage(const Image* image);
 		virtual void updateData(const Image* image);
 
-		void setConfig(const uint32& width, const uint32& height
+		void setConfig(const uint32_t& width, const uint32_t& height
 			, const TextureInternalFormat& internalFormat, const TextureFormat& format
 			, const DataMemFormat& dataType = DataMemFormat::UByte
 			, const TextureFilter& min = TextureFilter::Linear
@@ -175,7 +183,7 @@ namespace tezcat::Tiny
 		void generate() override;
 		void update() override;
 
-		std::tuple<uint32, uint32, uint32> getSizeWHL() override
+		std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() override
 		{
 			return { mWidth, mHeight, 0 };
 		}
@@ -186,10 +194,10 @@ namespace tezcat::Tiny
 			mHeight = height;
 		}
 
-		void apply(uint32 id);
+		void apply(uint32_t id);
 
-		uint32 getWidth() const { return mWidth; }
-		uint32 getHeight() const { return mHeight; }
+		uint32_t getWidth() const { return mWidth; }
+		uint32_t getHeight() const { return mHeight; }
 		void* getData() const { return mData; }
 
 		bool isHDR() const { return mIsHDR; }
@@ -197,9 +205,15 @@ namespace tezcat::Tiny
 		const TexWrapWrapper& getWrapS() const { return mWrapS; }
 		const TexWrapWrapper& getWrapT() const { return mWrapT; }
 
+		void setWrap(const TextureWrap& S, const TextureWrap& T)
+		{
+			mWrapS = ContextMap::TextureWrapArray[(uint32_t)S];
+			mWrapT = ContextMap::TextureWrapArray[(uint32_t)T];
+		}
+
 	protected:
-		uint32 mWidth;
-		uint32 mHeight;
+		uint32_t mWidth;
+		uint32_t mHeight;
 		TexWrapWrapper mWrapS;
 		TexWrapWrapper mWrapT;
 		bool mIsHDR;
@@ -216,7 +230,7 @@ namespace tezcat::Tiny
 
 		TextureType getTextureType() const final { return TextureType::Texture3D; }
 
-		void setConfig(const uint32& width, const uint32& hegiht, const uint32& length
+		void setConfig(const uint32_t& width, const uint32_t& hegiht, const uint32_t& length
 			, const TextureInternalFormat& internalFormat, const TextureFormat& format
 			, const DataMemFormat& dataType
 			, const TextureFilter& min = TextureFilter::Linear
@@ -225,20 +239,20 @@ namespace tezcat::Tiny
 			, const TextureWrap& wrapT = TextureWrap::Clamp_To_Edge
 			, const TextureWrap& wrapR = TextureWrap::Clamp_To_Edge);
 
-		uint32 getWidth() const { return mWidth; }
-		uint32 getHeight() const { return mHeight; }
-		uint32 getLength() const { return mLength; }
+		uint32_t getWidth() const { return mWidth; }
+		uint32_t getHeight() const { return mHeight; }
+		uint32_t getLength() const { return mLength; }
 
-		virtual std::tuple<uint32, uint32, uint32> getSizeWHL() final override
+		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() final override
 		{
 			return { mWidth, mHeight, mLength };
 		}
 
 
 	protected:
-		uint32 mWidth;
-		uint32 mHeight;
-		uint32 mLength;
+		uint32_t mWidth;
+		uint32_t mHeight;
+		uint32_t mLength;
 		TexWrapWrapper mWrapS;
 		TexWrapWrapper mWrapT;
 		TexWrapWrapper mWrapR;
@@ -257,7 +271,7 @@ namespace tezcat::Tiny
 
 		virtual void setImage(const std::array<Image*, 6>& images);
 
-		void setConfig(const uint32& size
+		void setConfig(const uint32_t& size
 			, const TextureInternalFormat& internalFormat, const TextureFormat& format
 			, const DataMemFormat& dataType
 			, const TextureFilter& min = TextureFilter::Linear
@@ -272,16 +286,16 @@ namespace tezcat::Tiny
 		const TexWrapWrapper& getWrapT() const { return mWrapT; }
 		const TexWrapWrapper& getWrapR() const { return mWrapR; }
 
-		void setSize(uint32 size) { mSize = size; }
-		uint32 getSize() const { return mSize; }
+		void setSize(uint32_t size) { mSize = size; }
+		uint32_t getSize() const { return mSize; }
 
-		void* getData(uint32 index) const { return mDatas[index]; }
-		void apply(uint32 id);
+		void* getData(uint32_t index) const { return mDatas[index]; }
+		void apply(uint32_t id);
 
-		virtual std::tuple<uint32, uint32, uint32> getSizeWHL() final override { return { mSize, mSize, mSize }; }
+		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() final override { return { mSize, mSize, mSize }; }
 
 	protected:
-		uint32 mSize;
+		uint32_t mSize;
 		TexWrapWrapper mWrapS;
 		TexWrapWrapper mWrapT;
 		TexWrapWrapper mWrapR;
@@ -304,22 +318,22 @@ namespace tezcat::Tiny
 		TextureType getTextureType() const override { return TextureType::TextureRender2D; }
 		void generate() override;
 
-		void setConfig(const uint32& width, const uint32& height, const TextureInternalFormat& internalFormat);
+		void setConfig(const uint32_t& width, const uint32_t& height, const TextureInternalFormat& internalFormat);
 
-		uint32 getWidth() const { return mWidth; }
-		uint32 getHeight() const { return mHeight; }
+		uint32_t getWidth() const { return mWidth; }
+		uint32_t getHeight() const { return mHeight; }
 
 		const TexWrapWrapper& getWrapS() const { return mWrapS; }
 		const TexWrapWrapper& getWrapT() const { return mWrapT; }
 
-		virtual std::tuple<uint32, uint32, uint32> getSizeWHL() final override
+		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() final override
 		{
 			return { mWidth, mHeight, 0 };
 		}
 
 	protected:
-		uint32 mWidth;
-		uint32 mHeight;
+		uint32_t mWidth;
+		uint32_t mHeight;
 		TexWrapWrapper mWrapS;
 		TexWrapWrapper mWrapT;
 	};

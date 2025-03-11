@@ -27,7 +27,7 @@ namespace tezcat::Editor
 			auto id = Com::getComponentTypeIDStatic();
 			if (mDrawFunctions.size() <= id)
 			{
-				mDrawFunctions.resize(id + 1, TINY_BIND_THIS(MyObjectInfoWindow::drawDefault, this));
+				mDrawFunctions.resize(id + 1, TINY_BIND_THIS(MyObjectInfoWindow::drawDefault));
 			}
 
 			mDrawFunctions[id] = std::move(function);

@@ -45,7 +45,7 @@ namespace tezcat::Tiny
 		, mUID(FrameBufferManager::giveID())
 		, mCurrentFrame(Pipeline::getFrameCount() - 1)
 	{
-
+		mEngineName = mName;
 	}
 
 	FrameBuffer::~FrameBuffer()
@@ -63,4 +63,10 @@ namespace tezcat::Tiny
 		tex->saveObject();
 		mComponents.push_back(tex);
 	}
+
+	std::string FrameBuffer::getMemoryInfo()
+	{
+		return TINY_OBJECT_MEMORY_INFO();
+	}
+
 }

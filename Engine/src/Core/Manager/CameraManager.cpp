@@ -90,8 +90,6 @@ namespace tezcat::Tiny
 			result.first->second = camera;
 			this->addRenderObserver(camera->getRenderObserver());
 		}
-
-		this->setMain(camera);
 	}
 
 	Camera* CameraData::findCamera(const std::string& name)
@@ -148,12 +146,14 @@ namespace tezcat::Tiny
 		}
 
 		auto it = mObserverArray.begin();
-		while (it != mObserverArray.end())
+		auto end = mObserverArray.end();
+		while (it != end)
 		{
-			if (auto observer = (*it).lock())
+			if (auto observer = it->lock())
 			{
 				if (!observer->getEnable())
 				{
+					it++;
 					continue;
 				}
 
@@ -163,6 +163,7 @@ namespace tezcat::Tiny
 				{
 					observer->onExitPipeline();
 					it = mObserverArray.erase(it);
+					end = mObserverArray.end();
 					continue;
 				}
 
@@ -177,6 +178,7 @@ namespace tezcat::Tiny
 			else
 			{
 				it = mObserverArray.erase(it);
+				end = mObserverArray.end();
 			}
 		}
 	}

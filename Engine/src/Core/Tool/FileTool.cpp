@@ -18,7 +18,9 @@ namespace tezcat::Tiny
 		{ ".jpg",	FileType::FT_Jpg },
 		{ ".png",	FileType::FT_Png },
 		{ ".hdr",	FileType::FT_Hdr },
-		{ ".fbx",	FileType::FT_Fbx }
+		{ ".fbx",	FileType::FT_Fbx },
+		{ ".pmx",	FileType::FT_PMX },
+		{ ".obj",	FileType::FT_Obj }
 	};
 
 	void FileTool::init(const std::string & resourceFolder)

@@ -5,7 +5,8 @@ namespace tezcat::Editor
 {
 	const ImVec2 MyGUIContext::UV0(0, 1);
 	const ImVec2 MyGUIContext::UV1(1, 0);
-
+	MyDragDropController MyGUIContext::DragDropController;
+	ImVec2 MyGUIContext::sViewPortSize;
 
 	MyGUIContext::MyGUIContext()
 		: mValueConfigAry(UniformID::allStringCount(), nullptr)
@@ -23,14 +24,14 @@ namespace tezcat::Editor
 
 	ValueConfig* MyGUIContext::getValueConfig(const UniformID& ID)
 	{
-		return mValueConfigAry[ID.getUID()];
+		return mValueConfigAry[ID.toUID()];
 	}
 
 	void MyGUIContext::initValueConfig()
 	{
-		mValueConfigAry[ShaderParam::LightDirection::Ambient.getUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
-		mValueConfigAry[ShaderParam::LightDirection::Diffuse.getUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
-		mValueConfigAry[ShaderParam::LightDirection::Specular.getUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+		mValueConfigAry[ShaderParam::LightDirection::Ambient.toUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+		mValueConfigAry[ShaderParam::LightDirection::Diffuse.toUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
+		mValueConfigAry[ShaderParam::LightDirection::Specular.toUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
 	}
 
 
@@ -75,5 +76,142 @@ namespace tezcat::Editor
 		ImGui::DragFloat3("##Scale", &scale.x);
 	}
 
+	//-------------------------------------------------------------
+	//
+	//	MyDragDropController
+	//
+	std::string_view MyDragDropController::dragData(const std::filesystem::path& path)
+	{
+		mIsDragResource = true;
+		mFilePath = path;
+		mDragName.clear();
+
+		auto ext = mFilePath.filename().extension().string();
+		std::transform(ext.begin()
+			, ext.end()
+			, ext.begin()
+			, [](unsigned char c) { return std::tolower(c); });
+
+		mFileType = FileTool::getFileType(ext);
+		switch (mFileType)
+		{
+		case FileType::FT_None:
+			break;
+		case FileType::FT_Text_Begin:
+			break;
+		case FileType::FT_Text:
+		case FileType::FT_Tysl:
+		case FileType::FT_Tyin:
+			mDragName = "Drag_Text";
+			break;
+		case FileType::FT_Text_End:
+			break;
+
+			//
+		case FileType::FT_Img_Begin:
+			break;
+		case FileType::FT_Jpg:
+		case FileType::FT_Png:
+		case FileType::FT_Hdr:
+			mDragName = "Drag_Image";
+			break;
+		case FileType::FT_Img_End:
+			break;
+
+			//
+		case FileType::FT_Model_Begin:
+			break;
+		case FileType::FT_Fbx:
+		case FileType::FT_Obj:
+		case FileType::FT_PMX:
+			mDragName = "Drag_Model";
+			break;
+		case FileType::FT_Model_End:
+			break;
+
+			//
+		case FileType::FT_Unknown:
+			break;
+		default:
+			break;
+		}
+
+		return mDragName;
+	}
+
+	std::tuple<bool, std::string> MyDragDropController::dropData()
+	{
+		bool flag = !mDragName.empty();
+		std::string name(mDragName);
+
+		return { flag, mDragName };
+	}
+
+	void MyTextureSizeHelper::calculate(const ImVec2& inTextureSize, const ImVec2& inWindowSize, ImVec2& outDisplaySize, ImVec2& outOffsetToCenter, ImVec2& outUV0, ImVec2& outUV1)
+	{
+		outDisplaySize = inWindowSize;
+
+		//按照视图比例 得到符合当前视图的窗口大小
+		float ratio_xDy = inTextureSize.x / inTextureSize.y;
+		float ratio_yDx = inTextureSize.y / inTextureSize.x;
+
+		//先保证上下对齐,也就是需要计算左右偏移(例如 600:600 16:9 1.8)
+		//获得当前视口大小下,帧图片的理论宽度
+		float width = inWindowSize.y * ratio_xDy; // 600*1.8 = 1080
+		//如果宽度比当前的小,说明当前视口大小可以容纳当前帧
+		//需要把帧图片移动到view中心
+		if (width < inWindowSize.x)
+		{
+			//计算多出来的宽度的一半
+			outOffsetToCenter.x = (inWindowSize.x - width) * 0.5f;
+			outDisplaySize.x = width;
+		}
+		else
+		{
+			//宽度比当前的大,说明当前视口宽度就应该设置成帧图片的最大宽度
+			//此时应该计算上下之间预留的空隙
+			//以及把帧图片移动到视口正中间
+			float height = inWindowSize.x * ratio_yDx;	//600*0.56=337.5
+			outOffsetToCenter.y = (inWindowSize.y - height) * 0.5f;
+			outDisplaySize.y = height;
+		}
+
+		//计算当前显示大小与视图的比值
+		//
+		outUV0 = ImVec2(0, outDisplaySize.y / inTextureSize.y);
+		outUV1 = ImVec2(outDisplaySize.x / inTextureSize.x, 0);
+
+		if (outUV0.y > 1)
+		{
+			outUV0.y = 1;
+		}
+
+		if (outUV1.x > 1)
+		{
+			outUV1.x = 1;
+		}
+	}
+
+	void MyTextureSizeHelper::fitImageToRect(const ImVec2& inWindowSize, const ImVec2& inImageSize, ImVec2& outDisplaySize, ImVec2& outOffsetToCenter)
+	{
+		float target_ratio = inWindowSize.x / inWindowSize.y;
+		float image_ratio = inImageSize.x / inImageSize.y;
+
+		// 计算缩放比例
+		if (image_ratio > target_ratio)
+		{
+			// 宽度受限：按宽度缩放
+			outDisplaySize.x = inWindowSize.x;
+			outDisplaySize.y = (inImageSize.y / inImageSize.x) * inWindowSize.x;
+			outOffsetToCenter.y = (inWindowSize.y - outDisplaySize.y) * 0.5f; // 垂直居中偏移
+		}
+		else
+		{
+			// 高度受限：按高度缩放
+			outDisplaySize.y = inWindowSize.y;
+			outDisplaySize.x = (inImageSize.x / inImageSize.y) * inWindowSize.y;
+			outOffsetToCenter.x = (inWindowSize.x - outDisplaySize.x) * 0.5f; // 水平居中偏移
+		}
+	}
 
 }

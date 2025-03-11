@@ -26,7 +26,10 @@ namespace tezcat::Tiny
 	std::string ResourceManager::sRelativeEngineDir;
 	std::string ResourceManager::sRelativeResDir;
 
-	std::unordered_map<std::string, Model*> ResourceManager::mModelMap;
+	std::unordered_map<file_path, Model*> ResourceManager::mModelMap;
+	std::unordered_map<file_path, Texture2D*> ResourceManager::mTexture2DUMap;
+	std::unordered_map<file_path, Image*> ResourceManager::mImageMap;
+	std::unordered_map<file_path, Image*> ResourceManager::mTinyImageMap;
 
 
 
@@ -34,8 +37,9 @@ namespace tezcat::Tiny
 	{
 		std::regex rg(R"(\\+)");
 
-		sEngineDir = std::filesystem::current_path().string();
-		sEngineDir = std::regex_replace(sEngineDir, rg, "/");
+		auto path = file_sys::current_path();
+		path = file_sys_helper::generic(path);
+		sEngineDir = path.string();
 
 		if (!std::filesystem::exists(sEngineDir))
 		{
@@ -44,7 +48,7 @@ namespace tezcat::Tiny
 
 		if (!std::filesystem::exists(std::format("{}/{}", sEngineDir, folderPath)))
 		{
-			throw std::logic_error("fatal : .exe and ResourceFolder[" + folderPath + "] must be in the same directory");
+			throw std::logic_error(std::format("fatal : .exe and ResourceFolder[{}] must be in the same directory", folderPath));
 		}
 
 		sResDir = std::format("{}/{}", sEngineDir, folderPath);
@@ -52,8 +56,6 @@ namespace tezcat::Tiny
 		sRelativeEngineDir = "./";
 		sRelativeResDir = std::format("./{}", folderPath);
 	}
-
-
 }
 
 

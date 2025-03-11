@@ -64,6 +64,8 @@ namespace tezcat::Tiny
 		bool isEnable() const { return mEnable; }
 		void setEnable(bool val);
 
+		std::string getMemoryInfo() override;
+
 	public:
 		virtual void onComponentAdded(Component* component) {}
 		virtual void onComponentRemoved(Component* component) {}

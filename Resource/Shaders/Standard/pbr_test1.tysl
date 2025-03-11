@@ -128,7 +128,7 @@
 
             //color = (1 - shadow) * color;
 
-            float shadow = calcShadow(myLightPosition, N, normalize(-TINY_LitDir.direction), TINY_TexDepth);
+            float shadow = calcShadow(myLightPosition, N, normalize(-TINY_LitDir.direction), TINY_TexShadow);
 
             myFinalColor = float4(color, 1.0) * myColor * (1.0 - shadow);
             //myFinalColor = float4(specular, 1.0);

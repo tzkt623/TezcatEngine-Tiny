@@ -19,7 +19,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(MeshRenderAgent, BaseMeshRenderer)
+	TINY_OBJECT_CPP(MeshRenderAgent, BaseMeshRenderer);
 
 	MeshRenderAgent::MeshRenderAgent()
 	{

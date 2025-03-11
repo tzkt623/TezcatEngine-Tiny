@@ -38,6 +38,7 @@ namespace tezcat::Tiny
 	public:
 		virtual ~FrameBuffer();
 		void generate();
+		std::string getMemoryInfo() override;
 
 	public:
 		void apply(uint32 id) { mBufferID = id; }

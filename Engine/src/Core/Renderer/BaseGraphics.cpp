@@ -46,6 +46,12 @@ namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
 	{
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_ReadObjectID, this
+			, [this](const EventData& data)
+			{
+				int* pos = (int*)data.userData;
+				this->addCommand<RenderCMD_ReadObjectID>(pos[0], pos[1], FrameBufferManager::find("FB_ObjectID"));
+			});
 	}
 
 	BaseGraphics::~BaseGraphics()
@@ -53,9 +59,9 @@ namespace tezcat::Tiny
 
 	}
 
-
 	void BaseGraphics::init(Engine* engine)
 	{
+
 	}
 
 	void BaseGraphics::buildCommand()
@@ -68,7 +74,9 @@ namespace tezcat::Tiny
 		uint32_t index = 0;
 		while (index < mBuildCommandList.size())
 		{
-			auto& cmd = mBuildCommandList[index];
+			//不能引用
+			//迭代器会变
+			auto cmd = mBuildCommandList[index];
 			cmd->execute();
 			delete cmd;
 			index++;

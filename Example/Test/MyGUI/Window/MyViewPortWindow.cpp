@@ -31,24 +31,25 @@ namespace tezcat::Editor
 		float ratio_xDy = inTextureSize.x / inTextureSize.y;
 		float ratio_yDx = inTextureSize.y / inTextureSize.x;
 
-		//先保证上下对齐,也就是需要计算左右偏移
-		//获得当前比例下的宽度
-		float width = inWindowSize.y * ratio_xDy;
-		//如果宽度比当前的小,需要把图片移动到view中心
+		//先保证上下对齐,也就是需要计算左右偏移(例如 600:600 16:9 1.8)
+		//获得当前视口大小下,帧图片的理论宽度
+		float width = inWindowSize.y * ratio_xDy; // 600*1.8 = 1080
+		//如果宽度比当前的小,说明当前视口大小可以容纳当前帧
+		//需要把帧图片移动到view中心
 		if (width < inWindowSize.x)
 		{
 			//计算多出来的宽度的一半
 			outOffset.x = (inWindowSize.x - width) * 0.5f;
-			outDisplaySize.x = inWindowSize.y * ratio_xDy;
+			outDisplaySize.x = width;
 		}
 		else
 		{
-			//宽度比当前的大
-			//左右压缩满了
-			//计算上下之间的空隙
-			float height = inWindowSize.x * ratio_yDx;
+			//宽度比当前的大,说明当前视口宽度就应该设置成帧图片的最大宽度
+			//此时应该计算上下之间预留的空隙
+			//以及把帧图片移动到视口正中间
+			float height = inWindowSize.x * ratio_yDx;	//600*0.56=337.5
 			outOffset.y = (inWindowSize.y - height) * 0.5f;
-			outDisplaySize.y = inWindowSize.x * ratio_yDx;
+			outDisplaySize.y = height;
 		}
 
 		//计算当前显示大小与视图的比值
@@ -104,6 +105,8 @@ namespace tezcat::Editor
 
 		if (ImGui::BeginChild("Viewport"))
 		{
+			mViewPortPos = ImGui::GetItemRectMin();
+
 			if (mColorBuffer == nullptr)
 			{
 				mColorBuffer = (Texture2D*)FrameBufferManager::getMainFrameBufferBuildin()->getAttachmentes().at(0);
@@ -111,15 +114,17 @@ namespace tezcat::Editor
 
 			if (mColorBuffer)
 			{
+				ImVec2 display_size, offset, uv0, uv1, texture_size;
 				auto camera_data = CameraManager::getData();
 				if (camera_data.lock() && camera_data->getMainCamera())
 				{
-					ImVec2 texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
-					ImVec2 display_size, offset, uv0, uv1;
+					texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
 
-					this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+					MyTextureSizeHelper::calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+					//this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
 
 					camera_data->getMainCamera()->setViewRect(0, 0, display_size.x, display_size.y);
+					MyGUIContext::sViewPortSize = display_size;
 
 					ImGui::SetCursorPos(offset);
 					ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
@@ -129,10 +134,9 @@ namespace tezcat::Editor
 				}
 				else
 				{
-					ImVec2 texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
-					ImVec2 display_size, offset, uv0, uv1;
-
-					this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+					texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
+					//this->calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+					MyTextureSizeHelper::calculate(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
 
 					ImGui::SetCursorPos(offset);
 					ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
@@ -141,8 +145,28 @@ namespace tezcat::Editor
 								, ImVec2(1, 0));
 				}
 
+				mFramePos.x = mViewPortPos.x + offset.x;
+				mFramePos.y = mViewPortPos.y + offset.y;
+
+				auto mouse_pos = ImGui::GetMousePos();
+				mMousePos.x = (mouse_pos.x - mFramePos.x);
+				mMousePos.y = ImGui::GetItemRectSize().y - (mouse_pos.y - mFramePos.y);
+
 				if (ImGui::IsItemHovered())
 				{
+					if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+					{
+						if (GameObjectManager::allowPickObject())
+						{
+							int32_t pos[2]
+							{
+								mMousePos.x,
+								mMousePos.y
+							};
+							EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ReadObjectID, pos });
+						}
+					}
+
 					InputSys::getInstance()->update();
 				}
 			}
@@ -190,14 +214,21 @@ namespace tezcat::Editor
 			ImGui::Text("FreeID: %d", TinyGC::freeID());
 			ImGui::SameLine();
 			ImGui::Text("UsedID: %d", TinyGC::usedID());
+			ImGui::Separator();
+
+			ImGui::Text("ObjectCount: %d", GameObjectManager::getObjectCount());
 
 			ImGui::Separator();
 
+			//auto mouse_pos = ImGui::GetMousePos();
+			//ImVec2 mouse_local(mouse_pos.x - mFramePos.x, mouse_pos.y - mFramePos.y);
 			//mouse
-			ImGui::InputFloat2("MousePosition", glm::value_ptr(Profiler::mousePosition), "%.3f", ImGuiInputTextFlags_ReadOnly);
+			ImGui::InputFloat2("MousePosition", &mMousePos[0], "%.3f", ImGuiInputTextFlags_ReadOnly);
 			ImGui::InputFloat2("MouseOffset", glm::value_ptr(Profiler::mouseOffset), "%.3f", ImGuiInputTextFlags_ReadOnly);
 
 			ImGui::End();
 		}
 	}
+
+
 }

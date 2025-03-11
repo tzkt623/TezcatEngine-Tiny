@@ -34,7 +34,7 @@ namespace tezcat::Tiny
 #pragma region BaseRenderObserver
 	TINY_OBJECT_CPP(BaseRenderObserver, TinyObject)
 
-	BaseRenderObserver::BaseRenderObserver()
+		BaseRenderObserver::BaseRenderObserver()
 		: mCullMask(0)
 		, mFrameBuffer(nullptr)
 		, mNearFace(0.1f)
@@ -80,7 +80,7 @@ namespace tezcat::Tiny
 		mDirty = true;
 	}
 
-	void BaseRenderObserver::setViewRect(int32 x, int32 y, int32 width, int32 height)
+	void BaseRenderObserver::setViewRect(int32_t x, int32_t y, int32_t width, int32_t height)
 	{
 		mViewInfo.OX = x;
 		mViewInfo.OY = y;
@@ -89,7 +89,7 @@ namespace tezcat::Tiny
 		mDirty = true;
 	}
 
-	void BaseRenderObserver::setViewRect(int32 width, int32 height)
+	void BaseRenderObserver::setViewRect(int32_t width, int32_t height)
 	{
 		mViewInfo.OX = 0;
 		mViewInfo.OY = 0;
@@ -151,9 +151,9 @@ namespace tezcat::Tiny
 	ObserverPipelinePass* BaseRenderObserver::createOrGetPass(Shader* shader)
 	{
 		auto uid = shader->getUID();
-		if (mPassCache.size() <= shader->getUID())
+		if (mPassCache.size() <= uid)
 		{
-			mPassCache.resize(shader->getUID() + 1);
+			mPassCache.resize(static_cast<size_t>(uid + 1));
 		}
 
 		if (mPassCache[uid] == nullptr)
@@ -187,6 +187,7 @@ namespace tezcat::Tiny
 			}
 		}
 		mPassCache.clear();
+		mPassArray.clear();
 
 		if (mFrameBuffer)
 		{
@@ -227,7 +228,6 @@ namespace tezcat::Tiny
 	void BaseRenderObserver::addToPipeline()
 	{
 		CameraManager::addRenderObserver(this);
-		;
 	}
 
 	void BaseRenderObserver::removeFromPipeline()
@@ -349,7 +349,7 @@ namespace tezcat::Tiny
 		delete[] mViewMatrixArray;
 	}
 
-	void RenderObserverMultView::setViewMartixArray(float4x4* array, int32 size)
+	void RenderObserverMultView::setViewMartixArray(float4x4* array, int32_t size)
 	{
 		mViewMatrixArray = array;
 		mArraySize = size;

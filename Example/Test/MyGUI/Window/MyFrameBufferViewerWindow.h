@@ -9,5 +9,8 @@ namespace tezcat::Editor
 	public:
 		void init() override;
 		void onRender() override;
+
+	private:
+		FrameBuffer* mSelectBuffer;
 	};
 }

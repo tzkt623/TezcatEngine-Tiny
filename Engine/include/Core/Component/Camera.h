@@ -31,12 +31,11 @@ namespace tezcat::Tiny
 		TINY_RENDER_OBSERVER_FUNCTION(mCameraAgent)
 	public:
 		virtual ~Camera();
-		uint32 getUID() const { return mUID; }
 
 	public:
 		bool isMain() const { return mIsMain; }
 		void setMain();
-		void clearMain() { mIsMain = false; }
+		void clearMain();
 
 	protected:
 		void onStart() override;
@@ -45,8 +44,6 @@ namespace tezcat::Tiny
 
 	private:
 		CameraObserver* mCameraAgent;
-
 		bool mIsMain;
-		uint32 mUID;
 	};
 }

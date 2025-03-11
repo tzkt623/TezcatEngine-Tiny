@@ -40,6 +40,7 @@ namespace tezcat::Tiny
 	class BaseGraphics;
 	class Pipeline;
 	class PipelinePass;
+	class ReplacedPipelinePass;
 	class BaseRenderObserver;
 	class Transform;
 
@@ -75,19 +76,10 @@ namespace tezcat::Tiny
 		 */
 		virtual RenderObjectType getRenderObjectType() = 0;
 
-		/*
-		* Info:		HCL|2023|4|8
-		* Access:		virtual public
-		* Returns:		void
-		* Qualifier:
-		* Parameter:	Shader * shader
-		* Comment: 向shader提交数据
-		*/
-		virtual void submit(Shader* shader) = 0;
-
+		virtual void submit(Shader* shader) {} ;
 
 		virtual void makeRenderCommand(BaseRenderObserver* renderObserver) = 0;
-		virtual void makeRenderCommand(PipelinePass* pass) = 0;
+		virtual void makeRenderCommand(ReplacedPipelinePass* pass) = 0;
 	};
 
 	/*
@@ -139,13 +131,11 @@ namespace tezcat::Tiny
 		void setMesh(Vertex* vertex);
 		Vertex* getVertex() const { return mVertex; }
 
-		void submit(Shader* shader) override;
-
 		void setShadowReciever(bool value) { mIsShadowReciever = true; }
 		bool isShadowReciever() const { return mIsShadowReciever; }
 
 		virtual void makeRenderCommand(BaseRenderObserver* renderObserver) override;
-		virtual void makeRenderCommand(PipelinePass* pass) override;
+		virtual void makeRenderCommand(ReplacedPipelinePass* pass) override;
 
 		void setTransform(Transform* value) { mTransform = value; }
 		Transform* getTransform() const { return mTransform; }

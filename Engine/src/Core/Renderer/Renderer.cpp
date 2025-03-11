@@ -95,19 +95,15 @@ namespace tezcat::Tiny
 		mVertex->saveObject();
 	}
 
-	void BaseMeshRenderer::submit(Shader* shader)
-	{
-		mMaterial->submit(shader);
-	}
-
 	void BaseMeshRenderer::makeRenderCommand(BaseRenderObserver* renderObserver)
 	{
 		auto pass = renderObserver->createOrGetPass(mMaterial->getShader());
-		pass->addCommand<RenderCMD_DrawMesh>(mVertex, mTransform, mMaterial);
+		pass->addCommand<RenderCMD_DrawMeshWithMaterial>(mVertex, mTransform, mMaterial);
 	}
 
-	void BaseMeshRenderer::makeRenderCommand(PipelinePass* pass)
+	void BaseMeshRenderer::makeRenderCommand(ReplacedPipelinePass* pass)
 	{
-		pass->addCommand<RenderCMD_DrawShadow>(mVertex, mTransform);
+		pass->pushCommand(this);
+//		pass->addCommand<RenderCMD_DrawMeshWithOutMaterial>(mVertex, mTransform);
 	}
 }

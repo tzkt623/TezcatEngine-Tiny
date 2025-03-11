@@ -25,10 +25,10 @@
 
 namespace tezcat::Tiny
 {
-	uint32 Texture::sUIDGiver = 0;
-	std::deque<uint32> Texture::sFreeUIDs;
+	uint32_t Texture::sUIDGiver = 0;
+	std::deque<uint32_t> Texture::sFreeUIDs;
 
-	TINY_OBJECT_CPP(Texture, TinyObject)
+	TINY_OBJECT_CPP(Texture, TinyObject);
 	Texture::Texture(const TextureFormat& internalFormat
 					   , const TextureFormat& format
 					   , const TextureFilter& minFilter
@@ -37,11 +37,11 @@ namespace tezcat::Tiny
 		: mUID(giveUID())
 		, mTextureID(0)
 		, mAttachPosition(TextureAttachPosition::None)
-		, mMinFilter(ContextMap::TextureFilterArray[(uint32)minFilter])
-		, mMagFilter(ContextMap::TextureFilterArray[(uint32)magFilter])
-		, mInternalFormat(ContextMap::TextureInternalFormatArray[(uint32)internalFormat])
-		, mFormat(ContextMap::TextureFormatArray[(uint32)format])
-		, mDataMemFormat(ContextMap::DataMemFormatArray[(uint32)dataType])
+		, mMinFilter(ContextMap::TextureFilterArray[(uint32_t)minFilter])
+		, mMagFilter(ContextMap::TextureFilterArray[(uint32_t)magFilter])
+		, mInternalFormat(ContextMap::TextureInternalFormatArray[(uint32_t)internalFormat])
+		, mFormat(ContextMap::TextureFormatArray[(uint32_t)format])
+		, mDataMemFormat(ContextMap::DataMemFormatArray[(uint32_t)dataType])
 		, mName()
 	{
 
@@ -56,18 +56,18 @@ namespace tezcat::Tiny
 	{
 		switch (image.getChannels())
 		{
-		case 1: return ContextMap::TextureFormatArray[(uint32)TextureFormat::R];
-		case 2: return ContextMap::TextureFormatArray[(uint32)TextureFormat::RG];
-		case 3: return ContextMap::TextureFormatArray[(uint32)TextureFormat::RGB];
-		case 4: return ContextMap::TextureFormatArray[(uint32)TextureFormat::RGBA];
+		case 1: return ContextMap::TextureFormatArray[(uint32_t)TextureFormat::R];
+		case 2: return ContextMap::TextureFormatArray[(uint32_t)TextureFormat::RG];
+		case 3: return ContextMap::TextureFormatArray[(uint32_t)TextureFormat::RGB];
+		case 4: return ContextMap::TextureFormatArray[(uint32_t)TextureFormat::RGBA];
 		default:
 			break;
 		}
 
-		return ContextMap::TextureFormatArray[(uint32)TextureFormat::None];
+		return ContextMap::TextureFormatArray[(uint32_t)TextureFormat::None];
 	}
 
-	uint32 Texture::giveUID()
+	uint32_t Texture::giveUID()
 	{
 		if (sFreeUIDs.empty())
 		{
@@ -83,22 +83,27 @@ namespace tezcat::Tiny
 	{
 		switch (image.getChannels())
 		{
-		case 1: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::R16F] : ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::R];
-		case 2: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::RG16F] : ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::RG];
-		case 3: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::RGB16F] : ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::RGB];
-		case 4: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::RGBA16F] : ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::RGBA];
+		case 1: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::R16F] : ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::R];
+		case 2: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::RG16F] : ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::RG];
+		case 3: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::RGB16F] : ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::RGB];
+		case 4: return image.isHDR() ? ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::RGBA16F] : ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::RGBA];
 		default:
 			break;
 		}
 
-		return ContextMap::TextureInternalFormatArray[(uint32)TextureInternalFormat::None];
+		return ContextMap::TextureInternalFormatArray[(uint32_t)TextureInternalFormat::None];
+	}
+
+	std::string Texture::getMemoryInfo()
+	{
+		return TINY_OBJECT_MEMORY_INFO();
 	}
 
 	//------------------------------------------------------------
 	//
 	//	Texture2D
 	//
-	TINY_OBJECT_CPP(Texture2D, Texture)
+	TINY_OBJECT_CPP(Texture2D, Texture);
 	Texture2D::Texture2D()
 		: Base(TextureFormat::RGBA
 			, TextureFormat::RGBA
@@ -117,12 +122,11 @@ namespace tezcat::Tiny
 		: Texture2D()
 	{
 		mName.assign(std::move(name));
+		mEngineName = mName;
 	}
 
 	Texture2D::~Texture2D()
 	{
-		//Graphics::getInstance()->cmdDeleteTexture2D(mTextureID);
-
 		Graphics::getInstance()->addCommand(new RenderCMD_DeleteTexture2D(this));
 	}
 
@@ -137,20 +141,24 @@ namespace tezcat::Tiny
 		if (temp)
 		{
 			mData = temp;
-			memcpy_s(mData, size, image->getData(), size);
+			memcpy(mData, image->getData(), size);
+		}
+		else
+		{
+			throw std::bad_exception();
 		}
 
 		mAttachPosition = TextureAttachPosition::ColorComponent;
-		mWrapS = ContextMap::TextureWrapArray[(uint32)TextureWrap::Clamp_To_Edge];
-		mWrapT = ContextMap::TextureWrapArray[(uint32)TextureWrap::Clamp_To_Edge];
-		mMinFilter = ContextMap::TextureFilterArray[(uint32)TextureFilter::Linear];
-		mMagFilter = ContextMap::TextureFilterArray[(uint32)TextureFilter::Linear];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)TextureWrap::Clamp_To_Edge];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)TextureWrap::Clamp_To_Edge];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)TextureFilter::Linear];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)TextureFilter::Linear];
 		mInternalFormat = getTextureInternalFormat(*image);
 		mFormat = getTextureFormat(*image);
-		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32)(image->isHDR() ? DataMemFormat::Float : DataMemFormat::UByte)];
+		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)(image->isHDR() ? DataMemFormat::Float : DataMemFormat::UByte)];
 	}
 
-	void Texture2D::setConfig(const uint32& width, const uint32& height
+	void Texture2D::setConfig(const uint32_t& width, const uint32_t& height
 		, const TextureInternalFormat& internalFormat, const TextureFormat& format
 		, const DataMemFormat& dataType
 		, const TextureFilter& min /*= TextureFilter::Linear */
@@ -161,14 +169,14 @@ namespace tezcat::Tiny
 		mWidth = width;
 		mHeight = height;
 
-		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32)internalFormat];
-		mFormat = ContextMap::TextureFormatArray[(uint32)format];
-		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32)dataType];
+		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)internalFormat];
+		mFormat = ContextMap::TextureFormatArray[(uint32_t)format];
+		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)dataType];
 
-		mWrapS = ContextMap::TextureWrapArray[(uint32)wrapS];
-		mWrapT = ContextMap::TextureWrapArray[(uint32)wrapT];
-		mMinFilter = ContextMap::TextureFilterArray[(uint32)min];
-		mMagFilter = ContextMap::TextureFilterArray[(uint32)mag];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)wrapS];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)wrapT];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)min];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)mag];
 	}
 
 	void Texture2D::updateData(const Image* image)
@@ -179,7 +187,7 @@ namespace tezcat::Tiny
 
 		mInternalFormat = getTextureInternalFormat(*image);
 		mFormat = getTextureFormat(*image);
-		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32)(image->isHDR() ? DataMemFormat::Float : DataMemFormat::UByte)];
+		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)(image->isHDR() ? DataMemFormat::Float : DataMemFormat::UByte)];
 
 		free(mData);
 
@@ -188,7 +196,7 @@ namespace tezcat::Tiny
 		if (temp)
 		{
 			mData = temp;
-			memcpy_s(mData, size, image->getData(), size);
+			memcpy(mData, image->getData(), size);
 		}
 	}
 
@@ -208,7 +216,7 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->cmdUpdateTexture2D(this);
 	}
 
-	void Texture2D::apply(uint32 id)
+	void Texture2D::apply(uint32_t id)
 	{
 		Base::apply(id);
 		free(mData);
@@ -219,13 +227,13 @@ namespace tezcat::Tiny
 	//
 	//	Texture3D
 	//
-	TINY_OBJECT_CPP(Texture3D, Texture)
+	TINY_OBJECT_CPP(Texture3D, Texture);
 	Texture3D::~Texture3D()
 	{
 
 	}
 
-	void Texture3D::setConfig(const uint32& width, const uint32& hegiht, const uint32& length
+	void Texture3D::setConfig(const uint32_t& width, const uint32_t& hegiht, const uint32_t& length
 		, const TextureInternalFormat& internalFormat, const TextureFormat& format
 		, const DataMemFormat& dataType
 		, const TextureFilter& min /*= TextureFilter::Linear */
@@ -238,23 +246,23 @@ namespace tezcat::Tiny
 		mHeight = hegiht;
 		mLength = length;
 
-		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32)internalFormat];
-		mFormat = ContextMap::TextureFormatArray[(uint32)format];
-		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32)dataType];
+		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)internalFormat];
+		mFormat = ContextMap::TextureFormatArray[(uint32_t)format];
+		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)dataType];
 
-		mMinFilter = ContextMap::TextureFilterArray[(uint32)min];
-		mMagFilter = ContextMap::TextureFilterArray[(uint32)mag];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)min];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)mag];
 
-		mWrapS = ContextMap::TextureWrapArray[(uint32)wrapS];
-		mWrapT = ContextMap::TextureWrapArray[(uint32)wrapT];
-		mWrapR = ContextMap::TextureWrapArray[(uint32)wrapR];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)wrapS];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)wrapT];
+		mWrapR = ContextMap::TextureWrapArray[(uint32_t)wrapR];
 	}
 
 	//--------------------------------------------------------
 	//
 	//	TextureCubes
 	//
-	TINY_OBJECT_CPP(TextureCube, Texture)
+	TINY_OBJECT_CPP(TextureCube, Texture);
 	TextureCube::TextureCube()
 		: Base(TextureFormat::RGBA
 			, TextureFormat::RGBA
@@ -281,6 +289,7 @@ namespace tezcat::Tiny
 		mDatas[4] = nullptr;
 		mDatas[5] = nullptr;
 		mName.assign(std::move(name));
+		mEngineName = mName;
 	}
 
 	TextureCube::~TextureCube()
@@ -295,15 +304,15 @@ namespace tezcat::Tiny
 		mSize = images[0]->getWidth();
 
 		mAttachPosition = TextureAttachPosition::ColorComponent;
-		mMinFilter = ContextMap::TextureFilterArray[(uint32)TextureFilter::Linear];
-		mMagFilter = ContextMap::TextureFilterArray[(uint32)TextureFilter::Linear];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)TextureFilter::Linear];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)TextureFilter::Linear];
 		mInternalFormat = getTextureInternalFormat(*images[0]);
 		mFormat = getTextureFormat(*images[0]);
-		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32)(images[0]->isHDR() ? DataMemFormat::Float : DataMemFormat::UByte)];
+		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)(images[0]->isHDR() ? DataMemFormat::Float : DataMemFormat::UByte)];
 
-		mWrapS = ContextMap::TextureWrapArray[(uint32)TextureWrap::Clamp_To_Edge];
-		mWrapT = ContextMap::TextureWrapArray[(uint32)TextureWrap::Clamp_To_Edge];
-		mWrapR = ContextMap::TextureWrapArray[(uint32)TextureWrap::Clamp_To_Edge];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)TextureWrap::Clamp_To_Edge];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)TextureWrap::Clamp_To_Edge];
+		mWrapR = ContextMap::TextureWrapArray[(uint32_t)TextureWrap::Clamp_To_Edge];
 
 		for (size_t i = 0; i < images.size(); i++)
 		{
@@ -312,12 +321,12 @@ namespace tezcat::Tiny
 			if (temp)
 			{
 				mDatas[i] = temp;
-				memcpy_s(mDatas[i], size, images[i]->getData(), size);
+				memcpy(mDatas[i], images[i]->getData(), size);
 			}
 		}
 	}
 
-	void TextureCube::setConfig(const uint32& size
+	void TextureCube::setConfig(const uint32_t& size
 		, const TextureInternalFormat& internalFormat, const TextureFormat& format
 		, const DataMemFormat& dataType
 		, const TextureFilter& min, const TextureFilter& mag
@@ -325,16 +334,16 @@ namespace tezcat::Tiny
 	{
 		mSize = size;
 
-		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32)internalFormat];
-		mFormat = ContextMap::TextureFormatArray[(uint32)format];
-		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32)dataType];
+		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)internalFormat];
+		mFormat = ContextMap::TextureFormatArray[(uint32_t)format];
+		mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)dataType];
 
-		mMinFilter = ContextMap::TextureFilterArray[(uint32)min];
-		mMagFilter = ContextMap::TextureFilterArray[(uint32)mag];
+		mMinFilter = ContextMap::TextureFilterArray[(uint32_t)min];
+		mMagFilter = ContextMap::TextureFilterArray[(uint32_t)mag];
 
-		mWrapS = ContextMap::TextureWrapArray[(uint32)wrapS];
-		mWrapT = ContextMap::TextureWrapArray[(uint32)wrapT];
-		mWrapR = ContextMap::TextureWrapArray[(uint32)wrapR];
+		mWrapS = ContextMap::TextureWrapArray[(uint32_t)wrapS];
+		mWrapT = ContextMap::TextureWrapArray[(uint32_t)wrapT];
+		mWrapR = ContextMap::TextureWrapArray[(uint32_t)wrapR];
 	}
 
 	void TextureCube::generate()
@@ -342,7 +351,7 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->addCommand(new RenderCMD_CreateTextureCube(this));
 	}
 
-	void TextureCube::apply(uint32 id)
+	void TextureCube::apply(uint32_t id)
 	{
 		Texture::apply(id);
 		for (auto& d : mDatas)
@@ -356,7 +365,7 @@ namespace tezcat::Tiny
 	//
 	//	TextureRender2D
 	//
-	TINY_OBJECT_CPP(TextureRender2D, Texture)
+	TINY_OBJECT_CPP(TextureRender2D, Texture);
 	TextureRender2D::TextureRender2D()
 		: Base(TextureFormat::RGBA
 			, TextureFormat::RGBA
@@ -379,6 +388,7 @@ namespace tezcat::Tiny
 		, mHeight(0)
 	{
 		mName.assign(name);
+		mEngineName = mName;
 	}
 
 	TextureRender2D::~TextureRender2D()
@@ -386,11 +396,11 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->addCommand(new RenderCMD_DeleteTextureRender2D(this));
 	}
 
-	void TextureRender2D::setConfig(const uint32& width, const uint32& height, const TextureInternalFormat& internalFormat)
+	void TextureRender2D::setConfig(const uint32_t& width, const uint32_t& height, const TextureInternalFormat& internalFormat)
 	{
 		mWidth = width;
 		mHeight = height;
-		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32)internalFormat];
+		mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)internalFormat];
 	}
 
 	void TextureRender2D::generate()

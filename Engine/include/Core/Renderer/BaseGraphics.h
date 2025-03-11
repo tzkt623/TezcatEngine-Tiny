@@ -101,7 +101,7 @@ namespace tezcat::Tiny
 		virtual void deleteBuffer(IndexBuffer* indexBuffer) {}
 		virtual void deleteBuffer(FrameBuffer* frameBuffer) {}
 		virtual void deleteShader(Shader* shader) {}
-		virtual void deleteTexture2D(const uint32& id) {}
+		virtual void deleteTexture2D(const uint32_t& id) {}
 		virtual void deleteTextureCube(const uint32& id) {}
 		virtual void deleteRender2D(const uint32& id) {}
 
@@ -121,10 +121,10 @@ namespace tezcat::Tiny
 			, Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* prefitler
-			, uint32 mipMaxLevel
-			, uint32 mipWidth
-			, uint32 mipHeight
-			, int32 resolution) {}
+			, uint32_t mipMaxLevel
+			, uint32_t mipWidth
+			, uint32_t mipHeight
+			, int32_t resolution) {}
 
 	public:
 		virtual void setUniformBuffer(UniformBuffer* uniformBuffer) {}
@@ -152,11 +152,12 @@ namespace tezcat::Tiny
 		virtual void setFloat3(Shader* shader, const char* name, float* data) = 0;
 		virtual void setFloat4(Shader* shader, const char* name, float* data) = 0;
 
-		virtual void setInt1(Shader* shader, const char* name, const int& data) = 0;
-		virtual void setInt1(Shader* shader, const char* name, int* data) = 0;
-		virtual void setInt2(Shader* shader, const char* name, int* data) = 0;
-		virtual void setInt3(Shader* shader, const char* name, int* data) = 0;
-		virtual void setInt4(Shader* shader, const char* name, int* data) = 0;
+		virtual void setUInt1(Shader* shader, const char* name, const uint32_t& data) = 0;
+		virtual void setInt1(Shader* shader, const char* name, const int32_t& data) = 0;
+		virtual void setInt1(Shader* shader, const char* name, int32_t* data) = 0;
+		virtual void setInt2(Shader* shader, const char* name, int32_t* data) = 0;
+		virtual void setInt3(Shader* shader, const char* name, int32_t* data) = 0;
+		virtual void setInt4(Shader* shader, const char* name, int32_t* data) = 0;
 
 		virtual void setMat3(Shader* shader, const char* name, float* data) = 0;
 		virtual void setMat4(Shader* shader, const char* name, const float* data) = 0;
@@ -173,17 +174,17 @@ namespace tezcat::Tiny
 		virtual void setFloat3(Shader* shader, UniformID& uniform, const float3& data) = 0;
 		virtual void setFloat4(Shader* shader, UniformID& uniform, float* data) = 0;
 
-		virtual void setInt1(Shader* shader, UniformID& uniform, const int& data) = 0;
-		virtual void setInt1(Shader* shader, UniformID& uniform, int* data) = 0;
-		virtual void setInt2(Shader* shader, UniformID& uniform, int* data) = 0;
-		virtual void setInt3(Shader* shader, UniformID& uniform, int* data) = 0;
-		virtual void setInt4(Shader* shader, UniformID& uniform, int* data) = 0;
+		virtual void setInt1(Shader* shader, UniformID& uniform, const int32_t& data) = 0;
+		virtual void setInt1(Shader* shader, UniformID& uniform, int32_t* data) = 0;
+		virtual void setInt2(Shader* shader, UniformID& uniform, int32_t* data) = 0;
+		virtual void setInt3(Shader* shader, UniformID& uniform, int32_t* data) = 0;
+		virtual void setInt4(Shader* shader, UniformID& uniform, int32_t* data) = 0;
 
 		virtual void setMat3(Shader* shader, UniformID& uniform, float* data) = 0;
 		virtual void setMat3(Shader* shader, UniformID& uniform, const float3x3& mat3) = 0;
 		virtual void setMat4(Shader* shader, UniformID& uniform, const float* data) = 0;
 		virtual void setMat4(Shader* shader, UniformID& uniform, const float4x4& mat4) = 0;
-		virtual void setMat4(Shader* shader, UniformID& uniform, float4x4 data[], int count) = 0;
+		virtual void setMat4(Shader* shader, UniformID& uniform, float4x4 data[], int32_t count) = 0;
 
 		virtual void setGlobalTexture2D(Shader* shader, UniformID& uniform, Texture2D* data) = 0;
 		virtual void setTexture2D(Shader* shader, UniformID& uniform, Texture2D* data) = 0;
@@ -197,29 +198,29 @@ namespace tezcat::Tiny
 		//	User Interface
 		//
 	public:
-		virtual void setFloat1(Shader* shader, const int& valueID, const float& data) = 0;
-		virtual void setFloat1(Shader* shader, const int& valueID, const float* data) = 0;
-		virtual void setFloat2(Shader* shader, const int& valueID, const float* data) = 0;
-		virtual void setFloat3(Shader* shader, const int& valueID, const float* data) = 0;
-		virtual void setFloat4(Shader* shader, const int& valueID, const float* data) = 0;
+		virtual void setFloat1(Shader* shader, const int32_t& valueID, const float& data) = 0;
+		virtual void setFloat1(Shader* shader, const int32_t& valueID, const float* data) = 0;
+		virtual void setFloat2(Shader* shader, const int32_t& valueID, const float* data) = 0;
+		virtual void setFloat3(Shader* shader, const int32_t& valueID, const float* data) = 0;
+		virtual void setFloat4(Shader* shader, const int32_t& valueID, const float* data) = 0;
 
-		virtual void setInt1(Shader* shader, const int& valueID, const int& data) = 0;
-		virtual void setInt1(Shader* shader, const int& valueID, int* data) = 0;
-		virtual void setInt2(Shader* shader, const int& valueID, int* data) = 0;
-		virtual void setInt3(Shader* shader, const int& valueID, int* data) = 0;
-		virtual void setInt4(Shader* shader, const int& valueID, int* data) = 0;
+		virtual void setInt1(Shader* shader, const int32_t& valueID, const int32_t& data) = 0;
+		virtual void setInt1(Shader* shader, const int32_t& valueID, int32_t* data) = 0;
+		virtual void setInt2(Shader* shader, const int32_t& valueID, int32_t* data) = 0;
+		virtual void setInt3(Shader* shader, const int32_t& valueID, int32_t* data) = 0;
+		virtual void setInt4(Shader* shader, const int32_t& valueID, int32_t* data) = 0;
 
-		virtual void setMat3(Shader* shader, const int& valueID, const float* data) = 0;
-		virtual void setMat3(Shader* shader, const int& valueID, const float3x3& mat3) = 0;
-		virtual void setMat4(Shader* shader, const int& valueID, const float* data) = 0;
-		virtual void setMat4(Shader* shader, const int& valueID, const float4x4& mat4) = 0;
-		virtual void setMat4(Shader* shader, const int& valueID, float4x4 data[], int count) = 0;
+		virtual void setMat3(Shader* shader, const int32_t& valueID, const float* data) = 0;
+		virtual void setMat3(Shader* shader, const int32_t& valueID, const float3x3& mat3) = 0;
+		virtual void setMat4(Shader* shader, const int32_t& valueID, const float* data) = 0;
+		virtual void setMat4(Shader* shader, const int32_t& valueID, const float4x4& mat4) = 0;
+		virtual void setMat4(Shader* shader, const int32_t& valueID, float4x4 data[], int32_t count) = 0;
 
-		virtual void setGlobalTexture2D(Shader* shader, const int& valueID, Texture2D* data) = 0;
-		virtual void setTexture2D(Shader* shader, const int& valueID, Texture2D* data) = 0;
+		virtual void setGlobalTexture2D(Shader* shader, const int32_t& valueID, Texture2D* data) = 0;
+		virtual void setTexture2D(Shader* shader, const int32_t& valueID, Texture2D* data) = 0;
 
-		virtual void setGlobalTextureCube(Shader* shader, const int& valueID, TextureCube* data) = 0;
-		virtual void setTextureCube(Shader* shader, const int& valueID, TextureCube* data) = 0;
+		virtual void setGlobalTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data) = 0;
+		virtual void setTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data) = 0;
 
 		//----------------------------------------------------
 		//
@@ -232,6 +233,8 @@ namespace tezcat::Tiny
 		virtual void bind(Shader* shader) = 0;
 		virtual void bind(FrameBuffer* frameBuffer) = 0;
 		virtual void bind(UniformBuffer* uniformBuffer) = 0;
+		virtual void readPixel(int32_t x, int32_t y) = 0;
+		virtual void readObjectID(int32_t x, int32_t y, int32_t& id) = 0;
 
 		//----------------------------------------------------
 		//

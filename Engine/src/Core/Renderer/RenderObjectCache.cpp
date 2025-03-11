@@ -56,7 +56,7 @@ namespace tezcat::Tiny
 		sLayerAry[index]->mRenderObjectList.push_back(renderAgent);
 	}
 
-	void RenderObjectCache::culling(int layerIndex,  PipelinePass* pass)
+	void RenderObjectCache::culling(int layerIndex, ReplacedPipelinePass* pass)
 	{
 		auto& render_object_list = sLayerAry[layerIndex]->mRenderObjectList;
 		if (render_object_list.empty())
@@ -68,7 +68,7 @@ namespace tezcat::Tiny
 		auto end = render_object_list.end();
 		while (it != end)
 		{
-			if (auto renderer = (*it).lock())
+			if (auto renderer = it->lock())
 			{
 				renderer->makeRenderCommand(pass);
 				it++;
@@ -93,7 +93,7 @@ namespace tezcat::Tiny
 		auto end = render_object_list.end();
 		while (it != end)
 		{
-			if (auto renderer = (*it).lock())
+			if (auto renderer = it->lock())
 			{
 				renderer->makeRenderCommand(renderObserver);
 				it++;

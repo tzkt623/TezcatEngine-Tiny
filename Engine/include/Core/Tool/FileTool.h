@@ -38,6 +38,7 @@ namespace tezcat::Tiny
 		FT_Model_Begin,
 		FT_Fbx,
 		FT_Obj,
+		FT_PMX,
 		FT_Model_End,
 
 		FT_Unknown

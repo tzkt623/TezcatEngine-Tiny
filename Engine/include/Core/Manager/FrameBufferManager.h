@@ -1,5 +1,20 @@
 ﻿#pragma once
+/*
+	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
 
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include "../Head/TinyCpp.h"
 
 namespace tezcat::Tiny
@@ -19,35 +34,11 @@ namespace tezcat::Tiny
 
 	private:
 
-		static uint32 giveID()
-		{
-			uint32 id = -1;
+		static uint32_t giveID();
 
-			if (sFreeIDs.size() > 0)
-			{
-				id = sFreeIDs.front();
-				sFreeIDs.pop();
-			}
-			else
-			{
-				id = sID++;
-			}
-
-			return id;
-		}
-
-		static void recycleID(uint32 id)
+		static void recycleID(uint32_t id)
 		{
 			sFreeIDs.push(id);
-		}
-
-		static void store(const std::string&name, FrameBuffer* buffer)
-		{
-			auto it = sUMap.try_emplace(name, buffer);
-			if (!it.second)
-			{
-				TINY_THROW_LOGIC(fmt::format("FrameBuffer {0} had stored!", name));
-			}
 		}
 
 	public:
@@ -56,17 +47,7 @@ namespace tezcat::Tiny
 		static std::tuple<bool, FrameBuffer*> create(std::string name);
 
 		static FrameBuffer* getMainFrameBufferBuildin();
-
-		static FrameBuffer* find(const std::string& name)
-		{
-			auto result = sUMap.find(name);
-			if (result != sUMap.end())
-			{
-				return (*result).second;
-			}
-
-			return nullptr;
-		}
+		static FrameBuffer* find(const std::string& name);
 
 	public:
 		static void bind(FrameBuffer* buffer);
@@ -75,15 +56,15 @@ namespace tezcat::Tiny
 
 	private:
 		static std::unordered_map<std::string_view, FrameBuffer*> sUMap;
-		static uint32 sID;
-		static std::queue<uint32> sFreeIDs;
+		static uint32_t sID;
+		static std::queue<uint32_t> sFreeIDs;
 		static std::stack<FrameBuffer*> sFrameBufferStack;
 		static FrameBuffer* sDefaultBuffer;
 
 		static FrameBuffer* sMainBuffer;
 	};
 
-constexpr auto TINY_FRAMEBUFFER_VIEWPORT = "Viewport_FrameBuffer";
-constexpr auto TINY_FRAMEBUFFER_VIEWPORT_COLOR_TEXTURE = "Viewport_ColorBuffer";
-constexpr auto TINY_FRAMEBUFFER_VIEWPORT_DEPTH_TEXTURE = "Viewport_DepthBuffer";
+constexpr auto TINY_FRAMEBUFFER_VIEWPORT = "Tiny_Viewport_FrameBuffer";
+constexpr auto TINY_FRAMEBUFFER_VIEWPORT_COLOR_TEXTURE = "Tiny_Viewport_ColorBuffer";
+constexpr auto TINY_FRAMEBUFFER_VIEWPORT_DEPTH_TEXTURE = "Tiny_Viewport_DepthBuffer";
 }

@@ -56,7 +56,7 @@ namespace tezcat::Tiny
 
 
 		void makeRenderCommand(BaseRenderObserver* renderObserver) override;
-		void makeRenderCommand(PipelinePass* pass) override;
+		void makeRenderCommand(ReplacedPipelinePass* pass) override;
 
 	private:
 		float3 mDirection;
@@ -87,7 +87,6 @@ namespace tezcat::Tiny
 	{
 		DirectionalLight();
 		DirectionalLight(const float3& direction, const float3& ambient, const float3& diffuse, const float3& specular);
-	public:
 		TINY_OBJECT_H(DirectionalLight, LightComponent);
 
 	public:

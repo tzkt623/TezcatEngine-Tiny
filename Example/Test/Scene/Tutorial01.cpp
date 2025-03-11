@@ -33,14 +33,16 @@ void Tutorial01::onEnter()
 	mVertex->generate();
 	mVertex->saveObject();
 
-	auto observer = RenderObserver::create();
-	observer->setOrderID(0);
-	observer->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
-	observer->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+	mObserver = RenderObserver::create();
+	mObserver->saveObject();
+	mObserver->setOrderID(0);
+	mObserver->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+	mObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+	//GameObjectManager::setIDObserver(mObserver);
 
 	auto shader = ShaderManager::find("Tutorial/t01");
-	mPass = ReplacedPipelinePass::create(observer, shader);
-	mPass->setPreFunction([=](ReplacedPipelinePass* pass)
+	mPass = ReplacedPipelinePass::create(mObserver, shader);
+	mPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 	{
 		pass->addCommand<RenderCMD_DrawVertex>(mVertex);
 	});
@@ -53,6 +55,7 @@ void Tutorial01::onExit()
 	Base::onExit();
 	mPass->removeFromPipeline();
 	mVertex->deleteObject();
+	mObserver->deleteObject();
 }
 
 void Tutorial01::onPause()

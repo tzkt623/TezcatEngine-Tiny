@@ -3,11 +3,12 @@
 
 namespace tezcat::Editor
 {
-	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyOverviewWindow)
+	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyOverviewWindow);
 
 	MyOverviewWindow::MyOverviewWindow()
 		: GUIWindow("场景总览(Overview)")
 		, mSelectedGameObject(nullptr)
+		, mPickObject(false)
 	{
 
 	}
@@ -19,11 +20,18 @@ namespace tezcat::Editor
 
 	void MyOverviewWindow::init()
 	{
-
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_SelectObject, this,
+			[this](const EventData& data)
+			{
+				mSelectedGameObject = (GameObject*)data.userData;
+				this->createPickPath(mSelectedGameObject->getTransform());
+				MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, mSelectedGameObject });
+			});
 	}
 
 	void MyOverviewWindow::buildTree(std::list<TinyWeakRef<Transform>>& children)
 	{
+		int32_t child_id = 0;
 		for (auto& transform : children)
 		{
 			auto game_object = transform->getGameObject();
@@ -45,11 +53,25 @@ namespace tezcat::Editor
 				flags |= ImGuiTreeNodeFlags_Leaf;
 			}
 
+			
+			if (!mPickPath.empty())
+			{
+				//如果当前对象在选取路径上
+				if (transform.get() == mPickPath.top())
+				{
+					//展开节点给用户看
+					mPickPath.pop();
+					ImGui::SetNextItemOpen(true);
+				}
+			}
+
+			ImGui::PushID(child_id++);
 			auto open = ImGui::TreeNodeEx(game_object->getName().c_str(), flags);
+
+			//使当前单位成为抓取目标
 			if (mDragedTransform == nullptr && ImGui::BeginDragDropSource())
 			{
-				int s;
-				if (ImGui::SetDragDropPayload("ObjectMove", &s, sizeof(int), ImGuiCond_Once))
+				if (ImGui::SetDragDropPayload("ObjectMove", nullptr, 0, ImGuiCond_Once))
 				{
 					mDragedTransform = transform.get();
 					TINY_LOG_INFO("!!!!");
@@ -57,27 +79,54 @@ namespace tezcat::Editor
 				ImGui::EndDragDropSource();
 			}
 
+			//使当前单位成为投放目标
 			if (ImGui::BeginDragDropTarget())
 			{
-				if (auto payload = ImGui::AcceptDragDropPayload("ObjectMove"))
+				//投放一个对象到当前对象的子节点中
+				if (ImGui::AcceptDragDropPayload("ObjectMove"))
 				{
+					//一定要先添加父类
 					mDragedTransform->setParent(transform.get());
+					this->createPickPath(mDragedTransform);
+					mSelectedGameObject = mDragedTransform->getGameObject();
+
 					mDragedTransform = nullptr;
 				}
 				ImGui::EndDragDropTarget();
 			}
 
+			//点击控件选择对象
 			if (ImGui::IsItemHovered())
 			{
-				if (ImGui::IsItemClicked())
+				if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 				{
 					mSelectedGameObject = game_object;
 					MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, game_object });
 				}
-				else if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+			}
+
+			//从屏幕中选择物品时
+			//将滚动条移动到当前物品的位置
+			if (mPickObject)
+			{
+				if (mSelectedGameObject == game_object)
 				{
-					ImGui::OpenPopup("ObjectMenu");
+					mPickObject = false;
+					this->scrollToCurrentObject();
 				}
+			}
+
+			if (ImGui::BeginPopupContextItem())
+			{
+				ImGui::Text("ObjectControl");
+				ImGui::Separator();
+
+				if (ImGui::Button("DeleteObject"))
+				{
+					game_object->deleteObject();
+				}
+
+				ImGui::EndPopup();
 			}
 
 			if (open)
@@ -86,9 +135,10 @@ namespace tezcat::Editor
 				{
 					buildTree(*children);
 				}
-
 				ImGui::TreePop();
 			}
+
+			ImGui::PopID();
 		}
 	}
 
@@ -107,76 +157,83 @@ namespace tezcat::Editor
 		auto& list = SceneManager::getCurrentScene()->getTransformList();
 		this->buildTree(list);
 
-		if (ImGui::BeginPopup("ObjectMenu"))
-		{
-			ImGui::Text("Aquarium");
-			ImGui::EndPopup();
-		}
-
 		ImGui::EndChild();
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			if (auto payload = ImGui::AcceptDragDropPayload("ObjectMove"))
+			auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
+			if (flag)
 			{
+				auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
+				if (payload)
+				{
+					auto path = MyGUIContext::DragDropController.getFilePath();
+					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_LoadModel, &path });
+				}
+			}
+			else if (auto payload = ImGui::AcceptDragDropPayload("ObjectMove"))
+			{
+				mSelectedGameObject = mDragedTransform->getGameObject();
 				mDragedTransform->setParent(nullptr);
 				mDragedTransform = nullptr;
+				mPickObject = true;
 			}
 			ImGui::EndDragDropTarget();
 		}
-
-
-		/*
-		for (auto& transform : list)
-		{
-			auto game_object = transform->getGameObject();
-
-			ImGuiTreeNodeFlags flags = base_flags;
-			if (mSelectedGameObject == game_object)
-			{
-				flags |= ImGuiTreeNodeFlags_Selected;
-			}
-
-			auto children = transform->getChildren();
-			auto has_children = children && !children->empty();
-			if (has_children)
-			{
-				flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-			}
-			else
-			{
-				flags |= ImGuiTreeNodeFlags_Leaf;
-			}
-
-			auto open = ImGui::TreeNodeEx(game_object->getName().c_str(), flags);
-			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-			{
-				mSelectedGameObject = game_object;
-				MyEvent::get()->dispatch(EventData
-					{
-						MyEventID::Window_ObjectSelected,
-						game_object
-					});
-			}
-
-			if (open)
-			{
-				if (has_children)
-				{
-					buildTree(*children);
-				}
-				ImGui::TreePop();
-			}
-		}
-		*/
 	}
 
 	void MyOverviewWindow::end()
 	{
 		GUIWindow::end();
-
 	}
 
+	void MyOverviewWindow::scrollToCurrentObject()
+	{
+		//-----------------------------------------------
+		// 核心：滚动到当前控件的位置
+		//-----------------------------------------------
+		// 1. 获取控件的屏幕坐标
+		ImVec2 item_min = ImGui::GetItemRectMin(); // 控件的左上角
+		ImVec2 item_max = ImGui::GetItemRectMax(); // 控件的右下角
 
+		// 2. 获取窗口的可视区域信息
+		ImVec2 window_pos = ImGui::GetWindowPos();   // 窗口的屏幕坐标
+		float window_height = ImGui::GetWindowHeight(); // 窗口可视高度
+		float current_scroll_y = ImGui::GetScrollY();   // 当前滚动位置
+
+		// 3. 计算控件在窗口内的相对位置
+		float item_top_rel = item_min.y - window_pos.y + current_scroll_y;
+		float item_bottom_rel = item_max.y - window_pos.y + current_scroll_y;
+
+		// 4. 判断是否需要调整滚动条
+		if (item_top_rel < current_scroll_y)
+		{
+			// 控件在可视区域上方：滚动到控件顶部
+			ImGui::SetScrollY(item_top_rel);
+		}
+		else if (item_bottom_rel > current_scroll_y + window_height)
+		{
+			// 控件在可视区域下方：滚动到控件底部
+			ImGui::SetScrollY(item_bottom_rel - window_height);
+		}
+	}
+
+	void MyOverviewWindow::createPickPath(Transform* transform)
+	{
+		while (true)
+		{
+			auto temp = transform->getParent();
+			if (temp == nullptr)
+			{
+				mPickObject = true;
+				break;
+			}
+			else
+			{
+				mPickPath.push(temp);
+				transform = temp;
+			}
+		}
+	}
 
 }

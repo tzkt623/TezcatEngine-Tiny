@@ -18,6 +18,7 @@
 #include "Core/Component/GameObject.h"
 #include "Core/Scene.h"
 #include "Core/Manager/SceneManager.h"
+#include "Core/Manager/GameObjectManager.h"
 #include "Core/Tool/Tool.h"
 
 
@@ -28,7 +29,6 @@ namespace tezcat::Tiny
 	GameObject::GameObject()
 		: GameObject("GameObject")
 	{
-
 	}
 
 	GameObject::GameObject(std::string name)
@@ -38,17 +38,17 @@ namespace tezcat::Tiny
 		, mUID(-1)
 		, mName(std::move(name))
 	{
-
+		mEngineName = mName;
 	}
 
 	void GameObject::init()
 	{
-		mUID = SceneManager::getCurrentScene()->addGameObject(this);
+		mUID = GameObjectManager::addGameObject(this);
+		SceneManager::getCurrentScene()->addGameObject(this);
 	}
 
 	GameObject::~GameObject()
 	{
-
 	}
 
 	void GameObject::enterScene(Scene* scene)
@@ -130,6 +130,8 @@ namespace tezcat::Tiny
 
 	void GameObject::onClose()
 	{
+		GameObjectManager::removeGameObject(this);
+
 		auto children = this->getTransform()->getChildren();
 		if (children)
 		{
@@ -138,8 +140,6 @@ namespace tezcat::Tiny
 				child->getGameObject()->deleteObject();
 			}
 		}
-
-		SceneManager::getCurrentScene()->removeGameObject(this);
 
 		for (auto com : mComponentList)
 		{
@@ -156,7 +156,7 @@ namespace tezcat::Tiny
 
 	void GameObject::removeComponent(Component* com)
 	{
-		for (uint32 i = 0; i < mComponentList.size(); i++)
+		for (uint32_t i = 0; i < mComponentList.size(); i++)
 		{		
 			if (auto ptr = mComponentList[i])
 			{
@@ -172,50 +172,9 @@ namespace tezcat::Tiny
 		}
 	}
 
-	//-------------------------------------------
-	//
-	//	GameObjectData
-	//
-	TINY_OBJECT_CPP(GameObjectData, TinyObject)
-	GameObjectData::GameObjectData()
+	std::string GameObject::getMemoryInfo()
 	{
-
+		return TINY_OBJECT_MEMORY_INFO();
 	}
 
-	GameObjectData::~GameObjectData()
-	{
-		for (auto go : mArray)
-		{
-			if (go)
-			{
-				go->deleteObject();
-			}
-		}
-		mArray.clear();
-	}
-
-	int32 GameObjectData::addGameObject(GameObject* gameObject)
-	{
-		gameObject->saveObject();
-		if (mFreeIDQueue.empty())
-		{
-			int32 id = (int32)mArray.size();
-			mArray.push_back(gameObject);
-			return id;
-		}
-		else
-		{
-			int32 id = mFreeIDQueue.front();
-			mFreeIDQueue.pop();
-			mArray[id] = gameObject;
-			return id;
-		}
-	}
-
-	void GameObjectData::removeGameObject(GameObject* gameObject)
-	{
-		int32 id = gameObject->getUID();
-		mFreeIDQueue.push(id);
-		mArray[id] = nullptr;
-	}
 }

@@ -76,8 +76,8 @@
         uniform tex2D myTexDiffuse2D;
         [Editor(Specular2D)]
         uniform tex2D myTexSpecular2D;
-        [Editor(Shininess)]
-        uniform float myShininess;
+        [Editor(Shininess2D)]
+        uniform tex2D myTexShininess2D;
 
         float4 reflection(float3 I)
         {
@@ -103,14 +103,14 @@
             float NdH = dot(normal, half_dir);
 
             float diff = max(NdL, 0.0);
-            float spec = pow(max(NdH, 0.0), myShininess);
+            float spec = pow(max(NdH, 0.0), texture(myTexShininess2D, myUV).r);
 
             float3 ambient = lit.ambient * texture(myTexDiffuse2D, myUV).rgb;
             float3 diffuse = lit.diffuse * diff * texture(myTexDiffuse2D, myUV).rgb;
             float3 specular = lit.specular * spec * texture(myTexSpecular2D, myUV).rrr;
 
             // shadow
-            float shadow = calcShadow(myLightPosition, normal, light_dir, TINY_TexDepth);
+            float shadow = calcShadow(myLightPosition, normal, light_dir, TINY_TexShadow);
             float3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
 
             return lighting;

@@ -64,6 +64,12 @@ namespace tezcat::Tiny
 	Vertex* LightingManager::sHDRVertex = nullptr;
 	LightData* LightingManager::sLightData = nullptr;
 
+	RenderObserverMultView* LightingManager::sObserverHDR = nullptr;
+	RenderObserverMultView* LightingManager::sObserverIrradiance = nullptr;
+	RenderObserverMultView* LightingManager::sObserverPrefilter = nullptr;
+	RenderObserver* LightingManager::sObserverBRDF_LUT = nullptr;
+
+
 
 	bool LightingManager::sCloseEnvLighting = true;
 	float LightingManager::sSkyboxLod = 0;
@@ -186,7 +192,7 @@ namespace tezcat::Tiny
 						sCurrentCubeMap = sCubeTextureMap;
 					}
 
-					sSkyBoxPass->setPreFunction([=](ReplacedPipelinePass* pass)
+					sSkyBoxPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 					{
 						pass->addCommand<RenderCMD_DrawSkybox>(sSkyboxVertex
 							, sCurrentCubeMap
@@ -259,16 +265,17 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		auto observer = createObserver();
-		observer->setPerspective(90.0f, 0.1f, 10.0f);
-		observer->setViewRect(0, 0, cube_size, cube_size);
-		observer->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		observer->setOrderID(-127);
+		sObserverHDR = createObserver();
+		sObserverHDR->saveObject();
+		sObserverHDR->setPerspective(90.0f, 0.1f, 10.0f);
+		sObserverHDR->setViewRect(0, 0, cube_size, cube_size);
+		sObserverHDR->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+		sObserverHDR->setOrderID(-127);
 
-		sMakeCubeTexPass = ReplacedPipelinePass::create(observer, ShaderManager::find("Unlit/EnvMakeCube"));
+		sMakeCubeTexPass = ReplacedPipelinePass::create(sObserverHDR, ShaderManager::find("Unlit/EnvMakeCube"));
 		sMakeCubeTexPass->setOnceMode();
 		sMakeCubeTexPass->setFrameBuffer(frame_buffer);
-		sMakeCubeTexPass->setPreFunction([=](ReplacedPipelinePass* pass)
+		sMakeCubeTexPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 		{
 			pass->addCommand<RenderCMD_MakeHDR2Cube>(sHDRVertex, sTexHDR, sCubeTextureMap);
 		});
@@ -300,18 +307,19 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		auto observer = createObserver();
-		observer->setPerspective(90.0f, 0.1f, 10.0f);
-		observer->setViewRect(0, 0, irr_size, irr_size);
-		observer->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		observer->setOrderID(-127);
+		sObserverIrradiance = createObserver();
+		sObserverIrradiance->saveObject();
+		sObserverIrradiance->setPerspective(90.0f, 0.1f, 10.0f);
+		sObserverIrradiance->setViewRect(0, 0, irr_size, irr_size);
+		sObserverIrradiance->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+		sObserverIrradiance->setOrderID(-127);
 
 		auto shader = ShaderManager::find("Unlit/EnvMakeIrradiance");
 
-		sIrradiancePass = ReplacedPipelinePass::create(observer, shader);
+		sIrradiancePass = ReplacedPipelinePass::create(sObserverIrradiance, shader);
 		sIrradiancePass->setOnceMode();
 		sIrradiancePass->setFrameBuffer(frame_buffer);
-		sIrradiancePass->setPreFunction([=](ReplacedPipelinePass* pass)
+		sIrradiancePass->setCustomCulling([=](ReplacedPipelinePass* pass)
 		{
 			pass->addCommand(new RenderCMD_MakeEnvIrradiance(sHDRVertex, sCubeTextureMap, sIrradianceMap));
 		});
@@ -344,17 +352,18 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		auto render_observer = createObserver();
-		render_observer->setPerspective(90.0f, 0.1f, 10.0f);
-		render_observer->setViewRect(0, 0, prefilter_size, prefilter_size);
-		render_observer->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		render_observer->setOrderID(-127);
+		sObserverPrefilter = createObserver();
+		sObserverPrefilter->saveObject();
+		sObserverPrefilter->setPerspective(90.0f, 0.1f, 10.0f);
+		sObserverPrefilter->setViewRect(0, 0, prefilter_size, prefilter_size);
+		sObserverPrefilter->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+		sObserverPrefilter->setOrderID(-127);
 
-		sPrefilterPass = ReplacedPipelinePass::create(render_observer
+		sPrefilterPass = ReplacedPipelinePass::create(sObserverPrefilter
 			, ShaderManager::find("Unlit/EnvMakePrefilter"));
 		sPrefilterPass->setOnceMode();
 		sPrefilterPass->setFrameBuffer(frame_buffer);
-		sPrefilterPass->setPreFunction([=](ReplacedPipelinePass* pass)
+		sPrefilterPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 		{
 			pass->addCommand(new RenderCMD_MakeEnvPrefilter(sHDRVertex
 				, sCubeTextureMap
@@ -388,17 +397,18 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		auto render_observer = createObserver();
-		render_observer->setPerspective(90.0f, 0.1f, 10.0f);
-		render_observer->setViewRect(0, 0, sCubeSize, sCubeSize);
-		render_observer->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		render_observer->setOrderID(-127);
+		sObserverBRDF_LUT = RenderObserver::create();
+		sObserverBRDF_LUT->saveObject();
+		sObserverBRDF_LUT->setPerspective(90.0f, 0.1f, 10.0f);
+		sObserverBRDF_LUT->setViewRect(0, 0, sCubeSize, sCubeSize);
+		sObserverBRDF_LUT->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+		sObserverBRDF_LUT->setOrderID(-127);
 
-		sBRDFLUTPass = ReplacedPipelinePass::create(render_observer
+		sBRDFLUTPass = ReplacedPipelinePass::create(sObserverBRDF_LUT
 			, ShaderManager::find("Unlit/EnvMakeBRDFLut"));
 		sBRDFLUTPass->setOnceMode();
 		sBRDFLUTPass->setFrameBuffer(frame_buffer);
-		sBRDFLUTPass->setPreFunction([](ReplacedPipelinePass* pass)
+		sBRDFLUTPass->setCustomCulling([](ReplacedPipelinePass* pass)
 		{
 			auto rect_vertex = VertexBufferManager::create("Rect");
 			pass->addCommand(new RenderCMD_DrawVertex(rect_vertex));
@@ -531,6 +541,11 @@ namespace tezcat::Tiny
 	}
 
 	LightData::~LightData()
+	{
+
+	}
+
+	void LightData::onClose()
 	{
 		this->directionalLight = nullptr;
 		this->pointLights.clear();

@@ -1,4 +1,5 @@
 uniform tex2D TINY_TexDepth;
+uniform tex2D TINY_TexShadow;
 uniform texCube TINY_TexSkybox;
 uniform texCube TINY_TexIrradiance;
 uniform texCube TINY_TexPrefilter;

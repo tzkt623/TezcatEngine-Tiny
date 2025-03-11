@@ -55,25 +55,25 @@ namespace tezcat::Tiny
 
 	public:
 		IDString()
-			: mID(-1)
+			: mID(0)
 		{
 
 		}
 
 		IDString(const char* string)
-			: mID(-1)
+			: mID(0)
 		{
 			this->init(string);
 		}
 
-// 		IDString(std::string&& string)
-// 			: mID(-1)
-// 		{
-// 			this->init(std::forward<std::string>(string));
-// 		}
+		// 		IDString(std::string&& string)
+		// 			: mID(0)
+		// 		{
+		// 			this->init(std::forward<std::string>(string));
+		// 		}
 
 		IDString(const std::string& string)
-			: mID(-1)
+			: mID(0)
 		{
 			this->init(string);
 		}
@@ -87,7 +87,7 @@ namespace tezcat::Tiny
 		IDString(IDString&& other) noexcept
 			: mID(other.mID)
 		{
-			other.mID = -1;
+			other.mID = 0;
 		}
 
 		~IDString()
@@ -107,16 +107,16 @@ namespace tezcat::Tiny
 			return *this;
 		}
 
-// 		IDString& operator = (std::string&& data)
-// 		{
-// 			this->init(std::forward<std::string>(data));
-// 			return *this;
-// 		}
+		// 		IDString& operator = (std::string&& data)
+		// 		{
+		// 			this->init(std::forward<std::string>(data));
+		// 			return *this;
+		// 		}
 
 		IDString& operator = (IDString&& other) noexcept
 		{
 			mID = other.mID;
-			other.mID = -1;
+			other.mID = 0;
 			return *this;
 		}
 
@@ -136,95 +136,139 @@ namespace tezcat::Tiny
 			return mID != other.mID;
 		}
 
-		operator const char* ()
+		bool operator == (const std::string& other) const
 		{
-			return sStringArray[mID].data();
+			auto it = sStringMap.find(other);
+			if (it == sStringMap.end())
+			{
+				return false;
+			}
+
+			return mID == it->second;
 		}
 
-		operator int()
+		bool operator != (const std::string& other) const
+		{
+			auto it = sStringMap.find(other);
+			if (it == sStringMap.end())
+			{
+				return true;
+			}
+
+			return mID != it->second;
+		}
+
+		//operator const char* ()
+		//{
+		//	return sStringArray[mID].data();
+		//}
+		//
+		operator uint32_t()
 		{
 			return mID;
 		}
 
-		const int getUID() const
+		//operator std::string_view()
+		//{
+		//	return sStringArray[mID];
+		//}
+
+		const uint32_t toUID() const
 		{
 			return mID;
 		}
 
-		const char* getStringData() const
+		const char* toData() const
 		{
-			return sStringArray[mID].data();
+			return sStringArray[mID]->c_str();
 		}
 
-		const std::string_view& getString() const
+		const std::string& toString() const
 		{
-			return sStringArray[mID];
+			return *sStringArray[mID];
+		}
+
+		const std::string_view toView() const
+		{
+			return *sStringArray[mID];
 		}
 
 	private:
 		void init(const std::string& data)
 		{
-			auto pair = sStringMap.try_emplace(data, mID);
-			if (pair.second)
+			auto it = sStringMap.find(data);
+			if (it == sStringMap.end())
 			{
-				mID = static_cast<int>(sStringArray.size());
-				pair.first->second = mID;
-				sStringArray.emplace_back(pair.first->first);
+				mID = static_cast<uint32_t>(sStringArray.size());
+				sStringArray.push_back(new std::string(data));
+				sStringMap.emplace(*sStringArray[mID], mID);
 			}
 			else
 			{
-				mID = pair.first->second;
+				mID = it->second;
 			}
-		}
 
-// 		void init(std::string&& data)
-// 		{
-// 			auto pair = sStringMap.try_emplace(std::move(data), mID);
-// 			if (pair.second)
-// 			{
-// 				mID = static_cast<int>(sStringArray.size());
-// 				pair.first->second = mID;
-// 				sStringArray.emplace_back(pair.first->first);
-// 			}
-// 			else
-// 			{
-// 				mID = pair.first->second;
-// 			}
-// 		}
+			//auto pair = sStringMap.try_emplace(data, 0);
+			//if (pair.second)
+			//{
+			//	mID = static_cast<uint32_t>(sStringArray.size());
+			//	pair.first->second = mID;
+			//	sStringArray.emplace_back(pair.first->first);
+			//}
+			//else
+			//{
+			//	mID = pair.first->second;
+			//}
+		}
 
 		void init(const char* data)
 		{
-			//			std::string name(data);
-			auto pair = sStringMap.try_emplace(data, mID);
-			if (pair.second)
+			auto it = sStringMap.find(data);
+			if (it == sStringMap.end())
 			{
-				mID = static_cast<int>(sStringArray.size());
-				pair.first->second = mID;
-				sStringArray.emplace_back(pair.first->first);
+				mID = static_cast<uint32_t>(sStringArray.size());
+				sStringArray.push_back(new std::string(data));
+				sStringMap.emplace(*sStringArray[mID], mID);
 			}
 			else
 			{
-				mID = pair.first->second;
+				mID = it->second;
 			}
+
+			//auto pair = sStringMap.try_emplace(data, 0);
+			//if (pair.second)
+			//{
+			//	mID = static_cast<uint32_t>(sStringArray.size());
+			//	pair.first->second = mID;
+			//	sStringArray.emplace_back(pair.first->first);
+			//}
+			//else
+			//{
+			//	mID = pair.first->second;
+			//}
 		}
 
 	private:
-		int mID;
+		uint32_t mID;
 
 	public:
 		static auto allStringCount() { return sStringArray.size(); }
 
 		static bool tryAddString(const std::string& data)
 		{
-			auto pair = sStringMap.try_emplace(data, -1);
-			if (pair.second)
+			auto it = sStringMap.find(data);
+			if (it == sStringMap.end())
 			{
-				pair.first->second = static_cast<int>(sStringArray.size());
-				sStringArray.emplace_back(pair.first->first);
+				mID = static_cast<uint32_t>(sStringArray.size());
+				sStringArray.push_back(new std::string(data));
+				sStringMap.emplace(*sStringArray[mID], mID);
 				return true;
 			}
-
-			return false;
+			else
+			{
+				mID = it->second;
+				return false;
+			}
 		}
 
 		static IDString create(const char* data)
@@ -232,32 +276,42 @@ namespace tezcat::Tiny
 			return IDString(data);
 		}
 
-		static const std::string_view& getStringStatic(const int& id)
+		static std::string_view getStringStatic(const uint32_t& id)
 		{
-			return sStringArray[id];
+			return *sStringArray[id];
 		}
 
-		static const int getUIDStatic(const std::string& name)
+		static const uint32_t getUIDStatic(const std::string& name)
 		{
 			TINY_THROW_RUNTIME(!sStringMap.contains(name), name);
 			return sStringMap[name];
 		}
 
+		static void deleteAllString()
+		{
+			for (auto ptr : sStringArray)
+			{
+				delete ptr;
+			}
+			sStringArray.clear();
+			sStringMap.clear();
+		}
+
 	private:
-		static std::unordered_map<std::string, int> sStringMap;
-		static std::vector<std::string_view> sStringArray;
+		static std::vector<std::string*> sStringArray;
+		static std::unordered_map<std::string_view, uint32_t> sStringMap;
 	};
 
 	template<typename Belong>
-	std::unordered_map<std::string, int> IDString<Belong>::sStringMap;
+	std::vector<std::string*> IDString<Belong>::sStringArray{ new std::string("TINY_EMPTY_IDSTRING") };
 
 	template<typename Belong>
-	std::vector<std::string_view> IDString<Belong>::sStringArray;
+	std::unordered_map<std::string_view, uint32_t> IDString<Belong>::sStringMap{ {*sStringArray[0], 0} };
 
 	template<typename Belong>
 	std::ostream& operator << (std::ostream& out, IDString<Belong>& idString)
 	{
-		return out << idString.getString();
+		return out << idString.toString();
 	}
 
 	// 	template<typename Belong>

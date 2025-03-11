@@ -13,7 +13,13 @@ namespace tezcat::Editor
 		void end() override;
 
 	private:
+		void scrollToCurrentObject();
+		void createPickPath(Transform* transform);
+
+	private:
 		GameObject* mSelectedGameObject;
 		Transform* mDragedTransform;
+		bool mPickObject;
+		std::stack<Transform*> mPickPath;
 	};
 }

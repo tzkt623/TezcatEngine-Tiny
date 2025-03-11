@@ -15,21 +15,32 @@
 
 <img width="1280" alt="屏幕截图 2024-06-03 144114" src="https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/52484691-2753-4d82-8995-cba8439866ff">
 
-![Image](https://github.com/user-attachments/assets/87e58d80-1cd6-43f6-8afa-afa1f5f6e9d7)
+![Image](https://github.com/user-attachments/assets/7dd9cd78-9a9c-46b5-9b7f-5c03dc5d95a2)
+
+-------------------------------------------------
 
 ## **Update**
 
-- [ ] 更新模型加载(update model load)
+- [ ] 正在添加一个引擎内部的名称系统(Adding an internal engine name system)
+- [x] 现在可以拖拽模型到总览中进行加载了(You can now drag and drop the model into the overview to load it)
+- [x] 现在可以拖拽图片到材质中进行替换(You can now drag and drop the image into the material to replace it)
+- [x] 现在可以选中场景中的单位,总览会进行自动选择(You can now select the units in the scene, and the overview will automatically select them)
+- [x] 主相机会自动启动单位选择系统(The main camera automatically starts the unit selection system)
 - [x] 添加了UnfiormBuffer(add UniformBuffer)
 - [x] 一些Shader内建变量被UniformBuffer代替(now uniformbuffer values instead of Some Buildin shader values)
-- [x] Shader编辑器有点问题(ShaderEditor has issue now)
 - [x] 全新的渲染流程架构,更加的合理好用(New Pipeline)
-- [x] 暂时取消多线程模式(Disabled multithreading mode for now)
-- [x] 一个简单的帧缓存查看器(A Sample Frames Viewer)
-- [ ] PBR效果被我改坏了(PBR Shader has issue now)
-- [ ] 正在重构资源加载和管理方式(Refactoring resoure loader and managers)
 - [x] 可以加载和显示Shader数组对象了!(Can load and display Shader array objects in Editor!)
 - [x] 约束回归!在所有Uniform对象里设置约束信息以显示在Editor中.(Constraint return! Sets Uniform objects constraint information in ShaderFile to display in Editor)
+
+## **Issue**
+
+- [ ] 模型加载并不完善,会有加载失败的模型存在(Model loading is not perfect, and there will be fail to load)
+- [ ] PBR效果被我改坏了(PBR Shader some issues now)
+- [ ] 正在重构资源加载和管理方式(Refactoring resoure loader and managers)
+- [ ] Shader编辑器有点问题(ShaderEditor has some issues now)
+- [ ] 暂时取消多线程模式(Disabled multithreading mode for now)
+
+-------------------------------------------
 
 ```glsl
 struct MatPBR_Test
@@ -82,9 +93,11 @@ Editor
 - [ ] Node Based Shader Editor
 - [x] Sample FrameBuffers Viewer
 
+-------------------------------------------------------
+
 ## **渲染管线(Pipeline)**
 
-![QQ截图20240601230356](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/77c7bbee-50df-4247-bee1-03b3d7c8e124)
+![20240601230356](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/77c7bbee-50df-4247-bee1-03b3d7c8e124)
 
 - ObserverPipelinePass
   
@@ -183,7 +196,7 @@ Now Object Overview can show components bind in object when you selected, and yo
 
 Now Editor can rebuild shader in runtime.
 
-### 资源管理器(Resource Browse)
+### 资源管理器(Resource Browser)
 
 双击图片文件可以打开查看
 
@@ -193,11 +206,19 @@ Double Click image file to open viwer
 
 Try Drag image file to envlighting map widget
 
+### 帧缓存查看器(FrameBuffer Viewer)
+
+查看当前的帧缓存信息
+
+Check the frame information
+
 ## **内存管理(Memory Management)**
 
 做了一套简单的基于引用计数的内存管理,还在调试中......
 
 A simple reference counting based memory management, just still debugging......
+
+-----------------------------------------------
 
 ## **创建引擎对象(Create TinyObject)**
 

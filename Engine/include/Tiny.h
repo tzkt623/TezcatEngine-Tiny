@@ -45,6 +45,7 @@
 #include "Core/Manager/ModelManager.h"
 #include "Core/Manager/ShadowCasterManager.h"
 #include "Core/Manager/ResourceManager.h"
+#include "Core/Manager/GameObjectManager.h"
 
 #include "Core/Scene.h"
 

@@ -1,0 +1,162 @@
+#TINY_HEAD_BEGIN
+{
+    str Name = Standard/StdValue1;
+}
+#TINY_HEAD_END
+
+#TINY_PASS_BEGIN
+{
+    #TINY_CFG_BEGIN
+    {
+        int Version = 330;
+        int OrderID = 50;
+        str Queue = Opaque;
+        str DepthTest = Less;
+        bool ZWrite = true;
+        str CullFace = Back;
+        str LightMode = Forward;
+    }
+    #TINY_CFG_END
+
+    #TINY_VA_BEGIN
+    {
+        inout TINY_VS2FS
+        {
+            float4 color;
+            float2 uv;
+            float3 normal;
+            float3 worldPosition;
+            float4 lightPosition;
+        };
+    }
+    #TINY_VA_END
+
+    #TINY_VS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        layout (location = 0) in float3 aPos;
+        layout (location = 1) in float3 aNormal;
+        layout (location = 2) in float2 aUV;
+        layout (location = 3) in float4 aColor;
+
+        out float4 myColor;
+        out float2 myUV;
+        out float3 myNormal;
+        out float3 myWorldPosition;
+        out float4 myLightPosition;
+
+        void main()
+        {
+            float4 position =  float4(aPos, 1.0);
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
+
+            myColor = aColor;
+            myUV = aUV;
+            myNormal = TINY_MatrixN * aNormal;
+            myWorldPosition = float3(TINY_MatrixM * position);
+            myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
+        }
+    }
+    #TINY_VS_END
+
+    #TINY_FS_BEGIN
+    {
+        #include "../Include/tiny_fs.tyin"
+
+        in float4 myColor;
+        in float2 myUV;
+        in float3 myNormal;
+        in float3 myWorldPosition;
+        in float4 myLightPosition;
+        
+        out float4 myFinalColor;
+
+        [Editor(Diffuse)]
+        uniform float3 myDiffuse;
+        [Editor(Specular)]
+        uniform float3 mySpecular;
+        [Editor(Shininess)]
+        uniform float myShininess;
+
+        float4 reflection(float3 I)
+        {
+            //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
+            float3 R = reflect(I, normalize(myNormal));
+            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
+        }
+
+        float4 refraction(float3 I)
+        {
+            float ratio = 1.00 / 1.52;
+            //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
+            float3 R = refract(I, normalize(myNormal), ratio);
+            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
+        }
+
+        float3 calcDirectionLight(LightDirection lit, float3 viewDir, float3 normal)
+        {
+            float3 light_dir = normalize(-lit.direction);
+            float3 half_dir = normalize(viewDir + light_dir); 
+
+            float NdL = dot(normal, light_dir);
+            float NdH = dot(normal, half_dir);
+
+            float diff = max(NdL, 0.0);
+            float spec = pow(max(NdH, 0.0), myShininess);
+
+            float3 ambient = lit.ambient * myDiffuse;
+            float3 diffuse = lit.diffuse * diff * myDiffuse;
+            float3 specular = lit.specular * spec * mySpecular;
+
+            // shadow
+            float shadow = calcShadow(myLightPosition, normal, light_dir, TINY_TexShadow);
+            float3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular));
+
+            return lighting;
+        }
+
+        void main()
+        {
+            float3 normal = normalize(myNormal);
+            float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
+            myFinalColor = float4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
+            //myFinalColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
+        }
+    }
+    #TINY_FS_END
+}
+#TINY_PASS_END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

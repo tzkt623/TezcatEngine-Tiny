@@ -29,7 +29,7 @@ namespace tezcat::Tiny
 	class ObserverPipelinePass;
 	class GameObject;
 
-	enum class ViewType : uint8
+	enum class ViewType : uint8_t
 	{
 		Screen = 0,
 		Ortho,
@@ -62,32 +62,32 @@ namespace tezcat::Tiny
 
 		bool isDataMode() const { return mCullLayerList.empty(); }
 
-		bool cullLayerMask(uint32 index)
+		bool cullLayerMask(uint32_t index)
 		{
 			auto mask = 1 << index;
 			return (mCullMask & mask) == mask;
 		}
 
-		void setCullLayer(uint32 index)
+		void setCullLayer(uint32_t index)
 		{
 			mCullMask = 1 << index;
 			mCullLayerList.clear();
 			mCullLayerList.push_back(index);
 		}
 
-		void addCullLayer(uint32 index)
+		void addCullLayer(uint32_t index)
 		{
 			mCullMask |= (1 << index);
 			mCullLayerList.push_back(index);
 		}
 
-		void removeCullLayer(uint32 index)
+		void removeCullLayer(uint32_t index)
 		{
 			mCullMask &= ~(1 << index);
 			mCullLayerList.erase(std::find(mCullLayerList.begin(), mCullLayerList.end(), index));
 		}
 
-		const std::vector<uint32>& getCullLayerList() const { return mCullLayerList; }
+		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
 
 		void addToPipeline();
 		void removeFromPipeline();
@@ -95,16 +95,16 @@ namespace tezcat::Tiny
 		void onExitPipeline();
 
 	public:
-		void setViewRect(int32 x, int32 y, int32 width, int32 height);
-		void setViewRect(int32 width, int32 height);
+		void setViewRect(int32_t x, int32_t y, int32_t width, int32_t height);
+		void setViewRect(int32_t width, int32_t height);
 		ViewportInfo& getViewportInfo() { return mViewInfo; }
 
 		float4x4& getProjectionMatrix() { return mProjectionMatrix; }
 
 		virtual float4x4& getViewMatrix() = 0;
-		virtual float4x4& getViewMatrix(int32 index) const = 0;
+		virtual float4x4& getViewMatrix(int32_t index) const = 0;
 		virtual float4x4* getViewMatrixAry() const = 0;
-		virtual int32 getViewMatrixArySize() const = 0;
+		virtual int32_t getViewMatrixArySize() const = 0;
 
 		void setOrtho(float near, float far);
 		void setPerspective(float fov, float near, float far);
@@ -113,9 +113,9 @@ namespace tezcat::Tiny
 		const ClearOption& getClearOption() const { return mClearOption; }
 
 	public:
-		int32 getOrderID() const { return mOrder; }
+		int32_t getOrderID() const { return mOrder; }
 		//Range[-127,128]
-		void setOrderID(int8 val)
+		void setOrderID(int8_t val)
 		{
 			mOrder = val;
 		}
@@ -156,7 +156,7 @@ namespace tezcat::Tiny
 		void setEnable(bool val);
 		bool getEnable() const { return mEnable; }
 
-		uint32 getUID() const { return mUID; }
+		uint32_t getUID() const { return mUID; }
 
 	public:
 		bool updateObserverMatrix();
@@ -168,11 +168,11 @@ namespace tezcat::Tiny
 		Transform* mTransform;
 
 	protected:
-		uint32 mUID;
+		uint32_t mUID;
 		bool mNeedRemove;
 		bool mEnable;
 		bool mDirty;
-		int32 mOrder;
+		int32_t mOrder;
 		ViewType mViewType;
 		float mNearFace;
 		float mFarFace;
@@ -182,8 +182,8 @@ namespace tezcat::Tiny
 		ViewportInfo mViewInfo;
 
 	protected:
-		uint32 mCullMask;
-		std::vector<uint32> mCullLayerList;
+		uint32_t mCullMask;
+		std::vector<uint32_t> mCullLayerList;
 		ClearOption mClearOption;
 
 	protected:
@@ -208,9 +208,9 @@ namespace tezcat::Tiny
 		virtual void submit(Shader* shader) override;
 		virtual float4x4& getViewMatrix() { return mViewMatrix; }
 
-		virtual float4x4& getViewMatrix(int32 index) const final { TINY_THROW("Fatal Error!"); }
+		virtual float4x4& getViewMatrix(int32_t index) const final { TINY_THROW("Fatal Error!"); }
 		virtual float4x4* getViewMatrixAry() const final { TINY_THROW("Fatal Error!"); }
-		virtual int32 getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
+		virtual int32_t getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
 
 	private:
 		float4x4 mViewMatrix;
@@ -229,9 +229,9 @@ namespace tezcat::Tiny
 		virtual void submit(Shader* shader) override;
 		virtual float4x4& getViewMatrix() { return mViewMatrix; }
 
-		virtual float4x4& getViewMatrix(int32 index) const final { TINY_THROW("Fatal Error!"); }
+		virtual float4x4& getViewMatrix(int32_t index) const final { TINY_THROW("Fatal Error!"); }
 		virtual float4x4* getViewMatrixAry() const final { TINY_THROW("Fatal Error!"); }
-		virtual int32 getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
+		virtual int32_t getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
 
 	protected:
 		float4x4 mViewMatrix;
@@ -245,7 +245,7 @@ namespace tezcat::Tiny
 	public:
 		virtual ~RenderObserverMultView();
 
-		void setViewMartixArray(float4x4* array, int32 size);
+		void setViewMartixArray(float4x4* array, int32_t size);
 
 		virtual void submit(Shader* shader) override;
 		virtual void prepareRender() override;
@@ -253,9 +253,9 @@ namespace tezcat::Tiny
 	public:
 		virtual float4x4& getViewMatrix() override final { TINY_THROW("Fatal Error!"); }
 
-		virtual float4x4& getViewMatrix(int32 index) const override { return mViewMatrixArray[index]; }
+		virtual float4x4& getViewMatrix(int32_t index) const override { return mViewMatrixArray[index]; }
 		virtual float4x4* getViewMatrixAry() const override { return mViewMatrixArray; }
-		virtual int32 getViewMatrixArySize() const override { return mArraySize; }
+		virtual int32_t getViewMatrixArySize() const override { return mArraySize; }
 
 	protected:
 		float4x4* mViewMatrixArray;
@@ -270,17 +270,17 @@ public:\
 	float getNear() const { return memberName->getNear(); }\
 	float getFar() const { return memberName->getFar(); }\
 	float getAspect() const { return memberName->getAspect(); }\
-	int32 getOrderID() const { return memberName->getOrderID(); }\
+	int32_t getOrderID() const { return memberName->getOrderID(); }\
 	ViewType getViewType() const { return memberName->getViewType(); }\
 public:\
-	void setOrderID(int32 val) { memberName->setOrderID(val); }\
+	void setOrderID(int32_t val) { memberName->setOrderID(val); }\
 	void setOrtho(float near, float far) { return memberName->setOrtho(near, far); }\
 	void setPerspective(float fov, float near, float far) { return memberName->setPerspective(fov, near, far); }\
 	void setClearOption(ClearOptionID option) { memberName->setClearOption(option); }\
 	const ClearOption& getClearOption() const { return memberName->getClearOption(); }\
-	void setViewRect(int32 x, int32 y, int32 width, int32 height) { memberName->setViewRect(x, y, width, height); }\
-	void setCullLayer(uint32 index) { memberName->setCullLayer(index); }\
-	void addCullLayer(uint32 index) { memberName->addCullLayer(index); }\
-	void removeCullLayer(uint32 index) { memberName->removeCullLayer(index); }\
+	void setViewRect(int32_t x, int32_t y, int32_t width, int32_t height) { memberName->setViewRect(x, y, width, height); }\
+	void setCullLayer(uint32_t index) { memberName->setCullLayer(index); }\
+	void addCullLayer(uint32_t index) { memberName->addCullLayer(index); }\
+	void removeCullLayer(uint32_t index) { memberName->removeCullLayer(index); }\
 	void setFrameBuffer(FrameBuffer* frameBuffer) { memberName->setFrameBuffer(frameBuffer); }
 }

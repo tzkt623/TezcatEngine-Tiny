@@ -21,6 +21,7 @@
 
 namespace tezcat::Tiny
 {
+
 	class TINY_API TinyObject : public TinyRefObject
 	{
 		TINY_ABSTRACT_OBJECT_H(TinyObject, TinyRefObject)
@@ -30,5 +31,19 @@ namespace tezcat::Tiny
 
 	public:
 		static void destroy(TinyObject* obj);
+
+		template<class TinyObjectT>
+		static TinyObjectT* setObject(TinyObjectT* oldObject, TinyObjectT* newObject)
+		{
+			if (oldObject != nullptr)
+			{
+				oldObject->deleteObject();
+			}
+
+			newObject->saveObject();
+			return newObject;
+		}
 	};
+
+#define TINY_OBJECT_SET(oldObj, newObj) oldObj = TinyObject::setObject(oldObj, newObj)
 }

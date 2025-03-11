@@ -34,12 +34,11 @@ namespace tezcat::Tiny
 
 	}
 
-	Vertex::Vertex(std::string name)
-		: mName(std::move(name))
-		, mChildren(nullptr)
+	Vertex::Vertex(const std::string& name)
+		: mChildren(nullptr)
 		, mIndexBuffer(nullptr)
 	{
-
+		mEngineName = name;
 	}
 
 	Vertex::~Vertex()
@@ -49,9 +48,9 @@ namespace tezcat::Tiny
 
 	void Vertex::setMesh(MeshData* meshData)
 	{
-		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32)meshData->mDrawMode];
-		mVertexCount = (uint32)meshData->mVertices.size();
-		mName = meshData->getName();
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->mDrawMode];
+		mVertexCount = (uint32_t)meshData->mVertices.size();
+		mEngineName = meshData->getName();
 
 		for (auto& position : meshData->mLayoutPositions)
 		{
@@ -65,17 +64,17 @@ namespace tezcat::Tiny
 		auto [size, data] = meshData->getIndexData();
 		if (size > 0)
 		{
-			mIndexCount = (uint32)meshData->mIndices.size();
+			mIndexCount = (uint32_t)meshData->mIndices.size();
 			auto index = IndexBuffer::create();
 			index->init(size, data);
 			this->setIndexBuffer(index);
 		}
 	}
 
-	void Vertex::setMesh(const std::string& name, const uint32& vertexCount, const DrawMode& drawMode)
+	void Vertex::setMesh(const std::string& name, const uint32_t& vertexCount, const DrawMode& drawMode)
 	{
-		mName = name;
-		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32)drawMode];
+		mEngineName = name;
+		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)drawMode];
 		mVertexCount = vertexCount;
 	}
 
@@ -130,6 +129,11 @@ namespace tezcat::Tiny
 
 			delete mChildren;
 		}
+	}
+
+	std::string Vertex::getMemoryInfo()
+	{
+		return TINY_OBJECT_MEMORY_INFO();
 	}
 }
 

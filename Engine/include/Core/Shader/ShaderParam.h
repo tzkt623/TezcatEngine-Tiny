@@ -57,6 +57,7 @@ namespace tezcat::Tiny
 		static UniformID LightWorldPosition;
 
 		static UniformID TexDepth;
+		static UniformID TexShadow;
 		static UniformID TexSkybox;
 		static UniformID TexIrradiance;
 		static UniformID TexPrefilter;

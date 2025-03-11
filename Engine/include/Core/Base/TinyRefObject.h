@@ -18,6 +18,7 @@
 */
 
 #include "TinyGC.h"
+#include "../Tool/IDString.h"
 
 namespace tezcat::Tiny
 {
@@ -39,6 +40,7 @@ namespace tezcat::Tiny
 	};
 
 	class TinyObject;
+	class TinyRefObject;
 	/*
 	* TinyRefObject
 	* @brief 引用对象,靠引用计数来管理自身生命周期
@@ -46,6 +48,9 @@ namespace tezcat::Tiny
 	* @brief subRef减少引用
 	*
 	*/
+
+	using TinyString = IDString<TinyRefObject>;
+
 	class TINY_API TinyRefObject
 	{
 		friend class TinyBaseWeakRef;
@@ -71,6 +76,12 @@ namespace tezcat::Tiny
 
 		//use this to delete object
 		void deleteObject();
+
+		virtual std::string getMemoryInfo() { return this->getClassName(); }
+
+		TinyString getEngineName() { return mEngineName; }
+		void setEngineName(const std::string& name) { mEngineName = name; }
+
 
 	public:
 		TinyGCInfoID getTinyID() const { return mGCInfo->index; }
@@ -118,6 +129,9 @@ namespace tezcat::Tiny
 		{
 
 		}
+
+	protected:
+		TinyString mEngineName;
 	};
 
 	//-----------------------------------------------------
@@ -521,4 +535,7 @@ visit:\
 		typeid(currentClass),\
 		TinyRefObject::giveID()\
 	};
+
+#define TINY_OBJECT_MEMORY_INFO_WTIH_NAME(engineName) std::format("{}", engineName.toString())
+#define TINY_OBJECT_MEMORY_INFO() TINY_OBJECT_MEMORY_INFO_WTIH_NAME(mEngineName)
 }

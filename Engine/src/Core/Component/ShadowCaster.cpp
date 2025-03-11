@@ -37,7 +37,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(ShadowCaster, ComponentT<ShadowCaster>)
+	TINY_OBJECT_CPP(ShadowCaster, ComponentT<ShadowCaster>);
 
 	ShadowCaster::ShadowCaster()
 		: mShadowObserver()
@@ -60,11 +60,11 @@ namespace tezcat::Tiny
 
 		mShadowObserver = ShadowObserver::create();
 		mShadowObserver->saveObject();
+		mShadowObserver->setCullLayer(0);
 		mShadowObserver->setOrderID(-126);
 
 		mPipePass = ReplacedPipelinePass::create(mShadowObserver
 			, ShaderManager::find("Unlit/ShadowMap"));
-		mPipePass->setUseCullLayerData(true);
 		mPipePass->saveObject();
 	}
 
@@ -112,7 +112,7 @@ namespace tezcat::Tiny
 			, DataMemFormat::Float);
 		mShadowTexture->setAttachPosition(TextureAttachPosition::DepthComponent);
 
-		mFrameBuffer = FrameBuffer::create(shaderName + std::to_string(mUID));
+		mFrameBuffer = FrameBuffer::create(std::format("{}{}", shaderName, mUID));
 		mFrameBuffer->saveObject();
 		mFrameBuffer->addAttachment(mShadowTexture);
 		mFrameBuffer->generate();
@@ -125,6 +125,6 @@ namespace tezcat::Tiny
 	{
 		auto pv = mShadowObserver->getProjectionMatrix() * mShadowObserver->getViewMatrix();
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixLightVP, pv);
-		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexDepth, mShadowTexture);
+		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexShadow, mShadowTexture);
 	}
 }

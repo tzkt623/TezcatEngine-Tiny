@@ -20,6 +20,7 @@
 #include "Core/Manager/ShaderManager.h"
 #include "Core/Manager/VertexBufferManager.h"
 #include "Core/Data/MeshData.h"
+#include "Core/Manager/ResourceManager.h"
 
 
 namespace tezcat::Tiny
@@ -44,6 +45,10 @@ namespace tezcat::Tiny
 		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
 		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
 		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
+
+		ResourceManager::loadDefault<Image>("Image/Tiny/TinyDiffuse.png");
+		ResourceManager::loadDefault<Image>("Image/Tiny/TinyShininess.png");
+		ResourceManager::loadDefault<Image>("Image/Tiny/TinySpecular.png");
 
 		this->createBuildinModules();
 	}

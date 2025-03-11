@@ -16,12 +16,19 @@
 */
 
 #include "Core/Data/MeshData.h"
+
 #include "Core/Renderer/Vertex.h"
+
 #include "Core/Component/Transform.h"
 #include "Core/Component/GameObject.h"
 #include "Core/Component/MeshRenderer.h"
+
+#include "Core/Manager/ResourceManager.h"
 #include "Core/Manager/ShaderManager.h"
+
 #include "Core/Shader/Shader.h"
+
+#include "Core/Debug/Debug.h"
 
 #include "ThirdParty/assimp/Importer.hpp"
 #include "ThirdParty/assimp/scene.h"
@@ -154,11 +161,11 @@ namespace tezcat::Tiny
 	//	ModelNode
 	//
 	ModelNode::ModelNode()
-		: mChildren(nullptr)
-		, mChildrenCount(0)
-		, mVertex(nullptr)
+		: mVertex(nullptr)
 		, mIndex(0)
-		, mInited(false)
+		, mParentIndex(-1)
+		, mTextureMap(nullptr)
+		, mIsEnableBlend(false)
 	{
 
 	}
@@ -168,21 +175,20 @@ namespace tezcat::Tiny
 		if (mVertex)
 		{
 			mVertex->deleteObject();
+			mVertex = nullptr;
 		}
 
-		if (mChildren)
+		if (mTextureMap)
 		{
-			for (uint32_t i = 0; i < mChildrenCount; i++)
-			{
-				delete mChildren[i];
-			}
+			delete mTextureMap;
+			mTextureMap = nullptr;
 		}
-		delete[] mChildren;
-	}
 
-	void ModelNode::addChild(ModelNode* node)
-	{
-		mChildren[mIndex++] = node;
+		if (mValueMap)
+		{
+			delete mValueMap;
+			mValueMap = nullptr;
+		}
 	}
 
 	void ModelNode::setVertex(Vertex* vertex)
@@ -191,23 +197,77 @@ namespace tezcat::Tiny
 		mVertex->saveObject();
 	}
 
-	void ModelNode::init(uint32_t meshCount, uint32_t childCount)
+	std::unordered_map<MaterialTextureSlot, std::string>& ModelNode::getTextureMap()
 	{
-		if (mInited)
+		if (mTextureMap == nullptr)
 		{
-			return;
+			mTextureMap = new std::unordered_map<MaterialTextureSlot, std::string>();
 		}
 
-		mInited = true;
-		if (meshCount > 1)
+		return *mTextureMap;
+	}
+
+	std::tuple<bool, std::string_view> ModelNode::getTextureMap(MaterialTextureSlot slot)
+	{
+		auto result = mTextureMap->find(slot);
+		return { result != mTextureMap->end(), result->second };
+	}
+
+	std::unordered_map<MaterialTextureSlot, ModelNode::Value>& ModelNode::getValueMap()
+	{
+		if (mValueMap == nullptr)
 		{
-			childCount += meshCount;
+			mValueMap = new std::unordered_map<MaterialTextureSlot, ModelNode::Value>();
 		}
 
-		if (childCount > 0)
+		return *mValueMap;
+	}
+
+	std::tuple<bool, ModelNode::Value> ModelNode::getValueMap(MaterialTextureSlot slot)
+	{
+		auto result = mValueMap->find(slot);
+		return { result != mValueMap->end(), result->second };
+	}
+
+	void ModelNode::setBlend(Blend source, Blend target)
+	{
+		mSource = source;
+		mTarget = target;
+	}
+
+	ModelNode::Value* ModelNode::tryGetValue(MaterialTextureSlot slot)
+	{
+		if (mValueMap == nullptr)
 		{
-			mChildrenCount = childCount;
-			mChildren = new ModelNode * [mChildrenCount];
+			return nullptr;
+		}
+
+		auto it = mValueMap->find(slot);
+		if (it == mValueMap->end())
+		{
+			return nullptr;
+		}
+		else
+		{
+			return &it->second;
+		}
+	}
+
+	std::string* ModelNode::tryGetTexture(MaterialTextureSlot slot)
+	{
+		if (mTextureMap == nullptr)
+		{
+			return nullptr;
+		}
+
+		auto it = mTextureMap->find(slot);
+		if (it == mTextureMap->end())
+		{
+			return nullptr;
+		}
+		else
+		{
+			return &it->second;
 		}
 	}
 
@@ -224,16 +284,17 @@ namespace tezcat::Tiny
 
 	}
 
-	void Model::load(const std::string& path)
+	bool Model::load(const file_path& path)
 	{
+		mPath = path;
 		uint32_t load_flag = aiProcess_CalcTangentSpace
 			| aiProcess_Triangulate
 			| aiProcess_JoinIdenticalVertices
 			| aiProcess_SortByPType
 			| aiProcess_GenSmoothNormals
-			| aiProcess_FlipUVs
+			//| aiProcess_FlipUVs			//DX需要这一段,GL不需要
 			| aiProcess_RemoveComponent
-			//| aiProcess_OptimizeMeshes //当前参数执行后会自动优化mesh个数
+			//| aiProcess_OptimizeMeshes	//当前参数执行后会自动优化mesh个数
 			| aiProcess_OptimizeGraph
 			| aiProcess_SplitLargeMeshes
 			;
@@ -248,15 +309,18 @@ namespace tezcat::Tiny
 		importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, remove_flag);
 		importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
 
-		const aiScene* ai_scene = importer.ReadFile(path, load_flag);
+		const aiScene* ai_scene = importer.ReadFile(mPath.string(), load_flag);
 
 		if (ai_scene == nullptr)
 		{
-			return;
+			TINY_LOG_WARNING(std::format("Can`t load this model"));
+			return false;
 		}
 
 		mChildren.reserve(ai_scene->mNumMeshes);
 		this->createModelNode(ai_scene, ai_scene->mRootNode, -1);
+
+		return true;
 	}
 
 	void Model::createModelNode(const aiScene* aiscene, aiNode* ainode, int32_t parentIndex)
@@ -296,17 +360,18 @@ namespace tezcat::Tiny
 		//说明当前层本身就是mesh
 		else if (ainode->mNumMeshes == 1)
 		{
-			auto ai_mesh = aiscene->mMeshes[ainode->mMeshes[0]];
-			auto mesh_data = this->createMesh(ai_mesh, aiscene, ainode);
+			auto mesh = aiscene->mMeshes[ainode->mMeshes[0]];
+			auto mesh_data = this->createMesh(mesh, aiscene, ainode);
 
 			auto vertex = Vertex::create();
 			vertex->setMesh(mesh_data);
 			vertex->generate();
 
 			this_layer = new ModelNode();
-			this_layer->mName = ai_mesh->mName.C_Str();
+			this_layer->mName = mesh->mName.C_Str();
 			this_layer->mParentIndex = parentIndex;
 			this_layer->setVertex(vertex);
+			this->setMaterial(this_layer, aiscene->mMaterials[mesh->mMaterialIndex]);
 
 			this_layer->mIndex = mChildren.size();
 			mChildren.push_back(this_layer);
@@ -345,7 +410,7 @@ namespace tezcat::Tiny
 		bool has_tangents = aimesh->HasTangentsAndBitangents();
 		auto& transform = node->mTransformation;
 
-		aiColor4D diffuseColor(0.f, 0.f, 0.f, 1.f);
+		aiColor4D diffuseColor(0.0f, 0.0f, 0.0f, 1.f);
 
 		for (uint32_t ver_i = 0; ver_i < aimesh->mNumVertices; ver_i++)
 		{
@@ -415,12 +480,6 @@ namespace tezcat::Tiny
 
 	GameObject* Model::generate()
 	{
-		auto shader = ShaderManager::find("Standard/PBRTest1");
-		auto index_albedo = shader->getUniformIndex("myPBR.albedo");
-		auto index_metallic = shader->getUniformIndex("myPBR.metallic");
-		auto index_roughness = shader->getUniformIndex("myPBR.roughness");
-		auto index_ao = shader->getUniformIndex("myPBR.ao");
-
 		std::vector<GameObject*> go_array;
 		go_array.reserve(mChildren.size());
 
@@ -435,13 +494,140 @@ namespace tezcat::Tiny
 				auto mr = go->addComponent<MeshRenderer>();
 				mr->setMesh(node->mVertex);
 
-				auto material = Material::create(shader);
-				mr->setMaterial(material);
+				if (node->mIsPBR)
+				{
+					if (node->mHasTexture)
+					{
+						auto shader = ShaderManager::find("Standard/PBRStd1");
+						auto material = Material::create(shader);
+						mr->setMaterial(material);
 
-				material->setUniform<UniformF3>(index_albedo, float3(1.0f, 1.0f, 1.0f));
-				material->setUniform<UniformF1>(index_metallic, 0.8);
-				material->setUniform<UniformF1>(index_roughness, 0.3);
-				material->setUniform<UniformF1>(index_ao, 1.0f);
+						auto index_albedo = shader->getUniformIndex("myPBR.albedo2D");
+						auto index_metallic = shader->getUniformIndex("myPBR.metallic2D");
+						auto index_roughness = shader->getUniformIndex("myPBR.roughness2D");
+						auto index_ao = shader->getUniformIndex("myPBR.ao2D");
+
+						material->setUniform<UniformTex2D>(index_albedo
+							, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_BASE_COLOR)));
+						material->setUniform<UniformTex2D>(index_metallic
+						, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_METALNESS)));
+						material->setUniform<UniformTex2D>(index_roughness
+						, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_ROUGHNESS)));
+						material->setUniform<UniformTex2D>(index_ao
+						, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_AMBIENT_OCCLUSION)));
+					}
+					else
+					{
+						auto shader = ShaderManager::find("Standard/PBRTest1");
+						auto material = Material::create(shader);
+						mr->setMaterial(material);
+
+						auto index_albedo = shader->getUniformIndex("myPBR.albedo");
+						auto index_metallic = shader->getUniformIndex("myPBR.metallic");
+						auto index_roughness = shader->getUniformIndex("myPBR.roughness");
+						auto index_ao = shader->getUniformIndex("myPBR.ao");
+
+						auto& color_albedo = node->getValueMap().at(MaterialTextureSlot::PBR_BASE_COLOR);
+						material->setUniform<UniformF3>(index_albedo
+							, float3(color_albedo.color.r, color_albedo.color.g, color_albedo.color.b));
+
+						material->setUniform<UniformF1>(index_metallic
+							, node->getValueMap().at(MaterialTextureSlot::PBR_METALNESS).v1);
+						material->setUniform<UniformF1>(index_roughness
+							, node->getValueMap().at(MaterialTextureSlot::PBR_ROUGHNESS).v1);
+						material->setUniform<UniformF1>(index_ao
+							, node->getValueMap().at(MaterialTextureSlot::PBR_AMBIENT_OCCLUSION).v1);
+					}
+				}
+				else
+				{
+					if (node->mHasTexture)
+					{
+						auto shader = ShaderManager::find("Standard/Std1");
+						auto material = Material::create(shader);
+						mr->setMaterial(material);
+
+						auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
+						auto index_specular = shader->getUniformIndex("myTexSpecular2D");
+						auto index_shininess = shader->getUniformIndex("myTexShininess2D");
+
+						auto diff = node->tryGetTexture(MaterialTextureSlot::TEX_DIFFUSE);
+						if (diff)
+						{
+							auto tex = ResourceManager::loadAndSave<Texture2D>(*diff);
+							material->setUniform<UniformTex2D>(index_diffuse, tex);
+						}
+						else
+						{
+							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyDiffuse.png");
+							material->setUniform<UniformTex2D>(index_diffuse, tex);
+						}
+
+						auto spe = node->tryGetTexture(MaterialTextureSlot::TEX_SPECULA);
+						if (spe)
+						{
+							auto tex = ResourceManager::loadAndSave<Texture2D>(*diff);
+							material->setUniform<UniformTex2D>(index_specular, tex);
+						}
+						else
+						{
+							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinySpecular.png");
+							material->setUniform<UniformTex2D>(index_specular, tex);
+						}
+
+						auto shi = node->tryGetTexture(MaterialTextureSlot::TEX_SHININESS);
+						if (shi)
+						{
+							auto tex = ResourceManager::loadAndSave<Texture2D>(*shi);
+							material->setUniform<UniformTex2D>(index_shininess, tex);
+						}
+						else
+						{
+							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinySpecular.png");
+							material->setUniform<UniformTex2D>(index_shininess, tex);
+						}
+					}
+					else
+					{
+						auto shader = ShaderManager::find("Standard/StdValue1");
+						auto material = Material::create(shader);
+						mr->setMaterial(material);
+
+						auto index_diffuse = shader->getUniformIndex("myDiffuse");
+						auto index_specular = shader->getUniformIndex("mySpecular");
+						auto index_shininess = shader->getUniformIndex("myShininess");
+
+						auto v1 = node->tryGetValue(MaterialTextureSlot::DIFFUSE);
+						if (v1)
+						{
+							material->setUniform<UniformF3>(index_diffuse, float3(v1->color.r, v1->color.g, v1->color.b));
+						}
+						else
+						{
+							material->setUniform<UniformF3>(index_diffuse, float3(1.0f, 0.0f, 1.0f));
+						}
+
+						auto v2 = node->tryGetValue(MaterialTextureSlot::SPECULA);
+						if (v2)
+						{
+							material->setUniform<UniformF3>(index_specular, float3(v2->color.r, v2->color.g, v2->color.b));
+						}
+						else
+						{
+							material->setUniform<UniformF3>(index_specular, float3(1.0f, 0.0f, 1.0f));
+						}
+
+						auto v3 = node->tryGetValue(MaterialTextureSlot::SHININESS);
+						if (v3)
+						{
+							material->setUniform<UniformF1>(index_shininess, v3->v1);
+						}
+						else
+						{
+							material->setUniform<UniformF1>(index_shininess, 0.0f);
+						}
+					}
+				}
 			}
 
 			go_array.push_back(go);
@@ -460,14 +646,218 @@ namespace tezcat::Tiny
 		return go_array[0];
 	}
 
+	template <typename Enum>
+	constexpr auto EnumNameArray()
+	{
+		if constexpr (std::is_same_v<Enum, MaterialTextureSlot>)
+		{
+			return std::array
+			{
+				"AMBIENT",
+				"TEX_AMBIENT",
+
+				"DIFFUSE",
+				"TEX_DIFFUSE",
+
+				"SPECULA",
+				"TEX_SPECULA",
+
+				"NORMALS",
+				"TEX_NORMALS",
+
+				"EMISSIVE",
+				"TEX_EMISSIVE",
+
+				"SHININESS",
+				"TEX_SHININESS",
+
+				"REFLECTION",
+				"TEX_REFLECTION",
+
+				"TRANSPARENT",
+				"TEX_TRANSPARENT",
+
+				//PBR
+				"PBR_BASE_COLOR",
+				"PBR_TEX_BASE_COLOR",
+
+				"PBR_NORMAL",
+				"PBR_TEX_NORMAL",
+
+				"PBR_ROUGHNESS",
+				"PBR_TEX_ROUGHNESS",
+
+				"PBR_EMISSION",
+				"PBR_TEX_EMISSION",
+
+				"PBR_AMBIENT_OCCLUSION",
+				"PBR_TEX_AMBIENT_OCCLUSION",
+
+
+				"PBR_METALNESS",
+				"PBR_TEX_METALNESS",
+
+				"PBR_GLOSSINESS",
+				"PBR_TEX_GLOSSINESS",
+			};
+		}
+	}
+
+	template <typename Enum>
+	constexpr const char* ConvertEnumToString(Enum value)
+	{
+		return EnumNameArray<Enum>()[static_cast<int32_t>(value)];
+	}
+
+#define TINY_BEGIN_ENUM
+
 	void Model::setMaterial(ModelNode* node, aiMaterial* aiMaterial)
 	{
-		aiString texturePath;
-		aiMaterial->GetTexture(aiTextureType_AMBIENT, 0, &texturePath);
-		aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
-		aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
-
-		aiColor3D diffuseColor(0.f, 0.f, 0.f);
-		aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+		//this->setBlend(node, aiMaterial);
+		this->setShading(node, aiMaterial);
 	}
+
+	void Model::setBlend(ModelNode* node, aiMaterial* aiMaterial)
+	{
+		aiBlendMode blend_mode = aiBlendMode_Default;
+		if (aiMaterial->Get(AI_MATKEY_BLEND_FUNC, blend_mode) == aiReturn_SUCCESS)
+		{
+			node->mIsEnableBlend = true;
+			switch (blend_mode)
+			{
+			case aiBlendMode_Default:
+				node->setBlend(Blend::SourceAlpha, Blend::One_Minus_SourceAlpha);
+				break;
+			case aiBlendMode_Additive:
+				node->setBlend(Blend::One, Blend::One);
+				break;
+			case _aiBlendMode_Force32Bit:
+			default:
+				node->setBlend(Blend::SourceAlpha, Blend::One_Minus_SourceAlpha);
+				break;
+			}
+		}
+	}
+
+	void Model::setShading(ModelNode* node, aiMaterial* aiMaterial)
+	{
+		aiString texturePath;
+		auto loadTexture = [&node, &aiMaterial, &texturePath](aiTextureType type, MaterialTextureSlot slot)
+			{
+				if (aiMaterial->GetTexture(type, 0, &texturePath) == aiReturn_SUCCESS)
+				{
+					node->getTextureMap().emplace(slot, texturePath.C_Str());
+					TINY_LOG_INFO(std::format("{} | {}", ConvertEnumToString(slot), texturePath.C_Str()));
+				}
+			};
+
+		aiColor4D color;
+		auto loadColor = [&node, &aiMaterial, &color](const char* key, unsigned int type, unsigned int idx, MaterialTextureSlot slot)
+			{
+				if (aiMaterial->Get(key, type, idx, color) == aiReturn_SUCCESS)
+				{
+					ModelNode::Value temp
+					{
+						color.r,
+						color.g,
+						color.b,
+						color.a
+					};
+					node->getValueMap().emplace(slot, temp);
+					TINY_LOG_INFO(std::format("{} | R:{} G:{} B:{} A:{}", ConvertEnumToString(slot), temp.color.r, temp.color.g, temp.color.b, temp.color.a));
+				}
+			};
+
+		float value = 0;
+		auto loadValue = [&node, &aiMaterial, &value](const char* key, unsigned int type, unsigned int idx, MaterialTextureSlot slot)
+			{
+				if (aiMaterial->Get(key, type, idx, value) == aiReturn_SUCCESS)
+				{
+					ModelNode::Value temp{ .v1 = value };
+					node->getValueMap().emplace(slot, temp);
+					TINY_LOG_INFO(std::format("{} | V:{}", ConvertEnumToString(slot), temp.v1));
+				}
+			};
+
+		aiShadingMode shading_mode = aiShadingMode_NoShading;
+		if (aiMaterial->Get(AI_MATKEY_SHADING_MODEL, shading_mode) == aiReturn_SUCCESS)
+		{
+			if (shading_mode == aiShadingMode_PBR_BRDF)
+			{
+				node->mIsPBR = true;
+				if (AssimpHelper::isPBRTexture(aiMaterial))
+				{
+					node->mHasTexture = true;
+					node->mShader = ShaderManager::find("Standard/PBRStd1");
+					loadTexture(aiTextureType_BASE_COLOR, MaterialTextureSlot::PBR_TEX_BASE_COLOR);
+					loadTexture(aiTextureType_NORMAL_CAMERA, MaterialTextureSlot::PBR_TEX_NORMAL);
+					loadTexture(aiTextureType_EMISSION_COLOR, MaterialTextureSlot::PBR_TEX_EMISSION);
+					loadTexture(aiTextureType_METALNESS, MaterialTextureSlot::PBR_TEX_METALNESS);
+					loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, MaterialTextureSlot::PBR_TEX_ROUGHNESS);
+					loadTexture(aiTextureType_AMBIENT_OCCLUSION, MaterialTextureSlot::PBR_TEX_AMBIENT_OCCLUSION);
+				}
+				else
+				{
+					node->mHasTexture = false;
+					node->mShader = ShaderManager::find("Standard/PBRTest1");
+					loadColor(AI_MATKEY_BASE_COLOR, MaterialTextureSlot::PBR_BASE_COLOR);
+					loadValue(AI_MATKEY_METALLIC_FACTOR, MaterialTextureSlot::PBR_METALNESS);
+					loadValue(AI_MATKEY_GLOSSINESS_FACTOR, MaterialTextureSlot::PBR_GLOSSINESS);
+					loadValue(AI_MATKEY_EMISSIVE_INTENSITY, MaterialTextureSlot::PBR_EMISSION);
+				}
+
+				return;
+			}
+		}
+
+
+		node->mIsPBR = false;
+		if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		{
+			node->mHasTexture = true;
+			node->mShader = ShaderManager::find("Standard/Std1");
+			loadTexture(aiTextureType_AMBIENT, MaterialTextureSlot::TEX_AMBIENT);
+			loadTexture(aiTextureType_DIFFUSE, MaterialTextureSlot::TEX_DIFFUSE);
+			loadTexture(aiTextureType_SPECULAR, MaterialTextureSlot::TEX_SPECULA);
+			loadTexture(aiTextureType_NORMALS, MaterialTextureSlot::TEX_NORMALS);
+			loadTexture(aiTextureType_EMISSIVE, MaterialTextureSlot::TEX_EMISSIVE);
+			loadTexture(aiTextureType_SHININESS, MaterialTextureSlot::TEX_SHININESS);
+			loadTexture(aiTextureType_REFLECTION, MaterialTextureSlot::TEX_REFLECTION);
+			loadTexture(aiTextureType_OPACITY, MaterialTextureSlot::TEX_TRANSPARENT);
+		}
+		else
+		{
+			loadColor(AI_MATKEY_COLOR_AMBIENT, MaterialTextureSlot::AMBIENT);
+			loadColor(AI_MATKEY_COLOR_DIFFUSE, MaterialTextureSlot::DIFFUSE);
+			loadColor(AI_MATKEY_COLOR_SPECULAR, MaterialTextureSlot::SPECULA);
+			loadColor(AI_MATKEY_COLOR_EMISSIVE, MaterialTextureSlot::EMISSIVE);
+			loadColor(AI_MATKEY_COLOR_REFLECTIVE, MaterialTextureSlot::REFLECTION);
+			loadColor(AI_MATKEY_COLOR_TRANSPARENT, MaterialTextureSlot::TRANSPARENT);
+		}
+	}
+
+	bool AssimpHelper::isPBRValue(aiMaterial* material)
+	{
+		// 检查金属性 (Metallic)
+		float value;
+		if (material->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS)
+		{
+			return true;
+		}
+
+		// 检查粗糙度 (Roughness)
+		if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool AssimpHelper::isPBRTexture(aiMaterial* material)
+	{
+		return material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0
+			|| material->GetTextureCount(aiTextureType_METALNESS) > 0;
+	}
+
 }

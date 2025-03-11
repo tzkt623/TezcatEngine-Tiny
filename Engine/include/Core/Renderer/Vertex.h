@@ -35,28 +35,27 @@ namespace tezcat::Tiny
 	class TINY_API Vertex : public TinyObject
 	{
 		Vertex();
-		Vertex(std::string name);
+		Vertex(const std::string& name);
 		TINY_OBJECT_H(Vertex, TinyObject)
 
 	protected:
 		virtual void init() override {}
+		std::string getMemoryInfo() override;
 
 	public:
 		virtual ~Vertex();
-		void setName(const std::string& val) { mName = val; }
-		std::string getName() const { return mName; }
-		const uint32 &getVertexCount() const { return mVertexCount; }
-		const uint32 &getIndexCount() const { return mIndexCount; }
+		const uint32_t& getVertexCount() const { return mVertexCount; }
+		const uint32_t &getIndexCount() const { return mIndexCount; }
 		DrawModeWrapper& getDrawMode() { return mDrawModeWrapper; }
 
-		const uint32 &getVertexID() const { return mVertexID; }
-		void apply(uint32 id) { mVertexID = id; }
+		const uint32_t &getVertexID() const { return mVertexID; }
+		void apply(uint32_t id) { mVertexID = id; }
 		void generate();
 
 		void setVertexBuffer(VertexBuffer* buffer);
 		void setIndexBuffer(IndexBuffer* buffer);
-		void setVertexCount(uint32 size) { mVertexCount = size; }
-		void setIndexCount(uint32 size) { mIndexCount = size; }
+		void setVertexCount(uint32_t size) { mVertexCount = size; }
+		void setIndexCount(uint32_t size) { mIndexCount = size; }
 
 		void addChild(Vertex* vertex);
 
@@ -72,17 +71,16 @@ namespace tezcat::Tiny
 
 	public:
 		void setMesh(MeshData* mesh);
-		void setMesh(const std::string& name, const uint32& vertexCount, const DrawMode& drawMode);
+		void setMesh(const std::string& name, const uint32_t& vertexCount, const DrawMode& drawMode);
 
 	protected:
 		virtual void onClose() override;
 
 	protected:
-		std::string mName;
-		uint32 mVertexID = 0;
+		uint32_t mVertexID = 0;
 
-		uint32 mVertexCount = 0;
-		uint32 mIndexCount = 0;
+		uint32_t mVertexCount = 0;
+		uint32_t mIndexCount = 0;
 
 		DrawModeWrapper mDrawModeWrapper;
 		std::vector<VertexBuffer*> mVertexBuffers;

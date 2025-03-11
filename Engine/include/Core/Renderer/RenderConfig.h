@@ -98,6 +98,9 @@ namespace tezcat::Tiny
 		RG32F,
 		RGB32F,
 		RGBA32F,
+
+		R32UI,
+
 		Count
 	};
 
@@ -113,6 +116,8 @@ namespace tezcat::Tiny
 		RGBA,
 		BGR,
 		BGRA,
+
+		RI,
 		Count
 	};
 
@@ -410,6 +415,47 @@ namespace tezcat::Tiny
 	};
 
 
+	enum class MaterialTextureSlot
+	{
+		AMBIENT = 0,
+		TEX_AMBIENT,
+		DIFFUSE,
+		TEX_DIFFUSE,
+		SPECULA,
+		TEX_SPECULA,
+		NORMALS,
+		TEX_NORMALS,
+		EMISSIVE,
+		TEX_EMISSIVE,
+		SHININESS,
+		TEX_SHININESS,
+		REFLECTION,
+		TEX_REFLECTION,
+		TRANSPARENT,
+		TEX_TRANSPARENT,
 
+
+		//PBR
+		PBR_BASE_COLOR,
+		PBR_TEX_BASE_COLOR,
+
+		PBR_NORMAL,
+		PBR_TEX_NORMAL,
+
+		PBR_ROUGHNESS,
+		PBR_TEX_ROUGHNESS,
+
+		PBR_EMISSION,
+		PBR_TEX_EMISSION,
+
+		PBR_AMBIENT_OCCLUSION,
+		PBR_TEX_AMBIENT_OCCLUSION,
+
+		PBR_METALNESS,
+		PBR_TEX_METALNESS,
+
+		PBR_GLOSSINESS,
+		PBR_TEX_GLOSSINESS,
+	};
 
 }
