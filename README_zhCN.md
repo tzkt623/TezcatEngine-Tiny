@@ -10,7 +10,8 @@
 - en [English](README.md)
 - zh_CN [简体中文](README_zhCN.md)
 
-## **TinyEngine in progress**
+
+## **引擎二周目进行中**
 
 ![logo1](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/1faf72c8-36e8-4bb3-9e40-2b87a0656dfc)
 
@@ -24,24 +25,24 @@
 
 ## **Update**
 
-- [ ] Adding an internal engine name system
-- [x] You can now drag and drop the model into the overview to load it
-- [x] You can now drag and drop the image into the material to replace it
-- [x] You can now select the units in the scene, and the overview will automatically select them
-- [x] The main camera automatically starts the unit selection system
-- [x] Add UniformBuffer
-- [x] now uniformbuffer values instead of Some Buildin shader values
-- [x] New Pipeline
-- [x] Can load and display Shader array objects in Editor
-- [x] Constraint return! Sets Uniform objects constraint information in ShaderFile to display in Editor
+- [ ] 正在添加一个引擎内部的名称系统
+- [x] 现在可以拖拽模型到总览中进行加载了
+- [x] 现在可以拖拽图片到材质中进行替换
+- [x] 现在可以选中场景中的单位,总览会进行自动选择
+- [x] 主相机会自动启动单位选择系统
+- [x] 添加了UnfiormBuffer
+- [x] 一些Shader内建变量被UniformBuffer代替
+- [x] 全新的渲染流程架构,更加的合理好用
+- [x] 可以加载和显示Shader数组对象了!
+- [x] 约束回归!在所有Uniform对象里设置约束信息以显示在Editor中.
 
 ## **Issue**
 
-- [ ] Model loading is not perfect, and there will be fail to load
-- [ ] PBR Shader some issues now
-- [ ] Refactoring resoure loader and managers
-- [ ] ShaderEditor has some issues now
-- [ ] Disabled multithreading mode for now
+- [ ] 模型加载并不完善,会有加载失败的模型存在
+- [ ] PBR效果被我改坏了
+- [ ] 正在重构资源加载和管理方式
+- [ ] Shader编辑器有点问题
+- [ ] 暂时取消多线程模式
 
 -------------------------------------------
 
@@ -92,17 +93,17 @@ Editor
 
 -------------------------------------------------------
 
-## **Pipeline**
+## **渲染管线(Pipeline)**
 
 ![20240601230356](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/77c7bbee-50df-4247-bee1-03b3d7c8e124)
 
 - ObserverPipelinePass
   
-  A rendering pass for the player's camera to automatically process and render Material that comes with MeshRender
+  用于玩家视角相机的渲染通道,用于自动处理并渲染MeshRender自带的Material
 
 - ReplacedPipePass
   
-  A custom rendering pass that can handle rendering for various custom needs, such as shading, post-processing, etc
+  用于用户自定义渲染通道,可以处理各种自定义需求的渲染,例如阴影,后处理等
 
 - RenderCommand Order
   
@@ -159,51 +160,51 @@ pass->saveObject();
 pass->addToPipeline();
 ```
 
-## **Editor**
+## **编辑器(Editor)**
 
-Now you can switch scenes in the menu
+现在可以在菜单里面切换两个场景
 
-### Shader Editor
+### 着色器编辑器(Shader Editor)
 
-Double-click the shader file in Explorer to open the built-in editor
+双击资源管理器里的shader文件打开内置编辑器
 
-### Scene Overview
+### 场景总览(Scene Overview)
 
-Now Scene Overview can show all object in current scene, and you can select one of them
+目前场景总览可以看到所有当前场景中的对象
 
-### Object Overview
+### 对象总览(Object Overview)
 
-Now Object Overview can show components bind in object when you selected, and you can change them values
+目前对象总览可以看到对象上绑定的组件的信息,还可以与其互动
 
-### Runtime Rebuild Shader
+### 热编译着色器(Runtime Rebuild Shader)
 
-Now Editor can rebuild shader in runtime.
+可以在运行时重新编译着色器
 
-### Resource Browser
+### 资源管理器(Resource Browser)
 
-Double Click image file to open viwer
+双击图片文件可以打开查看
 
-Try Drag image file to envlighting map widget
+可以拖拽图片给环境光照贴图
 
-### FrameBuffer Viewer
+### 帧缓存查看器(FrameBuffer Viewer)
 
-Check the frame information
+查看当前的帧缓存信息
 
-## **Memory Management**
+## **内存管理(Memory Management)**
 
-A simple reference counting based memory management, just still debugging......
+做了一套简单的基于引用计数的内存管理,还在调试中......
 
-----------------------------
+-----------------------------------------------
 
-## **Create TinyObject**
+## **创建引擎对象**
 
-TinyObject will auto manages memory
+TinyObject会自动进行内存管理
 
-- Create an Object ```YourType::create(...)```
-- Save an Object ```obj->saveObject()```
-- Delete an Object  ```obj->deleteObject()```
+- 创建一个对象```YourType::create(...)```
+- 保存一个对象```obj->saveObject()```
+- 删除一个对象```obj->deleteObject()```
 
-TinyObject will be auto deleted in the end of current frame when you have not used this ```obj->saveObject()``` function
+如果不调用```obj->saveObject()```方法,此对象会在当前帧结束时被删除
 
 ```cpp
 //--------------------------------
@@ -266,9 +267,9 @@ auto pass = ReplacedPipelinePass::create(render_observer, ShaderManager::find("U
 
 ````
 
-## **Create GameObjects**
+## **创建游戏对象**
 
-- Create a Camera
+- 创建相机
 
 ```cpp
 //gameobject will auto load into current scene
@@ -288,7 +289,7 @@ go->getTransform()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 go->getTransform()->setParent(controller_go->getTransform());
 ```
 
-- Create a DirectionLight
+- 创建一个区域光
 
 ```cpp
 auto go = GameObject::create("DirectionLight");
@@ -309,11 +310,11 @@ shadow_caster->setCullLayer(0);
 shadow_caster->setShadowMap(4096, 4096, "Shadow");
 ```
 
-- Create a Skybox
-  
-  Drag a png/jpg/hdr image in resource browser to lighting manager window And check camera`s clear option to render skybox
+- 创建天空盒
 
-- Create a GameObject
+  把资源管理器里面的一张方形天空盒直接拖到光照管理器中,记得把相机的ClearOption勾上Skybox
+
+- 创建一个游戏物体
 
 ```cpp
 auto wife = GameObject::create("Wife");
@@ -337,7 +338,7 @@ auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
 wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 ```
 
-- Load A Model
+- 加载模型
 
 ```cpp
 auto model = ResourceManager::loadAndSave<Model>("Model/szb.fbx");
@@ -352,7 +353,7 @@ go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
 go_dasd->getTransform()->setRotation(0.0f, -90.0f, 0.0f);
 ```
 
-- Create a FrameBuffer
+- 创建一个帧缓冲
 
 ```cpp
 //create and save or get a framebuffer with manager
@@ -392,7 +393,7 @@ mFrameBuffer->addAttachment(mShadowTexture);
 mFrameBuffer->generate();
 ```
 
-- Create a Texture
+- 创建一张贴图
 
 ```cpp
 //create and save or get a texture named "MyTexture" with manager
@@ -417,13 +418,14 @@ texture->setImage(image);
 texture->generate();
 ```
 
-**Please check the Example project to get more infos.**
+**具体使用方法请看Example.**
 
-## **Resouce Manage**
+## **资源管理**
 
-Attention! The .exe file must be in the same directory as the resource folder
+注意! .exe文件必须和资源文件夹处于同一目录下
 
-1. Inherit and implement the `MyEngineIniter` class
+
+1. 继承并实现`MyEngineIniter`类
 
     ```cpp
     class MyEngineIniter : public EngineIniter
@@ -437,9 +439,10 @@ Attention! The .exe file must be in the same directory as the resource folder
         void initYourShaderParam() override;
     };
     ```
-    `prepareEngine`,`prepareResource`,`prepareGame`are invoked in this order
 
-2. Set your **ResourceFolder Name, ProgramName, ScreenSize**
+    `prepareEngine`,`prepareResource`,`prepareGame`三个方法会按此顺序依次执行
+
+2. 设置自己的资源文件夹名称,程序名称,屏幕大小
 
     ```cpp
     void MyEngineIniter::prepareEngine(Engine* engine)
@@ -458,7 +461,7 @@ Attention! The .exe file must be in the same directory as the resource folder
     }
     ```
 
-3. Load resource files
+3. 加载资源文件
 
     ```cpp
     void MyEngineIniter::prepareResource(Engine* engine)
@@ -472,7 +475,7 @@ Attention! The .exe file must be in the same directory as the resource folder
     }
     ```
 
-4. Prepare Scene
+4. 准备场景
 
     ```cpp
     void MyEngineIniter::prepareGame(Engine* engine)
@@ -485,11 +488,12 @@ Attention! The .exe file must be in the same directory as the resource folder
     }
     ```
 
-## **Material**
+## **材质结构**
 
-ShaderBuilder can auto scan all GLSL Uniform value except array type.
+目前Shader构建器可以自动解析出所有Uniform变量.
 
-Tiny Current Global Uniform Values
+Tiny的全局变量如下
+
 
 |        ShaderName        |   Type   |        Useage         |
 | :----------------------: | :------: | :-------------------: |
@@ -524,7 +528,7 @@ Tiny Current Global Uniform Values
 | TINY_LitPoint.specular | float3 |        |
 |  TINY_LitPoint.config  | float3 |        |
 
-**Current Buildin Material Values**
+**目前内建材质变量类型有**
 
 |    TinyType     |  CommonType   |
 | :-------------: | :-----------: |
@@ -534,7 +538,7 @@ Tiny Current Global Uniform Values
 |  UniformTex2D   |   Texture2D   |
 | UniformTexCube  |  TextureCube  |
 
-Notice! add uniform value to your material for the gameobject.
+给一个object添加一个材质之后一定要记得添加材质对应的参数,贴图,数值等等
 
 ```cpp
 auto plane_material = Material::create("Standard/Std1");
@@ -557,9 +561,9 @@ plane_material->setUniform<UniformTex2D>(index_specular, tex_spec);
 plane_material->setUniform<UniformF1>(index_shininess, 64.0f);
 ```
 
-## **Shader**
+## **着色器**
 
-ShaderBuilder now combine header files to automatically generate a shader file
+现在着色器构建器采用组合头文件的方式来自动生成着色器文件
 
 ```cpp
 void EngineIniter::prepareResource(Engine* engine)
@@ -571,11 +575,12 @@ void EngineIniter::prepareResource(Engine* engine)
     this->createSomeMode();
 }
 ```
-You can create generic header files in the `Include` folder to avoid duplicating each shader file
 
-Header files support repetitive inclusion
+你可以在Include文件夹中建立一些通用头文件,避免在各个着色器文件中重复书写
 
-The shader file supports both // and /**/
+头文件支持重复包含
+
+着色器文件支持//和/**/两种注释
 
 ```glsl
 file tiny_vs.tyin 
@@ -599,7 +604,7 @@ file any shader you need
 }
 ```
 
-### **Pipeline Position**
+### **管线位置**
 
 ```cpp
 "Background"    Forward::Background
@@ -610,9 +615,9 @@ file any shader you need
 "Overlay"       Forward::Overlay
 ```
 
-### **Blend**
+### **混合**
 
-BlendFunc
+混合参数
 
 ```cpp
 "0"         ZERO
@@ -631,7 +636,7 @@ BlendFunc
 "1-ConstA"  ONE_MINUS_CONSTANT_ALPHA
 ```
 
-EnableBlend
+启用混合
 
 ```cpp
 bool Blend = true;
@@ -639,15 +644,15 @@ str BlendSrc = 1;
 str BlendTar = 1-TarA;
 ```
 
-DisableBlend
+关闭混合
 
 ```cpp
 bool Blend = false;
 ```
 
-### **Cullface**
+### **表面剔除**
 
-Cullface
+剔除参数
 
 ```cpp
 "Off"       Disable
@@ -656,21 +661,21 @@ Cullface
 "All"       FRONT_AND_BACK
 ```
 
-Enable Cull Face
+启用剔除
 
 ```cpp
 str CullFace = Back;
 ```
 
-Disable Cull Face
+关闭剔除
 
 ```cpp
 str CullFace = Off;
 ```
 
-### **DepthTest**
+### **深度测试**
 
-Args
+测试参数
 
 ```cpp
 "Off"               Off
@@ -684,37 +689,37 @@ Args
 "NotEqual"          NotEqual
 ```
 
-Enable
+启用
 
 ```cpp
 str DepthTest = Less;
 ```
 
-Disable
+关闭
 
 ```cpp
 str DepthTest = Off;
 ```
 
-### **ZWrite**
+### **深度写入**
 
-Only work when DepthTest is Enabled
+只有在深度测试启用时才有用
 
-Enable
+启用
 
 ```cpp
 bool ZWrite = true;
 ```
 
-Disable
+关闭
 
 ```cpp
 bool ZWrite = false;
 ```
 
-### **DefaultValue**
+### **默认值**
 
-The[`int Version`] should be setted.The other params You can set as your wish.
+除了[`int Version`]为必须值,其他值均为拥有默认值的可选参数
 
 ```glsl
 #TINY_HEAD_BEGIN
