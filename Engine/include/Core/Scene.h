@@ -48,6 +48,8 @@ namespace tezcat::Tiny
 		void open();
 		void push();
 
+		void save();
+
 	public:
 		virtual void onEnter();
 		virtual void onExit();

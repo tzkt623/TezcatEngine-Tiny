@@ -271,17 +271,12 @@ namespace tezcat::Tiny
 			}
 		}
 
-		static IDString create(const char* data)
-		{
-			return IDString(data);
-		}
-
-		static std::string_view getStringStatic(const uint32_t& id)
+		static std::string_view staticGetString(const uint32_t& id)
 		{
 			return *sStringArray[id];
 		}
 
-		static const uint32_t getUIDStatic(const std::string& name)
+		static const uint32_t staticGetUID(const std::string& name)
 		{
 			TINY_THROW_RUNTIME(!sStringMap.contains(name), name);
 			return sStringMap[name];

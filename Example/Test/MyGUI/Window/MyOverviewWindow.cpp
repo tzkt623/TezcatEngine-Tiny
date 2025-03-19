@@ -53,7 +53,7 @@ namespace tezcat::Editor
 				flags |= ImGuiTreeNodeFlags_Leaf;
 			}
 
-			
+
 			if (!mPickPath.empty())
 			{
 				//如果当前对象在选取路径上
@@ -80,7 +80,7 @@ namespace tezcat::Editor
 			}
 
 			//使当前单位成为投放目标
-			if (ImGui::BeginDragDropTarget())
+			if (mDragedTransform != nullptr && ImGui::BeginDragDropTarget())
 			{
 				//投放一个对象到当前对象的子节点中
 				if (ImGui::AcceptDragDropPayload("ObjectMove"))
@@ -98,7 +98,13 @@ namespace tezcat::Editor
 			//点击控件选择对象
 			if (ImGui::IsItemHovered())
 			{
-				if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				{
+					mSelectedGameObject = game_object;
+					MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, game_object });
+					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_FocusObject, game_object });
+				}
+				else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
 					mSelectedGameObject = game_object;
 					MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, game_object });
@@ -123,7 +129,8 @@ namespace tezcat::Editor
 
 				if (ImGui::Button("DeleteObject"))
 				{
-					game_object->deleteObject();
+					mDeleteList.push(game_object);
+					//game_object->deleteObject();
 				}
 
 				ImGui::EndPopup();
@@ -185,6 +192,11 @@ namespace tezcat::Editor
 	void MyOverviewWindow::end()
 	{
 		GUIWindow::end();
+		while (!mDeleteList.empty())
+		{
+			mDeleteList.top()->deleteObject();
+			mDeleteList.pop();
+		}
 	}
 
 	void MyOverviewWindow::scrollToCurrentObject()

@@ -51,7 +51,7 @@ namespace tezcat::Tiny
 
 	class TINY_API CameraManager
 	{
-		CameraManager() = delete;
+		CameraManager();
 		~CameraManager() = delete;
 	public:
 		static void setData(CameraData* data) { mCurrentData = data; }

@@ -330,6 +330,18 @@ namespace tezcat::Tiny
 		}
 	}
 
+	void RenderObserver::lookAt(Transform* transform)
+	{
+		//auto dir = transform->getWorldPosition() - this->getTransform()->getWorldPosition();
+		//dir = glm::normalize(dir);
+		//auto r = glm::dot(dir, mTransform->getForward());
+		//mTransform->setWorldRotation()
+		//
+		//mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
+		//	, transform->getWorldPosition()
+		//	, mTransform->getUp());
+	}
+
 #pragma endregion
 
 

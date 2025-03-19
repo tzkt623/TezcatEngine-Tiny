@@ -11,7 +11,6 @@ namespace tezcat::Editor
 	MyGUIContext::MyGUIContext()
 		: mValueConfigAry(UniformID::allStringCount(), nullptr)
 	{
-
 		this->initValueConfig();
 	}
 
@@ -178,17 +177,17 @@ namespace tezcat::Editor
 
 		//计算当前显示大小与视图的比值
 		//
-		outUV0 = ImVec2(0, outDisplaySize.y / inTextureSize.y);
-		outUV1 = ImVec2(outDisplaySize.x / inTextureSize.x, 0);
+		outUV0 = ImVec2(0.0f, outDisplaySize.y / inTextureSize.y);
+		outUV1 = ImVec2(outDisplaySize.x / inTextureSize.x, 0.0f);
 
-		if (outUV0.y > 1)
+		if (outUV0.y > 1.0f)
 		{
-			outUV0.y = 1;
+			outUV0.y = 1.0f;
 		}
 
-		if (outUV1.x > 1)
+		if (outUV1.x > 1.0f)
 		{
-			outUV1.x = 1;
+			outUV1.x = 1.0f;
 		}
 	}
 
@@ -198,20 +197,25 @@ namespace tezcat::Editor
 		float image_ratio = inImageSize.x / inImageSize.y;
 
 		// 计算缩放比例
-		if (image_ratio > target_ratio)
+		// 比如 16:9 > 16:10
+		if (image_ratio >= target_ratio)
 		{
-			// 宽度受限：按宽度缩放
+			//此时image的宽超过了target的宽
+			//需要用target的宽来计算出缩放后的image的高
 			outDisplaySize.x = inWindowSize.x;
 			outDisplaySize.y = (inImageSize.y / inImageSize.x) * inWindowSize.x;
-			outOffsetToCenter.y = (inWindowSize.y - outDisplaySize.y) * 0.5f; // 垂直居中偏移
+			//将image移动的到正中央需要的偏移大小(垂直居中)
+			outOffsetToCenter.y = (inWindowSize.y - outDisplaySize.y) * 0.5f; 
 		}
+		//比如 16:10 < 16:9
 		else
 		{
-			// 高度受限：按高度缩放
+			//此时image的高超过了target的高
+			//需要用target的高来计算出缩放后的image的宽
 			outDisplaySize.y = inWindowSize.y;
 			outDisplaySize.x = (inImageSize.x / inImageSize.y) * inWindowSize.y;
-			outOffsetToCenter.x = (inWindowSize.x - outDisplaySize.x) * 0.5f; // 水平居中偏移
+			//将image移动的到正中央需要的偏移大小(水平居中)
+			outOffsetToCenter.x = (inWindowSize.x - outDisplaySize.x) * 0.5f;
 		}
 	}
-
 }

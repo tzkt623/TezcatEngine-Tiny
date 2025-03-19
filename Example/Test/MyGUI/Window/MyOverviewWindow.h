@@ -21,5 +21,6 @@ namespace tezcat::Editor
 		Transform* mDragedTransform;
 		bool mPickObject;
 		std::stack<Transform*> mPickPath;
+		std::stack<GameObject*> mDeleteList;
 	};
 }

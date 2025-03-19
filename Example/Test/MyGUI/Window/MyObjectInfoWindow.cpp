@@ -256,21 +256,21 @@ namespace tezcat::Editor
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 					auto config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Ambient);
-					ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Ambient).data());
+					ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Ambient).data());
 					ImGui::TableNextColumn();
 					ImGui::ColorEdit3("##0", glm::value_ptr(lit->getAmbient()));
 
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 					config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Diffuse);
-					ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Diffuse).data());
+					ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Diffuse).data());
 					ImGui::TableNextColumn();
 					ImGui::ColorEdit3("##1", glm::value_ptr(lit->getDiffuse()));
 
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
 					config = MyGUIContext::getInstance().getValueConfig(ShaderParam::LightDirection::Specular);
-					ImGui::Text(UniformID::getStringStatic(ShaderParam::LightDirection::Specular).data());
+					ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Specular).data());
 					ImGui::TableNextColumn();
 					ImGui::ColorEdit3("##2", glm::value_ptr(lit->getSpecular()));
 

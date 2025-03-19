@@ -144,6 +144,8 @@ namespace tezcat::Tiny
 
 		ViewType getViewType() const { return mViewType; }
 
+		virtual void lookAt(Transform* transform) {}
+
 	public:
 		void setTransform(Transform* transform);
 		Transform* getTransform() { return mTransform; }
@@ -233,6 +235,8 @@ namespace tezcat::Tiny
 		virtual float4x4* getViewMatrixAry() const final { TINY_THROW("Fatal Error!"); }
 		virtual int32_t getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
 
+		void lookAt(Transform* transform) override;
+
 	protected:
 		float4x4 mViewMatrix;
 	};
@@ -282,5 +286,6 @@ public:\
 	void setCullLayer(uint32_t index) { memberName->setCullLayer(index); }\
 	void addCullLayer(uint32_t index) { memberName->addCullLayer(index); }\
 	void removeCullLayer(uint32_t index) { memberName->removeCullLayer(index); }\
-	void setFrameBuffer(FrameBuffer* frameBuffer) { memberName->setFrameBuffer(frameBuffer); }
+	void setFrameBuffer(FrameBuffer* frameBuffer) { memberName->setFrameBuffer(frameBuffer); }\
+	void lookAt(Transform* transform) { memberName->lookAt(transform); }
 }

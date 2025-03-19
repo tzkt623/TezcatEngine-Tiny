@@ -501,8 +501,8 @@ namespace tezcat::Tiny
 private:\
 		using Base = parentClass;\
 public:\
-		constexpr static const std::string& getClassNameStatic() { return __TINY__RTTI__453.__className; }\
-		constexpr static const std::string& getParentClassNameStatic() { return __TINY__RTTI__453.__parent->__className; }\
+		constexpr static const std::string& staticGetClassName() { return __TINY__RTTI__453.__className; }\
+		constexpr static const std::string& staticGetParentClassName() { return __TINY__RTTI__453.__parent->__className; }\
 		virtual const std::string& getClassName() const override { return __TINY__RTTI__453.__className; }\
 		virtual const std::string& getParentClassName() const override { return __TINY__RTTI__453.__parent->__className; }\
 		virtual const std::type_index& getClassType() const override { return __TINY__RTTI__453.__typeIndex; }\

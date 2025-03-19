@@ -228,4 +228,9 @@ namespace tezcat::Tiny
 	{
 		mNewGameObjectList.push_back(gameObject);
 	}
+
+	void Scene::save()
+	{
+
+	}
 }

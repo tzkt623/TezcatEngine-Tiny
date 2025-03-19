@@ -1,0 +1,16 @@
+TINY_SCENE_CONFIG_BEGIN
+
+
+
+
+TINY_SCENE_CONFIG_END
+
+
+
+TINY_SCENE_OBJECT_BEGIN
+
+
+myObject ref:object1 position:[x, y, z] scale:[x, y, z] rotation:[x, y, z]
+
+
+TINY_SCENE_OBJECT_END

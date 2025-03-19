@@ -63,6 +63,19 @@ namespace tezcat::Tiny
 		mCurrentData->addRenderObserver(renderObserver);
 	}
 
+	CameraManager::CameraManager()
+	{
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_FocusObject, this
+			, [](const EventData& data)
+			{
+				GameObject* go = (GameObject*)data.userData;
+				if (go)
+				{
+					auto camera_pos = mCurrentData->getMainCamera()->getTransform()->getWorldPosition();
+					mCurrentData->getMainCamera()->lookAt(go->getTransform());
+				}
+			});
+	}
 
 	//--------------------------------------------------------
 	//

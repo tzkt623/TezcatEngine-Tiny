@@ -12,7 +12,7 @@ namespace tezcat::Editor
 		uniforms.reserve(UniformID::allStringCount());
 		for (auto i = 0; i < UniformID::allStringCount(); i++)
 		{
-			uniforms.push_back(UniformID::getStringStatic(i).data());
+			uniforms.push_back(UniformID::staticGetString(i).data());
 		}
 
 		uniforms.push_back("gl_Position");

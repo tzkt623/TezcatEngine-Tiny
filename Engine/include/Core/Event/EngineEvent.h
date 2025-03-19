@@ -49,6 +49,7 @@ namespace tezcat::Tiny
 
 		EE_ReadObjectID,
 		EE_SelectObject,
+		EE_FocusObject,
 
 		EE_IDCount
 	};

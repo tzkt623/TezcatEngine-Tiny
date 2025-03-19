@@ -406,7 +406,7 @@ namespace tezcat::Tiny::GL
 						for (int32_t i = 0; i < array_size; i++)
 						{
 							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
-							auto uid = UniformID::getUIDStatic(true_name);
+							auto uid = UniformID::staticGetUID(true_name);
 							if (uid < shader->getTinyUniformCount())
 							{
 								shader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()), i);
@@ -420,7 +420,7 @@ namespace tezcat::Tiny::GL
 					else
 					{
 						std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
-						auto uid = UniformID::getUIDStatic(true_name);
+						auto uid = UniformID::staticGetUID(true_name);
 						if (uid < shader->getTinyUniformCount())
 						{
 							shader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()));

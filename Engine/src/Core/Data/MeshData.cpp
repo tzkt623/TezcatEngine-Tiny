@@ -507,14 +507,57 @@ namespace tezcat::Tiny
 						auto index_roughness = shader->getUniformIndex("myPBR.roughness2D");
 						auto index_ao = shader->getUniformIndex("myPBR.ao2D");
 
-						material->setUniform<UniformTex2D>(index_albedo
-							, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_BASE_COLOR)));
-						material->setUniform<UniformTex2D>(index_metallic
-						, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_METALNESS)));
-						material->setUniform<UniformTex2D>(index_roughness
-						, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_ROUGHNESS)));
-						material->setUniform<UniformTex2D>(index_ao
-						, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_AMBIENT_OCCLUSION)));
+
+						//albedo
+						auto tex_path = node->tryGetTexture(MaterialTextureSlot::PBR_TEX_BASE_COLOR);
+						if (tex_path && std::filesystem::exists(*tex_path))
+						{
+							material->setUniform<UniformTex2D>(index_albedo, ResourceManager::loadAndSave<Texture2D>(*tex_path));
+						}
+						else
+						{
+							material->setUniform<UniformTex2D>(index_albedo, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyOne.png"));
+						}
+
+						//
+						tex_path = node->tryGetTexture(MaterialTextureSlot::PBR_TEX_METALNESS);
+						if (tex_path && std::filesystem::exists(*tex_path))
+						{
+							material->setUniform<UniformTex2D>(index_metallic, ResourceManager::loadAndSave<Texture2D>(*tex_path));
+						}
+						else
+						{
+							material->setUniform<UniformTex2D>(index_metallic, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png"));
+						}
+
+						tex_path = node->tryGetTexture(MaterialTextureSlot::PBR_TEX_ROUGHNESS);
+						if (tex_path && std::filesystem::exists(*tex_path))
+						{
+							material->setUniform<UniformTex2D>(index_roughness, ResourceManager::loadAndSave<Texture2D>(*tex_path));
+						}
+						else
+						{
+							material->setUniform<UniformTex2D>(index_roughness, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png"));
+						}
+
+						tex_path = node->tryGetTexture(MaterialTextureSlot::PBR_TEX_AMBIENT_OCCLUSION);
+						if (tex_path && std::filesystem::exists(*tex_path))
+						{
+							material->setUniform<UniformTex2D>(index_ao, ResourceManager::loadAndSave<Texture2D>(*tex_path));
+						}
+						else
+						{
+							material->setUniform<UniformTex2D>(index_ao, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png"));
+						}
+
+						//material->setUniform<UniformTex2D>(index_albedo
+						//	, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_BASE_COLOR)));
+						//material->setUniform<UniformTex2D>(index_metallic
+						//, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_METALNESS)));
+						//material->setUniform<UniformTex2D>(index_roughness
+						//, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_ROUGHNESS)));
+						//material->setUniform<UniformTex2D>(index_ao
+						//, ResourceManager::loadAndSave<Texture2D>(node->getTextureMap().at(MaterialTextureSlot::PBR_TEX_AMBIENT_OCCLUSION)));
 					}
 					else
 					{
@@ -552,38 +595,38 @@ namespace tezcat::Tiny
 						auto index_shininess = shader->getUniformIndex("myTexShininess2D");
 
 						auto diff = node->tryGetTexture(MaterialTextureSlot::TEX_DIFFUSE);
-						if (diff)
+						if (diff && std::filesystem::exists(*diff))
 						{
 							auto tex = ResourceManager::loadAndSave<Texture2D>(*diff);
 							material->setUniform<UniformTex2D>(index_diffuse, tex);
 						}
 						else
 						{
-							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyDiffuse.png");
+							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyOne.png");
 							material->setUniform<UniformTex2D>(index_diffuse, tex);
 						}
 
 						auto spe = node->tryGetTexture(MaterialTextureSlot::TEX_SPECULA);
-						if (spe)
+						if (spe && std::filesystem::exists(*diff))
 						{
 							auto tex = ResourceManager::loadAndSave<Texture2D>(*diff);
 							material->setUniform<UniformTex2D>(index_specular, tex);
 						}
 						else
 						{
-							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinySpecular.png");
+							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png");
 							material->setUniform<UniformTex2D>(index_specular, tex);
 						}
 
 						auto shi = node->tryGetTexture(MaterialTextureSlot::TEX_SHININESS);
-						if (shi)
+						if (shi && std::filesystem::exists(*diff))
 						{
 							auto tex = ResourceManager::loadAndSave<Texture2D>(*shi);
 							material->setUniform<UniformTex2D>(index_shininess, tex);
 						}
 						else
 						{
-							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinySpecular.png");
+							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png");
 							material->setUniform<UniformTex2D>(index_shininess, tex);
 						}
 					}
@@ -747,7 +790,7 @@ namespace tezcat::Tiny
 				if (aiMaterial->GetTexture(type, 0, &texturePath) == aiReturn_SUCCESS)
 				{
 					node->getTextureMap().emplace(slot, texturePath.C_Str());
-					TINY_LOG_INFO(std::format("{} | {}", ConvertEnumToString(slot), texturePath.C_Str()));
+					//TINY_LOG_INFO(std::format("{} | {}", ConvertEnumToString(slot), texturePath.C_Str()));
 				}
 			};
 
@@ -764,7 +807,7 @@ namespace tezcat::Tiny
 						color.a
 					};
 					node->getValueMap().emplace(slot, temp);
-					TINY_LOG_INFO(std::format("{} | R:{} G:{} B:{} A:{}", ConvertEnumToString(slot), temp.color.r, temp.color.g, temp.color.b, temp.color.a));
+					//TINY_LOG_INFO(std::format("{} | R:{} G:{} B:{} A:{}", ConvertEnumToString(slot), temp.color.r, temp.color.g, temp.color.b, temp.color.a));
 				}
 			};
 
@@ -775,7 +818,7 @@ namespace tezcat::Tiny
 				{
 					ModelNode::Value temp{ .v1 = value };
 					node->getValueMap().emplace(slot, temp);
-					TINY_LOG_INFO(std::format("{} | V:{}", ConvertEnumToString(slot), temp.v1));
+					//TINY_LOG_INFO(std::format("{} | V:{}", ConvertEnumToString(slot), temp.v1));
 				}
 			};
 
