@@ -23,8 +23,8 @@ namespace tezcat::Editor
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.Fonts->AddFontFromFileTTF(
-			"c:/windows/fonts/simhei.ttf",
-			16.0f,
+			"./Resource/font/deng.ttf",
+			24.0f,
 			nullptr,
 			io.Fonts->GetGlyphRangesChineseFull());
 		// 		io.Fonts->AddFontFromFileTTF(

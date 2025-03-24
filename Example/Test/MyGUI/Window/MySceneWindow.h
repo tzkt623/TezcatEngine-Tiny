@@ -22,7 +22,5 @@ namespace tezcat::Editor
 		ImVec2 mViewPortPos;
 		ImVec2 mMousePos;
 		ImVec2 mFramePos;
-
-	public:
 	};
 }

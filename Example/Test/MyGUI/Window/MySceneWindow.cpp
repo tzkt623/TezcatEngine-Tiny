@@ -2,7 +2,6 @@
 
 namespace tezcat::Editor
 {
-
 	TINY_EDITOR_WINDOW_INSTANCE_CPP(MySceneWindow);
 	MySceneWindow::MySceneWindow()
 		: GUIWindow("场景(Scene)")
