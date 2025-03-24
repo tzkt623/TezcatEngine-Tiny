@@ -8,7 +8,11 @@ namespace tezcat::Editor
 		: GUIWindow("帧缓存查看器(FrameBufferViewer)")
 		, mSelectBuffer(nullptr)
 	{
-
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_PopScene, this
+			, [this](const EventData& data)
+			{
+				mSelectBuffer = nullptr;
+			});
 	}
 
 	MyFrameBufferViewerWindow::~MyFrameBufferViewerWindow()
