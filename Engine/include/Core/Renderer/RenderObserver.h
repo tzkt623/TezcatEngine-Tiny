@@ -54,7 +54,7 @@ namespace tezcat::Tiny
 		virtual void submit(Shader* shader) = 0;
 
 	public:
-		virtual void prepareRender() {}
+		virtual void preRender() {}
 		void createUniformBuffer();
 		UniformBuffer* getUniformBuffer() const { return mUniformBuffer; }
 
@@ -206,7 +206,7 @@ namespace tezcat::Tiny
 		virtual ~ShadowObserver();
 
 	public:
-		virtual void prepareRender() override;
+		virtual void preRender() override;
 		virtual void submit(Shader* shader) override;
 		virtual float4x4& getViewMatrix() { return mViewMatrix; }
 
@@ -227,7 +227,7 @@ namespace tezcat::Tiny
 		virtual ~RenderObserver();
 
 	public:
-		virtual void prepareRender() override;
+		virtual void preRender() override;
 		virtual void submit(Shader* shader) override;
 		virtual float4x4& getViewMatrix() { return mViewMatrix; }
 
@@ -252,7 +252,7 @@ namespace tezcat::Tiny
 		void setViewMartixArray(float4x4* array, int32_t size);
 
 		virtual void submit(Shader* shader) override;
-		virtual void prepareRender() override;
+		virtual void preRender() override;
 
 	public:
 		virtual float4x4& getViewMatrix() override final { TINY_THROW("Fatal Error!"); }

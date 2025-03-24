@@ -198,11 +198,16 @@ namespace tezcat::Tiny
 		//	User Interface
 		//
 	public:
-		virtual void setFloat1(Shader* shader, const int32_t& valueID, const float& data) = 0;
 		virtual void setFloat1(Shader* shader, const int32_t& valueID, const float* data) = 0;
 		virtual void setFloat2(Shader* shader, const int32_t& valueID, const float* data) = 0;
 		virtual void setFloat3(Shader* shader, const int32_t& valueID, const float* data) = 0;
 		virtual void setFloat4(Shader* shader, const int32_t& valueID, const float* data) = 0;
+
+		virtual void setFloat1(Shader* shader, const int32_t& valueID, const float& data) = 0;
+		virtual void setFloat2(Shader* shader, const int32_t& valueID, const float2& data) = 0;
+		virtual void setFloat3(Shader* shader, const int32_t& valueID, const float3& data) = 0;
+		virtual void setFloat4(Shader* shader, const int32_t& valueID, const float4& data) = 0;
+
 
 		virtual void setInt1(Shader* shader, const int32_t& valueID, const int32_t& data) = 0;
 		virtual void setInt1(Shader* shader, const int32_t& valueID, int32_t* data) = 0;
@@ -233,6 +238,7 @@ namespace tezcat::Tiny
 		virtual void bind(Shader* shader) = 0;
 		virtual void bind(FrameBuffer* frameBuffer) = 0;
 		virtual void bind(UniformBuffer* uniformBuffer) = 0;
+		virtual void bind(Texture2D* texture) = 0;
 		virtual void readPixel(int32_t x, int32_t y) = 0;
 		virtual void readObjectID(int32_t x, int32_t y, int32_t& id) = 0;
 

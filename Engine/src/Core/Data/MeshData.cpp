@@ -47,8 +47,13 @@ namespace tezcat::Tiny
 	MeshData::MeshData(std::string name)
 		: mName(std::move(name))
 		, mDrawMode(DrawMode::Triangles)
-		, mChildrenData(nullptr)
 		, mIndex(-1)
+		, mNormals(nullptr)
+		, mUVs(nullptr)
+		, mColors(nullptr)
+		, mTangents(nullptr)
+		, mBitTangents(nullptr)
+		, mIndices(nullptr)
 	{
 
 	}
@@ -56,61 +61,42 @@ namespace tezcat::Tiny
 	MeshData::~MeshData()
 	{
 		this->mVertices.clear();
-		this->mNormals.clear();
-		this->mColors.clear();
-		this->mUVs.clear();
-		this->mIndices.clear();
 
-		if (mChildrenData != nullptr)
+		if (mNormals)
 		{
-			for (auto c : *mChildrenData)
-			{
-				delete c;
-			}
-
-			delete mChildrenData;
-		}
-	}
-
-	int MeshData::getBufferSize() const
-	{
-		int count = 0;
-		if (!this->mVertices.empty())
-		{
-			count++;
+			mNormals->clear();
+			delete mNormals;
 		}
 
-		if (!this->mNormals.empty())
+		if (mColors)
 		{
-			count++;
+			mColors->clear();
+			delete mColors;
 		}
 
-		if (!this->mColors.empty())
+		if (mUVs)
 		{
-			count++;
+			mUVs->clear();
+			delete mUVs;
 		}
 
-		if (!this->mUVs.empty())
+		if (mTangents)
 		{
-			count++;
+			mTangents->clear();
+			delete mTangents;
 		}
 
-		if (!this->mIndices.empty())
+		if (mBitTangents)
 		{
-			count++;
+			mBitTangents->clear();
+			delete mBitTangents;
 		}
 
-		return count;
-	}
-
-	void MeshData::addChild(MeshData* meshData)
-	{
-		if (mChildrenData == nullptr)
+		if (mIndices)
 		{
-			mChildrenData = new std::vector<MeshData*>();
+			mIndices->clear();
+			delete mIndices;
 		}
-
-		mChildrenData->push_back(meshData);
 	}
 
 	std::tuple<uint64, const void*> MeshData::getVertexData(const VertexPosition& position)
@@ -118,39 +104,46 @@ namespace tezcat::Tiny
 		switch (position)
 		{
 		case VertexPosition::VP_Position:
-			return { this->vertexSize(), this->mVertices.data() };
+			return { this->vertexSize(), mVertices.data() };
 		case VertexPosition::VP_Normal:
-			return { this->normalSize(), this->mNormals.data() };
+			return { this->normalSize(), mNormals->data() };
 		case VertexPosition::VP_Color:
-			return  { this->colorSize(), this->mColors.data() };
+			return  { this->colorSize(), mColors->data() };
 		case VertexPosition::VP_UV:
-			return  { this->uvSize(), this->mUVs.data() };
+			return  { this->uvSize(), mUVs->data() };
 		default: return { 0, nullptr };
 		}
 	}
 
-	std::tuple<uint64, const void*> MeshData::getIndexData()
+	std::tuple<uint64_t, const void*> MeshData::getIndexData()
 	{
-		return { this->indexSize(), this->mIndices.data() };
+		if (mIndices)
+		{
+			return { this->indexSize(), mIndices->data() };
+		}
+		else
+		{
+			return { 0, nullptr };
+		}
 	}
 
-	void MeshData::apply(DrawMode drawMode)
+	void MeshData::generate(DrawMode drawMode)
 	{
 		drawMode = drawMode;
 
 		mLayoutPositions.emplace_back(VertexPosition::VP_Position);
 
-		if (!this->mNormals.empty())
+		if (mNormals)
 		{
 			mLayoutPositions.emplace_back(VertexPosition::VP_Normal);
 		}
 
-		if (!this->mUVs.empty())
+		if (mUVs)
 		{
 			mLayoutPositions.emplace_back(VertexPosition::VP_UV);
 		}
 
-		if (!this->mColors.empty())
+		if (mColors)
 		{
 			mLayoutPositions.emplace_back(VertexPosition::VP_Color);
 		}
@@ -396,13 +389,18 @@ namespace tezcat::Tiny
 		auto material = aiscene->mMaterials[aimesh->mMaterialIndex];
 
 		MeshData* meshData = MeshData::create(aimesh->mName.C_Str());
+		meshData->mNormals = new std::vector<float3>();
+		meshData->mUVs = new std::vector<float2>();
+		meshData->mColors = new std::vector<float4>();
+		meshData->mTangents = new std::vector<float3>();
+		meshData->mBitTangents = new std::vector<float3>();
 
 		meshData->mVertices.reserve(aimesh->mNumVertices);
-		meshData->mNormals.reserve(aimesh->mNumVertices);
-		meshData->mUVs.reserve(aimesh->mNumVertices);
-		meshData->mColors.reserve(aimesh->mNumVertices);
-		meshData->mTangents.reserve(aimesh->mNumVertices);
-		meshData->mBitTangents.reserve(aimesh->mNumVertices);
+		meshData->mNormals->reserve(aimesh->mNumVertices);
+		meshData->mUVs->reserve(aimesh->mNumVertices);
+		meshData->mColors->reserve(aimesh->mNumVertices);
+		meshData->mTangents->reserve(aimesh->mNumVertices);
+		meshData->mBitTangents->reserve(aimesh->mNumVertices);
 
 		bool has_normal = aimesh->HasNormals();
 		bool has_uv0 = aimesh->HasTextureCoords(0);
@@ -421,7 +419,7 @@ namespace tezcat::Tiny
 			if (has_normal)
 			{
 				auto& ai_normal = aimesh->mNormals[ver_i];
-				meshData->mNormals.emplace_back(ai_normal.x
+				meshData->mNormals->emplace_back(ai_normal.x
 										  , ai_normal.y
 										  , ai_normal.z);
 			}
@@ -429,12 +427,12 @@ namespace tezcat::Tiny
 			if (has_uv0)
 			{
 				auto& ai_uv = aimesh->mTextureCoords[0][ver_i];
-				meshData->mUVs.emplace_back(ai_uv.x, ai_uv.y);
+				meshData->mUVs->emplace_back(ai_uv.x, ai_uv.y);
 			}
 
 			if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
 			{
-				meshData->mColors.emplace_back(diffuseColor.r
+				meshData->mColors->emplace_back(diffuseColor.r
 					, diffuseColor.g
 					, diffuseColor.b
 					, diffuseColor.a);
@@ -442,7 +440,7 @@ namespace tezcat::Tiny
 			else if (has_color0)
 			{
 				auto& ai_color = aimesh->mColors[0][ver_i];
-				meshData->mColors.emplace_back(ai_color.r
+				meshData->mColors->emplace_back(ai_color.r
 										 , ai_color.g
 										 , ai_color.b
 										 , ai_color.a);
@@ -451,12 +449,12 @@ namespace tezcat::Tiny
 			if (has_tangents)
 			{
 				auto& ai_tangents = aimesh->mTangents[ver_i];
-				meshData->mTangents.emplace_back(ai_tangents.x
+				meshData->mTangents->emplace_back(ai_tangents.x
 										   , ai_tangents.y
 										   , ai_tangents.z);
 
 				auto& ai_bit = aimesh->mBitangents[ver_i];
-				meshData->mBitTangents.emplace_back(ai_bit.x
+				meshData->mBitTangents->emplace_back(ai_bit.x
 											  , ai_bit.y
 											  , ai_bit.z);
 			}
@@ -464,17 +462,18 @@ namespace tezcat::Tiny
 
 		if (aimesh->HasFaces())
 		{
+			meshData->mIndices = new std::vector<uint32_t>();
 			for (uint32_t face_i = 0; face_i < aimesh->mNumFaces; face_i++)
 			{
 				auto& ai_face = aimesh->mFaces[face_i];
 				for (uint32_t index_i = 0; index_i < ai_face.mNumIndices; index_i++)
 				{
-					meshData->mIndices.emplace_back(ai_face.mIndices[index_i]);
+					meshData->mIndices->emplace_back(ai_face.mIndices[index_i]);
 				}
 			}
 		}
 
-		meshData->apply();
+		meshData->generate();
 		return meshData;
 	}
 

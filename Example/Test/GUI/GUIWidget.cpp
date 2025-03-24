@@ -97,17 +97,19 @@ namespace tezcat::Editor
 
 	void GUIWindow::onRender()
 	{
-		if (mNeedFocus)
-		{
-			mNeedFocus = false;
-			ImGui::SetWindowFocus();
-		}
+
 	}
 
 	void GUIWindow::update()
 	{
 		if (this->begin())
 		{
+			if (mNeedFocus)
+			{
+				mNeedFocus = false;
+				ImGui::SetWindowFocus();
+			}
+
 			this->onRender();
 		}
 		this->end();

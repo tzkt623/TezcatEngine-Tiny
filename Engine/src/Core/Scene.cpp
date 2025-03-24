@@ -54,7 +54,9 @@ namespace tezcat::Tiny
 
 	void Scene::onEnter()
 	{
-		TINY_LOG_INFO(std::format("Enter Scene: {}", mName));
+		TINY_LOG_INFO(std::format("Enter Scene: {0},{1},{2},{3}\n"
+			, this->getClassName(), this->getClassID()
+			, this->getParentClassName(), Base::RTTIStatic()->__classID));
 
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_LoadModel, this,
 			[](const EventData& evt)

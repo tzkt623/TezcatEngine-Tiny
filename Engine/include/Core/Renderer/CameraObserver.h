@@ -29,7 +29,7 @@ namespace tezcat::Tiny
 		virtual ~CameraObserver();
 
 		virtual void submit(Shader* shader) override;
-		virtual void prepareRender() override;
+		virtual void preRender() override;
 
 	private:
 

@@ -56,11 +56,14 @@ namespace tezcat::Tiny
 		static void pushScene(Scene* scene);
 		static void prepareScene(Scene* scene);
 		static void switchScene(Scene* scene);
-		static const std::unordered_map<std::string_view, Scene*>& getAllScene() { return sSceneUMap; }
+		static const std::unordered_map<std::string_view, Scene*>& getAllSceneMap() { return sPreparedSceneUMap; }
+		static const std::vector<Scene*>& getAllSceneArray() { return sPreparedSceneArray; }
 
 	private:
 		static std::stack<Scene*> sSceneArray;
-		static std::unordered_map<std::string_view, Scene*> sSceneUMap;
 		static std::deque<CMDData> mCDMs;
+
+		static std::unordered_map<std::string_view, Scene*> sPreparedSceneUMap;
+		static std::vector<Scene*> sPreparedSceneArray;
 	};
 }

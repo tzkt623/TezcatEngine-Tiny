@@ -140,9 +140,11 @@ namespace tezcat::Tiny
 
 	struct TINY_API UniformValueConfig
 	{
+		//index in class Shader
 		int32_t index;
 		std::string name;
 		UniformType type;
+		//id in Graphic shader
 		int32_t valueID;
 		ShaderConstraint constraint;
 		std::string editorName;

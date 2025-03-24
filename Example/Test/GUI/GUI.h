@@ -27,20 +27,6 @@ namespace tezcat::Editor
 			mWindows.push_back(window);
 		}
 
-		void removeWindow(GUIWindow* window)
-		{
-			auto it = mWindows.begin();
-			while (it != mWindows.end())
-			{
-				if ((*it) == window)
-				{
-					mWindows.erase(it);
-					break;
-				}
-				it++;
-			}
-		}
-
 	private:
 		std::vector<GUIWindow*> mInitList;
 		std::list<GUIWindow*> mWindows;

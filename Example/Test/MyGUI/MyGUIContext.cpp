@@ -197,7 +197,7 @@ namespace tezcat::Editor
 		float image_ratio = inImageSize.x / inImageSize.y;
 
 		// 计算缩放比例
-		// 比如 16:9 > 16:10
+		// 比如 16:9(17.7:10) > 16:10
 		if (image_ratio >= target_ratio)
 		{
 			//此时image的宽超过了target的宽

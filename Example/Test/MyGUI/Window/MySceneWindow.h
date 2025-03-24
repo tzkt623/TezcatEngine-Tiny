@@ -4,9 +4,9 @@
 
 namespace tezcat::Editor
 {
-	class MyViewPortWindow : public GUIWindow
+	class MySceneWindow : public GUIWindow
 	{
-		TINY_EDITOR_WINDOW_INSTANCE_H(MyViewPortWindow);
+		TINY_EDITOR_WINDOW_INSTANCE_H(MySceneWindow);
 
 	protected:
 		bool begin() override;
@@ -25,7 +25,4 @@ namespace tezcat::Editor
 
 	public:
 	};
-
-
-
 }

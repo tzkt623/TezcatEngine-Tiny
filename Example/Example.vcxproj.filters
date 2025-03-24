@@ -45,7 +45,7 @@
     <ClCompile Include="Test\MyGUI\Window\MyObjectInfoWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyViewPortWindow.cpp">
+    <ClCompile Include="Test\MyGUI\Window\MySceneWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Test\MyGUI\Window\MyInfoWindow.cpp">
@@ -63,7 +63,7 @@
     <ClCompile Include="Test\MyGUI\Window\MyGCInfoWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\Tutorial01.cpp">
+    <ClCompile Include="Test\Scene\Tutorial_Triangle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Test\MyObserver.cpp">
@@ -114,6 +114,18 @@
     <ClCompile Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test\Scene\Tutorial_Texture2D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\Scene\Tutorial_Cube.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\Scene\Tutorial_Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\Scene\Tutorial_FrameBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test\MyGUI\MyGUI.h">
@@ -143,7 +155,7 @@
     <ClInclude Include="Test\MyGUI\Window\MyObjectInfoWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyViewPortWindow.h">
+    <ClInclude Include="Test\MyGUI\Window\MySceneWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyGUI\Window\MyInfoWindow.h">
@@ -161,7 +173,7 @@
     <ClInclude Include="Test\MyGUI\Window\MyGCInfoWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\Tutorial01.h">
+    <ClInclude Include="Test\Scene\Tutorial_Triangle.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyObserver.h">
@@ -219,6 +231,24 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\Scene\Tutorial_Texture2D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\Scene\SceneHead.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\Scene\Tutorial_Cube.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\Scene\Tutorial_Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\Scene\TutorialHelper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\Scene\Tutorial_FrameBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

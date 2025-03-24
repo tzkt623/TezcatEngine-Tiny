@@ -29,7 +29,7 @@ namespace tezcat::Tiny
 	{
 	public:
 		static void init();
-		static void calculate();
+		static void preRender();
 
 		static int32_t addGameObject(GameObject* gameObject);
 		static void removeGameObject(GameObject* gameObject);

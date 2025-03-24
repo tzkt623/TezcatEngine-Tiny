@@ -305,28 +305,26 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void RenderObserver::prepareRender()
+	void RenderObserver::preRender()
 	{
-		if (!mTransform)
-		{
-			return;
-		}
-
 		this->updateObserverMatrix();
 
-		mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
-			, mTransform->getWorldPosition() + mTransform->getForward()
-			, mTransform->getUp());
-
-		auto VP = mProjectionMatrix * mViewMatrix;
-
-		if (mUniformBuffer)
+		if (mTransform)
 		{
-			mUniformBuffer->update<float4x4>(0, glm::value_ptr(mProjectionMatrix));
-			mUniformBuffer->update<float4x4>(1, glm::value_ptr(mViewMatrix));
-			mUniformBuffer->update<float4x4>(2, glm::value_ptr(VP));
-			mUniformBuffer->update<float3>(3, glm::value_ptr(mTransform->getWorldPosition()));
-			mUniformBuffer->update<float2>(4, glm::value_ptr(float2(mNearFace, mFarFace)));
+			mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
+				, mTransform->getWorldPosition() + mTransform->getForward()
+				, mTransform->getUp());
+
+			auto VP = mProjectionMatrix * mViewMatrix;
+
+			if (mUniformBuffer)
+			{
+				mUniformBuffer->update<float4x4>(0, glm::value_ptr(mProjectionMatrix));
+				mUniformBuffer->update<float4x4>(1, glm::value_ptr(mViewMatrix));
+				mUniformBuffer->update<float4x4>(2, glm::value_ptr(VP));
+				mUniformBuffer->update<float3>(3, glm::value_ptr(mTransform->getWorldPosition()));
+				mUniformBuffer->update<float2>(4, glm::value_ptr(float2(mNearFace, mFarFace)));
+			}
 		}
 	}
 
@@ -378,7 +376,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void RenderObserverMultView::prepareRender()
+	void RenderObserverMultView::preRender()
 	{
 		if (this->updateObserverMatrix())
 		{
@@ -410,7 +408,7 @@ namespace tezcat::Tiny
 
 	}
 
-	void ShadowObserver::prepareRender()
+	void ShadowObserver::preRender()
 	{
 		if (!mTransform)
 		{

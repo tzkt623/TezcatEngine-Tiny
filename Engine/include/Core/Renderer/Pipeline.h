@@ -191,7 +191,7 @@ namespace tezcat::Tiny
 	* 1.观察者主动遍历Layer,找到合适的Renderer并让其自动生成CMD并加入到Pass中
 	* 2.在此模式下Pass和CMD都是自动生成
 	*
-	* 注意:此通道中Pass的生命周期归Observer管
+	* 注意:此通道不会管理其中Observer的生命周期
 	*/
 	class TINY_API ObserverPipelinePass : public PipelinePass
 	{
@@ -215,14 +215,12 @@ namespace tezcat::Tiny
 	* 2.此通道可以自定义渲染方式
 	*	例如,渲染没有Mesh的特殊Shader,体积云等特效
 	* 
-	* 注意:此通道会管理其中Observer的生命周期
-	* 
-	* 屏幕空间特效
-	*
+	* 注意:此通道不会管理其中Observer的生命周期
 	* 
 	*/
 	class TINY_API ReplacedPipelinePass : public PipelinePass
 	{
+		friend class BaseMeshRenderer;
 		TINY_OBJECT_H(ReplacedPipelinePass, PipelinePass)
 	protected:
 		ReplacedPipelinePass(BaseRenderObserver* renderObserver
@@ -234,26 +232,58 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~ReplacedPipelinePass();
-		void preCalculate();
+
+		/*
+		* 自定义剔除方式
+		* 需要手动对所有渲染对象进行剔除 以及设置他们的渲染命令生成方法
+		*/
 		void setCustomCulling(const std::function<void(ReplacedPipelinePass*)>& func)
 		{
+			mIsAutoCulling = false;
 			mCustomCulling = func;
 		}
 
-		void pushCommand(BaseMeshRenderer* meshRenderer);
-
-		void setCommandCreator(const std::function<RenderCommand*(BaseMeshRenderer*)>& func)
+		/*
+		* 自动剔除方式
+		* 只需要设置渲染命令的生成方式即可
+		*/
+		void setAutoCulling(const std::function<RenderCommand*(BaseMeshRenderer*)>& func)
 		{
-			mCreateFunction = func;
+			mIsAutoCulling = true;
+			mAutoCulling = func;
 		}
 
+		void setAutoCulling()
+		{
+			mAutoCulling = TINY_BIND_THIS(ReplacedPipelinePass::createCommand);
+		}
+
+	private:
+		void preCalculate();
+		void pushCommand(BaseMeshRenderer* meshRenderer);
 
 	private:
 		RenderCommand* createCommand(BaseMeshRenderer* renderer);
 
 	private:
-		std::function<void(ReplacedPipelinePass*)> mCustomCulling;
-		std::function<RenderCommand*(BaseMeshRenderer*)> mCreateFunction;
+		bool mIsAutoCulling;
+		union
+		{
+			std::function<void(ReplacedPipelinePass*)> mCustomCulling;
+			std::function<RenderCommand* (BaseMeshRenderer*)> mAutoCulling;
+		};
+
+	public:
+		static void preRender();
+		static void clearPassArray();
+		static void addArray(ReplacedPipelinePass* pass)
+		{
+			pass->saveObject();
+			mReplacedPipePassArray.push_back(pass);
+		}
+
+	private:
+		static std::vector<ReplacedPipelinePass*> mReplacedPipePassArray;
 	};
 
 #pragma region PipeQueue
@@ -284,7 +314,7 @@ namespace tezcat::Tiny
 
 		virtual void init();
 		virtual void render();
-		virtual void addPipePass(PipelinePass* pass) = 0;
+		virtual void addPipelinePass(PipelinePass* pass) = 0;
 
 		static uint32_t getFrameCount() { return sFrameCount; }
 
@@ -314,7 +344,7 @@ namespace tezcat::Tiny
 	public:
 		PipelineBuildin();
 		virtual ~PipelineBuildin() noexcept;
-		virtual void addPipePass(PipelinePass* pass) override;
+		virtual void addPipelinePass(PipelinePass* pass) override;
 	protected:
 		virtual void preRender() override;
 		virtual void onRender() override;
@@ -323,7 +353,6 @@ namespace tezcat::Tiny
 	protected:
 		bool mDirty;
 		std::vector<PipelinePass*> mPassArray;
-		std::vector<ReplacedPipelinePass*> mReplacedPipePassArray;
 	};
 
 
@@ -337,9 +366,9 @@ namespace tezcat::Tiny
 			sPipeline = pipeline;
 		}
 
-		static void addPipePass(PipelinePass* pass)
+		static void addPipelinePass(PipelinePass* pass)
 		{
-			sPipeline->addPipePass(pass);
+			sPipeline->addPipelinePass(pass);
 		}
 
 		Pipeline* getCurrentPipeline()

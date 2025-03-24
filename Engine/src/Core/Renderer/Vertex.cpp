@@ -64,7 +64,7 @@ namespace tezcat::Tiny
 		auto [size, data] = meshData->getIndexData();
 		if (size > 0)
 		{
-			mIndexCount = (uint32_t)meshData->mIndices.size();
+			mIndexCount = (uint32_t)meshData->mIndices->size();
 			auto index = IndexBuffer::create();
 			index->init(size, data);
 			this->setIndexBuffer(index);

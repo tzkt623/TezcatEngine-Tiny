@@ -141,5 +141,19 @@ namespace tezcat::Tiny
 		return id;
 	}
 
+	bool FrameBufferManager::remove(std::string name)
+	{
+		auto it = sUMap.find(name);
+		if (it != sUMap.end())
+		{
+			it->second->deleteObject();
+			sUMap.erase(it);
+
+			return true;
+		}
+
+		return false;
+	}
+
 }
 

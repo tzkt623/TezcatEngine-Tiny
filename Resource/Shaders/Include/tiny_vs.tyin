@@ -11,3 +11,8 @@ uniform float3x3 TINY_MatrixN;
 
 //light
 uniform float4x4 TINY_MatrixLightVP;
+
+#define TINY_LAYOUT_POSITION layout (location = 0) in float3 tiny_layout_Position
+#define TINY_LAYOUT_NORMAL layout (location = 1) in float3 tiny_layout_Normal
+#define TINY_LAYOUT_UV layout (location = 2) in float2 tiny_layout_UV
+#define TINY_LAYOUT_COLOR layout (location = 3) in float4 tiny_layout_Color

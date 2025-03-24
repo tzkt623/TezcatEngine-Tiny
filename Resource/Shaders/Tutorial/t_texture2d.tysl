@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Tutorial/t01;
+    str Name = Tutorial/Texture2D;
 }
 #TINY_HEAD_END
 
@@ -22,11 +22,15 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in float3 aPos;
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_UV;
+
+        out float2 myUV;
 
         void main()
         {
-            gl_Position = float4(aPos.x, aPos.y, aPos.z, 1.0);
+            gl_Position = float4(tiny_layout_Position, 1.0);
+            myUV = tiny_layout_UV;
         }
     }
     #TINY_VS_END
@@ -35,11 +39,13 @@
     {
         #include "../Include/tiny_fs.tyin"
 
+        in float2 myUV;
         out float4 myFinalColor;
+        uniform tex2D myTexColor2D;
 
         void main()
         {
-            myFinalColor = float4(1.0f, 0.5f, 0.2f, 1.0f);
+            myFinalColor = texture(myTexColor2D, myUV);
         } 
     }
     #TINY_FS_END

@@ -23,10 +23,10 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in float3 aPos;
-        layout (location = 1) in float3 aNormal;
-        layout (location = 2) in float2 aUV;
-        layout (location = 3) in float4 aColor;
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_NORMAL;
+        TINY_LAYOUT_UV;
+        TINY_LAYOUT_COLOR;
 
         out float4 myColor;
         out float2 myUV;
@@ -36,11 +36,11 @@
 
         void main()
         {
-            float4 position = TINY_MatrixM * float4(aPos, 1.0);
+            float4 position = TINY_MatrixM * float4(tiny_layout_Position, 1.0);
 
-            myColor = aColor;
-            myUV = aUV;
-            myNormal = TINY_MatrixN * aNormal;
+            myColor = tiny_layout_Color;
+            myUV = tiny_layout_UV;
+            myNormal = TINY_MatrixN * tiny_layout_Normal;
             myWorldPosition = float3(position);
             myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
 

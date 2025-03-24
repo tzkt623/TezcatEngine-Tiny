@@ -51,61 +51,93 @@ namespace tezcat::Tiny
 
 		const std::string& getName() const { return mName; }
 
-		uint64 vertexSize() const
+		uint64_t vertexSize() const
 		{
-			return this->mVertices.size() * sizeof(float3);
+			return mVertices.size() * sizeof(float3);
 		}
 
-		uint64 normalSize() const
+		uint64_t normalSize() const
 		{
-			return this->mNormals.size() * sizeof(float3);
+			return mNormals->size() * sizeof(float3);
 		}
 
-		uint64 colorSize() const
+		uint64_t colorSize() const
 		{
-			return this->mColors.size() * sizeof(float4);
+			return mColors->size() * sizeof(float4);
 		}
 
-		uint64 uvSize() const
+		uint64_t uvSize() const
 		{
-			return this->mUVs.size() * sizeof(float2);
+			return mUVs->size() * sizeof(float2);
 		}
 
-		uint64 indexSize() const
+		uint64_t indexSize() const
 		{
-			return this->mIndices.size() * sizeof(unsigned int);
+			return mIndices->size() * sizeof(uint32_t);
 		}
 
-		int getBufferSize() const;
+		std::tuple<uint64_t, const void*> getVertexData(const VertexPosition& position);
+		std::tuple<uint64_t, const void*> getIndexData();
 
-		std::tuple<uint64, const void*> getVertexData(const VertexPosition& position);
-		std::tuple<uint64, const void*> getIndexData();
+		void generate(DrawMode drawMode = DrawMode::Triangles);
 
-		void apply(DrawMode drawMode = DrawMode::Triangles);
+		void createNormals()
+		{
+			if (mNormals)
+			{
+				return;
+			}
+			mNormals = new std::vector<float3>();
+		}
+		void createColors()
+		{
+			if (mColors)
+			{
+				return;
+			}
+			mColors = new std::vector<float4>();
+		}
+		void createUVs()
+		{
+			if (mUVs)
+			{
+				return;
+			}
+			mUVs = new std::vector<float2>();
+		}
+		void createTangents()
+		{
+			if (mTangents)
+			{
+				return;
+			}
+			mTangents = new std::vector<float3>();
+			mBitTangents = new std::vector<float3>();
+		}
+
+		void createIndices()
+		{
+			if (mIndices)
+			{
+				return;
+			}
+			mIndices = new std::vector<uint32_t>();
+		}
 
 	public:
-		bool hasChildren() { return mChildrenData != nullptr; }
-		void addChild(MeshData* meshData);
-		const std::vector<MeshData*>& getChildren() { return *mChildrenData; }
-
-
-	public:
-		int mIndex;
 		std::string mName;
-		std::vector<float3> mVertices;
-		std::vector<float3> mNormals;
-		std::vector<float4> mColors;
-		std::vector<float2> mUVs;
-		std::vector<float3> mTangents;
-		std::vector<float3> mBitTangents;
-
-		std::vector<uint32> mIndices;
-
+		int mIndex;
 		DrawMode mDrawMode;
 		std::vector<VertexPosition> mLayoutPositions;
 
-	private:
-		std::vector<MeshData*>* mChildrenData;
+		std::vector<float3> mVertices;
+		std::vector<float3>* mNormals;
+		std::vector<float4>* mColors;
+		std::vector<float2>* mUVs;
+		std::vector<float3>* mTangents;
+		std::vector<float3>* mBitTangents;
+
+		std::vector<uint32_t>* mIndices;
 	};
 
 
@@ -151,7 +183,7 @@ namespace tezcat::Tiny
 	public:
 		Vertex* mVertex;
 		std::string mName;
-		uint32 mIndex;
+		uint32_t mIndex;
 		int32_t mParentIndex;
 		Shader* mShader;
 

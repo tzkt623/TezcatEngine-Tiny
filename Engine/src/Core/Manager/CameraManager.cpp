@@ -50,11 +50,11 @@ namespace tezcat::Tiny
 		return mCurrentData->findCamera(name);
 	}
 
-	void CameraManager::calculate()
+	void CameraManager::preRender()
 	{
 		if (mCurrentData)
 		{
-			mCurrentData->calculate();
+			mCurrentData->preRender();
 		}
 	}
 
@@ -147,7 +147,7 @@ namespace tezcat::Tiny
 		mObserverArray.push_back(observer);
 	}
 
-	void CameraData::calculate()
+	void CameraData::preRender()
 	{
 		if (mDirty)
 		{
@@ -170,7 +170,7 @@ namespace tezcat::Tiny
 					continue;
 				}
 
-				observer->prepareRender();
+				observer->preRender();
 
 				if (observer->isNeedRemove())
 				{

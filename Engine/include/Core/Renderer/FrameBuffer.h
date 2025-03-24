@@ -55,6 +55,9 @@ namespace tezcat::Tiny
 		void updateCurrentFrame(uint32 val) { mCurrentFrame = val; }
 
 	protected:
+		void onClose() override;
+
+	protected:
 		uint32 mCurrentFrame;
 		uint32 mBufferID;
 		uint32 mUID;

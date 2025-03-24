@@ -40,7 +40,7 @@ namespace tezcat::Tiny
 		void addCamera(Camera* camera);
 		void addRenderObserver(BaseRenderObserver* observer);
 
-		void calculate();
+		void preRender();
 
 	private:
 		bool mDirty;
@@ -67,7 +67,7 @@ namespace tezcat::Tiny
 
 	public:
 		static void addRenderObserver(BaseRenderObserver* renderObserver);
-		static void calculate();
+		static void preRender();
 
 	private:
 		static CameraData* mCurrentData;

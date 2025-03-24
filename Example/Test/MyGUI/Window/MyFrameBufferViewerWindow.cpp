@@ -2,10 +2,11 @@
 
 namespace tezcat::Editor
 {
-	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyFrameBufferViewerWindow)
+	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyFrameBufferViewerWindow);
 
 	MyFrameBufferViewerWindow::MyFrameBufferViewerWindow()
 		: GUIWindow("帧缓存查看器(FrameBufferViewer)")
+		, mSelectBuffer(nullptr)
 	{
 
 	}
@@ -29,34 +30,37 @@ namespace tezcat::Editor
 		static ImVec2 uv1(1, 0);
 		static ImVec2 offset;
 
-		ImGui::BeginChild("##FrameBufferViewerWindow", ImVec2(240, ImGui::GetContentRegionAvail().y), true);
+		ImGui::BeginChild("##FrameBufferViewerWindow", ImVec2(240.0f, ImGui::GetContentRegionAvail().y), true);
 
 		auto& frame_buffers = FrameBufferManager::getAllFrameBuffer();
-
-		ImGuiListClipper clipper;
-		clipper.Begin(frame_buffers.size(), ImGui::GetTextLineHeightWithSpacing());
-		while (clipper.Step())
+		if (!frame_buffers.empty())
 		{
-			for (auto& pair : frame_buffers)
+			ImGuiListClipper clipper;
+			clipper.Begin(frame_buffers.size(), ImGui::GetTextLineHeightWithSpacing());
+			while (clipper.Step())
 			{
-				ImGui::Selectable(pair.first.data(), mSelectBuffer == pair.second);
-				if (ImGui::IsItemHovered())
+				for (auto& pair : frame_buffers)
 				{
-					if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+					ImGui::Selectable(pair.first.data(), mSelectBuffer == pair.second);
+					if (ImGui::IsItemHovered())
 					{
-						mSelectBuffer = pair.second;
+						if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+						{
+							mSelectBuffer = pair.second;
+						}
 					}
 				}
 			}
+			clipper.End();
 		}
-		clipper.End();
-
 
 		ImGui::EndChild();
+
 
 		ImGui::SameLine();
 
 		ImGui::BeginChild("##FrameBufferTextureWindow", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+
 		if (mSelectBuffer)
 		{
 			auto& attachments = mSelectBuffer->getAttachmentes();
@@ -96,5 +100,6 @@ namespace tezcat::Editor
 		}
 
 		ImGui::EndChild();
+
 	}
 }

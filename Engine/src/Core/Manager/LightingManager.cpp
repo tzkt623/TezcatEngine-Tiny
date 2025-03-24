@@ -79,6 +79,8 @@ namespace tezcat::Tiny
 	bool LightingManager::sCalculateEnvLighting = false;
 	bool LightingManager::sEnableSkyBox = false;
 	bool LightingManager::sIsSceneExited = true;
+	bool LightingManager::sRefreshSkyBox = false;
+
 	float LightingManager::sExposure = 1;
 	std::function<void()> LightingManager::sRemovePassFromPipeline = nullptr;
 
@@ -90,9 +92,10 @@ namespace tezcat::Tiny
 			{
 				setSkyBoxHDRTexture(static_cast<Image*>(data.userData));
 				sCalculateEnvLighting = true;
-				sMakeCubeTexPass->resetOnceMode();
-				sIrradiancePass->resetOnceMode();
-				sPrefilterPass->resetOnceMode();
+				sRefreshSkyBox = true;
+				//sMakeCubeTexPass->resetOnceMode();
+				//sIrradiancePass->resetOnceMode();
+				//sPrefilterPass->resetOnceMode();
 				//sBRDFLUTPass->resetOnceMode();
 			});
 
@@ -110,6 +113,7 @@ namespace tezcat::Tiny
 				sIsSceneExited = true;
 				sEnableSkyBox = false;
 				sCalculateEnvLighting = false;
+				sRefreshSkyBox = false;
 
 				if (sTexHDR)
 				{
@@ -117,9 +121,9 @@ namespace tezcat::Tiny
 					sTexHDR = nullptr;
 				}
 
-				sMakeCubeTexPass->removeFromPipeline();
-				sIrradiancePass->removeFromPipeline();
-				sPrefilterPass->removeFromPipeline();
+				//sMakeCubeTexPass->removeFromPipeline();
+				//sIrradiancePass->removeFromPipeline();
+				//sPrefilterPass->removeFromPipeline();
 				//sBRDFLUTPass->removeFromPipeline();
 
 				if (sSkyBoxPass)
@@ -138,11 +142,6 @@ namespace tezcat::Tiny
 		createIrradiance();
 		createPrefilter();
 		createBRDF_LUT();
-
-		mEnvPassArray.push_back([]()
-			{
-				sBRDFLUTPass->addToPipeline();
-			});
 	}
 
 	void LightingManager::close()
@@ -150,29 +149,11 @@ namespace tezcat::Tiny
 		EngineEvent::getInstance()->removeListener(&sIsSceneExited);
 	}
 
-	void LightingManager::calculate()
+	void LightingManager::preRender()
 	{
 		if (sIsSceneExited)
 		{
 			return;
-		}
-
-		if (!mEnvPassArray.empty())
-		{
-			for (auto& func : mEnvPassArray)
-			{
-				func();
-			}
-			mEnvPassArray.clear();
-		}
-
-		//如果启用环境光照,就需要计算环境光
-		if (sCalculateEnvLighting)
-		{
-			sMakeCubeTexPass->addToPipeline();
-			sIrradiancePass->addToPipeline();
-			sPrefilterPass->addToPipeline();
-			//sBRDFLUTPass->addToPipeline();
 		}
 
 		//如果启用天空盒
@@ -205,6 +186,15 @@ namespace tezcat::Tiny
 
 			if (sSkyBoxPass)
 			{
+				if (sRefreshSkyBox)
+				{
+					sRefreshSkyBox = false;
+					sMakeCubeTexPass->addToPipeline();
+					sIrradiancePass->addToPipeline();
+					sPrefilterPass->addToPipeline();
+					sBRDFLUTPass->addToPipeline();
+				}
+
 				//把天空盒加入渲染
 				sSkyBoxPass->addToPipeline();
 			}
@@ -216,6 +206,16 @@ namespace tezcat::Tiny
 				sSkyBoxPass->removeFromPipeline();
 			}
 		}
+
+
+		//if (!mEnvPassArray.empty())
+		//{
+		//	for (auto& func : mEnvPassArray)
+		//	{
+		//		func();
+		//	}
+		//	mEnvPassArray.clear();
+		//}
 	}
 
 	void LightingManager::submitEnvLighting(Shader* shader)

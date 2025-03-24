@@ -50,6 +50,17 @@ namespace tezcat::Tiny
 
 	}
 
+	RenderCMD_Lambda::RenderCMD_Lambda(std::function<void(PipelinePass*, Shader*)> function)
+		: mFuncion(function)
+	{
+
+	}
+
+	void RenderCMD_Lambda::execute(PipelinePass* pass, Shader* shader)
+	{
+		mFuncion(pass, shader);
+	}
+
 #pragma region Shader
 	RenderCMD_CreateShader::RenderCMD_CreateShader(Shader* shader)
 		: mShader(shader)
@@ -490,4 +501,7 @@ namespace tezcat::Tiny
 		}
 		TINY_LOG_INFO(std::format("Pick ObjectID {}", id));
 	}
+
+
+
 }

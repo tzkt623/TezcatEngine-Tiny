@@ -125,8 +125,10 @@ Sort Function ```a->getPipelineOrderID() < b->getPipelineOrderID()```
 //
 pass = ReplacedPipelinePass::create(mShadowObserver
     , ShaderManager::find("Unlit/ShadowMap"));
-//Use RenderObject data in layer
-pass->setUseCullLayerData(true);
+pass->setAutoCulling([](BaseMeshRenderer* renderer)
+    {
+        return new RenderCMD_DrawMeshWithOutMaterial(renderer->getVertex(), renderer->getTransform());
+    });
 pass->saveObject();
 pass->addToPipeline();
 
@@ -137,7 +139,7 @@ pass->addToPipeline();
 pass = ReplacedPipelinePass::create(CameraManager::getMainCamera()->getRenderObserver(), ShaderManager::find("Unlit/Skybox"));
 pass->saveObject();
 //not use RenderObject data in layer but custom function to rendering
-pass->setPreFunction([=](ReplacedPipelinePass* pass)
+sSkyBoxPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 {
     pass->addCommand<RenderCMD_DrawSkybox>(sSkyboxVertex
         , sCurrentCubeMap
@@ -151,16 +153,29 @@ pass->addToPipeline();
 //
 //  Render Screen Effect
 //
-auto shader = ShaderManager::find("Tutorial/t01");
-pass = ReplacedPipelinePass::create(observer, shader);
-//not use RenderObject data in layer but custom function to rendering
-pass->setPreFunction([=](BReplacedPipelinePass* pass)
+auto shader = ShaderManager::find("Tutorial/Cube");
+auto config_mvp = shader->getUniformValueConfig("MVP");
+auto config_color = shader->getUniformValueConfig("myColor");
+
+mPass = ReplacedPipelinePass::create(mObserver, shader);
+mPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 {
-    pass->addCommand<RenderCMD_DrawVertex>(mVertex);
+    pass->addCommand<RenderCMD_Lambda>([=](PipelinePass* pass, Shader* shader)
+        {
+            auto projection = glm::perspective(glm::radians(75.0f), (floatEngine::getScreenWidth() / Engine::getScreenHeight(), 0.01f, 100.0f);
+            auto view = glm::lookAt(float3(0.0f, 0.0f, 2.0f)
+                , float3(0.0f, 0.0f, -1.0f)
+                , float3(0.0f, 1.0f, 0.0f));
+            auto model = glm::translate(float4x4(1.0f), float3(0.0f, 0.0f, -1.0f))
+                * glm::rotate(float4x4(1.0f), 45.0f, float3(0.0f, 1.0f, 0.0f));
+            auto mvp = projection * view * model;
+            Graphics::getInstance()->setMat4(shader, config_mvp->valueID, mvp);
+            Graphics::getInstance()->setFloat3(shader, config_color->valueID, float3(1.0f, 05f, 0.5f));
+            Graphics::getInstance()->draw(mVertex);
+        });
 });
-pass->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
-pass->saveObject();
-pass->addToPipeline();
+mPass->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
+mPass->addToPipeline();
 ```
 
 ## **Editor**

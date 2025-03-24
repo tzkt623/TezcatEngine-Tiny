@@ -64,13 +64,14 @@ namespace tezcat::Editor
 		ImGui::NewFrame();
 
 		auto it = mWindows.begin();
-
-		while (it != mWindows.end())
+		auto end = mWindows.end();
+		while (it != end)
 		{
 			if ((*it)->isClosed())
 			{
 				delete (*it);
 				it = mWindows.erase(it);
+				end = mWindows.end();
 			}
 			else
 			{

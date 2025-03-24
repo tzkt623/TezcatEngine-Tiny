@@ -6,7 +6,7 @@
 #include "MyOverviewWindow.h"
 #include "MyGCInfoWindow.h"
 #include "MyLogWindow.h"
-#include "MyViewPortWindow.h"
+#include "MySceneWindow.h"
 #include "MyLightingWindow.h"
 #include "MyFrameBufferViewerWindow.h"
 
@@ -50,7 +50,7 @@ namespace tezcat::Editor
 	{
 		MyObjectInfoWindow::create(this->getHost());
 		MyOverviewWindow::create(this->getHost());
-		MyViewPortWindow::create(this->getHost());
+		MySceneWindow::create(this->getHost());
 		MyResourceWindow::create(this->getHost());
 		MyLogWindow::create(this->getHost());
 		MyLightingWindow::create(this->getHost());
@@ -113,13 +113,12 @@ namespace tezcat::Editor
 
 				ImGui::Separator();
 
-				auto& scenes = SceneManager::getAllScene();
-				for (auto& it : scenes)
+				for (auto scene : SceneManager::getAllSceneArray())
 				{
-					if (ImGui::MenuItem(it.first.data()))
+					if (ImGui::MenuItem(scene->getName().data()))
 					{
 						EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
-						EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PushScene, it.second });
+						EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PushScene, scene });
 					}
 				}
 
@@ -141,7 +140,7 @@ namespace tezcat::Editor
 
 				if (ImGui::MenuItem("场景(Scene)"))
 				{
-					MyViewPortWindow::create(this->getHost())->setFocus();
+					MySceneWindow::create(this->getHost())->setFocus();
 				}
 
 				if (ImGui::MenuItem("文件目录(FileSystem)"))

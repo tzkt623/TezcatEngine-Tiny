@@ -45,6 +45,7 @@ namespace tezcat::Tiny::GL
 		void bind(Shader* shader) override;
 		void bind(FrameBuffer* frameBuffer) override;
 		void bind(UniformBuffer* uniformBuffer) override;
+		void bind(Texture2D* texture) override;
 		void readPixel(int32_t x, int32_t y) override;
 		void readObjectID(int32_t x, int32_t y, int32_t& id) override;
 
@@ -133,6 +134,7 @@ namespace tezcat::Tiny::GL
 		void setFloat4(Shader* shader, UniformID& uniform, float* data) override;
 
 
+
 		void setInt1(Shader* shader, UniformID& uniform, const int32_t& data) override;
 		void setInt1(Shader* shader, UniformID& uniform, int32_t* data) override;
 		void setInt2(Shader* shader, UniformID& uniform, int32_t* data) override;
@@ -152,11 +154,16 @@ namespace tezcat::Tiny::GL
 
 
 	public:
-		void setFloat1(Shader* shader, const int32_t& valueID, const float& data) override;
 		void setFloat1(Shader* shader, const int32_t& valueID, const float* data) override;
 		void setFloat2(Shader* shader, const int32_t& valueID, const float* data) override;
 		void setFloat3(Shader* shader, const int32_t& valueID, const float* data) override;
 		void setFloat4(Shader* shader, const int32_t& valueID, const float* data) override;
+
+
+		void setFloat1(Shader* shader, const int32_t& valueID, const float& data) override;
+		void setFloat2(Shader* shader, const int32_t& valueID, const float2& data) override;
+		void setFloat3(Shader* shader, const int32_t& valueID, const float3& data) override;
+		void setFloat4(Shader* shader, const int32_t& valueID, const float4& data) override;
 
 		void setInt1(Shader* shader, const int32_t& valueID, const int32_t& data) override;
 		void setInt1(Shader* shader, const int32_t& valueID, int32_t* data) override;

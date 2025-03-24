@@ -50,7 +50,6 @@ namespace tezcat::Tiny
 
 	FrameBuffer::~FrameBuffer()
 	{
-		FrameBufferManager::recycleID(mUID);
 	}
 
 	void FrameBuffer::generate()
@@ -69,4 +68,14 @@ namespace tezcat::Tiny
 		return TINY_OBJECT_MEMORY_INFO();
 	}
 
+	void FrameBuffer::onClose()
+	{
+		for (auto tex : mComponents)
+		{
+			tex->deleteObject();
+		}
+		mComponents.clear();
+
+		FrameBufferManager::recycleID(mUID);
+	}
 }

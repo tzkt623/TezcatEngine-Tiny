@@ -235,7 +235,8 @@ namespace tezcat::Tiny
 		if (mChildren)
 		{
 			auto it = mChildren->begin();
-			while (it != mChildren->end())
+			auto end = mChildren->end();
+			while (it != end)
 			{
 				auto& child = (*it);
 				if (child.lock())
@@ -246,6 +247,7 @@ namespace tezcat::Tiny
 				else
 				{
 					it = mChildren->erase(it);
+					end = mChildren->end();
 				}
 			}
 		}
@@ -256,7 +258,8 @@ namespace tezcat::Tiny
 		if (mChildren)
 		{
 			auto it = mChildren->begin();
-			while (it != mChildren->end())
+			auto end = mChildren->end();
+			while (it != end)
 			{
 				auto& child = (*it);
 				if (child.lock())
@@ -267,6 +270,7 @@ namespace tezcat::Tiny
 				else
 				{
 					it = mChildren->erase(it);
+					end = mChildren->end();
 				}
 			}
 		}

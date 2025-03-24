@@ -80,7 +80,7 @@ namespace tezcat::Tiny
 		mPass->removeFromPipeline();
 	}
 
-	void GameObjectManager::calculate()
+	void GameObjectManager::preRender()
 	{
 		if (mPass == nullptr)
 		{
@@ -137,7 +137,7 @@ namespace tezcat::Tiny
 	{
 		mPass = ReplacedPipelinePass::create(mObserver, ShaderManager::find("Unlit/ObjectID"));
 		mPass->setFrameBuffer(mFrameBuffer);
-		mPass->setCommandCreator([](BaseMeshRenderer* renderer)
+		mPass->setAutoCulling([](BaseMeshRenderer* renderer)
 			{
 				return new RenderCMD_DrawID(renderer->getVertex()
 					, renderer->getTransform());

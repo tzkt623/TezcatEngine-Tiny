@@ -46,7 +46,7 @@ namespace tezcat::Tiny
 
 	}
 
-	void CameraObserver::prepareRender()
+	void CameraObserver::preRender()
 	{
 		if (!mTransform)
 		{

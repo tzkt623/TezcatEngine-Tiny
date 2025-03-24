@@ -21,13 +21,13 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in float3 aPos;
+        TINY_LAYOUT_POSITION;
         out float3 myWorldPosition;
 
         void main()
         {
-            myWorldPosition = aPos;
-            gl_Position = TINY_SkyBox_MatrixP * TINY_SkyBox_MatrixV[TINY_SkyBox_ViewIndex] * float4(aPos, 1.0);
+            myWorldPosition = tiny_layout_Position;
+            gl_Position = TINY_SkyBox_MatrixP * TINY_SkyBox_MatrixV[TINY_SkyBox_ViewIndex] * float4(tiny_layout_Position, 1.0);
         }
     }
     #TINY_VS_END

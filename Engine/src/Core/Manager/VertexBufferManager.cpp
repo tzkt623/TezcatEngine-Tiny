@@ -31,7 +31,7 @@ namespace tezcat::Tiny
 	std::unordered_map<std::string_view, Vertex*> VertexBufferManager::mVertexUMap;
 	std::unordered_map<std::string, std::shared_ptr<UniformBufferLayout>> VertexBufferManager::mUniformBufferMap;
 
-	void VertexBufferManager::add(MeshData* meshData)
+	void VertexBufferManager::addMeshData(MeshData* meshData)
 	{
 		if (meshData->getName().empty())
 		{
@@ -68,7 +68,7 @@ namespace tezcat::Tiny
 		return nullptr;
 	}
 
-	void VertexBufferManager::add(Vertex* vertex)
+	void VertexBufferManager::addMeshData(Vertex* vertex)
 	{
 		auto result = mVertexUMap.try_emplace(vertex->getEngineName().toView(), nullptr);
 		if (result.second)

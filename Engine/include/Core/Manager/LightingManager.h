@@ -88,7 +88,7 @@ namespace tezcat::Tiny
 		//
 		// Environment Lighting
 		//
-		static void calculate();
+		static void preRender();
 		static void submitEnvLighting(Shader* shader);
 		static void setSkyBoxHDRTexture(Image* image);
 		static Texture2D* getSkyBoxHDRTexture() { return sTexHDR; }
@@ -150,6 +150,7 @@ namespace tezcat::Tiny
 		static bool sCloseEnvLighting;
 		static bool sEnableSkyBox;
 		static bool sIsSceneExited;
+		static bool sRefreshSkyBox;
 
 	private:
 		static ReplacedPipelinePass* sMakeCubeTexPass;

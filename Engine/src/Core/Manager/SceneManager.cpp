@@ -27,8 +27,10 @@
 namespace tezcat::Tiny
 {
 	std::deque<tezcat::Tiny::SceneManager::CMDData> SceneManager::mCDMs;
-	std::unordered_map<std::string_view, Scene*> SceneManager::sSceneUMap;
 	std::stack<Scene*> SceneManager::sSceneArray;
+
+	std::unordered_map<std::string_view, Scene*> SceneManager::sPreparedSceneUMap;
+	std::vector<Scene*> SceneManager::sPreparedSceneArray;
 
 	void SceneManager::init()
 	{
@@ -54,8 +56,8 @@ namespace tezcat::Tiny
 			sSceneArray.top()->onPause();
 		}
 
-		auto it = sSceneUMap.find(name);
-		if (it != sSceneUMap.end())
+		auto it = sPreparedSceneUMap.find(name);
+		if (it != sPreparedSceneUMap.end())
 		{
 			pushScene(it->second);
 		}
@@ -78,15 +80,12 @@ namespace tezcat::Tiny
 
 	void SceneManager::prepareScene(Scene* scene)
 	{
-		auto result = sSceneUMap.try_emplace(scene->getName(), nullptr);
-		if (result.second)
+		auto it = sPreparedSceneUMap.find(scene->getName());
+		if (it == sPreparedSceneUMap.end())
 		{
-			result.first->second = scene;
 			scene->saveObject();
-		}
-		else
-		{
-			TINY_THROW("Fatal Error!");
+			sPreparedSceneUMap.emplace(scene->getName(), scene);
+			sPreparedSceneArray.push_back(scene);
 		}
 	}
 

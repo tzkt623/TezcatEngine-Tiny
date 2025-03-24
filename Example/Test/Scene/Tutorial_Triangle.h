@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-#include "include/Tiny.h"
+#include "TutorialHelper.h"
 
 
-class Tutorial01 : public Scene
+class Tutorial_Triangle : public Scene
 {
-	Tutorial01(const std::string& name);
-	TINY_OBJECT_H(Tutorial01, Scene)
+	Tutorial_Triangle(const std::string& name);
+	TINY_OBJECT_H(Tutorial_Triangle, Scene)
 
 public:
-	virtual ~Tutorial01();
+	virtual ~Tutorial_Triangle();
 
 
 	void onEnter() override;
@@ -22,5 +22,3 @@ private:
 	ReplacedPipelinePass* mPass = nullptr;
 	RenderObserver* mObserver = nullptr;
 };
-
-

@@ -1,10 +1,10 @@
-﻿#include "MyViewPortWindow.h"
+﻿#include "MySceneWindow.h"
 
 namespace tezcat::Editor
 {
 
-	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyViewPortWindow);
-	MyViewPortWindow::MyViewPortWindow()
+	TINY_EDITOR_WINDOW_INSTANCE_CPP(MySceneWindow);
+	MySceneWindow::MySceneWindow()
 		: GUIWindow("场景(Scene)")
 		, mColorBuffer(nullptr)
 		, mIsPlaying(true)
@@ -12,17 +12,17 @@ namespace tezcat::Editor
 
 	}
 
-	MyViewPortWindow::~MyViewPortWindow()
+	MySceneWindow::~MySceneWindow()
 	{
 		TINY_EDITOR_WINDOW_DELETE_INSTACNE();
 	}
 
-	bool MyViewPortWindow::begin()
+	bool MySceneWindow::begin()
 	{
 		return ImGui::Begin(this->getName(), 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_MenuBar);
 	}
 
-	void MyViewPortWindow::calculate(const ImVec2& inTextureSize, const ImVec2& inWindowSize
+	void MySceneWindow::calculate(const ImVec2& inTextureSize, const ImVec2& inWindowSize
 		, ImVec2& outDisplaySize, ImVec2& outOffset, ImVec2& outUV0, ImVec2& outUV1)
 	{
 		outDisplaySize = inWindowSize;
@@ -68,7 +68,7 @@ namespace tezcat::Editor
 		}
 	}
 
-	void MyViewPortWindow::onRender()
+	void MySceneWindow::onRender()
 	{
 		GUIWindow::onRender();
 
@@ -103,7 +103,7 @@ namespace tezcat::Editor
 		}
 		*/
 
-		if (ImGui::BeginChild("Viewport"))
+		if (ImGui::BeginChild("##Scene"))
 		{
 			mViewPortPos = ImGui::GetItemRectMin();
 
@@ -175,12 +175,13 @@ namespace tezcat::Editor
 		}
 	}
 
-	void MyViewPortWindow::drawInfo(const ImVec2& pos)
+	void MySceneWindow::drawInfo(const ImVec2& pos)
 	{
 		ImGui::SetNextWindowPos(pos);
 		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 		if (ImGui::Begin("状态(State)", 0, window_flags))
+		//if (ImGui::BeginChild("状态(State)"))
 		{
 			//gpu
 			ImGui::Text("GPU: %s", Profiler::GPU);
@@ -229,6 +230,4 @@ namespace tezcat::Editor
 			ImGui::End();
 		}
 	}
-
-
 }

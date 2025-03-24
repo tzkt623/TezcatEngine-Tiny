@@ -191,4 +191,18 @@ namespace tezcat::Tiny
 		mTextureMap.emplace(t->getEngineName().toView(), t);
 		return { true, t };
 	}
+
+	bool TextureManager::remove(std::string name)
+	{
+		auto it = mTextureMap.find(name);
+		if (it != mTextureMap.end())
+		{
+			it->second->deleteObject();
+			mTextureMap.erase(it);
+			return true;
+		}
+
+		return false;
+	}
+
 }

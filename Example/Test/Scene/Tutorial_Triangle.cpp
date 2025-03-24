@@ -1,35 +1,26 @@
-﻿#include "Tutorial01.h"
+﻿#include "Tutorial_Triangle.h"
 #include "../MyObserver.h"
 
-TINY_OBJECT_CPP(Tutorial01, Scene);
+TINY_OBJECT_CPP(Tutorial_Triangle, Scene);
 
-Tutorial01::Tutorial01(const std::string& name)
+Tutorial_Triangle::Tutorial_Triangle(const std::string& name)
 	: Base(name)
 {
 
 }
 
-Tutorial01::~Tutorial01()
+Tutorial_Triangle::~Tutorial_Triangle()
 {
 }
 
-void Tutorial01::onEnter()
+void Tutorial_Triangle::onEnter()
 {
 	Base::onEnter();
 
 	LightingManager::disableEnvLighting();
 
-	fmt::print("{0},{1},{2},{3}", this->getClassName(), this->getClassID(), this->getParentClassName(), Base::RTTIStatic()->__classID);
-
-	MeshData* mesh = MeshData::create();
-	mesh->mName = "Triangle";
-	mesh->mVertices.emplace_back(-0.5f, -0.5f, 0.0f);	// left
-	mesh->mVertices.emplace_back(0.5f, -0.5f, 0.0f);	// right
-	mesh->mVertices.emplace_back(0.0f, 0.5f, 0.0f);		// top
-	mesh->apply();
-
 	mVertex = Vertex::create();
-	mVertex->setMesh(mesh);
+	mVertex->setMesh(TutorialHelper::createTriangleMesh());
 	mVertex->generate();
 	mVertex->saveObject();
 
@@ -38,19 +29,21 @@ void Tutorial01::onEnter()
 	mObserver->setOrderID(0);
 	mObserver->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 	mObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-	//GameObjectManager::setIDObserver(mObserver);
 
-	auto shader = ShaderManager::find("Tutorial/t01");
+	auto shader = ShaderManager::find("Tutorial/Triangle");
 	mPass = ReplacedPipelinePass::create(mObserver, shader);
 	mPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 	{
-		pass->addCommand<RenderCMD_DrawVertex>(mVertex);
+		pass->addCommand<RenderCMD_Lambda>([=](PipelinePass* pass, Shader* shader)
+			{
+				Graphics::getInstance()->draw(mVertex);
+			});
 	});
 	mPass->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 	mPass->addToPipeline();
 }
 
-void Tutorial01::onExit()
+void Tutorial_Triangle::onExit()
 {
 	Base::onExit();
 	mPass->removeFromPipeline();
@@ -58,12 +51,14 @@ void Tutorial01::onExit()
 	mObserver->deleteObject();
 }
 
-void Tutorial01::onPause()
+void Tutorial_Triangle::onPause()
 {
 	Base::onPause();
 }
 
-void Tutorial01::onResume()
+void Tutorial_Triangle::onResume()
 {
 	Base::onResume();
 }
+
+

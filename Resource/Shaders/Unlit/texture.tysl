@@ -22,15 +22,15 @@
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in float3 aPos;
-        layout (location = 2) in float2 aUV;
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_UV;
 
         out float2 myUV;
 
         void main()
         {
-            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * float4(aPos, 1.0);
-            myUV = aUV;
+            gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * float4(tiny_layout_Position, 1.0);
+            myUV = tiny_layout_UV;
         }
     }
     #TINY_VS_END

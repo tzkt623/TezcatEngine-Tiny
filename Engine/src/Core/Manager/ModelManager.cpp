@@ -119,14 +119,19 @@ namespace tezcat::Tiny
 
 	MeshData* ModelManager::createMesh(aiMesh* aimesh)
 	{
-		MeshData* meshData = MeshData::create(aimesh->mName.C_Str());
+		MeshData* mesh_data = MeshData::create(aimesh->mName.C_Str());
+		mesh_data->mColors = new std::vector<float4>();
+		mesh_data->mUVs = new std::vector<float2>();
+		mesh_data->mNormals = new std::vector<float3>();
+		mesh_data->mTangents = new std::vector<float3>();
+		mesh_data->mBitTangents = new std::vector<float3>();
 
-		meshData->mVertices.reserve(aimesh->mNumVertices);
-		meshData->mNormals.reserve(aimesh->mNumVertices);
-		meshData->mUVs.reserve(aimesh->mNumVertices);
-		meshData->mColors.reserve(aimesh->mNumVertices);
-		meshData->mTangents.reserve(aimesh->mNumVertices);
-		meshData->mBitTangents.reserve(aimesh->mNumVertices);
+		mesh_data->mVertices.reserve(aimesh->mNumVertices);
+		mesh_data->mNormals->reserve(aimesh->mNumVertices);
+		mesh_data->mUVs->reserve(aimesh->mNumVertices);
+		mesh_data->mColors->reserve(aimesh->mNumVertices);
+		mesh_data->mTangents->reserve(aimesh->mNumVertices);
+		mesh_data->mBitTangents->reserve(aimesh->mNumVertices);
 
 		bool has_normal = aimesh->HasNormals();
 		bool has_uv0 = aimesh->HasTextureCoords(0);
@@ -136,14 +141,14 @@ namespace tezcat::Tiny
 		for (uint32_t ver_i = 0; ver_i < aimesh->mNumVertices; ver_i++)
 		{
 			auto ai_vertex = aimesh->mVertices[ver_i];
-			meshData->mVertices.emplace_back(ai_vertex.x
+			mesh_data->mVertices.emplace_back(ai_vertex.x
 									   , ai_vertex.y
 									   , ai_vertex.z);
 
 			if (has_normal)
 			{
 				auto ai_normal = aimesh->mNormals[ver_i];
-				meshData->mNormals.emplace_back(ai_normal.x
+				mesh_data->mNormals->emplace_back(ai_normal.x
 										  , ai_normal.y
 										  , ai_normal.z);
 			}
@@ -151,13 +156,13 @@ namespace tezcat::Tiny
 			if (has_uv0)
 			{
 				auto ai_uv = aimesh->mTextureCoords[0][ver_i];
-				meshData->mUVs.emplace_back(ai_uv.x, ai_uv.y);
+				mesh_data->mUVs->emplace_back(ai_uv.x, ai_uv.y);
 			}
 
 			if (has_color0)
 			{
 				auto ai_color = aimesh->mColors[0][ver_i];
-				meshData->mColors.emplace_back(ai_color.r
+				mesh_data->mColors->emplace_back(ai_color.r
 										 , ai_color.g
 										 , ai_color.b
 										 , ai_color.a);
@@ -166,12 +171,12 @@ namespace tezcat::Tiny
 			if (has_tangents)
 			{
 				auto ai_tangents = aimesh->mTangents[ver_i];
-				meshData->mTangents.emplace_back(ai_tangents.x
+				mesh_data->mTangents->emplace_back(ai_tangents.x
 										   , ai_tangents.y
 										   , ai_tangents.z);
 
 				auto ai_bit = aimesh->mBitangents[ver_i];
-				meshData->mBitTangents.emplace_back(ai_bit.x
+				mesh_data->mBitTangents->emplace_back(ai_bit.x
 											  , ai_bit.y
 											  , ai_bit.z);
 			}
@@ -179,30 +184,32 @@ namespace tezcat::Tiny
 
 		if (aimesh->HasFaces())
 		{
+			mesh_data->mIndices = new std::vector<uint32_t>();
+
 			for (uint32_t face_i = 0; face_i < aimesh->mNumFaces; face_i++)
 			{
-				auto ai_face = aimesh->mFaces[face_i];
+				auto& ai_face = aimesh->mFaces[face_i];
 				for (uint32_t index_i = 0; index_i < ai_face.mNumIndices; index_i++)
 				{
-					meshData->mIndices.emplace_back(ai_face.mIndices[index_i]);
+					mesh_data->mIndices->emplace_back(ai_face.mIndices[index_i]);
 				}
 
 				if (ai_face.mNumIndices == 1)
 				{
-					meshData->mDrawMode = DrawMode::Points;
+					mesh_data->mDrawMode = DrawMode::Points;
 				}
 				else if (ai_face.mNumIndices == 2)
 				{
-					meshData->mDrawMode = DrawMode::Lines;
+					mesh_data->mDrawMode = DrawMode::Lines;
 				}
 				else if (ai_face.mNumIndices == 3)
 				{
-					meshData->mDrawMode = DrawMode::Triangles;
+					mesh_data->mDrawMode = DrawMode::Triangles;
 				}
 			}
 		}
 
-		return meshData;
+		return mesh_data;
 	}
 }
 

@@ -20,7 +20,7 @@ namespace tezcat::Tiny
 		virtual ~ShadowCaster();
 		void setShadowMap(int width, int height, const std::string& shaderName);
 
-		uint32 getUID() const { return mUID; }
+		uint32_t getUID() const { return mUID; }
 		Texture2D* getShadowTexutre() { return mShadowTexture; }
 
 		void submit(Shader* shader);
@@ -35,7 +35,7 @@ namespace tezcat::Tiny
 		void onDestroy() override;
 
 	private:
-		uint32 mUID;
+		uint32_t mUID;
 		Texture2D* mShadowTexture;
 		ShadowObserver* mShadowObserver;
 		ReplacedPipelinePass* mPipePass;

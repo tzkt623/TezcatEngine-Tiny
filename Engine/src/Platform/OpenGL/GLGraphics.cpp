@@ -403,6 +403,11 @@ namespace tezcat::Tiny::GL
 			, uniformBuffer->getBufferID()));
 	}
 
+	void GLGraphics::bind(Texture2D* texture)
+	{
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, texture->getTextureID()));
+	}
+
 	void GLGraphics::clear(const ClearOption& option)
 	{
 		if (option == ClearOption::CO_None)
@@ -440,16 +445,25 @@ namespace tezcat::Tiny::GL
 	void GLGraphics::draw(Vertex* vertex)
 	{
 		TINY_GL_CHECK(glBindVertexArray(vertex->getVertexID()));
-		//glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount());
 
-		if (vertex->getIndexCount() > 0)
+		switch (vertex->getIndexCount())
 		{
-			TINY_GL_CHECK(glDrawElements(vertex->getDrawMode().platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr));
-		}
-		else
-		{
+		case 0u:
 			TINY_GL_CHECK(glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount()));
+			break;
+		default:
+			TINY_GL_CHECK(glDrawElements(vertex->getDrawMode().platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr));
+			break;
 		}
+
+		//if (vertex->getIndexCount() > 0)
+		//{
+		//	TINY_GL_CHECK(glDrawElements(vertex->getDrawMode().platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr));
+		//}
+		//else
+		//{
+		//	TINY_GL_CHECK(glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount()));
+		//}
 
 		TINY_PROFILER_DRAWCALL(1);
 	}
@@ -545,38 +559,38 @@ namespace tezcat::Tiny::GL
 #pragma region Delete
 	void GLGraphics::deleteShader(Shader* shader)
 	{
-		glDeleteProgram(shader->getProgramID());
+		TINY_GL_CHECK(glDeleteProgram(shader->getProgramID()));
 		//shader->apply(0);
 	}
 
 	void GLGraphics::deleteVertex(Vertex* vertex)
 	{
-		glDeleteVertexArrays(1, &vertex->getVertexID());
+		TINY_GL_CHECK(glDeleteVertexArrays(1, &vertex->getVertexID()));
 	}
 
 	void GLGraphics::deleteBuffer(VertexBuffer* vertexBuffer)
 	{
-		glDeleteBuffers(1, &vertexBuffer->getBufferID());
+		TINY_GL_CHECK(glDeleteBuffers(1, &vertexBuffer->getBufferID()));
 	}
 
 	void GLGraphics::deleteBuffer(IndexBuffer* indexBuffer)
 	{
-		glDeleteBuffers(1, &indexBuffer->getBufferID());
+		TINY_GL_CHECK(glDeleteBuffers(1, &indexBuffer->getBufferID()));
 	}
 
 	void GLGraphics::deleteTexture2D(const uint32& id)
 	{
-		glDeleteTextures(1, &id);
+		TINY_GL_CHECK(glDeleteTextures(1, &id));
 	}
 
 	void GLGraphics::deleteTextureCube(const uint32& id)
 	{
-		glDeleteTextures(1, &id);
+		TINY_GL_CHECK(glDeleteTextures(1, &id));
 	}
 
 	void GLGraphics::deleteRender2D(const uint32& id)
 	{
-		glDeleteRenderbuffers(1, &id);
+		TINY_GL_CHECK(glDeleteRenderbuffers(1, &id));
 	}
 #pragma endregion
 
@@ -891,6 +905,11 @@ namespace tezcat::Tiny::GL
 		TINY_GL_CHECK(glUniform2fv(valueID, 1, data));
 	}
 
+	void GLGraphics::setFloat2(Shader* shader, const int32_t& valueID, const float2& data)
+	{
+		TINY_GL_CHECK(glUniform2fv(valueID, 1, &data.x));
+	}
+
 	void GLGraphics::setFloat3(Shader* shader, UniformID& uniform, float* data)
 	{
 		int32_t value_id;
@@ -921,6 +940,11 @@ namespace tezcat::Tiny::GL
 		TINY_GL_CHECK(glUniform3fv(valueID, 1, data));
 	}
 
+	void GLGraphics::setFloat3(Shader* shader, const int32_t& valueID, const float3& data)
+	{
+		TINY_GL_CHECK(glUniform3fv(valueID, 1, &data.x));
+	}
+
 	void GLGraphics::setFloat4(Shader* shader, UniformID& uniform, float* data)
 	{
 		int32_t value_id;
@@ -939,6 +963,11 @@ namespace tezcat::Tiny::GL
 	void GLGraphics::setFloat4(Shader* shader, const int32_t& valueID, const float* data)
 	{
 		TINY_GL_CHECK(glUniform4fv(valueID, 1, data));
+	}
+
+	void GLGraphics::setFloat4(Shader* shader, const int32_t& valueID, const float4& data)
+	{
+		TINY_GL_CHECK(glUniform4fv(valueID, 1, &data.x));
 	}
 
 	void GLGraphics::setUInt1(Shader* shader, const char* name, const uint32_t& data)
@@ -1165,11 +1194,11 @@ namespace tezcat::Tiny::GL
 
 	void GLGraphics::createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel)
 	{
-		glBindTexture(GL_TEXTURE_CUBE_MAP, texCube->getTextureID());
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, minLevel);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, maxLevel);
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, texCube->getTextureID()));
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, minLevel));
+		TINY_GL_CHECK(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, maxLevel));
+		TINY_GL_CHECK(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 	}
 
 	void GLGraphics::readPixel(int32_t x, int32_t y)

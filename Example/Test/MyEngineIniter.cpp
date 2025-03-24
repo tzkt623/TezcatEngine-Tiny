@@ -3,9 +3,7 @@
 #include "MyGUI/MyGUI.h"
 #include "MyEvent.h"
 
-#include "Scene/MyMainScene.h"
-#include "Scene/MySecondScene.h"
-#include "Scene/Tutorial01.h"
+#include "Scene/SceneHead.h"
 
 
 using namespace tezcat::Tiny::GL;
@@ -47,7 +45,7 @@ namespace tezcat::Editor
 		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
 
 		MyMainScene::create("MainScene")->prepare();
-		Tutorial01::create("Tutorial01")->prepare();
+		SceneHelper::prepareTutorialScene();
 	}
 
 	void MyEngineIniter::initYourShaderParam()

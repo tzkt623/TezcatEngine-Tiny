@@ -45,6 +45,7 @@ namespace tezcat::Tiny
 		static void init();
 		static const std::unordered_map<std::string_view, FrameBuffer*>& getAllFrameBuffer() { return sUMap; }
 		static std::tuple<bool, FrameBuffer*> create(std::string name);
+		static bool remove(std::string name);
 
 		static FrameBuffer* getMainFrameBufferBuildin();
 		static FrameBuffer* find(const std::string& name);

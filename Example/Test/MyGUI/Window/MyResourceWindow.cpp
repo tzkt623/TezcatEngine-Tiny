@@ -160,7 +160,6 @@ namespace tezcat::Editor
 			}
 
 			ImGui::PopStyleColor();
-
 			ImGui::EndTable();
 		}
 	}

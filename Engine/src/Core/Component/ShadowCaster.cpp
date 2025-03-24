@@ -30,6 +30,8 @@
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/Pipeline.h"
+#include "Core/Renderer/Renderer.h"
+#include "Core/Renderer/RenderCommand.h"
 
 #include "Core/Manager/ShadowCasterManager.h"
 #include "Core/Renderer/RenderObserver.h"
@@ -65,6 +67,10 @@ namespace tezcat::Tiny
 
 		mPipePass = ReplacedPipelinePass::create(mShadowObserver
 			, ShaderManager::find("Unlit/ShadowMap"));
+		//mPipePass->setAutoCulling([](BaseMeshRenderer* renderer)
+		//	{
+		//		return new RenderCMD_DrawMeshWithOutMaterial(renderer->getVertex(), renderer->getTransform());
+		//	});
 		mPipePass->saveObject();
 	}
 

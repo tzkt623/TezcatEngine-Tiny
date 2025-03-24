@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/EnvMakeBRDFLut;
+    str Name = Tutorial/Triangle;
 }
 #TINY_HEAD_END
 
@@ -10,10 +10,11 @@
     {
         int Version = 330;
         int OrderID = 50;
+        str LightMode = Unlit;
         str Queue = Prepare;
         str DepthTest = Off;
-        bool ZWrite = true;
-        str CullFace = Back;
+        bool ZWrite = false;
+        str CullFace = Off;
     }
     #TINY_CFG_END
 
@@ -22,13 +23,9 @@
         #include "../Include/tiny_vs.tyin"
 
         TINY_LAYOUT_POSITION;
-        TINY_LAYOUT_UV;
-
-        out float2 myUV;
 
         void main()
         {
-            myUV = tiny_layout_UV;
             gl_Position = float4(tiny_layout_Position, 1.0);
         }
     }
@@ -37,17 +34,14 @@
     #TINY_FS_BEGIN
     {
         #include "../Include/tiny_fs.tyin"
-        
-        in float2 myUV;
-        out float2 myFinalColor;
+
+        out float4 myFinalColor;
 
         void main()
         {
-            myFinalColor = integrateBRDF(myUV.x, myUV.y);
+            myFinalColor = float4(1.0f, 0.5f, 0.2f, 1.0f);
         } 
     }
     #TINY_FS_END
 }
 #TINY_PASS_END
-
-

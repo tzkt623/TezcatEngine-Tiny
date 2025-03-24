@@ -55,24 +55,24 @@ namespace tezcat::Tiny
 	class RenderCommand
 	{
 	public:
-		union
-		{
-			uint64 mOrderID;
-
-			struct
-			{
-				uint64 shaderID : 16;
-				uint64 priority : 32;
-				uint64 userID : 16;
-			} mBase;
-
-			struct
-			{
-				uint64 shaderID : 16;
-				uint64 distanceFromCamera : 32;
-				uint64 userID : 16;
-			} mTransparent;
-		};
+		//union
+		//{
+		//	uint64 mOrderID;
+		//
+		//	struct
+		//	{
+		//		uint64 shaderID : 16;
+		//		uint64 priority : 32;
+		//		uint64 userID : 16;
+		//	} mBase;
+		//
+		//	struct
+		//	{
+		//		uint64 shaderID : 16;
+		//		uint64 distanceFromCamera : 32;
+		//		uint64 userID : 16;
+		//	} mTransparent;
+		//};
 
 	protected:
 		RenderCommand();
@@ -81,6 +81,17 @@ namespace tezcat::Tiny
 		virtual ~RenderCommand();
 		virtual void execute(PipelinePass* pass = nullptr, Shader* shader = nullptr) = 0;
 		virtual RenderCommandType getType() const { return RenderCommandType::Normal; }
+	};
+
+	class RenderCMD_Lambda : public RenderCommand
+	{
+	public:
+		RenderCMD_Lambda(std::function<void(PipelinePass*, Shader*)> function);
+
+		void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		std::function<void(PipelinePass*, Shader*)> mFuncion;
 	};
 
 #pragma region Build

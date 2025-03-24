@@ -39,6 +39,8 @@ namespace tezcat::Tiny
 		static std::tuple<bool, TextureCube*> createCube(std::string name);
 		static std::tuple<bool, TextureRender2D*> createRender2D(std::string name);
 
+		static bool remove(std::string name);
+
 	public:
 		static Texture* find(const std::string& name);
 

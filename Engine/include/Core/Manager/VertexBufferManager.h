@@ -36,8 +36,8 @@ namespace tezcat::Tiny
 		static Vertex* create(const std::string& name);
 		static Vertex* create(MeshData* mesh);
 
-		static void add(MeshData* meshData);
-		static void add(Vertex* vertex);
+		static void addMeshData(MeshData* meshData);
+		static void addMeshData(Vertex* vertex);
 
 		static MeshData* findMeshData(const std::string& name);
 		static Vertex* findVertex(const std::string& name);
