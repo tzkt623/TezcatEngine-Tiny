@@ -67,6 +67,8 @@ namespace tezcat::Tiny
 		}
 
 		static std::deque<LogData*>& allLog() { return mLogQueue; }
+		static bool isDirty() { return mDirty; }
+		static void clearDirty() { mDirty = false; }
 
 	private:
 		static LogData* createString(const LogTypeID& type, std::string&& info);
@@ -75,6 +77,7 @@ namespace tezcat::Tiny
 		static LogImp* mLogImp;
 		static std::deque<LogData*> mLogQueue;
 		static std::stack<LogData*> mFreeStrings;
+		static bool mDirty;
 	};
 
 

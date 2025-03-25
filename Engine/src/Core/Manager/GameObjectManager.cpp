@@ -149,10 +149,10 @@ namespace tezcat::Tiny
 	void GameObjectManager::createFrameBuffer()
 	{
 		auto [flag1, frame_buffer] = FrameBufferManager::create("FB_ObjectID");
-		if (flag1)
+		if (flag1 == FlagCreate::Succeeded)
 		{
 			auto [flag2, texture] = TextureManager::create2D("CB_TexObjectID");
-			if (flag2)
+			if (flag2 == FlagCreate::Succeeded)
 			{
 				texture->setSize(Engine::getScreenWidth(), Engine::getScreenHeight());
 				texture->setFormat(TextureInternalFormat::R32UI, TextureFormat::RI);
@@ -164,10 +164,9 @@ namespace tezcat::Tiny
 			}
 
 			auto [flag3, texture_viewer] = TextureManager::create2D("CB_TexObjectIDViewer");
-			if (flag3)
+			if (flag3 == FlagCreate::Succeeded)
 			{
 				texture_viewer->setSize(Engine::getScreenWidth(), Engine::getScreenHeight());
-
 				texture_viewer->setFormat(TextureInternalFormat::RGBA8, TextureFormat::RGBA);
 				texture_viewer->setDataMemFormat(DataMemFormat::UByte);
 
@@ -177,7 +176,7 @@ namespace tezcat::Tiny
 			}
 
 			auto [flag4, render2d] = TextureManager::createRender2D("RB_TexObjectIDDepth");
-			if (flag4)
+			if (flag4 == FlagCreate::Succeeded)
 			{
 				render2d->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight(), TextureInternalFormat::Depth);
 				render2d->setAttachPosition(TextureAttachPosition::DepthComponent);

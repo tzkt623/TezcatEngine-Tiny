@@ -96,14 +96,23 @@ namespace tezcat::Tiny
 		virtual void createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel) {}
 
 	public:
-		virtual void deleteVertex(Vertex* vertex) {}
-		virtual void deleteBuffer(VertexBuffer* vertexBuffer) {}
-		virtual void deleteBuffer(IndexBuffer* indexBuffer) {}
-		virtual void deleteBuffer(FrameBuffer* frameBuffer) {}
-		virtual void deleteShader(Shader* shader) {}
+		virtual void setClearColor(float r, float g, float b, float a) {}
+
+
+		/*
+		* 注意 所有删除方法均不能出现具体类
+		* 因为必须在RenderCommad中进行
+		*/
+	public:
+		virtual void deleteShader(const uint32_t& id) {}
+		virtual void deleteVertex(const uint32_t& id) {}
+		virtual void deleteVertexBuffer(const uint32_t& id) {}
+		virtual void deleteIndexBuffer(const uint32_t& id) {}
+		virtual void deleteUniformBuffer(const uint32_t& id) {}
 		virtual void deleteTexture2D(const uint32_t& id) {}
-		virtual void deleteTextureCube(const uint32& id) {}
-		virtual void deleteRender2D(const uint32& id) {}
+		virtual void deleteTextureCube(const uint32_t& id) {}
+		virtual void deleteRender2D(const uint32_t& id) {}
+		virtual void deleteFrameBuffer(const uint32_t& id) {}
 
 	public:
 		virtual void makeHDR2Cube(Shader* shader

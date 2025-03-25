@@ -79,19 +79,19 @@ namespace tezcat::Tiny
 	}
 
 	RenderCMD_DeleteShader::RenderCMD_DeleteShader(Shader* shader)
-		: mShader(shader)
+		: mID(shader->getProgramID())
 	{
 
 	}
 
 	RenderCMD_DeleteShader::~RenderCMD_DeleteShader()
 	{
-		mShader = nullptr;
+		//mShader = nullptr;
 	}
 
 	void RenderCMD_DeleteShader::execute(PipelinePass* pass, Shader* shader)
 	{
-		Graphics::getInstance()->deleteShader(mShader);
+		Graphics::getInstance()->deleteShader(mID);
 	}
 
 	RenderCMD_RebuildShader::RenderCMD_RebuildShader(Shader* shader)
@@ -107,10 +107,11 @@ namespace tezcat::Tiny
 
 	void RenderCMD_RebuildShader::execute(PipelinePass* pass, Shader* shader)
 	{
-		Graphics::getInstance()->deleteShader(mShader);
+		Graphics::getInstance()->deleteShader(mShader->getProgramID());
 		mShader->rebuild();
 		Graphics::getInstance()->createShader(mShader);
 	}
+
 #pragma endregion
 	RenderCMD_DrawID::RenderCMD_DrawID(Vertex* vertex, Transform* transform)
 		: mVertex(vertex)
@@ -503,5 +504,105 @@ namespace tezcat::Tiny
 	}
 
 
+	RenderCMD_ClearTexture2D::RenderCMD_ClearTexture2D(Texture2D* tex)
+		: mTexture(tex)
+	{
+
+	}
+
+	RenderCMD_ClearTexture2D::~RenderCMD_ClearTexture2D()
+	{
+
+	}
+
+	void RenderCMD_ClearTexture2D::execute(PipelinePass* pass, Shader* shader)
+	{
+		auto frame_buffer = FrameBuffer::create();
+		frame_buffer->addAttachment(mTexture);
+
+		Graphics::getInstance()->createBuffer(frame_buffer);
+		FrameBufferManager::bind(frame_buffer);
+		Graphics::getInstance()->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		Graphics::getInstance()->clear(ClearOption::CO_Color);
+		FrameBufferManager::unbind(frame_buffer);
+	}
+
+	RenderCMD_DeleteFrameBuffer::RenderCMD_DeleteFrameBuffer(FrameBuffer* frameBuffer)
+		: mID(frameBuffer->getFrameBufferID())
+	{
+
+	}
+
+	RenderCMD_DeleteFrameBuffer::~RenderCMD_DeleteFrameBuffer()
+	{
+
+	}
+
+	void RenderCMD_DeleteFrameBuffer::execute(PipelinePass* pass, Shader* shader)
+	{
+		Graphics::getInstance()->deleteFrameBuffer(mID);
+	}
+
+	RenderCMD_DeleteVertex::RenderCMD_DeleteVertex(Vertex* buffer)
+		: mID(buffer->getVertexID())
+	{
+
+	}
+
+	RenderCMD_DeleteVertex::~RenderCMD_DeleteVertex()
+	{
+
+	}
+
+	void RenderCMD_DeleteVertex::execute(PipelinePass* pass, Shader* shader)
+	{
+		Graphics::getInstance()->deleteVertex(mID);
+	}
+
+	RenderCMD_DeleteVertexBuffer::RenderCMD_DeleteVertexBuffer(VertexBuffer* buffer)
+		: mID(buffer->getBufferID())
+	{
+
+	}
+
+	RenderCMD_DeleteVertexBuffer::~RenderCMD_DeleteVertexBuffer()
+	{
+
+	}
+
+	void RenderCMD_DeleteVertexBuffer::execute(PipelinePass* pass, Shader* shader)
+	{
+
+	}
+
+	RenderCMD_DeleteIndexBuffer::RenderCMD_DeleteIndexBuffer(IndexBuffer* buffer)
+	{
+
+	}
+
+	RenderCMD_DeleteIndexBuffer::~RenderCMD_DeleteIndexBuffer()
+	{
+
+	}
+
+	void RenderCMD_DeleteIndexBuffer::execute(PipelinePass* pass, Shader* shader)
+	{
+
+	}
+
+	RenderCMD_DeleteUniformBuffer::RenderCMD_DeleteUniformBuffer(UniformBuffer* buffer)
+	{
+
+	}
+
+	RenderCMD_DeleteUniformBuffer::~RenderCMD_DeleteUniformBuffer()
+	{
+
+	}
+
+	void RenderCMD_DeleteUniformBuffer::execute(PipelinePass* pass, Shader* shader)
+	{
+
+	}
 
 }

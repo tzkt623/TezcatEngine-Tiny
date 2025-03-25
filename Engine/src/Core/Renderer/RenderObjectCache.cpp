@@ -30,7 +30,7 @@ namespace tezcat::Tiny
 	RenderObjectCache::RenderObjectCache()
 		: mIndex(-1)
 	{
-		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPopScene
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_BeforeSceneExit
 			, this
 			, [this](const EventData& data)
 			{

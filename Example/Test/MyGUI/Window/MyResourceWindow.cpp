@@ -9,8 +9,8 @@ namespace tezcat::Editor
 	uint32_t Icon_Jpg = 0;
 	uint32_t Icon_Fbx = 0;
 
-	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyResourceWindow)
-		MyResourceWindow::MyResourceWindow()
+	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyResourceWindow);
+	MyResourceWindow::MyResourceWindow()
 		: GUIWindow("资源(Resource)")
 		, mFileItemSize(64)
 		, mUVx(0, 1)
@@ -129,59 +129,86 @@ namespace tezcat::Editor
 
 		if (ImGui::BeginTable("##ResourceWindow1", item_count))
 		{
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 0.0f));
+			//ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 0.0f));
 			//ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(1.0f, 1.0f, 1.0f, 0.0f));
 
+			std::vector<std::filesystem::path> files;
 			mDirectoryEntry.assign(mCurrentPath);
 			std::filesystem::directory_iterator list(mDirectoryEntry);
+			int32_t id = 0;
 			for (auto& it : list)
 			{
-				ImGui::TableNextColumn();
 				switch (it.status().type())
 				{
 				case std::filesystem::file_type::directory:
 				{
-					ImGui::ImageButton((ImTextureID)mIconAry[Icon_Folder]->getTextureID()
+					ImGui::TableNextColumn();
+
+					ImGui::PushID(id++);
+					ImGui::Image((ImTextureID)mIconAry[Icon_Folder]->getTextureID()
 						, ImVec2(mFileItemSize, mFileItemSize)
 						, mUVx
 						, mUVy);
-					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+					if (ImGui::IsItemHovered())
 					{
-						mCurrentPath = it.path();
+						ImGuiHelper::itemHighLight();
+
+						if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+						{
+							mCurrentPath = it.path();
+						}
 					}
+					ImGui::PopID();
+
 					ImGui::SetNextItemWidth(mFileItemSize);
 					ImGui::TextWrapped(it.path().filename().string().c_str());
 					break;
 				}
 				case std::filesystem::file_type::regular:
-					this->drawFile(it.path());
+					files.emplace_back(it.path());
 					break;
 				}
 			}
 
-			ImGui::PopStyleColor();
+			for (auto& path : files)
+			{
+				ImGui::TableNextColumn();
+				this->drawFile(path, id++);
+			}
+
+			//ImGui::PopStyleColor();
 			ImGui::EndTable();
 		}
 	}
 
-	void MyResourceWindow::drawFile(const std::filesystem::path& path)
+	void MyResourceWindow::drawFile(const std::filesystem::path& path, int32_t id)
 	{
-		ImGui::ImageButton((ImTextureID)mIconAry[Icon_DefaultFile]->getTextureID()
+		//ImGui::PushID(id);
+		ImGui::Image((ImTextureID)mIconAry[Icon_DefaultFile]->getTextureID()
 			, ImVec2(mFileItemSize, mFileItemSize)
 			, mUVx
 			, mUVy);
+
+
 		if (ImGui::IsItemHovered())
 		{
+			ImGuiHelper::dragResource(path);
+
+			//this->itemDrag(path);
+
+			ImGuiHelper::itemHighLight();
+
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
 				this->itemDoubleClick(path);
 			}
 			else if (ImGui::GetDragDropPayload() == nullptr && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
 			{
-				TINY_LOG_INFO(path.string().c_str());
-				this->itemDrag(path);
+
 			}
 		}
+		//ImGui::PopID();
+
 		ImGui::SetNextItemWidth(mFileItemSize);
 		ImGui::TextWrapped(path.filename().string().c_str());
 	}
@@ -271,11 +298,13 @@ namespace tezcat::Editor
 
 	void MyResourceWindow::itemDrag(const std::filesystem::path& path)
 	{
-		if (ImGui::BeginDragDropSource())
-		{
-			auto drag_name = MyGUIContext::DragDropController.dragData(path);
-			ImGui::SetDragDropPayload(drag_name.data(), nullptr, 0);
-			ImGui::EndDragDropSource();
-		}
+		ImGuiHelper::dragResource(path);
+
+		//if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+		//{
+		//	auto drag_name = MyGUIContext::DragDropController.dragData(path);
+		//	ImGui::SetDragDropPayload(drag_name.data(), nullptr, 0);
+		//	ImGui::EndDragDropSource();
+		//}
 	}
 }

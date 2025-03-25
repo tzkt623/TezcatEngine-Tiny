@@ -15,82 +15,6 @@ namespace tezcat::Editor
 	{
 		TINY_EDITOR_WINDOW_DELETE_INSTACNE();
 	}
-	/*
-	void MyLogWindow::onRender()
-	{
-		// Options menu
-		if (ImGui::BeginPopup("Options"))
-		{
-			ImGui::Checkbox("Auto-scroll", &mAutoScroll);
-			ImGui::EndPopup();
-		}
-
-		// Main window
-		if (ImGui::Button("Options"))
-		{
-			ImGui::OpenPopup("Options");
-		}
-		ImGui::SameLine();
-		bool clear = ImGui::Button("Clear");
-		ImGui::SameLine();
-		bool copy = ImGui::Button("Copy");
-		ImGui::SameLine();
-		mFilter.Draw("Filter", -100.0f);
-
-		ImGui::Separator();
-		ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-
-		if (clear)
-		{
-			this->clear();
-		}
-		if (copy)
-		{
-			ImGui::LogToClipboard();
-		}
-
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-		const char* buf = mTextBuffer.begin();
-		const char* buf_end = mTextBuffer.end();
-		if (mFilter.IsActive())
-		{
-			for (int line_no = 0; line_no < mLineOffsets.Size; line_no++)
-			{
-				const char* line_start = buf + mLineOffsets[line_no];
-				const char* line_end = (line_no + 1 < mLineOffsets.Size) ? (buf + mLineOffsets[line_no + 1] - 1) : buf_end;
-				if (mFilter.PassFilter(line_start, line_end))
-				{
-					//ImGui::TextUnformatted(line_start, line_end);
-					ImGui::TextUnformatted(line_start, line_end);
-				}
-			}
-		}
-		else
-		{
-			ImGuiListClipper clipper;
-			clipper.Begin(mLineOffsets.Size);
-			while (clipper.Step())
-			{
-				for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
-				{
-					const char* line_start = buf + mLineOffsets[line_no];
-					const char* line_end = (line_no + 1 < mLineOffsets.Size) ? (buf + mLineOffsets[line_no + 1] - 1) : buf_end;
-					//ImGui::TextUnformatted(line_start, line_end);
-				}
-			}
-			clipper.End();
-		}
-		ImGui::PopStyleVar();
-
-		if (mAutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-		{
-			ImGui::SetScrollHereY(1.0f);
-		}
-
-		ImGui::EndChild();
-		//ImGui::End();
-	}
-	*/
 
 	void MyLogWindow::onRender()
 	{
@@ -110,15 +34,15 @@ namespace tezcat::Editor
 		auto& logs = Log::allLog();
 		ImGui::Checkbox("Auto-scroll", &mAutoScroll);
 
-		static bool mOnlyEngine, mOnlyInfo, mOnlyError, mOnlyWarning;
+		static bool mShowEngine = true, mShowInfo = true, mShowError = true, mShowWarning = true;
 		ImGui::SameLine();
-		ImGui::Checkbox("Engine", &mOnlyEngine);
+		ImGui::Checkbox("Engine", &mShowEngine);
 		ImGui::SameLine();
-		ImGui::Checkbox("Error", &mOnlyError);
+		ImGui::Checkbox("Error", &mShowError);
 		ImGui::SameLine();
-		ImGui::Checkbox("Info", &mOnlyInfo);
+		ImGui::Checkbox("Info", &mShowInfo);
 		ImGui::SameLine();
-		ImGui::Checkbox("Warning", &mOnlyWarning);
+		ImGui::Checkbox("Warning", &mShowWarning);
 
 		ImGui::SameLine();
 		bool clear = ImGui::Button("Clear");
@@ -133,8 +57,8 @@ namespace tezcat::Editor
 
 
 		ImGui::Separator();
-		ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
+		ImGui::BeginChild("##Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 		if (clear)
 		{
 			Log::clear();
@@ -163,16 +87,28 @@ namespace tezcat::Editor
 				switch (data->type)
 				{
 				case LogTypeID::LT_Engine:
-					ImGui::TextColored(engine, data->str.c_str());
+					if (mShowEngine)
+					{
+						ImGui::TextColored(engine, data->str.c_str());
+					}
 					break;
 				case LogTypeID::LT_Info:
-					ImGui::TextColored(info, data->str.c_str());
+					if (mShowInfo)
+					{
+						ImGui::TextColored(info, data->str.c_str());
+					}
 					break;
 				case LogTypeID::LT_Error:
-					ImGui::TextColored(error, data->str.c_str());
+					if (mShowError)
+					{
+						ImGui::TextColored(error, data->str.c_str());
+					}
 					break;
 				case LogTypeID::LT_Warning:
-					ImGui::TextColored(warning, data->str.c_str());
+					if (mShowWarning)
+					{
+						ImGui::TextColored(warning, data->str.c_str());
+					}
 					break;
 				default:
 					break;
@@ -183,13 +119,14 @@ namespace tezcat::Editor
 
 		ImGui::PopStyleVar();
 
-		if (mAutoScroll && ImGui::GetScrollY() <= ImGui::GetScrollMaxY())
+		//if (Log::isDirty() && mAutoScroll && ImGui::GetScrollY() <= ImGui::GetScrollMaxY())
+		if (Log::isDirty() && mAutoScroll)
 		{
+			Log::clearDirty();
 			ImGui::SetScrollHereY(0.0f);
 		}
 
 		ImGui::EndChild();
-		//ImGui::End();
 	}
 
 	void MyLogWindow::clear()

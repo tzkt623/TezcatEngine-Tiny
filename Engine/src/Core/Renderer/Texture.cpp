@@ -223,6 +223,11 @@ namespace tezcat::Tiny
 		mData = nullptr;
 	}
 
+	void Texture2D::clearInGPU()
+	{
+		Graphics::getInstance()->addCommand<RenderCMD_ClearTexture2D>(this);
+	}
+
 	//--------------------------------------------------------
 	//
 	//	Texture3D

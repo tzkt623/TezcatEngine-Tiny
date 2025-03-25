@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 /*
 	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
@@ -15,44 +16,13 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#include "../Tool/Tool.h"
 
 namespace tezcat::Tiny
 {
-	class EngineEvent
+	enum class FlagCreate
 	{
-		EngineEvent() = delete;
-		~EngineEvent() = delete;
-
-	public:
-		static Event* getInstance() { return mEvent; }
-
-	private:
-		static Event* mEvent;
-	};
-
-	enum EngineEventID : EventID
-	{
-		EE_LoadScene = 0,
-		EE_PopScene,
-		EE_PushScene,
-		EE_BeforeSceneExit,
-		EE_AfterSceneExit,
-		EE_BeforeSceneEnter,
-		EE_AfterSceneEnter,
-
-		EE_SetMainCamera,
-		EE_ActiveSkybox,
-		EE_ChangeEnvImage,
-
-		EE_LoadModel,
-		EE_MouseLeftButonUp,
-		EE_MouseRightButonUp,
-
-		EE_ReadObjectID,
-		EE_SelectObject,
-		EE_FocusObject,
-
-		EE_IDCount
+		Failed = 0,
+		Succeeded,
+		Existed
 	};
 }

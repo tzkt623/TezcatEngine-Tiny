@@ -61,7 +61,7 @@ namespace tezcat::Tiny
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_LoadModel, this,
 			[](const EventData& evt)
 			{
-				std::string* path = (std::string*)evt.userData;
+				file_path* path = (file_path*)evt.userData;
 				Model* model = Model::create();
 				if (model->load(*path))
 				{

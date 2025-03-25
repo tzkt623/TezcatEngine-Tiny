@@ -375,13 +375,9 @@ go_dasd->getTransform()->setRotation(0.0f, -90.0f, 0.0f);
 
 ```cpp
 //create and save or get a framebuffer with manager
-//flag2 return true if create framebuffer successfully
-//flag2 return false if get framebuffer successfully
 auto [flag2, frame_buffer] = FrameBufferManager::create("FB_Cube");
-if (flag2)
+if (flag2 == FlagCreate::Succeeded)
 {
-    //...................
-
     sCubeTextureMap = TextureCube::create("CB_CubeMap");
     sCubeTextureMap->setConfig(cube_size
         , TextureInternalFormat::RGB16F
@@ -390,6 +386,7 @@ if (flag2)
         , TextureFilter::Linear_Mipmap_Linear
         , TextureFilter::Linear);
     sCubeTextureMap->setAttachPosition(TextureAttachPosition::ColorComponent);
+    sCurrentCubeMap = sCubeTextureMap;
 
     auto render_buffer = Texture2D::create("Depth");
     render_buffer->setConfig(cube_size, cube_size
@@ -397,7 +394,6 @@ if (flag2)
         , TextureFormat::Depth
         , DataMemFormat::Float);
     render_buffer->setAttachPosition(TextureAttachPosition::DepthComponent);
-
     frame_buffer->addAttachment(sCubeTextureMap);
     frame_buffer->addAttachment(render_buffer);
     frame_buffer->generate();
@@ -416,7 +412,7 @@ mFrameBuffer->generate();
 ```cpp
 //create and save or get a texture named "MyTexture" with manager
 auto [flag, texture] = TextureManager::create2D("MyTexture");
-if (flag)
+if (flag == FlagCreate::Succeeded)
 {
     texture->setConfig(width, height
         , TextureInternalFormat::RGBA
@@ -735,6 +731,15 @@ bool ZWrite = true;
 bool ZWrite = false;
 ```
 
+### **内建宏**
+
+|        Macro         |              glsl               |      Parameter       |
+| :------------------: | :-----------------------------: | :------------------: |
+| TINY_LAYOUT_POSITION | layout (location = 0) in float3 | tiny_layout_Position |
+|  TINY_LAYOUT_NORMAL  | layout (location = 1) in float3 |  tiny_layout_Normal  |
+|    TINY_LAYOUT_UV    | layout (location = 2) in float2 |    tiny_layout_UV    |
+|  TINY_LAYOUT_COLOR   | layout (location = 3) in float4 |  tiny_layout_Color   |
+
 ### **默认值**
 
 除了[`int Version`]为必须值,其他值均为拥有默认值的可选参数
@@ -778,10 +783,10 @@ bool ZWrite = false;
     {
         #include "../Include/tiny_vs.tyin"
 
-        layout (location = 0) in float3 aPos;
-        layout (location = 1) in float3 aNormal;
-        layout (location = 2) in float2 aUV;
-        layout (location = 3) in float4 aColor;
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_NORMAL;
+        TINY_LAYOUT_UV;
+        TINY_LAYOUT_COLOR;
 
         out float4 myColor;
         out float2 myUV;
@@ -789,23 +794,14 @@ bool ZWrite = false;
         out float3 myWorldPosition;
         out float4 myLightPosition;
 
-        out VS2FS
-        {
-            float4 color;
-            float2 uv;
-            float3 normal;
-            float3 worldPosition;
-            float4 lightPosition;
-        } TINY_VS2FS;
-
         void main()
         {
-            float4 position =  float4(aPos, 1.0);
+            float4 position =  float4(tiny_layout_Position, 1.0);
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
 
-            myColor = aColor;
-            myUV = aUV;
-            myNormal = TINY_MatrixN * aNormal;
+            myColor = tiny_layout_Color;
+            myUV = tiny_layout_UV;
+            myNormal = TINY_MatrixN * tiny_layout_Normal;
             myWorldPosition = float3(TINY_MatrixM * position);
             myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
         }
@@ -821,15 +817,6 @@ bool ZWrite = false;
         in float3 myNormal;
         in float3 myWorldPosition;
         in float4 myLightPosition;
-
-        in VS2FS
-        {
-            float4 color;
-            float2 uv;
-            float3 normal;
-            float3 worldPosition;
-            float4 lightPosition;
-        } TINY_VS2FS;
         
         out float4 myFinalColor;
 

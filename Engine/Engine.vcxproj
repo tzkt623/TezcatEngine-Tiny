@@ -254,6 +254,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Base\TinyGCInfo.h" />
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="include\Core\Component\ShadowCaster.h" />
+    <ClInclude Include="include\Core\Head\FlagConfig.h" />
     <ClInclude Include="include\Core\Manager\GameObjectManager.h" />
     <ClInclude Include="include\Core\Manager\ResourceManager.h" />
     <ClInclude Include="include\Core\Data\Text.h" />

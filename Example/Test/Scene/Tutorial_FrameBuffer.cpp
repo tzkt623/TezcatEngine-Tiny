@@ -5,6 +5,7 @@ TINY_OBJECT_CPP(Tutorial_FrameBuffer, Scene);
 Tutorial_FrameBuffer::Tutorial_FrameBuffer(const std::string& name)
 	: Base(name)
 	, mGenerator(0.0f, 1.0f)
+	, mColor(0.0f)
 {
 
 }
@@ -16,7 +17,6 @@ Tutorial_FrameBuffer::~Tutorial_FrameBuffer()
 void Tutorial_FrameBuffer::onEnter()
 {
 	Base::onEnter();
-	LightingManager::disableEnvLighting();
 
 	mVertex = Vertex::create();
 	mVertex->setMesh(TutorialHelper::createCubeMesh());
@@ -25,7 +25,7 @@ void Tutorial_FrameBuffer::onEnter()
 
 	mObserver = RenderObserver::create();
 	mObserver->saveObject();
-	mObserver->setOrderID(0);
+	mObserver->setOrderID(-127);
 	mObserver->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 	mObserver->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 
@@ -57,10 +57,10 @@ void Tutorial_FrameBuffer::onEnter()
 	});
 
 	auto [flag, frame_buffer] = FrameBufferManager::create("Tutorial_FrameBuffer");
-	if (flag)
+	if (flag == FlagCreate::Succeeded)
 	{
 		auto [flag2, tex_color] = TextureManager::create2D("Tutorial_FrameBuffer_TexColor");
-		if (flag2)
+		if (flag2 == FlagCreate::Succeeded)
 		{
 			tex_color->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
 				, TextureInternalFormat::RGBA
@@ -70,7 +70,7 @@ void Tutorial_FrameBuffer::onEnter()
 		}
 
 		auto [flag3, tex_depth] = TextureManager::create2D("Tutorial_FrameBuffer_TexDepth");
-		if (flag3)
+		if (flag3 == FlagCreate::Succeeded)
 		{
 			tex_depth->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
 				, TextureInternalFormat::Depth

@@ -27,13 +27,13 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(Shader, TinyObject)
+	TINY_OBJECT_CPP(Shader, TinyObject);
 
-		Shader::Shader(const std::string& filePath)
-		: mProgramID(-1)
+	Shader::Shader(const std::string& filePath)
+		: mProgramID(0)
 		, mName()
 		, mPath(filePath)
-		, mUID(IDGenerator<Shader, uint32>::generate())
+		, mUID(IDGenerator<Shader, uint32_t>::generate())
 		, mVersion(-1)
 		, mOrderID(0)
 		, mEnableBlend(false)
@@ -45,7 +45,7 @@ namespace tezcat::Tiny
 		, mCullFace(CullFace::Back, 0)
 		, mTinyUniformList(UniformID::allStringCount(), nullptr)
 	{
-		for (uint32 i = 0; i < mTinyUniformList.size(); i++)
+		for (uint32_t i = 0; i < mTinyUniformList.size(); i++)
 		{
 			mTinyUniformList[i] = new UniformValueConfig{ -1, "", UniformType::Error, -1 };
 		}
@@ -63,10 +63,10 @@ namespace tezcat::Tiny
 			delete u;
 		}
 
-		IDGenerator<Shader, uint32>::recycle(mUID);
+		IDGenerator<Shader, uint32_t>::recycle(mUID);
 	}
 
-	void Shader::apply(uint32 pid)
+	void Shader::apply(uint32_t pid)
 	{
 		mProgramID = pid;
 	}
@@ -119,7 +119,7 @@ namespace tezcat::Tiny
 		mUserUniformValueConfigMap.try_emplace(info->name, info);
 	}
 
-	void Shader::setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32& index, const int& shaderID, const int& arrayIndex)
+	void Shader::setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex)
 	{
 		auto member_info = metaData->getInfo<ArgMemberInfo>();
 
@@ -142,12 +142,12 @@ namespace tezcat::Tiny
 		mTinyUniformList[index]->range = member_info->range;
 	}
 
-	void Shader::resizeTinyUniformAry(uint64 size)
+	void Shader::resizeTinyUniformAry(uint64_t size)
 	{
 		//mTinyUniformList.resize(size, new UniformInfo{ "", UniformType::Error, -1 , -1 });
 	}
 
-	void Shader::resizeUserUniformAry(uint64 size)
+	void Shader::resizeUserUniformAry(uint64_t size)
 	{
 		mUserUniformValueConfigMap.reserve(size);
 	}

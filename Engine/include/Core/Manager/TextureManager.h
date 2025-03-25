@@ -17,7 +17,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "../Head/TinyCpp.h"
-
+#include "../Head/FlagConfig.h"
 
 
 namespace tezcat::Tiny
@@ -35,9 +35,9 @@ namespace tezcat::Tiny
 
 		static void loadResource(const std::string& dir);
 
-		static std::tuple<bool, Texture2D*> create2D(std::string name);
-		static std::tuple<bool, TextureCube*> createCube(std::string name);
-		static std::tuple<bool, TextureRender2D*> createRender2D(std::string name);
+		static std::tuple<FlagCreate, Texture2D*> create2D(std::string name);
+		static std::tuple<FlagCreate, TextureCube*> createCube(std::string name);
+		static std::tuple<FlagCreate, TextureRender2D*> createRender2D(std::string name);
 
 		static bool remove(std::string name);
 

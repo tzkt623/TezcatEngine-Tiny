@@ -445,7 +445,7 @@ namespace tezcat::Tiny
 	PipelineBuildin::PipelineBuildin()
 		: mDirty(true)
 	{
-		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPopScene, this
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_BeforeSceneExit, this
 			, [this](const EventData& data)
 			{
 				ReplacedPipelinePass::clearPassArray();

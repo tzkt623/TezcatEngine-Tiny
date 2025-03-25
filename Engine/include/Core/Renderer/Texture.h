@@ -68,6 +68,7 @@ namespace tezcat::Tiny
 		virtual void generate() = 0;
 		virtual void update() {};
 		virtual TextureType getTextureType() const = 0;
+		virtual void clearInGPU() {}
 
 		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() = 0;
 
@@ -171,6 +172,7 @@ namespace tezcat::Tiny
 
 		virtual void setImage(const Image* image);
 		virtual void updateData(const Image* image);
+		void clearInGPU() override;
 
 		void setConfig(const uint32_t& width, const uint32_t& height
 			, const TextureInternalFormat& internalFormat, const TextureFormat& format

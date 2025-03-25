@@ -211,27 +211,40 @@ namespace tezcat::Editor
 							ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 						}
 
-						if (ImGui::BeginDragDropTarget())
+						ImGuiHelper::dropResource([&tex](file_path path)
 						{
-							auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
-							if (flag)
+							Image* img = Image::create();
+							if (img->openFile(path))
 							{
-								auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
-								if (payload)
-								{
-									Image* img = Image::create();
-									if (img->openFile(MyGUIContext::DragDropController.getFilePath()))
-									{
-										Texture2D* new_tex = Texture2D::create();
-										new_tex->setImage(img);
-										new_tex->generate();
+								Texture2D* new_tex = Texture2D::create();
+								new_tex->setImage(img);
+								new_tex->generate();
 
-										tex->set(new_tex);
-									}
-								}
+								tex->set(new_tex);
 							}
-							ImGui::EndDragDropTarget();
-						}
+						});
+
+						//if (ImGui::BeginDragDropTarget())
+						//{
+						//	auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
+						//	if (flag)
+						//	{
+						//		auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
+						//		if (payload)
+						//		{
+						//			Image* img = Image::create();
+						//			if (img->openFile(MyGUIContext::DragDropController.getFilePath()))
+						//			{
+						//				Texture2D* new_tex = Texture2D::create();
+						//				new_tex->setImage(img);
+						//				new_tex->generate();
+						//
+						//				tex->set(new_tex);
+						//			}
+						//		}
+						//	}
+						//	ImGui::EndDragDropTarget();
+						//}
 
 						ImGui::Spacing();
 						break;

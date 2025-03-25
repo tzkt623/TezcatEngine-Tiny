@@ -39,18 +39,18 @@ namespace tezcat::Tiny
 		sFrameBufferStack.push(sDefaultBuffer);
 	}
 
-	std::tuple<bool, FrameBuffer*> FrameBufferManager::create(std::string name)
+	std::tuple<FlagCreate, FrameBuffer*> FrameBufferManager::create(std::string name)
 	{
 		auto result = sUMap.find(name);
 		if (result != sUMap.end())
 		{
-			return { false, result->second };
+			return { FlagCreate::Existed, result->second };
 		}
 
 		auto frame_buffer = FrameBuffer::create(name);
 		frame_buffer->saveObject();
 		sUMap.emplace(frame_buffer->getEngineName().toView(), frame_buffer);
-		return { true, frame_buffer };
+		return { FlagCreate::Succeeded, frame_buffer };
 	}
 
 	void FrameBufferManager::bind(FrameBuffer* buffer)
@@ -83,10 +83,10 @@ namespace tezcat::Tiny
 		if (!sMainBuffer)
 		{
 			auto [flag1, frame_buffer] = create(TINY_FRAMEBUFFER_VIEWPORT);
-			if (flag1)
+			if (flag1 == FlagCreate::Succeeded)
 			{
 				auto [flag2, tex_color] = TextureManager::create2D(TINY_FRAMEBUFFER_VIEWPORT_COLOR_TEXTURE);
-				if (flag2)
+				if (flag2 == FlagCreate::Succeeded)
 				{
 					tex_color->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
 						, TextureInternalFormat::RGBA
@@ -96,7 +96,7 @@ namespace tezcat::Tiny
 				}
 
 				auto [flag3, tex_depth] = TextureManager::create2D(TINY_FRAMEBUFFER_VIEWPORT_DEPTH_TEXTURE);
-				if (flag3)
+				if (flag3 == FlagCreate::Succeeded)
 				{
 					tex_depth->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
 						, TextureInternalFormat::Depth

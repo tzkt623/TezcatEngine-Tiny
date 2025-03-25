@@ -101,9 +101,10 @@ namespace tezcat::Tiny
 			{
 			case CMD::Pop:
 			{
-				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_OnPopScene });
+				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_BeforeSceneExit });
 				sSceneArray.top()->onExit();
 				sSceneArray.pop();
+				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_AfterSceneExit });
 
 				if (!sSceneArray.empty())
 				{
@@ -124,8 +125,9 @@ namespace tezcat::Tiny
 				}
 
 				sSceneArray.push(cmd.scene);
-				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_OnPushScene });
+				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_BeforeSceneEnter });
 				cmd.scene->onEnter();
+				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_AfterSceneEnter });
 				break;
 			}
 			default:
@@ -144,18 +146,17 @@ namespace tezcat::Tiny
 
 	void SceneManager::switchScene(Scene* scene)
 	{
-		if (!sSceneArray.empty())
-		{
-			sSceneArray.top()->onExit();
-			sSceneArray.pop();
-			EngineEvent::getInstance()->dispatch(EventData{ EngineEventID::EE_OnPopScene });
-		}
+		SceneManager::popScene();
+		SceneManager::pushScene(scene);
 
-		sSceneArray.push(scene);
-		EngineEvent::getInstance()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
-		scene->onEnter();
+			//sSceneArray.top()->onExit();
+			//sSceneArray.pop();
+			//EngineEvent::getInstance()->dispatch(EventData{ EngineEventID::EE_OnPopScene });
+		
+
+
+		//sSceneArray.push(scene);
+		//EngineEvent::getInstance()->dispatch(EventData{ EngineEventID::EE_OnPushScene });
+		//scene->onEnter();
 	}
-
-
-
 }

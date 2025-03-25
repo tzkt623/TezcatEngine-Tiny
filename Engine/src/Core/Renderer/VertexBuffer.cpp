@@ -92,7 +92,7 @@ namespace tezcat::Tiny
 
 	VertexBuffer::~VertexBuffer()
 	{
-		Graphics::getInstance()->deleteBuffer(this);
+		//Graphics::getInstance()->deleteBuffer(this);
 	}
 
 	void VertexBuffer::setLayoutData(VertexPosition position, VertexLayoutType type)
@@ -100,6 +100,11 @@ namespace tezcat::Tiny
 		mLayoutData.position = position;
 		mLayoutData.type = type;
 		mLayoutData.stride = VertexLayout::getTypeSize(type);
+	}
+
+	void VertexBuffer::onClose()
+	{
+		Graphics::getInstance()->addCommand<RenderCMD_DeleteVertexBuffer>(this);
 	}
 
 	//---------------------------------------------
@@ -114,10 +119,14 @@ namespace tezcat::Tiny
 
 	IndexBuffer::~IndexBuffer()
 	{
-		Graphics::getInstance()->deleteBuffer(this);
+		//Graphics::getInstance()->deleteBuffer(this);
 		//Graphics::getInstance()->cmdDeleteIndexBuffer(mBufferID);
 	}
 
+	void IndexBuffer::onClose()
+	{
+		Graphics::getInstance()->addCommand<RenderCMD_DeleteIndexBuffer>(this);
+	}
 
 	TINY_OBJECT_CPP(UniformBuffer, IBuffer);
 	UniformBuffer::UniformBuffer()
@@ -180,6 +189,7 @@ namespace tezcat::Tiny
 
 	void UniformBuffer::onClose()
 	{
+		Graphics::getInstance()->addCommand<RenderCMD_DeleteUniformBuffer>(this);
 		mLayout->removeHolder(this);
 	}
 }

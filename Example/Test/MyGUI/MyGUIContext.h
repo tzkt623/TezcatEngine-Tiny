@@ -21,28 +21,6 @@ namespace tezcat::Editor
 
 	};
 
-	class MyDragDropController
-	{
-	public:
-		std::string_view dragData(const std::filesystem::path& path);
-		std::tuple<bool, std::string> dropData();
-		std::string getFilePath() { return mFilePath.string(); }
-
-	private:
-		bool mIsDragResource;
-		FileType mFileType;
-		std::filesystem::path mFilePath;
-		std::string mDragName;
-	};
-
-	class MyTextureSizeHelper
-	{
-	public:
-		static void calculate(const ImVec2& inTextureSize, const ImVec2& inWindowSize
-			, ImVec2& outDisplaySize, ImVec2& outOffsetToCenter, ImVec2& outUV0, ImVec2& outUV1);
-
-		static void fitImageToRect(const ImVec2& inWindowSize, const ImVec2& inImageSize, ImVec2& outDisplaySize, ImVec2& outOffsetToCenter);
-	};
 
 	class MyGUIContext
 	{
@@ -85,7 +63,6 @@ namespace tezcat::Editor
 	public:
 		static const ImVec2 UV0;
 		static const ImVec2 UV1;
-		static MyDragDropController DragDropController;
 		static ImVec2 sViewPortSize;
 	};
 

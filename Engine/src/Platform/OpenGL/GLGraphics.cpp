@@ -557,40 +557,49 @@ namespace tezcat::Tiny::GL
 #pragma endregion
 
 #pragma region Delete
-	void GLGraphics::deleteShader(Shader* shader)
+	void GLGraphics::deleteShader(const uint32_t& id)
 	{
-		TINY_GL_CHECK(glDeleteProgram(shader->getProgramID()));
-		//shader->apply(0);
+		TINY_GL_CHECK(glDeleteProgram(id));
 	}
 
-	void GLGraphics::deleteVertex(Vertex* vertex)
+	void GLGraphics::deleteVertex(const uint32_t& id)
 	{
-		TINY_GL_CHECK(glDeleteVertexArrays(1, &vertex->getVertexID()));
+		TINY_GL_CHECK(glDeleteVertexArrays(1, &id));
 	}
 
-	void GLGraphics::deleteBuffer(VertexBuffer* vertexBuffer)
-	{
-		TINY_GL_CHECK(glDeleteBuffers(1, &vertexBuffer->getBufferID()));
-	}
-
-	void GLGraphics::deleteBuffer(IndexBuffer* indexBuffer)
-	{
-		TINY_GL_CHECK(glDeleteBuffers(1, &indexBuffer->getBufferID()));
-	}
-
-	void GLGraphics::deleteTexture2D(const uint32& id)
+	void GLGraphics::deleteTexture2D(const uint32_t& id)
 	{
 		TINY_GL_CHECK(glDeleteTextures(1, &id));
 	}
 
-	void GLGraphics::deleteTextureCube(const uint32& id)
+	void GLGraphics::deleteTextureCube(const uint32_t& id)
 	{
 		TINY_GL_CHECK(glDeleteTextures(1, &id));
 	}
 
-	void GLGraphics::deleteRender2D(const uint32& id)
+	void GLGraphics::deleteRender2D(const uint32_t& id)
 	{
 		TINY_GL_CHECK(glDeleteRenderbuffers(1, &id));
+	}
+
+	void GLGraphics::deleteFrameBuffer(const uint32_t& id)
+	{
+		TINY_GL_CHECK(glDeleteFramebuffers(1, &id));
+	}
+
+	void GLGraphics::deleteVertexBuffer(const uint32_t& id)
+	{
+		TINY_GL_CHECK(glDeleteBuffers(1, &id));
+	}
+
+	void GLGraphics::deleteIndexBuffer(const uint32_t& id)
+	{
+		TINY_GL_CHECK(glDeleteBuffers(1, &id));
+	}
+
+	void GLGraphics::deleteUniformBuffer(const uint32_t& id)
+	{
+		TINY_GL_CHECK(glDeleteBuffers(1, &id));
 	}
 #pragma endregion
 
@@ -1211,5 +1220,10 @@ namespace tezcat::Tiny::GL
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 		TINY_GL_CHECK(glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id));
 		glReadBuffer(GL_NONE);
+	}
+
+	void GLGraphics::setClearColor(float r, float g, float b, float a)
+	{
+		glClearColor(r, g, b, a);
 	}
 }

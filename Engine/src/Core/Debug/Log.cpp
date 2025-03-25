@@ -22,6 +22,7 @@ namespace tezcat::Tiny
 	LogImp* Log::mLogImp = new DefaultLogImp();
 	std::deque<LogData*> Log::mLogQueue;
 	std::stack<LogData*> Log::mFreeStrings;
+	bool Log::mDirty = false;
 
 	LogData* Log::createString(const LogTypeID& type, std::string&& info)
 	{
@@ -93,6 +94,7 @@ namespace tezcat::Tiny
 
 	void Log::push(LogData* result)
 	{
+		mDirty = true;
 		mLogQueue.push_back(result);
 		if (mLogQueue.size() > 500)
 		{
@@ -110,4 +112,6 @@ namespace tezcat::Tiny
 
 		mLogQueue.clear();
 	}
+
+
 }

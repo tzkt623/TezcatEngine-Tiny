@@ -62,30 +62,17 @@ namespace tezcat::Tiny
 
 		bool isDataMode() const { return mCullLayerList.empty(); }
 
-		bool cullLayerMask(uint32_t index)
+		bool cullLayerMask(uint32_t index) const
 		{
-			auto mask = 1 << index;
+			uint32_t mask = 1 << index;
 			return (mCullMask & mask) == mask;
 		}
 
-		void setCullLayer(uint32_t index)
-		{
-			mCullMask = 1 << index;
-			mCullLayerList.clear();
-			mCullLayerList.push_back(index);
-		}
+		void setCullLayer(uint32_t index);
 
-		void addCullLayer(uint32_t index)
-		{
-			mCullMask |= (1 << index);
-			mCullLayerList.push_back(index);
-		}
+		void addCullLayer(uint32_t index);
 
-		void removeCullLayer(uint32_t index)
-		{
-			mCullMask &= ~(1 << index);
-			mCullLayerList.erase(std::find(mCullLayerList.begin(), mCullLayerList.end(), index));
-		}
+		void removeCullLayer(uint32_t index);
 
 		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
 

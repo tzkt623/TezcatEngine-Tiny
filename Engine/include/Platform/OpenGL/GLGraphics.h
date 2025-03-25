@@ -65,14 +65,22 @@ namespace tezcat::Tiny::GL
 		void createTexture(TextureRender2D* render2D) override;
 		virtual void createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel) override;
 
-		virtual void deleteVertex(Vertex* vertex) override;
-		virtual void deleteBuffer(VertexBuffer* vertexBuffer) override;
-		virtual void deleteBuffer(IndexBuffer* indexBuffer) override;
-		virtual void deleteShader(Shader* shader) override;
+	public:
+		virtual void setClearColor(float r, float g, float b, float a) override;
+
+
+	public:
+		virtual void deleteVertex(const uint32_t& id) override;
+		virtual void deleteVertexBuffer(const uint32_t& id) override;
+		virtual void deleteIndexBuffer(const uint32_t& id) override;
+		virtual void deleteUniformBuffer(const uint32_t& id) override;
 		virtual void deleteTexture2D(const uint32_t& id) override;
 		virtual void deleteTextureCube(const uint32_t& id) override;
 		virtual void deleteRender2D(const uint32_t& id) override;
+		virtual void deleteFrameBuffer(const uint32_t& id) override;
+		virtual void deleteShader(const uint32_t& id) override;
 
+	public:
 		virtual void makeHDR2Cube(Shader* shader
 			, BaseRenderObserver* observer
 			, Vertex* vertex

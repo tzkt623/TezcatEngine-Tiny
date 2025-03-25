@@ -251,6 +251,25 @@ namespace tezcat::Tiny
 		mUniformBuffer->saveObject();
 	}
 
+	void BaseRenderObserver::setCullLayer(uint32_t index)
+	{
+		mCullMask = 1 << index;
+		mCullLayerList.clear();
+		mCullLayerList.push_back(index);
+	}
+
+	void BaseRenderObserver::addCullLayer(uint32_t index)
+	{
+		mCullMask |= (1 << index);
+		mCullLayerList.push_back(index);
+	}
+
+	void BaseRenderObserver::removeCullLayer(uint32_t index)
+	{
+		mCullMask &= ~(1 << index);
+		mCullLayerList.erase(std::find(mCullLayerList.begin(), mCullLayerList.end(), index));
+	}
+
 #pragma endregion
 
 

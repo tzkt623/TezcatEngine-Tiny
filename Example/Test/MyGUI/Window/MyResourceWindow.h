@@ -18,7 +18,7 @@ namespace tezcat::Editor
 		void onRender() override;
 		void drawFolder();
 		void drawDirectory(std::filesystem::directory_entry& entry);
-		void drawFile(const std::filesystem::path& path);
+		void drawFile(const std::filesystem::path& path, int32_t id);
 
 		void itemDoubleClick(const std::filesystem::path& path);
 		void itemDrag(const std::filesystem::path& path);

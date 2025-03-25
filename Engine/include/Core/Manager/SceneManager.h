@@ -46,6 +46,7 @@ namespace tezcat::Tiny
 	public:
 		static void init();
 		static bool update();
+		static bool isSceneRunning() { return !sSceneArray.empty(); }
 
 	public:
 		static Scene* getCurrentScene() { return sSceneArray.top(); }

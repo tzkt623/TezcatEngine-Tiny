@@ -73,10 +73,9 @@ namespace tezcat::Tiny
 
 	bool LightingManager::sCloseEnvLighting = true;
 	float LightingManager::sSkyboxLod = 0;
-	uint32 LightingManager::sCubeSize = 1024;
-	uint32 LightingManager::sPrefilterSize = 128;
-	uint32 LightingManager::sIrrSize = 32;
-	bool LightingManager::sCalculateEnvLighting = false;
+	uint32_t LightingManager::sCubeSize = 1024;
+	uint32_t LightingManager::sPrefilterSize = 128;
+	uint32_t LightingManager::sIrrSize = 32;
 	bool LightingManager::sEnableSkyBox = false;
 	bool LightingManager::sIsSceneExited = true;
 	bool LightingManager::sRefreshSkyBox = false;
@@ -91,7 +90,6 @@ namespace tezcat::Tiny
 			, [](const EventData& data)
 			{
 				setSkyBoxHDRTexture(static_cast<Image*>(data.userData));
-				sCalculateEnvLighting = true;
 				sRefreshSkyBox = true;
 				//sMakeCubeTexPass->resetOnceMode();
 				//sIrradiancePass->resetOnceMode();
@@ -99,20 +97,19 @@ namespace tezcat::Tiny
 				//sBRDFLUTPass->resetOnceMode();
 			});
 
-		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPushScene
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_BeforeSceneEnter
 			, &sIsSceneExited
 			, [](const EventData& data)
 			{
 				sIsSceneExited = false;
 			});
 
-		EngineEvent::getInstance()->addListener(EngineEventID::EE_OnPopScene
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_BeforeSceneExit
 			, &sIsSceneExited
 			, [](const EventData& data)
 			{
 				sIsSceneExited = true;
 				sEnableSkyBox = false;
-				sCalculateEnvLighting = false;
 				sRefreshSkyBox = false;
 
 				if (sTexHDR)
@@ -230,9 +227,9 @@ namespace tezcat::Tiny
 		int cube_size = sCubeSize;
 
 		auto [flag2, frame_buffer] = FrameBufferManager::create("FB_Cube");
-		if (flag2)
+		if (flag2 == FlagCreate::Succeeded)
 		{
-			for (uint32 i = 0; i < 6; i++)
+			for (uint32_t i = 0; i < 6; i++)
 			{
 				sCubeTextures[i] = Texture2D::create(std::format("CubeTexture{}", i));
 				sCubeTextures[i]->setConfig(cube_size, cube_size
@@ -288,10 +285,10 @@ namespace tezcat::Tiny
 		const auto irr_size = sIrrSize;
 
 		auto [flag1, frame_buffer] = FrameBufferManager::create("FB_Irradiance");
-		if (flag1)
+		if (flag1 == FlagCreate::Succeeded)
 		{
 			auto [flag2, texture] = TextureManager::createCube("CB_IrradianceMap");
-			if (flag2)
+			if (flag2 == FlagCreate::Succeeded)
 			{
 				texture->setConfig(irr_size
 					, TextureInternalFormat::RGB16F
@@ -332,10 +329,10 @@ namespace tezcat::Tiny
 		const int prefilter_size = sPrefilterSize;
 
 		auto [flag1, frame_buffer] = FrameBufferManager::create("FB_Prefilter");
-		if (flag1)
+		if (flag1 == FlagCreate::Succeeded)
 		{
 			auto [flag2, texture] = TextureManager::createCube("CB_PrefilterMap");
-			if (flag2)
+			if (flag2 == FlagCreate::Succeeded)
 			{
 				texture->setConfig(prefilter_size
 					, TextureInternalFormat::RGB16F
@@ -380,10 +377,10 @@ namespace tezcat::Tiny
 	void LightingManager::createBRDF_LUT()
 	{
 		auto [flag1, frame_buffer] = FrameBufferManager::create("FB_BRDF_LUT");
-		if (flag1)
+		if (flag1 == FlagCreate::Succeeded)
 		{
 			auto [flag2, texture] = TextureManager::create2D("CB_BRDF_LUT");
-			if (flag2)
+			if (flag2 == FlagCreate::Succeeded)
 			{
 				texture->setConfig(sCubeSize, sCubeSize
 					, TextureInternalFormat::RG16F
@@ -525,7 +522,7 @@ namespace tezcat::Tiny
 		sCubeTextureMap->setImage(images);
 		sCubeTextureMap->generate();
 
-		for (uint32 i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			sCubeTextures[i]->setImage(images[i]);
 			sCubeTextures[i]->generate();

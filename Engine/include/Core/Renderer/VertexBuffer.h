@@ -47,12 +47,12 @@ namespace tezcat::Tiny
 
 		void copy(const void* data, const size_t& dataSize, const size_t& offset);
 
-		void apply(uint32 id)
+		void apply(uint32_t id)
 		{
 			mBufferID = id;
 			mGenerated = true;
 		}
-		const uint32& getBufferID() const { return mBufferID; }
+		const uint32_t& getBufferID() const { return mBufferID; }
 
 		const void* getData() const { return mData; }
 
@@ -63,8 +63,8 @@ namespace tezcat::Tiny
 		const bool isGenerated() const { return mGenerated; }
 
 	protected:
-		uint32 mBufferID = 0;
-		uint64 mDataSize;
+		uint32_t mBufferID = 0;
+		uint64_t mDataSize;
 		void* mData;
 		bool mGenerated;
 	};
@@ -84,6 +84,9 @@ namespace tezcat::Tiny
 		const VertexLayoutData& getLayoutData() const { return mLayoutData; }
 
 	protected:
+		void onClose() override;
+
+	protected:
 		VertexLayoutData mLayoutData;
 	};
 
@@ -95,6 +98,9 @@ namespace tezcat::Tiny
 
 	public:
 		virtual ~IndexBuffer();
+
+	protected:
+		void onClose() override;
 	};
 
 

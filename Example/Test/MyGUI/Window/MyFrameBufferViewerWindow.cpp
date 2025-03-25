@@ -81,7 +81,7 @@ namespace tezcat::Editor
 				case TextureType::Texture2D:
 				{
 					ImVec2 display_size, uv00, uv01, tex_size(w, h);
-					MyTextureSizeHelper::fitImageToRect(size, tex_size, display_size, offset);
+					ImGuiHelper::fitImageToRect(size, tex_size, display_size, offset);
 					ImGui::Image((ImTextureID)tex->getTextureID(), display_size, uv0, uv1);
 					//ImGui::SetCursorPos(offset);
 					break;

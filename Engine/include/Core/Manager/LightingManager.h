@@ -107,16 +107,6 @@ namespace tezcat::Tiny
 		static void showIrradianceMap();
 		static void showPrefilterMap();
 
-		static void enableEnvLighting()
-		{
-			sCalculateEnvLighting = true;
-		}
-
-		static void disableEnvLighting()
-		{
-			sCalculateEnvLighting = false;
-		}
-
 	private:
 		static RenderObserverMultView* createObserver();
 		static void createHDR2Cube();
@@ -125,9 +115,9 @@ namespace tezcat::Tiny
 		static void createBRDF_LUT();
 
 	private:
-		static uint32 sCubeSize;
-		static uint32 sIrrSize;
-		static uint32 sPrefilterSize;
+		static uint32_t sCubeSize;
+		static uint32_t sIrrSize;
+		static uint32_t sPrefilterSize;
 
 		static TextureCube* sCubeTextureMap;
 		static TextureCube* sIrradianceMap;
@@ -146,7 +136,6 @@ namespace tezcat::Tiny
 		static TextureCube* sCurrentCubeMap;
 
 	private:
-		static bool sCalculateEnvLighting;
 		static bool sCloseEnvLighting;
 		static bool sEnableSkyBox;
 		static bool sIsSceneExited;

@@ -166,19 +166,14 @@ namespace tezcat::Editor
 
 		ImGui::EndChild();
 
+		ImGuiHelper::dropResource([](file_path path)
+		{
+			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_LoadModel, &path });
+		});
+
 		if (ImGui::BeginDragDropTarget())
 		{
-			auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
-			if (flag)
-			{
-				auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
-				if (payload)
-				{
-					auto path = MyGUIContext::DragDropController.getFilePath();
-					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_LoadModel, &path });
-				}
-			}
-			else if (auto payload = ImGui::AcceptDragDropPayload("ObjectMove"))
+			if (ImGui::AcceptDragDropPayload("ObjectMove"))
 			{
 				mSelectedGameObject = mDragedTransform->getGameObject();
 				mDragedTransform->setParent(nullptr);

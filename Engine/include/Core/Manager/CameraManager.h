@@ -16,7 +16,6 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "../Head/CppHead.h"
-#include "../Head/ConfigHead.h"
 #include "../Base/TinyObject.h"
 
 namespace tezcat::Tiny

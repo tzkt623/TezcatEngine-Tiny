@@ -32,4 +32,41 @@ namespace tezcat::Editor
 		std::list<GUIWindow*> mWindows;
 	};
 
+
+	class ResourceDragDropHelper
+	{
+	public:
+		void dragData(const std::filesystem::path& path);
+		std::tuple<bool, std::string> dropData();
+		std::string getFilePath() { return mFilePath.string(); }
+
+	public:
+		std::string mDragName;
+		std::filesystem::path mFilePath;
+		bool mIsDraging;
+
+	private:
+		FileType mFileType;
+	};
+
+	class ImGuiHelper
+	{
+	public:
+		static void fitImageToRect(const ImVec2& inTextureSize, const ImVec2& inWindowSize
+			, ImVec2& outDisplaySize, ImVec2& outOffsetToCenter, ImVec2& outUV0, ImVec2& outUV1);
+
+		static void fitImageToRect(const ImVec2& inWindowSize, const ImVec2& inImageSize, ImVec2& outDisplaySize, ImVec2& outOffsetToCenter);
+
+		static void itemBorderHighLight(ImU32 color = IM_COL32(0, 255, 0, 255));
+		static void itemHighLight(ImU32 color = IM_COL32(56, 150, 255, 150));
+
+		//DragDrop
+	public:
+		static void dragResource(const file_path& path);
+		static void dropResource(const std::function<void(file_path)>& function);
+		static void clearInvalidDraging();
+
+	private:
+		static ResourceDragDropHelper ResDragDropHelper;
+	};
 }

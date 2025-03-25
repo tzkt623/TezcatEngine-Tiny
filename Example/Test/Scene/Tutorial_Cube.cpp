@@ -15,8 +15,6 @@ Tutorial_Cube::~Tutorial_Cube()
 void Tutorial_Cube::onEnter()
 {
 	Base::onEnter();
-	LightingManager::disableEnvLighting();
-
 
 	mVertex = Vertex::create();
 	mVertex->setMesh(TutorialHelper::createCubeMesh());

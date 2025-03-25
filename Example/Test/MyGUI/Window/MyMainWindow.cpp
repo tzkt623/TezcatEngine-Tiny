@@ -80,8 +80,8 @@ namespace tezcat::Editor
 	{
 		GUIWindow::onRender();
 
-		ImGui::PopStyleVar();
-		ImGui::PopStyleVar(2);
+		//ImGui::PopStyleVar();
+		ImGui::PopStyleVar(3);
 
 		ImGuiIO& io = ImGui::GetIO();
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)

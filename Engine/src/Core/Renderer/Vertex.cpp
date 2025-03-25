@@ -107,7 +107,7 @@ namespace tezcat::Tiny
 
 	void Vertex::onClose()
 	{
-		Graphics::getInstance()->deleteVertex(this);
+		Graphics::getInstance()->addCommand<RenderCMD_DeleteVertex>(this);
 
 		for (auto buffer : mVertexBuffers)
 		{

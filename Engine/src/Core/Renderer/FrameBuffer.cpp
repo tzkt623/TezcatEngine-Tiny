@@ -50,6 +50,7 @@ namespace tezcat::Tiny
 
 	FrameBuffer::~FrameBuffer()
 	{
+
 	}
 
 	void FrameBuffer::generate()
@@ -70,6 +71,8 @@ namespace tezcat::Tiny
 
 	void FrameBuffer::onClose()
 	{
+		Graphics::getInstance()->addCommand(new RenderCMD_DeleteFrameBuffer(this));
+
 		for (auto tex : mComponents)
 		{
 			tex->deleteObject();

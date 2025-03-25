@@ -149,47 +149,47 @@ namespace tezcat::Tiny
 		}
 	}
 
-	std::tuple<bool, Texture2D*> TextureManager::create2D(std::string name)
+	std::tuple<FlagCreate, Texture2D*> TextureManager::create2D(std::string name)
 	{
 		auto result = mTextureMap.find(name);
 		if (result != mTextureMap.end())
 		{
-			return { false, (Texture2D*)result->second };
+			return { FlagCreate::Existed, (Texture2D*)result->second };
 		}
 
 		auto t = Texture2D::create(name);
 		t->saveObject();
 		mTextureMap.emplace(t->getEngineName().toView(), t);
-		return { true, t };
+		return { FlagCreate::Succeeded, t };
 
 	}
 
-	std::tuple<bool, TextureCube*> TextureManager::createCube(std::string name)
+	std::tuple<FlagCreate, TextureCube*> TextureManager::createCube(std::string name)
 	{
 		auto result = mTextureMap.find(name);
 		if (result != mTextureMap.end())
 		{
-			return { false, (TextureCube*)result->second };
+			return { FlagCreate::Existed, (TextureCube*)result->second };
 		}
 
 		auto t = TextureCube::create(name);
 		t->saveObject();
 		mTextureMap.emplace(t->getEngineName().toView(), t);
-		return { true, t };
+		return { FlagCreate::Succeeded, t };
 	}
 
-	std::tuple<bool, TextureRender2D*> TextureManager::createRender2D(std::string name)
+	std::tuple<FlagCreate, TextureRender2D*> TextureManager::createRender2D(std::string name)
 	{
 		auto result = mTextureMap.find(name);
 		if (result != mTextureMap.end())
 		{
-			return { false, (TextureRender2D*)result->second };
+			return { FlagCreate::Existed, (TextureRender2D*)result->second };
 		}
 
 		auto t = TextureRender2D::create(name);
 		t->saveObject();
 		mTextureMap.emplace(t->getEngineName().toView(), t);
-		return { true, t };
+		return { FlagCreate::Succeeded, t };
 	}
 
 	bool TextureManager::remove(std::string name)

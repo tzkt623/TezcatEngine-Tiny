@@ -5,12 +5,16 @@ namespace tezcat::Editor
 {
 	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyLightingWindow)
 
-	MyLightingWindow::MyLightingWindow()
+		MyLightingWindow::MyLightingWindow()
 		: GUIWindow("光照管理器(Lighting Manager)")
 		, mCurrentHDR(nullptr)
 		, mSkyboxLod(0)
 	{
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_PopScene, this
+			, [](const EventData& data)
+			{
 
+			});
 	}
 
 	MyLightingWindow::~MyLightingWindow()
@@ -60,24 +64,33 @@ namespace tezcat::Editor
 			ImGui::Image((ImTextureID)0, ImVec2(256, 256));
 		}
 
-		if (ImGui::BeginDragDropTarget())
+		ImGuiHelper::dropResource([this](file_path path)
 		{
-			auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
-			if (flag)
-			{
-				auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
-				if (payload)
-				{
-					Image* img = Image::create();
-					img->openFile(MyGUIContext::DragDropController.getFilePath(), true);
+			Image* img = Image::create();
+			img->openFile(path, true);
 
-					mCurrentHDR = nullptr;
-					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
-				}
-			}
+			mCurrentHDR = nullptr;
+			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+		});
 
-			ImGui::EndDragDropTarget();
-		}
+		//if (ImGui::BeginDragDropTarget())
+		//{
+		//	auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
+		//	if (flag)
+		//	{
+		//		auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
+		//		if (payload)
+		//		{
+		//			Image* img = Image::create();
+		//			img->openFile(MyGUIContext::DragDropController.getFilePath(), true);
+		//
+		//			mCurrentHDR = nullptr;
+		//			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+		//		}
+		//	}
+		//
+		//	ImGui::EndDragDropTarget();
+		//}
 
 		ImGui::Separator();
 

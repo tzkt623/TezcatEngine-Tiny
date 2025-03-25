@@ -17,8 +17,6 @@ void Tutorial_Triangle::onEnter()
 {
 	Base::onEnter();
 
-	LightingManager::disableEnvLighting();
-
 	mVertex = Vertex::create();
 	mVertex->setMesh(TutorialHelper::createTriangleMesh());
 	mVertex->generate();

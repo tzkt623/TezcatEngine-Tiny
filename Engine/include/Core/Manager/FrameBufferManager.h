@@ -16,6 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "../Head/TinyCpp.h"
+#include "../Head/FlagConfig.h"
 
 namespace tezcat::Tiny
 {
@@ -44,7 +45,7 @@ namespace tezcat::Tiny
 	public:
 		static void init();
 		static const std::unordered_map<std::string_view, FrameBuffer*>& getAllFrameBuffer() { return sUMap; }
-		static std::tuple<bool, FrameBuffer*> create(std::string name);
+		static std::tuple<FlagCreate, FrameBuffer*> create(std::string name);
 		static bool remove(std::string name);
 
 		static FrameBuffer* getMainFrameBufferBuildin();

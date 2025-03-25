@@ -15,8 +15,6 @@ Tutorial_Camera::~Tutorial_Camera()
 void Tutorial_Camera::onEnter()
 {
 	Base::onEnter();
-	LightingManager::disableEnvLighting();
-
 
 	mVertex = Vertex::create();
 	mVertex->setMesh(TutorialHelper::createCubeMesh());

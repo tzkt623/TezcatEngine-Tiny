@@ -1334,6 +1334,7 @@
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="ThirdParty\assimp\revision.h" />
     <ClInclude Include="include\Core\Manager\GameObjectManager.h" />
+    <ClInclude Include="include\Core\Head\FlagConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

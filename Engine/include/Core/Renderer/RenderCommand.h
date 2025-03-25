@@ -27,6 +27,9 @@ namespace tezcat::Tiny
 	class TextureCube;
 	class TextureRender2D;
 	class Vertex;
+	class VertexBuffer;
+	class IndexBuffer;
+	class UniformBuffer;
 	class Material;
 	class Transform;
 	class PipelinePass;
@@ -115,6 +118,54 @@ namespace tezcat::Tiny
 		Vertex* mVertex;
 	};
 
+	class RenderCMD_DeleteVertex : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_DeleteVertex(Vertex* buffer);
+		virtual ~RenderCMD_DeleteVertex();
+
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		uint32_t mID;
+	};
+
+	class RenderCMD_DeleteVertexBuffer : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_DeleteVertexBuffer(VertexBuffer* buffer);
+		virtual ~RenderCMD_DeleteVertexBuffer();
+
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		uint32_t mID;
+	};
+
+	class RenderCMD_DeleteIndexBuffer : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_DeleteIndexBuffer(IndexBuffer* buffer);
+		virtual ~RenderCMD_DeleteIndexBuffer();
+
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		uint32_t mID;
+	};
+
+	class RenderCMD_DeleteUniformBuffer : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_DeleteUniformBuffer(UniformBuffer* buffer);
+		virtual ~RenderCMD_DeleteUniformBuffer();
+
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		uint32_t mID;
+	};
+
 	class RenderCMD_CreateShader : public RenderCommadBuild
 	{
 	public:
@@ -136,7 +187,7 @@ namespace tezcat::Tiny
 		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
-		Shader* mShader;
+		uint32_t mID;
 	};
 
 	class RenderCMD_RebuildShader : public RenderCommadBuild
@@ -161,6 +212,18 @@ namespace tezcat::Tiny
 
 	private:
 		FrameBuffer* mBuffer;
+	};
+
+	class RenderCMD_DeleteFrameBuffer : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_DeleteFrameBuffer(FrameBuffer* frameBuffer);
+		virtual ~RenderCMD_DeleteFrameBuffer();
+
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		uint32_t mID;
 	};
 
 	class RenderCMD_CreateUniformBuffer : public RenderCommadBuild
@@ -258,6 +321,17 @@ namespace tezcat::Tiny
 		int mX;
 		int mY;
 		FrameBuffer* mFrameBuffer;
+	};
+
+	class RenderCMD_ClearTexture2D : public RenderCommadBuild
+	{
+	public:
+		RenderCMD_ClearTexture2D(Texture2D* tex);
+		virtual ~RenderCMD_ClearTexture2D();
+		void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		Texture2D* mTexture;
 	};
 #pragma endregion Build
 

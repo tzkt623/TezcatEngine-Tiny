@@ -20,6 +20,8 @@ namespace tezcat::Editor
 		ImGuiTextFilter mFilter;
 		ImVector<int> mLineOffsets; // Index to lines offset. We maintain this with AddLog() calls.
 		bool mAutoScroll;  // Keep scrolling if already at the bottom.
+		bool mDirty;
+		uint32_t mMask;
 	};
 }
 
