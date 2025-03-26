@@ -27,7 +27,7 @@ namespace tezcat::Tiny
 		const TinyRTTI* __parent;
 		const std::string __className;
 		const std::type_index __typeIndex;
-		const uint32 __classID;
+		const uint32_t __classID;
 	};
 
 	template<class Self, class Parent>
@@ -58,13 +58,13 @@ namespace tezcat::Tiny
 		friend class TinyBaseRef;
 
 	public:
-		static uint32 giveID() { return __ClassID++; }
+		static uint32_t giveID() { return __ClassID++; }
 		TinyGCInfo* mGCInfo;
 
 	private:
 		static const std::string Empty;
 		static const TinyRTTI __TINY__RTTI__453;
-		static uint32 __ClassID;
+		static uint32_t __ClassID;
 
 	public:
 		TinyRefObject();
@@ -92,7 +92,7 @@ namespace tezcat::Tiny
 		virtual const std::string& getClassName() const { return __TINY__RTTI__453.__className; }
 		virtual const std::string& getParentClassName() const = 0;
 		virtual const std::type_index& getClassType() const { return __TINY__RTTI__453.__typeIndex; }
-		virtual const uint32 getClassID() const { return __TINY__RTTI__453.__classID; }
+		virtual const uint32_t getClassID() const { return __TINY__RTTI__453.__classID; }
 
 		virtual const TinyRTTI& RTTI() const { return __TINY__RTTI__453; }
 		static const TinyRTTI* RTTIStatic() { return &__TINY__RTTI__453; }
@@ -506,7 +506,7 @@ public:\
 		virtual const std::string& getClassName() const override { return __TINY__RTTI__453.__className; }\
 		virtual const std::string& getParentClassName() const override { return __TINY__RTTI__453.__parent->__className; }\
 		virtual const std::type_index& getClassType() const override { return __TINY__RTTI__453.__typeIndex; }\
-		virtual const uint32 getClassID() const override { return __TINY__RTTI__453.__classID; }\
+		virtual const uint32_t getClassID() const override { return __TINY__RTTI__453.__classID; }\
 		static const TinyRTTI* RTTIStatic() { return &__TINY__RTTI__453; }\
 		virtual const TinyRTTI& RTTI() const override { return __TINY__RTTI__453; }\
 private:\

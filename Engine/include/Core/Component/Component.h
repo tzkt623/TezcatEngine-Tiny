@@ -71,7 +71,7 @@ namespace tezcat::Tiny
 		virtual void onComponentRemoved(Component* component) {}
 
 	public://RTTI
-		virtual uint32 getComponentTypeID() = 0;
+		virtual uint32_t getComponentTypeID() = 0;
 
 	private:
 		virtual void onClose() override;
@@ -83,14 +83,14 @@ namespace tezcat::Tiny
 		GameObject* mGameObject;
 
 	private:
-		static uint32 sID;
+		static uint32_t sID;
 	public:
-		static uint32 giveID()
+		static uint32_t giveID()
 		{
 			return sID++;
 		}
 
-		static uint32 totalID()
+		static uint32_t totalID()
 		{
 			return sID;
 		}
@@ -108,16 +108,16 @@ namespace tezcat::Tiny
 		virtual ~ComponentT() = default;
 
 	public:
-		uint32 getComponentTypeID() override { return sTypeID; }
-		bool isComponentID(const uint32& id) { return sTypeID == id; }
+		uint32_t getComponentTypeID() override { return sTypeID; }
+		bool isComponentID(const uint32_t& id) { return sTypeID == id; }
 
 	public:
-		static const uint32 getComponentTypeIDStatic() { return sTypeID; }
+		static const uint32_t getComponentTypeIDStatic() { return sTypeID; }
 
 	private:
-		static uint32 sTypeID;
+		static uint32_t sTypeID;
 	};
 
 	template<typename Com>
-	uint32 ComponentT<Com>::sTypeID = Component::giveID();
+	uint32_t ComponentT<Com>::sTypeID = Component::giveID();
 }

@@ -18,9 +18,6 @@
     <ClCompile Include="Test\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\MyGUI.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Test\MyInputer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -126,11 +123,29 @@
     <ClCompile Include="Test\Scene\Tutorial_FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test\ThirdParty\imguizmo\GraphEditor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImCurveEdit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImGradient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImGuizmo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImSequencer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\ThirdParty\nfd\nfd_common.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\ThirdParty\nfd\nfd_win.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Test\MyGUI\MyGUI.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Test\MyInputer.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -249,6 +264,33 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test\Scene\Tutorial_FrameBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\imguizmo\GraphEditor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImCurveEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImGradient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImGuizmo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImSequencer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImZoomSlider.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\nfd\include\nfd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\nfd\common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\ThirdParty\nfd\nfd_common.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

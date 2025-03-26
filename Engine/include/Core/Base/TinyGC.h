@@ -18,7 +18,6 @@
 */
 
 #include "TinyGCInfo.h"
-#include "SmartPointer.h"
 
 namespace tezcat::Tiny
 {
@@ -41,16 +40,16 @@ namespace tezcat::Tiny
 		static void recycle(TinyGCInfo* info);
 		static TinyGCInfo* getDefaultGCInfo() { return mGCInfos[0]; }
 
-		static uint32 totalID() { return(uint32)mGCInfos.size(); }
-		static uint32 freeID() { return (uint32)mFreeGCInfos.size(); }
-		static uint32 usedID() { return (uint32)(mGCInfos.size() - mFreeGCInfos.size()); }
+		static uint32_t totalID() { return(uint32_t)mGCInfos.size(); }
+		static uint32_t freeID() { return (uint32_t)mFreeGCInfos.size(); }
+		static uint32_t usedID() { return (uint32_t)(mGCInfos.size() - mFreeGCInfos.size()); }
 
 		static const std::vector<TinyGCInfo*>& getGCInfos() { return mGCInfos; }
 
 	private:
 		static std::vector<TinyRefObject*> mMemoryPool;
 		static std::vector<TinyGCInfo*> mGCInfos;
-		static std::queue<uint32> mFreeGCInfos;
+		static std::queue<uint32_t> mFreeGCInfos;
 	};
 
 	namespace v3

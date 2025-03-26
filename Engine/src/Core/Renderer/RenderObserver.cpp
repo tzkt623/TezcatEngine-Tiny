@@ -289,34 +289,28 @@ namespace tezcat::Tiny
 
 	void RenderObserver::submit(Shader* shader)
 	{
-		if (!mTransform)
-		{
-			return;
-		}
+		//this->updateObserverMatrix();
 
-		this->updateObserverMatrix();
+		//if (mTransform)
+		//{
+		//
+		//}
 
-		mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
-			, mTransform->getWorldPosition() + mTransform->getForward()
-			, mTransform->getUp());
 
-		auto VP = mProjectionMatrix * mViewMatrix;
+		//mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
+		//	, mTransform->getWorldPosition() + mTransform->getForward()
+		//	, mTransform->getUp());
+		//
+		//auto VP = mProjectionMatrix * mViewMatrix;
 
 		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
 		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
 		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixVP, VP);
 		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixMV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
 
-		Graphics::getInstance()->setFloat3(shader, ShaderParam::CameraWorldPosition, mTransform->getWorldPosition());
-		Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
+		//Graphics::getInstance()->setFloat3(shader, ShaderParam::CameraWorldPosition, mTransform->getWorldPosition());
+		//Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
 
-
-
-		//auto of_mat = sizeof(float4x4) / sizeof(float) * 3;
-		//float3 *p1 = (float3*)((float*)mUniformBuffer->getData() + of_mat);
-		//float2 *p2 = (float2*)((float*)mUniformBuffer->getData() + of_mat + sizeof(float3) / sizeof(float));
-		//
-		//auto c = (*p1).x;
 
 		if (mUniformBuffer)
 		{
@@ -334,10 +328,10 @@ namespace tezcat::Tiny
 				, mTransform->getWorldPosition() + mTransform->getForward()
 				, mTransform->getUp());
 
-			auto VP = mProjectionMatrix * mViewMatrix;
 
 			if (mUniformBuffer)
 			{
+				auto VP = mProjectionMatrix * mViewMatrix;
 				mUniformBuffer->update<float4x4>(0, glm::value_ptr(mProjectionMatrix));
 				mUniformBuffer->update<float4x4>(1, glm::value_ptr(mViewMatrix));
 				mUniformBuffer->update<float4x4>(2, glm::value_ptr(VP));

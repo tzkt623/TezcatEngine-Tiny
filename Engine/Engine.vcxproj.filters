@@ -1326,7 +1326,6 @@
     <ClInclude Include="include\Core\Renderer\CameraObserver.h" />
     <ClInclude Include="include\Core\Renderer\RenderObserver.h" />
     <ClInclude Include="include\Core\Renderer\GraphicsAgent.h" />
-    <ClInclude Include="include\Core\Base\SmartPointer.h" />
     <ClInclude Include="include\Core\Shader\ShaderParser.h" />
     <ClInclude Include="include\Core\Debug\Debug.h" />
     <ClInclude Include="include\Core\Manager\UniformBufferManager.h" />

@@ -31,30 +31,15 @@ namespace tezcat::Editor
 			return instance;
 		}
 		ValueConfig* getValueConfig(const UniformID& ID);
-		static bool isDragResource()
-		{
-			return sIsDragResource;
-		}
 
-		static void beginDragResource()
-		{
-			sIsDragResource = true;
-		}
-
-		static void endDragResource()
-		{
-			sIsDragResource = false;
-		}
-
+		static void clearOnPopScene();
 	private:
 		MyGUIContext();
 		~MyGUIContext();
 		void initValueConfig();
 
 	private:
-
 		std::vector<ValueConfig*> mValueConfigAry;
-		static bool sIsDragResource;
 
 	public:
 		static void matrix4(glm::mat4& mat4);
@@ -64,6 +49,14 @@ namespace tezcat::Editor
 		static const ImVec2 UV0;
 		static const ImVec2 UV1;
 		static ImVec2 sViewPortSize;
+		static GameObject* sSelectedGameObject;
+
+	public:
+		static file_path openFile(const char* filter);
+
+		static void createCamera();
+		static void createBuildinModel(const std::string& model);
+		static void createDirectionLight();
 	};
 
 	class MyWindow : public GUIWindow

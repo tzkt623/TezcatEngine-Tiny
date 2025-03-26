@@ -20,7 +20,7 @@
 
 namespace tezcat::Tiny
 {
-	std::array<DataMemFormatWrapper, (uint32)DataMemFormat::Count> ContextMap::DataMemFormatArray =
+	std::array<DataMemFormatWrapper, (uint32_t)DataMemFormat::Count> ContextMap::DataMemFormatArray =
 	{
 		DataMemFormatWrapper(DataMemFormat::Byte,		0),
 		DataMemFormatWrapper(DataMemFormat::UByte,		0),
@@ -35,7 +35,7 @@ namespace tezcat::Tiny
 		DataMemFormatWrapper(DataMemFormat::UInt_24_8,	0),
 	};
 
-	std::array<TexTypeWrapper, (uint32)TextureType::Count> ContextMap::TextureTypeArray =
+	std::array<TexTypeWrapper, (uint32_t)TextureType::Count> ContextMap::TextureTypeArray =
 	{
 		TexTypeWrapper(TextureType::Texture1D,			0),
 		TexTypeWrapper(TextureType::Texture2D,			0),
@@ -46,7 +46,7 @@ namespace tezcat::Tiny
 		TexTypeWrapper(TextureType::TextureRender2D,	0),
 	};
 
-	std::array<TexWrapWrapper, (uint32)TextureWrap::Count> ContextMap::TextureWrapArray =
+	std::array<TexWrapWrapper, (uint32_t)TextureWrap::Count> ContextMap::TextureWrapArray =
 	{
 		TexWrapWrapper(TextureWrap::Repeat,				0),
 		TexWrapWrapper(TextureWrap::Mirrored_Repeat,	0),
@@ -54,14 +54,14 @@ namespace tezcat::Tiny
 		TexWrapWrapper(TextureWrap::Clamp_To_Border,	0)
 	};
 
-	std::array<TexFilterWrapper, (uint32)TextureFilter::Count> ContextMap::TextureFilterArray =
+	std::array<TexFilterWrapper, (uint32_t)TextureFilter::Count> ContextMap::TextureFilterArray =
 	{
 		TexFilterWrapper(TextureFilter::Nearest,				0),
 		TexFilterWrapper(TextureFilter::Linear,					0),
 		TexFilterWrapper(TextureFilter::Linear_Mipmap_Linear,	0),
 	};
 
-	std::array<TexInternalFormatWrapper, (uint32)TextureInternalFormat::Count> ContextMap::TextureInternalFormatArray =
+	std::array<TexInternalFormatWrapper, (uint32_t)TextureInternalFormat::Count> ContextMap::TextureInternalFormatArray =
 	{
 		TexInternalFormatWrapper(TextureInternalFormat::None,			0),
 		TexInternalFormatWrapper(TextureInternalFormat::Depth,			0),
@@ -89,7 +89,7 @@ namespace tezcat::Tiny
 		TexInternalFormatWrapper(TextureInternalFormat::R32UI,			0),
 	};
 
-	std::array<TexFormatWrapper, (uint32)TextureFormat::Count> ContextMap::TextureFormatArray =
+	std::array<TexFormatWrapper, (uint32_t)TextureFormat::Count> ContextMap::TextureFormatArray =
 	{
 		TexFormatWrapper(TextureFormat::None,			0),
 		TexFormatWrapper(TextureFormat::Depth,			0),
@@ -105,7 +105,7 @@ namespace tezcat::Tiny
 
 	};
 
-	std::array<ColorBufferWrapper, (uint32)ColorBuffer::Count> ContextMap::ColorBufferArray =
+	std::array<ColorBufferWrapper, (uint32_t)ColorBuffer::Count> ContextMap::ColorBufferArray =
 	{
 		ColorBufferWrapper(ColorBuffer::None,	0),
 		ColorBufferWrapper(ColorBuffer::A0,		0),
@@ -120,7 +120,7 @@ namespace tezcat::Tiny
 	};
 
 
-	std::array<DrawModeWrapper, (uint32)DrawMode::Count> ContextMap::DrawModeArray =
+	std::array<DrawModeWrapper, (uint32_t)DrawMode::Count> ContextMap::DrawModeArray =
 	{
 		DrawModeWrapper(DrawMode::Points,			0),
 		DrawModeWrapper(DrawMode::Lines,			0),
@@ -131,6 +131,14 @@ namespace tezcat::Tiny
 		DrawModeWrapper(DrawMode::Triangles_Fan,	0)
 	};
 
+	std::array<PolygonModeWrapper, (uint32_t)PolygonMode::Count> ContextMap::PolygonModeArray =
+	{
+		PolygonModeWrapper(PolygonMode::Point,	0),
+		PolygonModeWrapper(PolygonMode::Line,	0),
+		PolygonModeWrapper(PolygonMode::Face,	0),
+	};
+
+
 	std::unordered_map<std::string, CullFaceWrapper> ContextMap::CullFaceMap =
 	{
 		{"Off",		CullFaceWrapper(CullFace::Off,		0)},
@@ -139,7 +147,7 @@ namespace tezcat::Tiny
 		{"All",		CullFaceWrapper(CullFace::All,		0)}
 	};
 
-	std::array<CullFaceWrapper, (uint32)CullFace::Count> ContextMap::CullFaceArray
+	std::array<CullFaceWrapper, (uint32_t)CullFace::Count> ContextMap::CullFaceArray
 	{
 		CullFaceWrapper(CullFace::Off,		0),
 		CullFaceWrapper(CullFace::Front,	0),
@@ -165,7 +173,7 @@ namespace tezcat::Tiny
 		{"1-ConstA",	BlendWrapper(Blend::One_Minus_ConstAlpha,	0)}
 	};
 
-	std::array<BlendWrapper, (uint32)Blend::Count> ContextMap::BlendArray =
+	std::array<BlendWrapper, (uint32_t)Blend::Count> ContextMap::BlendArray =
 	{
 		BlendWrapper(Blend::Zero,					0),
 		BlendWrapper(Blend::One,					0),
@@ -197,7 +205,7 @@ namespace tezcat::Tiny
 		{"NotEqual",		DepthTestWrapper(DepthTest::NotEqual,		0)}
 	};
 
-	std::array<DepthTestWrapper, (uint32)DepthTest::Count> ContextMap::DepthTestArray =
+	std::array<DepthTestWrapper, (uint32_t)DepthTest::Count> ContextMap::DepthTestArray =
 	{
 		DepthTestWrapper(DepthTest::Off,			0),
 		DepthTestWrapper(DepthTest::Always,			0),
@@ -256,6 +264,7 @@ namespace tezcat::Tiny
 		{ "tex3D",		UniformType::Tex3D },
 		{ "texCube",	UniformType::TexCube }
 	};
+
 
 	void UniformBufferLayout::notifyHolderUpdateData()
 	{

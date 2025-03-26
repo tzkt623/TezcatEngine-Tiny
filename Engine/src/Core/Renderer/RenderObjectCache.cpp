@@ -51,7 +51,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void RenderObjectCache::addRenderAgent(uint32 index, BaseRenderer* renderAgent)
+	void RenderObjectCache::addRenderAgent(uint32_t index, BaseRenderer* renderAgent)
 	{
 		sLayerAry[index]->mRenderObjectList.push_back(renderAgent);
 	}

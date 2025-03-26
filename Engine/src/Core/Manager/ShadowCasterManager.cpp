@@ -61,11 +61,19 @@ namespace tezcat::Tiny
 
 	void ShadowCasterManager::submit(Shader* mShader)
 	{
-		for (auto& caster : mCasterAry)
+		auto it = mCasterAry.begin();
+		while (it != mCasterAry.end())
 		{
-			caster->submit(mShader);
+			if (auto ptr = it->lock())
+			{
+				ptr->submit(mShader);
+				it++;
+			}
+			else
+			{
+				mCasterAry.erase(it);
+			}
 		}
 	}
-
 }
 

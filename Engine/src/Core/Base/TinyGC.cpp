@@ -23,7 +23,7 @@
 
 namespace tezcat::Tiny
 {
-	std::queue<uint32> TinyGC::mFreeGCInfos;
+	std::queue<uint32_t> TinyGC::mFreeGCInfos;
 	std::vector<TinyRefObject*> TinyGC::mMemoryPool;
 	std::vector<TinyGCInfo*> TinyGC::mGCInfos =
 	{

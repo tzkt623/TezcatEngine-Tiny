@@ -317,7 +317,7 @@ namespace tezcat::Tiny::GL
 	void GLFunction_FrameBuffer::attachCube(TextureCube* tex)
 	{
 		mColorCount = 6;
-		for (uint32 i = 0; i < mColorCount; i++)
+		for (uint32_t i = 0; i < mColorCount; i++)
 		{
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 								 , GL_COLOR_ATTACHMENT0 + i
@@ -629,7 +629,7 @@ namespace tezcat::Tiny::GL
 
 		auto size = texCube->getSize();
 
-		for (uint32 i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			TINY_GL_CHECK(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
 				, 0
@@ -699,7 +699,7 @@ namespace tezcat::Tiny::GL
 
 		auto array = LightingManager::getCubeMapTextureArray();
 
-		for (uint32 i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mCaptureViews[i]);
 
@@ -737,7 +737,7 @@ namespace tezcat::Tiny::GL
 		shader->resetLocalState();
 		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
 
-		for (uint32 i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			//mFrameBuffer->attachCube(mIrradianceMap, 0, i);
 			glFramebufferTexture2D(GL_FRAMEBUFFER
@@ -758,25 +758,25 @@ namespace tezcat::Tiny::GL
 		, Vertex* vertex
 		, TextureCube* skybox
 		, TextureCube* prefitler
-		, uint32 mipMaxLevel
-		, uint32 mipWidth
-		, uint32 mipHeight
-		, int32 resolution) const
+		, uint32_t mipMaxLevel
+		, uint32_t mipWidth
+		, uint32_t mipHeight
+		, int32_t resolution) const
 	{
 		shader->resetLocalState();
 		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
 
-		for (uint32 mip = 0; mip < mipMaxLevel; ++mip)
+		for (uint32_t mip = 0; mip < mipMaxLevel; ++mip)
 		{
-			uint32 mip_width = static_cast<uint32>(mipWidth * std::pow(0.5, mip));
-			uint32 mip_height = static_cast<uint32>(mipHeight * std::pow(0.5, mip));
+			uint32_t mip_width = static_cast<uint32_t>(mipWidth * std::pow(0.5, mip));
+			uint32_t mip_height = static_cast<uint32_t>(mipHeight * std::pow(0.5, mip));
 			Graphics::getInstance()->setViewport(ViewportInfo(0, 0, mip_width, mip_height));
 
 			float roughness = (float)mip / (float)(mipMaxLevel - 1);
 			Graphics::getInstance()->setFloat1(shader, "myRoughness", &roughness);
 			Graphics::getInstance()->setInt1(shader, "myResolution", &resolution);
 
-			for (uint32 i = 0; i < 6; ++i)
+			for (uint32_t i = 0; i < 6; ++i)
 			{
 				//mFrameBuffer->attachCube(mPrefilterMap, 0, i, mip);
 				glFramebufferTexture2D(GL_FRAMEBUFFER

@@ -37,7 +37,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(Scene, TinyObject)
+	TINY_OBJECT_CPP(Scene, TinyObject);
 
 	Scene::Scene(std::string name)
 		: mName(std::move(name))

@@ -56,7 +56,7 @@ namespace tezcat::Tiny
 
 		const void* getData() const { return mData; }
 
-		uint64 getDataSize() const { return mDataSize; }
+		uint64_t getDataSize() const { return mDataSize; }
 
 		void release() { free(mData); }
 

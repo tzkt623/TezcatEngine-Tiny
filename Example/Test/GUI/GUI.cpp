@@ -62,6 +62,7 @@ namespace tezcat::Editor
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 
 		auto it = mWindows.begin();
 		auto end = mWindows.end();
@@ -283,5 +284,50 @@ namespace tezcat::Editor
 			ResDragDropHelper.mIsDraging = false;
 		}
 	}
+
+	void ImGuiHelper::rect(int32_t id, const ImVec2& size, ImU32 color)
+	{
+		// 获取当前窗口的 DrawList
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		if (window->SkipItems)
+		{
+			return;
+		}
+
+		// 生成唯一 ID（基于父级 ID 和用户提供的字符串）
+		ImGuiID item_id = window->GetID(id);
+
+		ImGui::GetCursorPos();
+		ImGui::GetCursorScreenPos();
+
+		auto& cpos = window->DC.CursorPos;
+		// 定义矩形的边界框（屏幕坐标）
+		ImRect rect(cpos, ImVec2(cpos.x + size.x, cpos.y + size.y));
+
+		// 将矩形注册为可交互项（继承 ImGui 的交互管理）
+		if (!ImGui::ItemAdd(rect, item_id))
+		{
+			return;
+		}
+
+		//// 检测交互状态（悬停、点击等）
+		//bool is_hovered = ImGui::IsItemHovered();
+		//bool is_clicked = ImGui::IsItemClicked();
+		//
+		//// 根据状态改变颜色
+		//if (is_hovered)
+		//{
+		//	color = ImGui::GetColorU32(ImGuiCol_ButtonHovered);
+		//}
+		//
+		//if (is_clicked)
+		//{
+		//	color = ImGui::GetColorU32(ImGuiCol_ButtonActive);
+		//}
+
+		// 绘制矩形
+		ImGui::GetWindowDrawList()->AddRect(rect.Min, rect.Max, color);
+	}
+
 #pragma endregion Helper
 }

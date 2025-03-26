@@ -50,7 +50,7 @@ namespace tezcat::Tiny
 		mShader->deleteObject();
 	}
 
-	int Material::getUID() const
+	int32_t Material::getUID() const
 	{
 		return mShader->getUID();
 	}
@@ -66,7 +66,18 @@ namespace tezcat::Tiny
 
 	void Material::setShader(Shader* shader)
 	{
-		TINY_ASSERT(mShader == nullptr);
+		if (mShader)
+		{
+			mShader->deleteObject();
+			for (auto uniform : mUniforms)
+			{
+				if (uniform)
+				{
+					delete uniform;
+				}
+			}
+			mUniforms.clear();
+		}
 
 		mShader = shader;
 		mShader->saveObject();

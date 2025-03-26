@@ -88,7 +88,10 @@ namespace tezcat::Tiny
 
 	void UniformTex2D::submit(Shader* shader)
 	{
-		Graphics::getInstance()->setTexture2D(shader, *mValueID, this->value);
+		if (this->value)
+		{
+			Graphics::getInstance()->setTexture2D(shader, *mValueID, this->value);
+		}
 	}
 
 	UniformTexCube::~UniformTexCube()

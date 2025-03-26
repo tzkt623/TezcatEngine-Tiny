@@ -226,7 +226,7 @@ namespace tezcat::Tiny
 		Post
 	};
 
-	using ClearOptionID = uint32;
+	using ClearOptionID = uint32_t;
 	enum TINY_API ClearOption : ClearOptionID
 	{
 		CO_None = 0,
@@ -245,6 +245,14 @@ namespace tezcat::Tiny
 		ForwardAdd,
 		Deferred,
 		ForwardPlus,
+	};
+
+	enum class TINY_API PolygonMode : uint32_t
+	{
+		Point = 0,
+		Line,
+		Face,
+		Count
 	};
 
 	struct TINY_API ViewportInfo
@@ -303,6 +311,13 @@ namespace tezcat::Tiny
 
 		}
 
+		//TinyValueConventor(TinyType tiny, PlatformType platform)
+		//	: tiny(tiny)
+		//	, platform(platform)
+		//{
+		//
+		//}
+
 		TinyValueConventor& operator=(const TinyValueConventor& other)
 		{
 			tiny = other.tiny;
@@ -311,21 +326,22 @@ namespace tezcat::Tiny
 		}
 	};
 
-	using DataMemFormatWrapper = TinyValueConventor<DataMemFormat, uint32>;
-	using TexTypeWrapper = TinyValueConventor<TextureType, uint32>;
-	using TexWrapWrapper = TinyValueConventor<TextureWrap, uint32>;
-	using TexFilterWrapper = TinyValueConventor<TextureFilter, uint32>;
-	using TexInternalFormatWrapper = TinyValueConventor<TextureInternalFormat, uint32>;
-	using TexFormatWrapper = TinyValueConventor<TextureFormat, uint32>;
-	using ColorBufferWrapper = TinyValueConventor<ColorBuffer, uint32>;
-	using DrawModeWrapper = TinyValueConventor<DrawMode, uint32>;
-	using CullFaceWrapper = TinyValueConventor<CullFace, uint32>;
-	using BlendWrapper = TinyValueConventor<Blend, uint32>;
-	using DepthTestWrapper = TinyValueConventor<DepthTest, uint32>;
+	using DataMemFormatWrapper = TinyValueConventor<DataMemFormat, uint32_t>;
+	using TexTypeWrapper = TinyValueConventor<TextureType, uint32_t>;
+	using TexWrapWrapper = TinyValueConventor<TextureWrap, uint32_t>;
+	using TexFilterWrapper = TinyValueConventor<TextureFilter, uint32_t>;
+	using TexInternalFormatWrapper = TinyValueConventor<TextureInternalFormat, uint32_t>;
+	using TexFormatWrapper = TinyValueConventor<TextureFormat, uint32_t>;
+	using ColorBufferWrapper = TinyValueConventor<ColorBuffer, uint32_t>;
+	using DrawModeWrapper = TinyValueConventor<DrawMode, uint32_t>;
+	using CullFaceWrapper = TinyValueConventor<CullFace, uint32_t>;
+	using BlendWrapper = TinyValueConventor<Blend, uint32_t>;
+	using DepthTestWrapper = TinyValueConventor<DepthTest, uint32_t>;
+	using PolygonModeWrapper = TinyValueConventor<PolygonMode, uint32_t>;
 
 	struct TINY_API ContextMap
 	{
-		static std::array<DataMemFormatWrapper, (uint32)DataMemFormat::Count> DataMemFormatArray;
+		static std::array<DataMemFormatWrapper, (uint32_t)DataMemFormat::Count> DataMemFormatArray;
 
 		/// <summary>
 		///	Texture1D
@@ -335,7 +351,7 @@ namespace tezcat::Tiny
 		///	Texture1DA
 		///	Texture2DA
 		/// </summary>
-		static std::array<TexTypeWrapper, (uint32)TextureType::Count> TextureTypeArray;
+		static std::array<TexTypeWrapper, (uint32_t)TextureType::Count> TextureTypeArray;
 
 		/// <summary>
 		/// Tex_REPEAT
@@ -343,29 +359,29 @@ namespace tezcat::Tiny
 		///	Tex_CLAMP_TO_EDGE
 		///	Tex_CLAMP_TO_BORDER
 		/// </summary>
-		static std::array<TexWrapWrapper, (uint32)TextureWrap::Count> TextureWrapArray;
+		static std::array<TexWrapWrapper, (uint32_t)TextureWrap::Count> TextureWrapArray;
 
 		/// <summary>
 		/// Tex_NEAREST
 		/// Tex_LINEAR
 		/// </summary>
-		static std::array<TexFilterWrapper, (uint32)TextureFilter::Count> TextureFilterArray;
+		static std::array<TexFilterWrapper, (uint32_t)TextureFilter::Count> TextureFilterArray;
 
 		/// <summary>
 		/// Tex_RGB
 		/// Tex_RGBA
 		/// </summary>
-		static std::array<TexInternalFormatWrapper, (uint32)TextureInternalFormat::Count> TextureInternalFormatArray;
+		static std::array<TexInternalFormatWrapper, (uint32_t)TextureInternalFormat::Count> TextureInternalFormatArray;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		static std::array<TexFormatWrapper, (uint32)TextureFormat::Count> TextureFormatArray;
+		static std::array<TexFormatWrapper, (uint32_t)TextureFormat::Count> TextureFormatArray;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		static std::array<ColorBufferWrapper, (uint32)ColorBuffer::Count> ColorBufferArray;
+		static std::array<ColorBufferWrapper, (uint32_t)ColorBuffer::Count> ColorBufferArray;
 
 		/// <summary>
 		/// Points
@@ -376,21 +392,22 @@ namespace tezcat::Tiny
 		///	Triangles_Strip
 		///	Triangles_Fan
 		/// </summary>
-		static std::array<DrawModeWrapper, (uint32)DrawMode::Count> DrawModeArray;
+		static std::array<DrawModeWrapper, (uint32_t)DrawMode::Count> DrawModeArray;
+
+
+		static std::array<PolygonModeWrapper, (uint32_t)PolygonMode::Count> PolygonModeArray;
 
 		static std::unordered_map<std::string, CullFaceWrapper> CullFaceMap;
-		static std::array<CullFaceWrapper, (uint32)CullFace::Count> CullFaceArray;
+		static std::array<CullFaceWrapper, (uint32_t)CullFace::Count> CullFaceArray;
 
 		static std::unordered_map<std::string, BlendWrapper> BlendMap;
-		static std::array<BlendWrapper, (uint32)Blend::Count> BlendArray;
+		static std::array<BlendWrapper, (uint32_t)Blend::Count> BlendArray;
 
 		static std::unordered_map<std::string, DepthTestWrapper> DepthTestMap;
-		static std::array<DepthTestWrapper, (uint32)DepthTest::Count> DepthTestArray;
+		static std::array<DepthTestWrapper, (uint32_t)DepthTest::Count> DepthTestArray;
 
 		static std::unordered_map<std::string, LightMode> LightModeMap;
-
 		static std::unordered_map<std::string, Queue> QueueMap;
-
 		static std::unordered_map<std::string, UniformType> UniformTypeUMap;
 	};
 

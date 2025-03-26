@@ -22,7 +22,7 @@
 
 <img width="1280" alt="屏幕截图 2024-06-03 144114" src="https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/52484691-2753-4d82-8995-cba8439866ff">
 
-![Image](https://github.com/user-attachments/assets/7dd9cd78-9a9c-46b5-9b7f-5c03dc5d95a2)
+![Image](https://github.com/user-attachments/assets/f4bf38de-ef11-4aaf-92c9-e97182f81fca)
 
 -------------------------------------------------
 
@@ -765,19 +765,6 @@ bool ZWrite = false;
         str LightMode = Forward;
     }
     #TINY_CFG_END
-
-    #TINY_VA_BEGIN
-    {
-        inout TINY_VS2FS
-        {
-            float4 color;
-            float2 uv;
-            float3 normal;
-            float3 worldPosition;
-            float4 lightPosition;
-        };
-    }
-    #TINY_VA_END
 
     #TINY_VS_BEGIN
     {

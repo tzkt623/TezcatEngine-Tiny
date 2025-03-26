@@ -1,6 +1,5 @@
 ﻿#include "MyEngineIniter.h"
 #include "MyInputer.h"
-#include "MyGUI/MyGUI.h"
 #include "MyEvent.h"
 
 #include "Scene/SceneHead.h"

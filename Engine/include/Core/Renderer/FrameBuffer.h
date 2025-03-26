@@ -41,8 +41,8 @@ namespace tezcat::Tiny
 		std::string getMemoryInfo() override;
 
 	public:
-		void apply(uint32 id) { mBufferID = id; }
-		uint32 getFrameBufferID() const { return mBufferID; }
+		void apply(uint32_t id) { mBufferID = id; }
+		uint32_t getFrameBufferID() const { return mBufferID; }
 		void addAttachment(Texture* tex);
 		Texture* getAttachment(int index) { return mComponents[index]; }
 
@@ -51,16 +51,16 @@ namespace tezcat::Tiny
 		std::string& getName() { return mName; }
 		void setName(std::string& name) { mName.assign(std::move(name)); }
 
-		uint32 currentFrame() const { return mCurrentFrame; }
-		void updateCurrentFrame(uint32 val) { mCurrentFrame = val; }
+		uint32_t currentFrame() const { return mCurrentFrame; }
+		void updateCurrentFrame(uint32_t val) { mCurrentFrame = val; }
 
 	protected:
 		void onClose() override;
 
 	protected:
-		uint32 mCurrentFrame;
-		uint32 mBufferID;
-		uint32 mUID;
+		uint32_t mCurrentFrame;
+		uint32_t mBufferID;
+		uint32_t mUID;
 		std::string mName;
 		std::vector<Texture*> mComponents;
 	};

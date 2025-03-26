@@ -38,7 +38,10 @@ namespace tezcat::Tiny::GL
 		GLFWwindow* getGLFWwindow() { return mWindow; }
 
 	public:
+		void preRender() override;
+		void postRender() override;
 
+	public:
 		void setViewport(const ViewportInfo& info) override;
 		void clear(const ClearOption& option) override;
 		void setPassState(Shader* shader) override;
@@ -99,7 +102,7 @@ namespace tezcat::Tiny::GL
 			, uint32_t mipMaxLevel
 			, uint32_t mipWidth
 			, uint32_t mipHeight
-			, int32 resolution) override;
+			, int32_t resolution) override;
 
 	public:
 		virtual void setUniformBuffer(UniformBuffer* uniformBuffer) override;
@@ -198,5 +201,6 @@ namespace tezcat::Tiny::GL
 
 	private:
 		GLFWwindow* mWindow;
+		int32_t mSavePolygonMode;
 	};
 }

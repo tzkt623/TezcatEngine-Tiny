@@ -24,7 +24,7 @@ namespace tezcat::Tiny
 	//
 	//	TinyRefObject
 	//
-	uint32 TinyRefObject::__ClassID = 1;
+	uint32_t TinyRefObject::__ClassID = 1;
 	const std::string TinyRefObject::Empty = "TinyRefObject";
 	const TinyRTTI TinyRefObject::__TINY__RTTI__453{ nullptr, "TinyRefObject", typeid(TinyRefObject), 0 };
 
@@ -58,4 +58,3 @@ namespace tezcat::Tiny
 		TinyGC::manage(this);
 	}
 }
-

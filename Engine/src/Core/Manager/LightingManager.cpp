@@ -287,18 +287,15 @@ namespace tezcat::Tiny
 		auto [flag1, frame_buffer] = FrameBufferManager::create("FB_Irradiance");
 		if (flag1 == FlagCreate::Succeeded)
 		{
-			auto [flag2, texture] = TextureManager::createCube("CB_IrradianceMap");
-			if (flag2 == FlagCreate::Succeeded)
-			{
-				texture->setConfig(irr_size
-					, TextureInternalFormat::RGB16F
-					, TextureFormat::RGB
-					, DataMemFormat::Float
-					, TextureFilter::Linear_Mipmap_Linear
-					, TextureFilter::Linear);
-				texture->setAttachPosition(TextureAttachPosition::ColorComponent);
-				sIrradianceMap = texture;
-			}
+			auto texture = TextureCube::create("CB_IrradianceMap");
+			texture->setConfig(irr_size
+				, TextureInternalFormat::RGB16F
+				, TextureFormat::RGB
+				, DataMemFormat::Float
+				, TextureFilter::Linear_Mipmap_Linear
+				, TextureFilter::Linear);
+			texture->setAttachPosition(TextureAttachPosition::ColorComponent);
+			sIrradianceMap = texture;
 
 			frame_buffer->addAttachment(texture);
 			frame_buffer->generate();
@@ -331,19 +328,17 @@ namespace tezcat::Tiny
 		auto [flag1, frame_buffer] = FrameBufferManager::create("FB_Prefilter");
 		if (flag1 == FlagCreate::Succeeded)
 		{
-			auto [flag2, texture] = TextureManager::createCube("CB_PrefilterMap");
-			if (flag2 == FlagCreate::Succeeded)
-			{
-				texture->setConfig(prefilter_size
-					, TextureInternalFormat::RGB16F
-					, TextureFormat::RGB
-					, DataMemFormat::Float
-					, TextureFilter::Linear_Mipmap_Linear
-					, TextureFilter::Linear);
+			auto texture = TextureCube::create("CB_PrefilterMap");
 
-				texture->setAttachPosition(TextureAttachPosition::ColorComponent);
-				sPrefilterMap = texture;
-			}
+			texture->setConfig(prefilter_size
+				, TextureInternalFormat::RGB16F
+				, TextureFormat::RGB
+				, DataMemFormat::Float
+				, TextureFilter::Linear_Mipmap_Linear
+				, TextureFilter::Linear);
+
+			texture->setAttachPosition(TextureAttachPosition::ColorComponent);
+			sPrefilterMap = texture;
 
 			frame_buffer->addAttachment(texture);
 			frame_buffer->generate();
@@ -379,16 +374,15 @@ namespace tezcat::Tiny
 		auto [flag1, frame_buffer] = FrameBufferManager::create("FB_BRDF_LUT");
 		if (flag1 == FlagCreate::Succeeded)
 		{
-			auto [flag2, texture] = TextureManager::create2D("CB_BRDF_LUT");
-			if (flag2 == FlagCreate::Succeeded)
-			{
-				texture->setConfig(sCubeSize, sCubeSize
-					, TextureInternalFormat::RG16F
-					, TextureFormat::RG
-					, DataMemFormat::Float);
-				texture->setAttachPosition(TextureAttachPosition::ColorComponent);
-				sBRDFLUTMap = texture;
-			}
+			auto texture = Texture2D::create("CB_BRDF_LUT");
+
+			texture->setConfig(sCubeSize, sCubeSize
+				, TextureInternalFormat::RG16F
+				, TextureFormat::RG
+				, DataMemFormat::Float);
+			texture->setAttachPosition(TextureAttachPosition::ColorComponent);
+			sBRDFLUTMap = texture;
+
 
 			frame_buffer->addAttachment(texture);
 			frame_buffer->generate();
@@ -474,7 +468,7 @@ namespace tezcat::Tiny
 				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::Roughness>();
 				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::Resolution>();
 			});
-		ub->mOnLayoutDataUpdated = [ary](UniformBuffer *buffer)
+		ub->mOnLayoutDataUpdated = [ary](UniformBuffer* buffer)
 			{
 				buffer->updateWithConfig<UniformBufferBinding::SkyBox::MatrixV6>(ary);
 			};

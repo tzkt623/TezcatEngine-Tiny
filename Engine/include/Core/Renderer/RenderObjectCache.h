@@ -53,12 +53,12 @@ namespace tezcat::Tiny
 
 		static void culling(int layerIndex, BaseRenderObserver* renderObserver);
 		static void culling(int layerIndex, ReplacedPipelinePass* pass);
-		static RenderObjectCache* getRenderLayer(uint32 index)
+		static RenderObjectCache* getRenderLayer(uint32_t index)
 		{
 			return sLayerAry[index];
 		}
 
-		static void addRenderAgent(uint32 index, BaseRenderer* renderAgent);
+		static void addRenderAgent(uint32_t index, BaseRenderer* renderAgent);
 
 
 	private:

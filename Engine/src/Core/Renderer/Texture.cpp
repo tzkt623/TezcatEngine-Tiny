@@ -136,7 +136,7 @@ namespace tezcat::Tiny
 		mHeight = image->getHeight();
 		mIsHDR = image->isHDR();
 
-		uint64 size = image->getDataSize();
+		uint64_t size = image->getDataSize();
 		auto temp = realloc(mData, size);
 		if (temp)
 		{
@@ -191,7 +191,7 @@ namespace tezcat::Tiny
 
 		free(mData);
 
-		uint64 size = image->getDataSize();
+		uint64_t size = image->getDataSize();
 		auto temp = realloc(mData, size);
 		if (temp)
 		{

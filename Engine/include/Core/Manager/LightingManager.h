@@ -83,6 +83,11 @@ namespace tezcat::Tiny
 		static void submitLighting(Shader* shader);
 		static void setDirectionalLight(DirectionalLight* agent);
 
+		static bool hasDirectionalLight()
+		{
+			return (sLightData != nullptr) && (sLightData->directionalLight != nullptr);
+		}
+
 	public:
 		//-----------------------------------------
 		//

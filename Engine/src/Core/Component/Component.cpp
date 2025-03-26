@@ -26,7 +26,7 @@ namespace tezcat::Tiny
 {
 	TINY_OBJECT_CPP(Component, TinyObject)
 
-	uint32 Component::sID = 0;
+	uint32_t Component::sID = 0;
 
 	Component::Component()
 		: mGameObject(nullptr)

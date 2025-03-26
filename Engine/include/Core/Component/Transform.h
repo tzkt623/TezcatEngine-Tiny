@@ -114,17 +114,8 @@ namespace tezcat::Tiny
 		float4x4 getWorldToLocalMatrix();
 		const float4x4& getLocalToWorldMatrix() const { return mModelMatrix; }
 
-		void setWorldPosition(const float3& world)
-		{
-			mIsDirty = true;
-			this->inverseTransformPoint(world, mLocalPosition);
-		}
-
-		void setWorldRotation(const float3& worldRotation)
-		{
-			mIsDirty = true;
-			this->inverseTransformVector(worldRotation, mLocalRotation);
-		}
+		void setWorldPosition(const float3& world);
+		void setWorldRotation(const float3& worldRotation);
 
 		float3 getRight() const { return mModelMatrix[0]; }
 		float3 getLeft() const { return -mModelMatrix[0]; }

@@ -6,11 +6,13 @@ namespace tezcat::Editor
 {
 	class MyObjectInfoWindow : public GUIWindow
 	{
-		TINY_EDITOR_WINDOW_INSTANCE_H(MyObjectInfoWindow)
+		struct DrawMaterial
+		{
+			bool flag;
+			MeshRenderer* mr;
+		};
 
-	public:
-		void onSelectObject(GameObject* object);
-	private:
+		TINY_EDITOR_WINDOW_INSTANCE_H(MyObjectInfoWindow)
 
 	protected:
 		void onRender() override;
@@ -33,10 +35,13 @@ namespace tezcat::Editor
 			mDrawFunctions[id] = std::move(function);
 		}
 
+		void drawExtraMaterial();
+
 	private:
 		std::string mNameBuffer;
-		TinyWeakRef<GameObject> mGameObject;
+		//TinyWeakRef<GameObject> mGameObject;
 		std::vector<std::function<void(Component*)>> mDrawFunctions;
+		MeshRenderer* mMeshRenderer;
 	};
 
 }

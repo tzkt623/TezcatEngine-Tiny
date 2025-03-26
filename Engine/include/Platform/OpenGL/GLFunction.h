@@ -102,10 +102,10 @@ namespace tezcat::Tiny::GL
 			, Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* prefitler
-			, uint32 mipMaxLevel
-			, uint32 mipWidth
-			, uint32 mipHeight
-			, int32 resolution) const;
+			, uint32_t mipMaxLevel
+			, uint32_t mipWidth
+			, uint32_t mipHeight
+			, int32_t resolution) const;
 
 	private:
 		float4x4 mCaptureViews[6];

@@ -39,7 +39,7 @@ namespace tezcat::Tiny
 		const int32_t& getChannels() const { return mChannels; }
 		uint64_t getDataSize() const
 		{
-			return mWidth * mHeight * mChannels * uint64_t(mIsHDR ? sizeof(float) : sizeof(uint8));
+			return mWidth * mHeight * mChannels * uint64_t(mIsHDR ? sizeof(float) : sizeof(uint8_t));
 		}
 		void* getData() const { return mData; }
 		void* moveData()

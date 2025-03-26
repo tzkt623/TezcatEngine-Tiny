@@ -126,7 +126,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;TINY_STATIC;TINY_PLATFORM_WINDOWS_DEBUG;_CONSOLE;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;TINY_STATIC;_CRT_SECURE_NO_WARNINGS;TINY_PLATFORM_WINDOWS_DEBUG;_CONSOLE;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -155,7 +155,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;TINY_STATIC;TINY_Release;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TINY_PLATFORM_WINDOWS;TINY_STATIC_LIB;TINY_STATIC;_CRT_SECURE_NO_WARNINGS;TINY_Release;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -182,7 +182,6 @@
     <ClCompile Include="Test\MyController.cpp" />
     <ClCompile Include="Test\main.cpp" />
     <ClCompile Include="Test\MyEvent.cpp" />
-    <ClCompile Include="Test\MyGUI\MyGUI.cpp" />
     <ClCompile Include="Test\MyGUI\MyGUIContext.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.cpp" />
     <ClCompile Include="Test\MyGUI\Window\MyResourceWindow.cpp" />
@@ -206,6 +205,11 @@
     <ClCompile Include="Test\Scene\Tutorial_FrameBuffer.cpp" />
     <ClCompile Include="Test\Scene\Tutorial_Texture2D.cpp" />
     <ClCompile Include="Test\Scene\Tutorial_Triangle.cpp" />
+    <ClCompile Include="Test\ThirdParty\imguizmo\GraphEditor.cpp" />
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImGradient.cpp" />
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImGuizmo.cpp" />
+    <ClCompile Include="Test\ThirdParty\imguizmo\ImSequencer.cpp" />
     <ClCompile Include="Test\ThirdParty\imgui\imgui.cpp" />
     <ClCompile Include="Test\ThirdParty\imgui\imgui_draw.cpp" />
     <ClCompile Include="Test\ThirdParty\imgui\imgui_impl_glfw.cpp" />
@@ -213,6 +217,8 @@
     <ClCompile Include="Test\ThirdParty\imgui\imgui_tables.cpp" />
     <ClCompile Include="Test\ThirdParty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Test\ThirdParty\imgui\TextEditor\TextEditor.cpp" />
+    <ClCompile Include="Test\ThirdParty\nfd\nfd_common.c" />
+    <ClCompile Include="Test\ThirdParty\nfd\nfd_win.cpp" />
     <ClCompile Include="Test\WindowsEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -220,7 +226,6 @@
     <ClInclude Include="Test\GUI\GUIWidget.h" />
     <ClInclude Include="Test\MyController.h" />
     <ClInclude Include="Test\MyEvent.h" />
-    <ClInclude Include="Test\MyGUI\MyGUI.h" />
     <ClInclude Include="Test\MyGUI\MyGUIContext.h" />
     <ClInclude Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.h" />
     <ClInclude Include="Test\MyGUI\Window\MyResourceWindow.h" />
@@ -246,6 +251,12 @@
     <ClInclude Include="Test\Scene\Tutorial_FrameBuffer.h" />
     <ClInclude Include="Test\Scene\Tutorial_Texture2D.h" />
     <ClInclude Include="Test\Scene\Tutorial_Triangle.h" />
+    <ClInclude Include="Test\ThirdParty\imguizmo\GraphEditor.h" />
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImCurveEdit.h" />
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImGradient.h" />
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImGuizmo.h" />
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImSequencer.h" />
+    <ClInclude Include="Test\ThirdParty\imguizmo\ImZoomSlider.h" />
     <ClInclude Include="Test\ThirdParty\imgui\imconfig.h" />
     <ClInclude Include="Test\ThirdParty\imgui\imgui.h" />
     <ClInclude Include="Test\ThirdParty\imgui\imgui_impl_glfw.h" />
@@ -256,6 +267,9 @@
     <ClInclude Include="Test\ThirdParty\imgui\imstb_textedit.h" />
     <ClInclude Include="Test\ThirdParty\imgui\imstb_truetype.h" />
     <ClInclude Include="Test\ThirdParty\imgui\TextEditor\TextEditor.h" />
+    <ClInclude Include="Test\ThirdParty\nfd\common.h" />
+    <ClInclude Include="Test\ThirdParty\nfd\include\nfd.h" />
+    <ClInclude Include="Test\ThirdParty\nfd\nfd_common.h" />
     <ClInclude Include="Test\WindowsEngine.h" />
   </ItemGroup>
   <ItemGroup>

@@ -23,6 +23,5 @@ namespace tezcat::Editor
 		ImGuiWindowFlags mWindowFlags;
 		ImGuiDockNodeFlags mDockspaceFlags;
 	};
-
 }
 

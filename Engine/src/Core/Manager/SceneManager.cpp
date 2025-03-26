@@ -65,6 +65,7 @@ namespace tezcat::Tiny
 
 	void SceneManager::pushScene(Scene* scene)
 	{
+		scene->saveObject();
 		mCDMs.emplace_back(CMD::Push, scene);
 	}
 
@@ -103,6 +104,7 @@ namespace tezcat::Tiny
 			{
 				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_BeforeSceneExit });
 				sSceneArray.top()->onExit();
+				sSceneArray.top()->deleteObject();
 				sSceneArray.pop();
 				EngineEvent::getInstance()->dispatch({ EngineEventID::EE_AfterSceneExit });
 

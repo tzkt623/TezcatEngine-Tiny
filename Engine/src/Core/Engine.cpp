@@ -37,10 +37,11 @@
 
 namespace tezcat::Tiny
 {
-	int32 Engine::ScreenHeight = 0;
-	int32 Engine::ScreenWidth = 0;
+	int32_t Engine::ScreenHeight = 0;
+	int32_t Engine::ScreenWidth = 0;
 	float Engine::sDeltaTime = 0;
 	std::string Engine::sName;
+	bool Engine::mIsRunning = true;
 
 	std::mutex Engine::sMainMutex;
 	std::condition_variable Engine::sCVLogicThread;
@@ -57,7 +58,6 @@ namespace tezcat::Tiny
 		: mResourceLoader(nullptr)
 		, mInputSystem(nullptr)
 		, mGraphics(nullptr)
-		, mIsRunning(true)
 	{
 
 	}
@@ -278,4 +278,6 @@ namespace tezcat::Tiny
 		//sCVRenderThread.notify_one();
 		sSemRenderThread.release();
 	}
+
+
 }

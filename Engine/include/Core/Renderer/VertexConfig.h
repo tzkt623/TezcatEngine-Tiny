@@ -21,7 +21,7 @@
 
 namespace tezcat::Tiny
 {
-	enum TINY_API VertexPosition : uint32
+	enum TINY_API VertexPosition : uint32_t
 	{
 		VP_Position = 0,
 		VP_Normal,
@@ -30,7 +30,7 @@ namespace tezcat::Tiny
 		VP_ModuleMatrix
 	};
 
-	enum class TINY_API VertexLayoutType : uint32
+	enum class TINY_API VertexLayoutType : uint32_t
 	{
 		None = 0,
 		Float1,
@@ -48,9 +48,9 @@ namespace tezcat::Tiny
 		//顶点的数据类型
 		VertexLayoutType type;
 		//结构大小
-		uint64 stride = 0;
+		uint64_t stride = 0;
 
-		uint64 dataLength;
+		uint64_t dataLength;
 
 		const void* data;
 
@@ -62,8 +62,8 @@ namespace tezcat::Tiny
 	class TINY_API VertexLayout
 	{
 	public:
-		static int32 getTypeLength(VertexLayoutType type);
-		static uint32 getTypeSize(VertexLayoutType type);
+		static int32_t getTypeLength(VertexLayoutType type);
+		static uint32_t getTypeSize(VertexLayoutType type);
 		static VertexLayoutType getLayoutType(VertexPosition position);
 	};
 }

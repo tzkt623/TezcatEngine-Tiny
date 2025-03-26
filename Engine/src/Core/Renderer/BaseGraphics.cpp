@@ -45,6 +45,7 @@
 namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
+		: mPolygonMode(ContextMap::PolygonModeArray[(uint32_t)PolygonMode::Face])
 	{
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_ReadObjectID, this
 			, [this](const EventData& data)
@@ -108,6 +109,11 @@ namespace tezcat::Tiny
 // 		{
 // 			cmd->execute(nullptr);
 // 		}
+	}
+
+	void BaseGraphics::setPolygonMode(PolygonMode mode)
+	{
+		mPolygonMode = ContextMap::PolygonModeArray[(uint32_t)mode];
 	}
 
 }

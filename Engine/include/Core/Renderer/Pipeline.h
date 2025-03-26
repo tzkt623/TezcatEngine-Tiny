@@ -51,7 +51,7 @@ namespace tezcat::Tiny
 	class TINY_API PipelinePass : public TinyObject
 	{
 	public:
-		enum class Mode : int8
+		enum class Mode : int8_t
 		{
 			//持续存在型
 			Continued = 0,
@@ -105,7 +105,7 @@ namespace tezcat::Tiny
 		* User Set Custom OrderID
 		* Range [0, 65535]
 		*/
-		void setOrderID(uint16 value)
+		void setOrderID(uint16_t value)
 		{
 			mType2.userID = value;
 		}
@@ -124,7 +124,7 @@ namespace tezcat::Tiny
 		* 2.再排相机中的队列
 		* 3.再排队列中的通道
 		*/
-		uint64 getPipelineOrderID() const { return mPipelineOrderID; }
+		uint64_t getPipelineOrderID() const { return mPipelineOrderID; }
 		uint32_t getUID() const;
 
 		void addCommand(RenderCommand* cmd);

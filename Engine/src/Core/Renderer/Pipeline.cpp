@@ -35,6 +35,7 @@
 #include "Core/Manager/ShadowCasterManager.h"
 #include "Core/Manager/LightingManager.h"
 #include "Core/Manager/GameObjectManager.h"
+#include "Core/Manager/SceneManager.h"
 
 #include "Core/Debug/Debug.h"
 
@@ -432,6 +433,11 @@ namespace tezcat::Tiny
 
 	void Pipeline::render()
 	{
+		//if (SceneManager::empty())
+		//{
+		//	return;
+		//}
+
 		TINY_PROFILER_TIMER_OUT(Profiler::RenderTime);
 		this->preRender();
 		this->onRender();
@@ -490,6 +496,8 @@ namespace tezcat::Tiny
 				return a->getPipelineOrderID() < b->getPipelineOrderID();
 			});
 		}
+
+		Graphics::getInstance()->preRender();
 	}
 
 	void PipelineBuildin::onRender()
@@ -520,6 +528,7 @@ namespace tezcat::Tiny
 	void PipelineBuildin::postRender()
 	{
 		sFrameCount++;
+		Graphics::getInstance()->postRender();
 	}
 
 	void PipelineBuildin::addPipelinePass(PipelinePass* pass)

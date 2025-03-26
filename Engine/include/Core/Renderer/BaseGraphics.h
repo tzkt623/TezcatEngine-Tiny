@@ -82,6 +82,12 @@ namespace tezcat::Tiny
 
 		void buildCommand();
 
+		void setPolygonMode(PolygonMode mode);
+
+	public:
+		virtual void preRender() {}
+		virtual void postRender() {}
+
 	public:
 		virtual void createVertex(Vertex* vertex) {}
 		virtual void createShader(Shader* shader) {}
@@ -271,6 +277,9 @@ namespace tezcat::Tiny
 	private:
 		std::vector<RenderCommadBuild*> mBuildCommandList;
 		std::queue<RenderCommadBuild*> mBuildCommandQueue;
+
+	protected:
+		PolygonModeWrapper mPolygonMode;
 	};
 
 	using Graphics = SG<BaseGraphics>;

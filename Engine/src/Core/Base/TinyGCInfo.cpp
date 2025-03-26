@@ -21,9 +21,9 @@
 namespace tezcat::Tiny
 {
 	//TinyGCInfo* TinyGCInfo::Default = new TinyGCInfo(0, -9999999, -9999999, nullptr);
-	const int32 TinyGCInfo::EmptyStrongID = -623;
+	const int32_t TinyGCInfo::EmptyStrongID = -623;
 
-	TinyGCInfo::TinyGCInfo(TinyGCInfoID index, int32 strongRef, int32 weakRef, TinyRefObject* pointer)
+	TinyGCInfo::TinyGCInfo(TinyGCInfoID index, int32_t strongRef, int32_t weakRef, TinyRefObject* pointer)
 		: index(index)
 		, strongRef(strongRef)
 		, weakRef(weakRef)

@@ -20,7 +20,7 @@
 namespace tezcat::Tiny
 {
 
-	int32 VertexLayout::getTypeLength(VertexLayoutType type)
+	int32_t VertexLayout::getTypeLength(VertexLayoutType type)
 	{
 		switch (type)
 		{
@@ -35,7 +35,7 @@ namespace tezcat::Tiny
 		return 0;
 	}
 
-	uint32 VertexLayout::getTypeSize(VertexLayoutType type)
+	uint32_t VertexLayout::getTypeSize(VertexLayoutType type)
 	{
 		switch (type)
 		{

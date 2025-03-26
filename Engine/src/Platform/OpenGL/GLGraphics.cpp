@@ -49,6 +49,7 @@ namespace tezcat::Tiny::GL
 		: mWindow(nullptr)
 	{
 		Graphics::attach(this);
+		mPolygonMode.platform = GL_FILL;
 	}
 
 	GLGraphics::~GLGraphics()
@@ -342,6 +343,13 @@ namespace tezcat::Tiny::GL
 			DepthTestWrapper(DepthTest::Equal,			GL_EQUAL),
 			DepthTestWrapper(DepthTest::NotEqual,		GL_NOTEQUAL)
 		};
+
+		ContextMap::PolygonModeArray =
+		{
+			PolygonModeWrapper(PolygonMode::Point,  GL_POINT),
+			PolygonModeWrapper(PolygonMode::Line,	GL_LINE),
+			PolygonModeWrapper(PolygonMode::Face,	GL_FILL),
+		};
 	}
 
 	void GLGraphics::setViewport(const ViewportInfo& info)
@@ -358,6 +366,7 @@ namespace tezcat::Tiny::GL
 		}
 		else
 		{
+			glCullFace(GL_FRONT_AND_BACK);
 			glDisable(GL_CULL_FACE);
 		}
 
@@ -468,7 +477,7 @@ namespace tezcat::Tiny::GL
 		TINY_PROFILER_DRAWCALL(1);
 	}
 
-	void GLGraphics::drawLine(Vertex* vertex, const uint32& needCount)
+	void GLGraphics::drawLine(Vertex* vertex, const uint32_t& needCount)
 	{
 		glBindVertexArray(vertex->getVertexID());
 		glDrawArrays(GL_LINE, 0, needCount);
@@ -630,7 +639,7 @@ namespace tezcat::Tiny::GL
 		//	, uniform_buffer->getLayout()->mBindingIndex
 		//	, uniform_buffer->getBufferID()));
 
-		for (uint32 i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
 			this->setUniformBuffer(uniform_buffer);
@@ -691,7 +700,7 @@ namespace tezcat::Tiny::GL
 		//	, uniform_buffer->getLayout()->mBindingIndex
 		//	, uniform_buffer->getBufferID()));
 
-		for (uint32 i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
 			this->setUniformBuffer(uniform_buffer);
@@ -713,10 +722,10 @@ namespace tezcat::Tiny::GL
 		, Vertex* vertex
 		, TextureCube* skybox
 		, TextureCube* prefitler
-		, uint32 mipMaxLevel
-		, uint32 mipWidth
-		, uint32 mipHeight
-		, int32 resolution)
+		, uint32_t mipMaxLevel
+		, uint32_t mipWidth
+		, uint32_t mipHeight
+		, int32_t resolution)
 	{
 		shader->resetLocalState();
 		this->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
@@ -726,10 +735,10 @@ namespace tezcat::Tiny::GL
 		//	, uniform_buffer->getLayout()->mBindingIndex
 		//	, uniform_buffer->getBufferID()))
 
-		for (uint32 mip = 0; mip < mipMaxLevel; ++mip)
+		for (uint32_t mip = 0; mip < mipMaxLevel; ++mip)
 		{
-			uint32 mip_width = static_cast<uint32>(mipWidth * std::pow(0.5, mip));
-			uint32 mip_height = static_cast<uint32>(mipHeight * std::pow(0.5, mip));
+			uint32_t mip_width = static_cast<uint32_t>(mipWidth * std::pow(0.5, mip));
+			uint32_t mip_height = static_cast<uint32_t>(mipHeight * std::pow(0.5, mip));
 			this->setViewport(ViewportInfo(0, 0, mip_width, mip_height));
 
 			float roughness = (float)mip / (float)(mipMaxLevel - 1);
@@ -737,7 +746,7 @@ namespace tezcat::Tiny::GL
 			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::Roughness>(&roughness);
 			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::Resolution>(&resolution);
 
-			for (uint32 i = 0; i < 6; ++i)
+			for (uint32_t i = 0; i < 6; ++i)
 			{
 				uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
 				this->setUniformBuffer(uniform_buffer);
@@ -1226,4 +1235,16 @@ namespace tezcat::Tiny::GL
 	{
 		glClearColor(r, g, b, a);
 	}
+
+	void GLGraphics::preRender()
+	{
+		glGetIntegerv(GL_POLYGON_MODE, &mSavePolygonMode);
+		TINY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, mPolygonMode.platform));
+	}
+
+	void GLGraphics::postRender()
+	{
+		TINY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, mSavePolygonMode));
+	}
+
 }

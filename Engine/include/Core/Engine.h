@@ -42,6 +42,7 @@ namespace tezcat::Tiny
 		{
 			sMultiThread = true;
 		}
+		static void close() { mIsRunning = false; }
 
 	protected:
 		virtual bool preInit();
@@ -61,6 +62,7 @@ namespace tezcat::Tiny
 
 		virtual BaseGraphics* createGraphics() = 0;
 
+
 	protected:
 		InputSystem* mInputSystem;
 		EngineIniter* mResourceLoader;
@@ -68,25 +70,27 @@ namespace tezcat::Tiny
 		Pipeline* mPipeline;
 
 	protected:
-		bool mIsRunning;
 		std::thread mRenderThread;
 		std::condition_variable mThreadCondition;
 		std::atomic<bool> mRenderThreadInited;
 
 	public:
-		static const int32& getScreenWidth() { return ScreenWidth; }
-		static const int32& getScreenHeight() { return ScreenHeight; }
+		static const int32_t& getScreenWidth() { return ScreenWidth; }
+		static const int32_t& getScreenHeight() { return ScreenHeight; }
 		static const float& getDeltaTime() { return sDeltaTime; }
 		static const std::string& getName() { return sName; }
 
 	protected:
 		static std::string sName;
-		static int32 ScreenWidth;
-		static int32 ScreenHeight;
+		static int32_t ScreenWidth;
+		static int32_t ScreenHeight;
 		static float sDeltaTime;
 
 	public:
 		static bool sMultiThread;
+
+	protected:
+		static bool mIsRunning;
 
 	private:
 		static std::atomic<bool> allowRender;

@@ -42,7 +42,7 @@ namespace tezcat::Tiny
 		std::string& getName() { return mName; }
 		std::string_view getNameView() { return mName; }
 
-		int32 getUID() const;
+		int32_t getUID() const;
 		std::vector<Uniform*>& getUniforms() { return mUniforms; }
 		Shader* getShader() const { return mShader; }
 		void setShader(Shader* shader);

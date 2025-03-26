@@ -35,7 +35,7 @@ namespace tezcat::Tiny
 	{
 		friend class GameObject;
 		friend class Transform;
-		TINY_ABSTRACT_OBJECT_H(Scene, TinyObject)
+		TINY_OBJECT_H(Scene, TinyObject)
 
 	protected:
 		Scene(std::string name);
@@ -63,15 +63,12 @@ namespace tezcat::Tiny
 		void addLogicFunction(void* gameObject, const std::function<void()>& function);
 		void removeLogicFunction(void* gameObject);
 		void addTransform(Transform* transform);
+		void addGameObject(GameObject* gameObject);
 
 	public:
 		std::list<TinyWeakRef<Transform>>& getTransformList() { return mTransformList; }
 		std::vector<TinyWeakRef<Transform>> findTransforms(const std::string& name);
 		TinyWeakRef<Transform> findTransform(const std::string& name);
-
-	private:
-		void addGameObject(GameObject* gameObject);
-
 	private:
 		std::string mName;
 		std::list<GameObject*> mNewGameObjectList;

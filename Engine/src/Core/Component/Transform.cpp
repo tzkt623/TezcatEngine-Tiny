@@ -458,12 +458,13 @@ namespace tezcat::Tiny
 			mat = glm::inverse(mParent->getModelMatrix()) * mModelMatrix;
 		}
 
-		glm::vec3 skew;
-		glm::vec4 perspective;
-		glm::quat rotation;
+		//glm::vec3 skew;
+		//glm::vec4 perspective;
+		//glm::quat rotation;
 
-		glm::decompose(mat, mLocalScale, rotation, mLocalPosition, skew, perspective);
-		mLocalRotation = glm::degrees(glm::eulerAngles(rotation));
+		//glm::decompose(mat, mLocalScale, rotation, mLocalPosition, skew, perspective);
+
+		GLMHelper::decompose(mat, mLocalPosition, mLocalRotation, mLocalScale);
 
 		if (glm::determinant(mat) < 0.0f)
 		{
@@ -471,6 +472,31 @@ namespace tezcat::Tiny
 		}
 	}
 
+	void Transform::setWorldPosition(const float3& world)
+	{
+		mIsDirty = true;
+		if (mParent)
+		{
+			mParent->inverseTransformPoint(world, mLocalPosition);
+		}
+		else
+		{
+			mLocalPosition = world;
+		}
+	}
+
+	void Transform::setWorldRotation(const float3& worldRotation)
+	{
+		mIsDirty = true;
+		if (mParent)
+		{
+			mParent->inverseTransformRotation(worldRotation, mLocalRotation);
+		}
+		else
+		{
+			mLocalRotation = worldRotation;
+		}
+	}
 
 	//-------------------------------------------------
 	//

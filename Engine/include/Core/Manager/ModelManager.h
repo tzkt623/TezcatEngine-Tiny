@@ -39,7 +39,7 @@ namespace tezcat::Tiny
 		static MeshData* createMesh(aiMesh* aimesh);
 
 	private:
-		static std::unordered_map<uint64, ModelNode*> mModelUMap;
+		static std::unordered_map<uint64_t, ModelNode*> mModelUMap;
 		static std::vector<MeshData*> mMeshDataAry;
 	};
 }

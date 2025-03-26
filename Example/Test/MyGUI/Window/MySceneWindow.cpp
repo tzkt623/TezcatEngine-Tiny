@@ -40,10 +40,87 @@ namespace tezcat::Editor
 		//{
 		//	InputSys::getInstance()->update();
 		//}
+		static bool bTranform[3]{ true, false, false };
+		static ImGuizmo::OPERATION img_operation = ImGuizmo::OPERATION::TRANSLATE;
+
+		static ImGuizmo::MODE img_mode = ImGuizmo::MODE::LOCAL;
 
 		if (ImGui::BeginMenuBar())
 		{
 			static bool bInfo;
+
+			if (ImGui::MenuItem("T", 0, &bTranform[0]))
+			{
+				bTranform[1] = false;
+				bTranform[2] = false;
+				img_operation = ImGuizmo::OPERATION::TRANSLATE;
+			}
+
+			if (ImGui::MenuItem("R", 0, &bTranform[1]))
+			{
+				bTranform[0] = false;
+				bTranform[2] = false;
+				img_operation = ImGuizmo::OPERATION::ROTATE;
+			}
+
+			if (ImGui::MenuItem("S", 0, &bTranform[2]))
+			{
+				bTranform[0] = false;
+				bTranform[1] = false;
+				img_operation = ImGuizmo::OPERATION::SCALE;
+			}
+
+			switch (img_mode)
+			{
+			case ImGuizmo::LOCAL:
+				if (ImGui::Button("Local"))
+				{
+					img_mode = ImGuizmo::MODE::WORLD;
+				}
+				break;
+			case ImGuizmo::WORLD:
+				if (ImGui::Button("World"))
+				{
+					img_mode = ImGuizmo::MODE::LOCAL;
+				}
+				break;
+			default:
+				break;
+			}
+			ImGui::Separator();
+
+			static PolygonMode polygon_mode = PolygonMode::Face;
+			static std::string polygon_mode_name = "Face";
+			ImGui::SetNextItemWidth(120);
+			if (ImGui::BeginCombo("##PylgonMode", polygon_mode_name.c_str()))
+			{
+				if (ImGui::Selectable("Face##face0", polygon_mode == PolygonMode::Face))
+				{
+					polygon_mode = PolygonMode::Face;
+					polygon_mode_name = "Face";
+					Graphics::getInstance()->setPolygonMode(polygon_mode);
+				}
+
+				if (ImGui::Selectable("Line##line1", polygon_mode == PolygonMode::Line))
+				{
+					polygon_mode = PolygonMode::Line;
+					polygon_mode_name = "Line";
+					Graphics::getInstance()->setPolygonMode(polygon_mode);
+				}
+
+				if (ImGui::Selectable("Point##point2", polygon_mode == PolygonMode::Point))
+				{
+					polygon_mode = PolygonMode::Point;
+					polygon_mode_name = "Point";
+					Graphics::getInstance()->setPolygonMode(polygon_mode);
+				}
+
+
+				ImGui::EndCombo();
+			}
+
+			ImGui::Spacing();
+
 			ImGui::MenuItem("Info", 0, &bInfo);
 			if (bInfo)
 			{
@@ -119,9 +196,65 @@ namespace tezcat::Editor
 					mMousePos.x = (mouse_pos.x - mFramePos.x);
 					mMousePos.y = ImGui::GetItemRectSize().y - (mouse_pos.y - mFramePos.y);
 
+					if (auto main_camera = CameraManager::getMainCamera())
+					{
+						if (MyGUIContext::sSelectedGameObject)
+						{
+							ImGuizmo::SetOrthographic(false);
+							ImGuizmo::SetDrawlist();
+							auto window_pos = ImGui::GetItemRectMin();
+							auto size = ImGui::GetItemRectSize();
+							ImGuizmo::SetRect(window_pos.x, window_pos.y, size.x, size.y);
+
+							auto transform = MyGUIContext::sSelectedGameObject->getTransform();
+
+							//这个matrix是一个世界坐标系的矩阵
+							//所以如果此对象在一个父对象之中
+							//
+							auto transform_matrix = transform->getModelMatrix();
+
+							auto observer = main_camera->getRenderObserver();
+							//auto in_view_matrix = glm::inverse(observer->getViewMatrix());
+							ImGuizmo::Manipulate(glm::value_ptr(observer->getViewMatrix())
+								, glm::value_ptr(observer->getProjectionMatrix())
+								, img_operation
+								, img_mode
+								, glm::value_ptr(transform_matrix));
+
+							if (ImGuizmo::IsUsing())
+							{
+								glm::vec3 translation, scale, rotation;
+								GLMHelper::decompose(transform_matrix, translation, rotation, scale);
+
+								//auto matrix = MyGUIContext::sSelectedGameObject->getTransform()->getModelMatrix();
+								//auto p_matrix = glm::inverse(MyGUIContext::sSelectedGameObject->getTransform()->getParent()->getModelMatrix());
+								//p_matrix = glm::inverse(p_matrix);
+								//float3 lp = p_matrix * float4(translation, 1.0f);
+								//MyGUIContext::sSelectedGameObject->getTransform()->inverseTransformPoint(translation, translation);
+								//TINY_LOG_WARNING(std::format("{}, {}, {}", translation.x, translation.y, translation.z));
+								//TINY_LOG_WARNING(std::format("{}, {}, {}", lp.x, lp.y, lp.z));
+
+								switch (img_operation)
+								{
+								case ImGuizmo::TRANSLATE:
+									MyGUIContext::sSelectedGameObject->getTransform()->setWorldPosition(translation);
+									break;
+								case ImGuizmo::ROTATE:
+									MyGUIContext::sSelectedGameObject->getTransform()->setRotation(rotation);
+									break;
+								case ImGuizmo::SCALE:
+									MyGUIContext::sSelectedGameObject->getTransform()->setScale(scale);
+									break;
+								default:
+									break;
+								}
+							}
+						}
+					}
+
 					if (ImGui::IsItemHovered())
 					{
-						if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+						if (!ImGuizmo::IsOver() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 						{
 							if (GameObjectManager::allowPickObject())
 							{
@@ -147,9 +280,14 @@ namespace tezcat::Editor
 	{
 		ImGui::SetNextWindowPos(pos);
 		ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration
+			| ImGuiWindowFlags_NoDocking
+			| ImGuiWindowFlags_AlwaysAutoResize
+			| ImGuiWindowFlags_NoSavedSettings
+			| ImGuiWindowFlags_NoFocusOnAppearing
+			| ImGuiWindowFlags_NoNav
+			;
 		if (ImGui::Begin("状态(State)", 0, window_flags))
-			//if (ImGui::BeginChild("状态(State)"))
 		{
 			//gpu
 			ImGui::Text("GPU: %s", Profiler::GPU);

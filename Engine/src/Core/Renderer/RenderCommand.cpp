@@ -359,10 +359,10 @@ namespace tezcat::Tiny
 	RenderCMD_MakeEnvPrefilter::RenderCMD_MakeEnvPrefilter(Vertex* vertex
 		, TextureCube* skybox
 		, TextureCube* prefitler
-		, uint32 mipMaxLevel
-		, uint32 mipWidth
-		, uint32 mipHeight
-		, int32 resolution)
+		, uint32_t mipMaxLevel
+		, uint32_t mipWidth
+		, uint32_t mipHeight
+		, int32_t resolution)
 		: mVertex(vertex)
 		, mSkyboxMap(skybox)
 		, mPrefilterMap(prefitler)

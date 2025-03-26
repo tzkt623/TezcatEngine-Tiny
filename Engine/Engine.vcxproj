@@ -250,7 +250,6 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="src\Core\Tool\StringTool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Core\Base\SmartPointer.h" />
     <ClInclude Include="include\Core\Base\TinyGCInfo.h" />
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="include\Core\Component\ShadowCaster.h" />

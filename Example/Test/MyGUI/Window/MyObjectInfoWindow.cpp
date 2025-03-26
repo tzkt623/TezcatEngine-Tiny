@@ -3,25 +3,27 @@
 
 namespace tezcat::Editor
 {
-	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyObjectInfoWindow)
-		MyObjectInfoWindow::MyObjectInfoWindow()
+	TINY_EDITOR_WINDOW_INSTANCE_CPP(MyObjectInfoWindow);
+	MyObjectInfoWindow::MyObjectInfoWindow()
 		: GUIWindow("物体信息(ObjectInfo)")
-		, mGameObject(nullptr)
+		//, mGameObject(nullptr)
 		, mDrawFunctions()
 		, mNameBuffer(256, '\0')
 	{
-		MyEvent::get()->addListener(MyEventID::Window_ObjectSelected, this, [this](const EventData& data)
-			{
-				mGameObject = static_cast<GameObject*>(data.userData);
-			});
+// 		MyEvent::get()->addListener(MyEventID::Window_ObjectSelected, this, [this](const EventData& data)
+// 			{
+// 				mGameObject = static_cast<GameObject*>(data.userData);
+// 			});
 
 		this->drawComponent<Transform>([](Component* com)
 		{
-			if (ImGui::CollapsingHeader("坐标(Transform)"))
+			if (ImGui::CollapsingHeader("坐标(Transform)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				auto transform = static_cast<Transform*>(com);
 				if (ImGui::BeginTable("##tabel", 2, ImGuiTableFlags_SizingStretchProp))
 				{
+					bool is_dirty = false;
+
 					ImGui::TableSetupColumn("##0", ImGuiTableColumnFlags_WidthFixed);
 					ImGui::TableSetupColumn("##1", ImGuiTableColumnFlags_WidthStretch);
 
@@ -30,23 +32,28 @@ namespace tezcat::Editor
 					ImGui::Text("Position");
 					ImGui::TableSetColumnIndex(1);
 					ImGui::SetNextItemWidth(200);
-					ImGui::DragFloat3("##Position", glm::value_ptr(transform->getPosition()), 0.03f);
+					is_dirty |= ImGui::DragFloat3("##Position", glm::value_ptr(transform->getPosition()), 0.02f);
 
 					ImGui::TableNextRow(ImGuiTableRowFlags_None);
 					ImGui::TableSetColumnIndex(0);
 					ImGui::Text("Rotation");
 					ImGui::TableSetColumnIndex(1);
 					ImGui::SetNextItemWidth(200);
-					ImGui::DragFloat3("##Rotation", glm::value_ptr(transform->getRotation()), 0.03f);
+					is_dirty |= ImGui::DragFloat3("##Rotation", glm::value_ptr(transform->getRotation()), 0.02f);
 
 					ImGui::TableNextRow(ImGuiTableRowFlags_None);
 					ImGui::TableSetColumnIndex(0);
 					ImGui::Text("Scale");
 					ImGui::TableSetColumnIndex(1);
 					ImGui::SetNextItemWidth(200);
-					ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.03f);
+					is_dirty |= ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.02f);
 
 					ImGui::EndTable();
+
+					if (is_dirty)
+					{
+						transform->markDirty();
+					}
 				}
 
 				static bool open_matrix_info = false;
@@ -134,15 +141,16 @@ namespace tezcat::Editor
 				// 			ImGui::Text("Scale   ");
 				// 			ImGui::SameLine();
 				// 			ImGui::DragFloat3("##Scale", glm::value_ptr(transform->getScale()), 0.03f);
-				transform->markDirty();
+
+
 			}
 		});
 
-		this->drawComponent<MeshRenderer>([](Component* com)
+		this->drawComponent<MeshRenderer>([this](Component* com)
 		{
-			if (ImGui::CollapsingHeader("网格渲染器(MeshRenderer)"))
+			mMeshRenderer = static_cast<MeshRenderer*>(com);
+			if (ImGui::CollapsingHeader("网格渲染器(MeshRenderer)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				uint32_t widget_id = 0;
 				auto mr = static_cast<MeshRenderer*>(com);
 				ImGui::Text("Mesh");
 				auto vertex = mr->getVertex();
@@ -151,114 +159,12 @@ namespace tezcat::Editor
 				ImGui::Text("VertexCount: %d", vertex->getVertexCount());
 				ImGui::Text("IndexCount: %d", vertex->getIndexCount());
 				ImGui::Text("Face: %d", vertex->getIndexCount() / 3);
-				ImGui::Separator();
-
-				ImGui::Text("Material");
-				auto mt = mr->getMaterial();
-				auto shader = mt->getShader();
-				auto& uniforms = mt->getUniforms();
-				for (uint32_t i = 0; i < uniforms.size(); i++)
-				{
-					auto info = shader->getUniformValueConfig(i);
-					auto uniform = uniforms[i];
-
-					switch (uniform->getType())
-					{
-					case UniformType::Float:
-					{
-						auto f1 = (UniformF1*)uniform;
-						auto range = (RangeFloat*)info->range.get();
-						ImGui::Text(info->editorName.c_str());
-						ImGui::PushID(widget_id++);
-						ImGui::DragFloat("", &f1->value, 0.02f, range->min, range->max);
-						ImGui::PopID();
-
-						ImGui::Spacing();
-						break;
-					}
-					case UniformType::Float3:
-					{
-						auto f3 = (UniformF3*)uniform;
-
-						ImGui::Text(info->editorName.c_str());
-						ImGui::PushID(widget_id++);
-						if (info->constraint == ShaderConstraint::Color)
-						{
-							ImGui::ColorEdit3("", glm::value_ptr(f3->value));
-						}
-						else
-						{
-							auto range = (RangeFloat*)info->range.get();
-							ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f, range->min, range->max);
-						}
-
-						ImGui::PopID();
-
-						ImGui::Spacing();
-						break;
-					}
-					case UniformType::Tex2D:
-					{
-						auto tex = (UniformTex2D*)uniform;
-						ImGui::Text(info->editorName.c_str());
-						ImGui::Image((ImTextureID)tex->value->getTextureID()
-									, ImVec2(100, 100)
-									, ImVec2(0, 1)
-									, ImVec2(1, 0));
-
-						if (ImGui::IsItemHovered())
-						{
-							ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-						}
-
-						ImGuiHelper::dropResource([&tex](file_path path)
-						{
-							Image* img = Image::create();
-							if (img->openFile(path))
-							{
-								Texture2D* new_tex = Texture2D::create();
-								new_tex->setImage(img);
-								new_tex->generate();
-
-								tex->set(new_tex);
-							}
-						});
-
-						//if (ImGui::BeginDragDropTarget())
-						//{
-						//	auto [flag, drop_name] = MyGUIContext::DragDropController.dropData();
-						//	if (flag)
-						//	{
-						//		auto payload = ImGui::AcceptDragDropPayload(drop_name.data());
-						//		if (payload)
-						//		{
-						//			Image* img = Image::create();
-						//			if (img->openFile(MyGUIContext::DragDropController.getFilePath()))
-						//			{
-						//				Texture2D* new_tex = Texture2D::create();
-						//				new_tex->setImage(img);
-						//				new_tex->generate();
-						//
-						//				tex->set(new_tex);
-						//			}
-						//		}
-						//	}
-						//	ImGui::EndDragDropTarget();
-						//}
-
-						ImGui::Spacing();
-						break;
-					}
-					default:
-						break;
-					}
-				}
 			}
 		});
 
 		this->drawComponent<DirectionalLight>([](Component* com)
 		{
-			if (ImGui::CollapsingHeader("区域光(DirectionalLight)"))
+			if (ImGui::CollapsingHeader("区域光(DirectionalLight)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				if (ImGui::BeginTable("##table", 2, ImGuiTableFlags_SizingStretchProp))
 				{
@@ -294,7 +200,7 @@ namespace tezcat::Editor
 
 		this->drawComponent<Camera>([](Component* com)
 		{
-			if (ImGui::CollapsingHeader("相机(Camera)"))
+			if (ImGui::CollapsingHeader("相机(Camera)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				if (ImGui::BeginTable("##table", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Borders))
 				{
@@ -465,7 +371,7 @@ namespace tezcat::Editor
 
 		this->drawComponent<ShadowCaster>([](Component* com)
 		{
-			if (ImGui::CollapsingHeader("阴影投射器(ShadowCaster)"))
+			if (ImGui::CollapsingHeader("阴影投射器(ShadowCaster)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				auto caster = static_cast<ShadowCaster*>(com);
 
@@ -482,33 +388,49 @@ namespace tezcat::Editor
 		TINY_EDITOR_WINDOW_DELETE_INSTACNE();
 	}
 
-	void MyObjectInfoWindow::onSelectObject(GameObject* object)
-	{
-		mGameObject = object;
-	}
-
 	void MyObjectInfoWindow::onRender()
 	{
 		GUIWindow::onRender();
 
-		if (!mGameObject.lock())
+		if (MyGUIContext::sSelectedGameObject == nullptr)
 		{
 			return;
 		}
 
-		//mNameBuffer.assign(mGameObject->getName().c_str());
-
 		ImGui::Text("名称(Name):");
 		ImGui::SameLine();
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), mGameObject->getName().c_str());
-		//ImGui::InputText("123", mNameBuffer.data(), mNameBuffer.capacity(), 0, &MyOverviewWindow::resetName);
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), MyGUIContext::sSelectedGameObject->getName().c_str());
 
-		auto& components = mGameObject->getCompoents();
+		mMeshRenderer = nullptr;
+
+		auto& components = MyGUIContext::sSelectedGameObject->getCompoents();
 		for (auto com : components)
 		{
 			if (com)
 			{
 				mDrawFunctions[com->getComponentTypeID()](com);
+			}
+		}
+
+		if (mMeshRenderer)
+		{
+			this->drawExtraMaterial();
+
+			if (ImGui::BeginPopup("ShaderManager##vaf"))
+			{
+				auto mt = mMeshRenderer->getMaterial();
+				auto shader = mt->getShader();
+				auto& shaders = ShaderManager::getAllShaders();
+
+				for (auto& pair : shaders)
+				{
+					if (ImGui::Selectable(pair.first.data(), pair.second == shader))
+					{
+						mt->setShader(pair.second);
+					}
+				}
+
+				ImGui::EndPopup();
 			}
 		}
 	}
@@ -517,10 +439,129 @@ namespace tezcat::Editor
 	{
 		if (data->EventChar)
 		{
-			mGameObject->setName(data->Buf);
+			MyGUIContext::sSelectedGameObject->setName(data->Buf);
 			return 0;
 		}
 
 		return 1;
 	}
+
+	void MyObjectInfoWindow::drawExtraMaterial()
+	{
+		if (ImGui::CollapsingHeader("材质(Material)", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			auto& mr = mMeshRenderer;
+			auto mt = mr->getMaterial();
+			auto shader = mt->getShader();
+			auto& uniforms = mt->getUniforms();
+
+			if (ImGui::Button("Shader##ds"))
+			{
+				//MyEvent::get()->dispatch({ MyEventID::Window_OpenShaderManager, mMeshRenderer });
+
+				ImGui::OpenPopup("ShaderManager##vaf");
+			}
+			ImGui::SameLine();
+			ImGui::Text(shader->getName().c_str());
+
+			//ImGuiHelper::textWithBG("{}", shader->getName());
+			//auto pos = ImGui::GetCursorPos();
+			//ImGui::CalcTextSize(shader->getName().c_str());
+			//ImGui::Text(shader->getName().c_str());
+			//ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetItemRectMin()
+			//	, ImGui::GetItemRectMax()
+			//	, ImColor(255, 100, 100, 255));
+			//ImGui::SetCursorPos(pos);
+
+			uint32_t widget_id = 0;
+			for (uint32_t i = 0; i < uniforms.size(); i++)
+			{
+				auto info = shader->getUniformValueConfig(i);
+				auto uniform = uniforms[i];
+
+				switch (uniform->getType())
+				{
+				case UniformType::Float:
+				{
+					auto f1 = (UniformF1*)uniform;
+					auto range = (RangeFloat*)info->range.get();
+					ImGui::Text(info->editorName.c_str());
+					ImGui::PushID(widget_id++);
+					ImGui::DragFloat("", &f1->value, 0.02f, range->min, range->max);
+					ImGui::PopID();
+
+					ImGui::Spacing();
+					break;
+				}
+				case UniformType::Float3:
+				{
+					auto f3 = (UniformF3*)uniform;
+
+					ImGui::Text(info->editorName.c_str());
+					ImGui::PushID(widget_id++);
+					if (info->constraint == ShaderConstraint::Color)
+					{
+						ImGui::ColorEdit3("", glm::value_ptr(f3->value));
+					}
+					else
+					{
+						auto range = (RangeFloat*)info->range.get();
+						ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f, range->min, range->max);
+					}
+
+					ImGui::PopID();
+
+					ImGui::Spacing();
+					break;
+				}
+				case UniformType::Tex2D:
+				{
+					auto tex = (UniformTex2D*)uniform;
+					ImGui::Text(info->editorName.c_str());
+					if (tex->value)
+					{
+						ImGui::Image((ImTextureID)tex->value->getTextureID()
+							, ImVec2(100, 100)
+							, ImVec2(0, 1)
+							, ImVec2(1, 0));
+					}
+					else
+					{
+						ImGuiHelper::rect(widget_id++
+							, ImVec2(100, 100)
+							, ImGui::GetColorU32(ImGuiCol_Button));
+
+						//ImGui::PushID(widget_id++);
+						//ImGui::Button("Empty", ImVec2(100, 100));
+						//ImGui::PopID();
+					}
+
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+					}
+
+					ImGuiHelper::dropResource([&tex](file_path path)
+					{
+						Image* img = Image::create();
+						if (img->openFile(path))
+						{
+							Texture2D* new_tex = Texture2D::create();
+							new_tex->setImage(img);
+							new_tex->generate();
+
+							tex->set(new_tex);
+						}
+					});
+
+					ImGui::Spacing();
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+	}
+
 }

@@ -42,7 +42,7 @@ namespace tezcat::Tiny
 		Death
 	};
 
-	enum class CommandID : uint32
+	enum class CommandID : uint32_t
 	{
 		None = 0,
 		DrawMesh,
@@ -260,7 +260,7 @@ namespace tezcat::Tiny
 		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
-		uint32 mID;
+		uint32_t mID;
 	};
 
 	class RenderCMD_CreateTextureRender2D : public RenderCommadBuild
@@ -284,7 +284,7 @@ namespace tezcat::Tiny
 		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
-		uint32 mID;
+		uint32_t mID;
 	};
 
 	class RenderCMD_CreateTextureCube : public RenderCommadBuild
@@ -308,7 +308,7 @@ namespace tezcat::Tiny
 		virtual void execute(PipelinePass* pass, Shader* shader) override;
 
 	private:
-		uint32 mID;
+		uint32_t mID;
 	};
 
 	class RenderCMD_ReadObjectID : public RenderCommadBuild
@@ -451,10 +451,10 @@ namespace tezcat::Tiny
 		RenderCMD_MakeEnvPrefilter(Vertex* vertex
 			, TextureCube* skybox
 			, TextureCube* prefitler
-			, uint32 mipMaxLevel
-			, uint32 mipWidth
-			, uint32 mipHeight
-			, int32 resolution);
+			, uint32_t mipMaxLevel
+			, uint32_t mipWidth
+			, uint32_t mipHeight
+			, int32_t resolution);
 		virtual ~RenderCMD_MakeEnvPrefilter();
 
 		void execute(PipelinePass* pass, Shader* shader) override;
@@ -463,10 +463,10 @@ namespace tezcat::Tiny
 		Vertex* mVertex;
 		TextureCube* mSkyboxMap;
 		TextureCube* mPrefilterMap;
-		uint32 mMipMaxLevel;
-		uint32 mMipWidth;
-		uint32 mMipHeight;
-		int32 mResolution;
+		uint32_t mMipMaxLevel;
+		uint32_t mMipWidth;
+		uint32_t mMipHeight;
+		int32_t mResolution;
 	};
 
 #pragma endregion Draw

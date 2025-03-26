@@ -28,16 +28,22 @@ namespace tezcat::Editor
 	{
 		MyEvent::get()->addListener(MyEventID::Window_OpenShaderEditor, this, [this](const EventData& data)
 		{
-				auto path = (std::filesystem::path*)data.userData;
-				MyShaderEditorWindow::create(*path, this->getHost())->setFocus();
+			auto path = (std::filesystem::path*)data.userData;
+			MyShaderEditorWindow::create(*path, this->getHost())->setFocus();
 		});
 
 		MyEvent::get()->addListener(MyEventID::Window_OpenImageViwer, this, [this](const EventData& data)
 		{
-				auto path = (std::filesystem::path*)data.userData;
-				auto window = new MyTextureViewerWindow(path->filename().string());
-				window->loadTexture(*path);
-				window->open(this->getHost());
+			auto path = (std::filesystem::path*)data.userData;
+			auto window = new MyTextureViewerWindow(path->filename().string());
+			window->loadTexture(*path);
+			window->open(this->getHost());
+		});
+
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_BeforeSceneExit, this,
+		[](const EventData& data)
+		{
+			MyGUIContext::clearOnPopScene();
 		});
 	}
 
@@ -104,15 +110,81 @@ namespace tezcat::Editor
 		//-----------------------------------------
 		if (ImGui::BeginMenuBar())
 		{
-			if (ImGui::BeginMenu("场景(Scenes)"))
+			if (ImGui::BeginMenu("文件(File)"))
 			{
-				if (ImGui::MenuItem("关闭当前场景(Close Current Scene)"))
+				if (ImGui::MenuItem("新场景(NewScene)"))
+				{
+					SceneManager::switchScene(Scene::create("NewScene"));
+				}
+
+				if (SceneManager::empty())
+				{
+					ImGui::TextColored(ImVec4(0.2f, 0.2f, 0.2f, 1.0f), "关闭当前场景(Close Current Scene)");
+				}
+				else if (ImGui::MenuItem("关闭当前场景(Close Current Scene)"))
 				{
 					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
 				}
 
 				ImGui::Separator();
 
+				if (ImGui::MenuItem("加载模型(LoadModel)"))
+				{
+					auto path = MyGUIContext::openFile("fbx,pmx,obj");
+					if (!path.empty())
+					{
+						if (!SceneManager::empty())
+						{
+							auto model = ResourceManager::loadAndSave<Model>(path.string());
+							model->generate();
+						}
+					}
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("退出(Exit)"))
+				{
+					Engine::close();
+				}
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("资源(Resource)"))
+			{
+				if (ImGui::MenuItem("创建相机(Create Camera)"))
+				{
+					MyGUIContext::createCamera();
+				}
+
+				if (ImGui::MenuItem("创建区域光(Create Sphere)"))
+				{
+					MyGUIContext::createDirectionLight();
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("创建立方体(Create Cube)"))
+				{
+					MyGUIContext::createBuildinModel("Cube");
+				}
+
+				if (ImGui::MenuItem("创建球体(Create Sphere)"))
+				{
+					MyGUIContext::createBuildinModel("Sphere");
+				}
+
+				if (ImGui::MenuItem("创建方形(Create Square)"))
+				{
+					MyGUIContext::createBuildinModel("Square");
+				}
+
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("教程(Tutorial)"))
+			{
 				for (auto scene : SceneManager::getAllSceneArray())
 				{
 					if (ImGui::MenuItem(scene->getName().data()))

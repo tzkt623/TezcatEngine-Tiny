@@ -20,19 +20,19 @@
 
 namespace tezcat::Tiny
 {
-	using TinyGCInfoID = int32;
+	using TinyGCInfoID = int32_t;
 
 	class TinyRefObject;
 	struct TINY_API TinyGCInfo
 	{
 		TinyGCInfoID index = 0;
-		int32 strongRef = 0;
-		int32 weakRef = 0;
+		int32_t strongRef = 0;
+		int32_t weakRef = 0;
 		bool unique = false;
 		TinyRefObject* pointer = nullptr;
 
 		TinyGCInfo() {}
-		TinyGCInfo(TinyGCInfoID index, int32 strongRef, int32 weakRef, TinyRefObject* pointer);
+		TinyGCInfo(TinyGCInfoID index, int32_t strongRef, int32_t weakRef, TinyRefObject* pointer);
 		//TinyGCInfo(TinyGCInfo&& other) noexcept;
 
 		~TinyGCInfo();
@@ -40,6 +40,6 @@ namespace tezcat::Tiny
 
 		//static TinyGCInfo* Default;
 
-		const static int32 EmptyStrongID;
+		const static int32_t EmptyStrongID;
 	};
 }

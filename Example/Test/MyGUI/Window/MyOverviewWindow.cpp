@@ -7,7 +7,7 @@ namespace tezcat::Editor
 
 	MyOverviewWindow::MyOverviewWindow()
 		: GUIWindow("场景总览(Overview)")
-		, mSelectedGameObject(nullptr)
+		//, mSelectedGameObject(nullptr)
 		, mPickObject(false)
 	{
 
@@ -23,9 +23,10 @@ namespace tezcat::Editor
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_SelectObject, this,
 			[this](const EventData& data)
 			{
-				mSelectedGameObject = (GameObject*)data.userData;
-				this->createPickPath(mSelectedGameObject->getTransform());
-				MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, mSelectedGameObject });
+				MyGUIContext::sSelectedGameObject = (GameObject*)data.userData;
+				//mSelectedGameObject = (GameObject*)data.userData;
+				this->createPickPath(MyGUIContext::sSelectedGameObject->getTransform());
+				//MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, mSelectedGameObject });
 			});
 	}
 
@@ -37,7 +38,7 @@ namespace tezcat::Editor
 			auto game_object = transform->getGameObject();
 
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
-			if (mSelectedGameObject == game_object)
+			if (MyGUIContext::sSelectedGameObject == game_object)
 			{
 				flags |= ImGuiTreeNodeFlags_Selected;
 			}
@@ -88,7 +89,7 @@ namespace tezcat::Editor
 					//一定要先添加父类
 					mDragedTransform->setParent(transform.get());
 					this->createPickPath(mDragedTransform);
-					mSelectedGameObject = mDragedTransform->getGameObject();
+					MyGUIContext::sSelectedGameObject = mDragedTransform->getGameObject();
 
 					mDragedTransform = nullptr;
 				}
@@ -100,13 +101,13 @@ namespace tezcat::Editor
 			{
 				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
-					mSelectedGameObject = game_object;
+					MyGUIContext::sSelectedGameObject = game_object;
 					MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, game_object });
 					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_FocusObject, game_object });
 				}
 				else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{
-					mSelectedGameObject = game_object;
+					MyGUIContext::sSelectedGameObject = game_object;
 					MyEvent::get()->dispatch({ MyEventID::Window_ObjectSelected, game_object });
 				}
 			}
@@ -115,7 +116,7 @@ namespace tezcat::Editor
 			//将滚动条移动到当前物品的位置
 			if (mPickObject)
 			{
-				if (mSelectedGameObject == game_object)
+				if (MyGUIContext::sSelectedGameObject == game_object)
 				{
 					mPickObject = false;
 					this->scrollToCurrentObject();
@@ -130,7 +131,12 @@ namespace tezcat::Editor
 				if (ImGui::Button("DeleteObject"))
 				{
 					mDeleteList.push(game_object);
+					if (game_object == MyGUIContext::sSelectedGameObject)
+					{
+						MyGUIContext::sSelectedGameObject = nullptr;
+					}
 					//game_object->deleteObject();
+					ImGui::CloseCurrentPopup();
 				}
 
 				ImGui::EndPopup();
@@ -155,7 +161,6 @@ namespace tezcat::Editor
 
 		if (SceneManager::empty())
 		{
-			mSelectedGameObject = nullptr;
 			return;
 		}
 
@@ -175,7 +180,7 @@ namespace tezcat::Editor
 		{
 			if (ImGui::AcceptDragDropPayload("ObjectMove"))
 			{
-				mSelectedGameObject = mDragedTransform->getGameObject();
+				MyGUIContext::sSelectedGameObject = mDragedTransform->getGameObject();
 				mDragedTransform->setParent(nullptr);
 				mDragedTransform = nullptr;
 				mPickObject = true;

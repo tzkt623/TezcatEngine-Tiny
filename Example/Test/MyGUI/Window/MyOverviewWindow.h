@@ -17,7 +17,7 @@ namespace tezcat::Editor
 		void createPickPath(Transform* transform);
 
 	private:
-		GameObject* mSelectedGameObject;
+		//GameObject* mSelectedGameObject;
 		Transform* mDragedTransform;
 		bool mPickObject;
 		std::stack<Transform*> mPickPath;
