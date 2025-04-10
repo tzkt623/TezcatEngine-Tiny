@@ -18,11 +18,16 @@
 #include "Core/Renderer/Renderer.h"
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/Pipeline.h"
+#include "Core/Renderer/PipelineWorker.h"
 #include "Core/Renderer/RenderObserver.h"
 #include "Core/Renderer/BaseGraphics.h"
-#include "core/Renderer/RenderCommand.h"
+#include "Core/Renderer/RenderCommand.h"
+
+#include "Core/Component/GameObject.h"
 
 #include "Core/Manager/VertexBufferManager.h"
+#include "Core/Manager/PipelineManager.h"
+
 #include "Core/Data/MeshData.h"
 
 
@@ -40,6 +45,7 @@ namespace tezcat::Tiny
 		, mVertex(nullptr)
 		, mIsShadowReciever(true)
 		, mTransform(nullptr)
+		, mLayerID(nullptr)
 	{
 
 	}
@@ -49,6 +55,7 @@ namespace tezcat::Tiny
 		mVertex->deleteObject();
 		mMaterial->deleteObject();
 		mTransform = nullptr;
+		mLayerID = nullptr;
 	}
 
 	void BaseMeshRenderer::setMaterial(Material* material)
@@ -95,15 +102,26 @@ namespace tezcat::Tiny
 		mVertex->saveObject();
 	}
 
-	void BaseMeshRenderer::makeRenderCommand(BaseRenderObserver* renderObserver)
+	void BaseMeshRenderer::makeRenderCommand(PipelineQueue* queue)
 	{
-		auto pass = renderObserver->createOrGetPass(mMaterial->getShader());
+		//auto pass = PipelineManager::createOrGetObserverPass(mMaterial->getShader(), renderObserver);
+
+		auto pass = queue->createOrGetObserverPass(mMaterial->getShader());
 		pass->addCommand<RenderCMD_DrawMeshWithMaterial>(mVertex, mTransform, mMaterial);
+
+		//auto pass = renderObserver->createOrGetPass(mMaterial->getShader());
+		//auto pass = PipelinePassManager::createOrGetPass(*mLayerID, mMaterial->getShader());
+		//pass->addCommand<RenderCMD_DrawMeshWithMaterial>(mVertex, mTransform, mMaterial);
 	}
 
 	void BaseMeshRenderer::makeRenderCommand(ReplacedPipelinePass* pass)
 	{
 		pass->pushCommand(this);
-//		pass->addCommand<RenderCMD_DrawMeshWithOutMaterial>(mVertex, mTransform);
+		//		pass->addCommand<RenderCMD_DrawMeshWithOutMaterial>(mVertex, mTransform);
+	}
+
+	void BaseMeshRenderer::setLayer(GameObject* go)
+	{
+		mLayerID = &(go->mLayerMaskIndex);
 	}
 }

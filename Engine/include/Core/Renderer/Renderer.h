@@ -42,7 +42,9 @@ namespace tezcat::Tiny
 	class PipelinePass;
 	class ReplacedPipelinePass;
 	class BaseRenderObserver;
+	class CameraObserver;
 	class Transform;
+	class PipelineQueue;
 
 
 	/*
@@ -78,7 +80,7 @@ namespace tezcat::Tiny
 
 		virtual void submit(Shader* shader) {} ;
 
-		virtual void makeRenderCommand(BaseRenderObserver* renderObserver) = 0;
+		virtual void makeRenderCommand(PipelineQueue* queue) = 0;
 		virtual void makeRenderCommand(ReplacedPipelinePass* pass) = 0;
 	};
 
@@ -134,17 +136,20 @@ namespace tezcat::Tiny
 		void setShadowReciever(bool value) { mIsShadowReciever = true; }
 		bool isShadowReciever() const { return mIsShadowReciever; }
 
-		virtual void makeRenderCommand(BaseRenderObserver* renderObserver) override;
+		virtual void makeRenderCommand(PipelineQueue* queue) override;
 		virtual void makeRenderCommand(ReplacedPipelinePass* pass) override;
 
 		void setTransform(Transform* value) { mTransform = value; }
 		Transform* getTransform() const { return mTransform; }
+
+		void setLayer(GameObject* go);
 
 	protected:
 		bool mIsShadowReciever;
 		Material* mMaterial;
 		Vertex* mVertex;
 		Transform* mTransform;
+		uint32_t* mLayerID;
 	};
 
 

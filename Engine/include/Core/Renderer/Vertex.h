@@ -57,8 +57,6 @@ namespace tezcat::Tiny
 		void setVertexCount(uint32_t size) { mVertexCount = size; }
 		void setIndexCount(uint32_t size) { mIndexCount = size; }
 
-		void addChild(Vertex* vertex);
-
 		const std::vector<VertexBuffer*>& getVertexBuffers() const
 		{
 			return mVertexBuffers;
@@ -77,14 +75,13 @@ namespace tezcat::Tiny
 		virtual void onClose() override;
 
 	protected:
-		uint32_t mVertexID = 0;
+		uint32_t mVertexID;
 
-		uint32_t mVertexCount = 0;
-		uint32_t mIndexCount = 0;
+		uint32_t mVertexCount;
+		uint32_t mIndexCount;
 
 		DrawModeWrapper mDrawModeWrapper;
 		std::vector<VertexBuffer*> mVertexBuffers;
 		IndexBuffer* mIndexBuffer;
-		std::vector<Vertex*>* mChildren;
 	};
 }

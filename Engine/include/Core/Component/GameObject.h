@@ -20,6 +20,7 @@ namespace tezcat::Tiny
 		friend class Component;
 		friend class Transform;
 		friend class Scene;
+		friend class BaseMeshRenderer;
 
 		GameObject();
 		GameObject(std::string name);
@@ -42,7 +43,7 @@ namespace tezcat::Tiny
 		void exitScene();
 
 		uint32_t getLayerMask() const { return 1 << mLayerMaskIndex; }
-		uint32_t getLayerIndex() const { return mLayerMaskIndex; }
+		uint32_t getLayerID() const { return mLayerMaskIndex; }
 		void setLayerMaskIndex(uint32_t maskIndex) { mLayerMaskIndex = maskIndex; }
 		std::string getMemoryInfo() override;
 
@@ -57,30 +58,41 @@ namespace tezcat::Tiny
 		template<class Com>
 		Com* getComponent()
 		{
-			for (auto const& com : mComponentList)
+			//for (auto const& com : mComponentList)
+			//{
+			//	if (com && com->typeIDEqual<Com>())
+			//	{
+			//		return static_cast<Com*>(com);
+			//	}
+			//}
+
+			if (Com::getComponentTypeIDStatic() >= mComponentList.size())
 			{
-				if (com->typeIDEqual<Com>())
-				{
-					return static_cast<Com*>(com);
-				}
+				return nullptr;
 			}
 
-			return nullptr;
+			return static_cast<Com*>(mComponentList[Com::getComponentTypeIDStatic()]);
 		}
 
 		template<class Com>
 		Com* getComponentInChildren()
 		{
-			for (auto const& com : mComponentList)
+			//for (auto const& com : mComponentList)
+			//{
+			//	if (com && com->typeIDEqual<Com>())
+			//	{
+			//		return static_cast<Com*>(com);
+			//	}
+			//}
+
+			Com* result = static_cast<Com*>(mComponentList[Com::getComponentTypeIDStatic()]);
+			if (result)
 			{
-				if (com->typeIDEqual<Com>())
-				{
-					return static_cast<Com*>(com);
-				}
+				return result;
 			}
 
+
 			auto& children = this->getTransform()->getChildren();
-			Com* result = nullptr;
 			for (auto child : children)
 			{
 				result = child->getGameObject()->getComponentInChildren<Com>();
@@ -104,6 +116,19 @@ namespace tezcat::Tiny
 		void addComponent(Component* component);
 
 		std::vector<Component*>& getCompoents() { return mComponentList; }
+
+		template<class Com>
+		void removeComponent()
+		{
+			if (Com::getComponentTypeIDStatic() < mComponentList.size())
+			{
+				auto com = mComponentList[Com::getComponentTypeIDStatic()];
+				if (com)
+				{
+					com->deleteObject();
+				}
+			}
+		}
 
 	private:
 		void removeComponent(Component* com);

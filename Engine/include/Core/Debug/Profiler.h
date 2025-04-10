@@ -23,6 +23,8 @@
 
 namespace tezcat::Tiny
 {
+	class TinyObject;
+
 	struct TINY_API Profiler
 	{
 		static const unsigned char* GPU;
@@ -39,6 +41,55 @@ namespace tezcat::Tiny
 		static size_t MemoryFree;
 
 		static size_t getMemoryUse() { return MemoryAlloc; }
+
+
+	public:
+		struct PipelineInfo
+		{
+			std::string info;
+			uint32_t layer;
+		};
+
+		static std::vector<PipelineInfo> RenderInfoList;
+
+		static void pipelineInfoPush(std::string info)
+		{
+			if (EnableRenderInfo)
+			{
+				RenderInfoChecker = RenderInfoList.size();
+				RenderInfoList.emplace_back(std::move(info), RenderInfoLayer++);
+			}
+		}
+
+		static void pipelineInfoPop()
+		{
+			if (EnableRenderInfo)
+			{
+				if (RenderInfoList.size() - 1 != RenderInfoChecker)
+				{
+					throw std::runtime_error(RenderInfoList[RenderInfoList.size() - 1].info);
+				}
+
+				RenderInfoLayer--;
+			}
+		}
+
+		static void pipelineInfoClear()
+		{
+			RenderInfoChecker = 0;
+			if (RenderInfoLayer != 0)
+			{
+				throw std::runtime_error("RenderInfoLayer != 0");
+			}
+			RenderInfoList.clear();
+		}
+
+		static bool EnableRenderInfo;
+
+	private:
+		static int32_t RenderInfoChecker;
+		static int32_t RenderInfoLayer;
+		static int32_t CurrentRenderInfoLayer;
 	};
 
 	class TINY_API ProfilerTimer
@@ -83,7 +134,14 @@ namespace tezcat::Tiny
 #define TINY_PROFILER_TIMER_LOG_OUT(deltaTime) std::cout << deltaTime * 0.0001 << std::endl
 #define TINY_PROFILER_TIMER_FUNCTION_LOG() std::cout << PROFILER_Timer##__LINE__.getName() << ": " << ProfilerTimer::DefaultDeltaTime << std::endl
 
+#define TINY_PIPELINE_INFO_PUSH(info) Profiler::pipelineInfoPush(info)
+#define TINY_PIPELINE_INFO_POP() Profiler::pipelineInfoPop()
+#define TINY_PIPELINE_INFO_CLEAR() Profiler::RenderInfoList.clear()
 #else
+#define TINY_PIPELINE_INFO_PUSH(info)
+#define TINY_PIPELINE_INFO_POP()
+#define TINY_PIPELINE_INFO_CLEAR()
+
 #define TINY_PROFILER_RESET_DRAWCALL()
 #define TINY_PROFILER_RESET_PASSCOUNT()
 #define TINY_PROFILER_DRAWCALL(x)

@@ -10,49 +10,70 @@ namespace tezcat::Tiny
 
 	std::filesystem::path FileTool::EnginePath;
 
-	std::unordered_map<std::string, FileType> FileTool::sFileTypeUMap =
+	std::unordered_map<std::string, FileType> FileInfo::sFileTypeUMap =
 	{
-		{ ".text",	FileType::FT_Text },
-		{ ".tysl",	FileType::FT_Tysl },
-		{ ".tyin",	FileType::FT_Tyin },
-		{ ".jpg",	FileType::FT_Jpg },
-		{ ".png",	FileType::FT_Png },
-		{ ".hdr",	FileType::FT_Hdr },
-		{ ".fbx",	FileType::FT_Fbx },
-		{ ".pmx",	FileType::FT_PMX },
-		{ ".obj",	FileType::FT_Obj }
+		{ ".text",		FileType::FT_Text },
+		{ ".tysl",		FileType::FT_Tysl },
+		{ ".tyin",		FileType::FT_Tyin },
+		{ ".tymeta",	FileType::FT_TyMeta },
+		{ ".jpg",		FileType::FT_Jpg },
+		{ ".png",		FileType::FT_Png },
+		{ ".hdr",		FileType::FT_Hdr },
+		{ ".fbx",		FileType::FT_Fbx },
+		{ ".pmx",		FileType::FT_PMX },
+		{ ".obj",		FileType::FT_Obj }
 	};
 
-	void FileTool::init(const std::string & resourceFolder)
+	void FileInfo::parseFileType(FileInfo& fileInfo)
 	{
-		std::regex rg(R"(\\+)");
-
-		EnginePath = std::filesystem::current_path();
-		EngineDir = EnginePath.string();
-		EngineDir = std::regex_replace(EngineDir, rg, "/");
-
-		if (!std::filesystem::exists(EngineDir))
+		auto it = sFileTypeUMap.find(fileInfo.ext);
+		if (it != sFileTypeUMap.end())
 		{
-			throw std::logic_error("fatal : Engine RootPath not Exists!!!");
+			fileInfo.type = it->second;
 		}
-
-		if (!std::filesystem::exists(EngineDir + "/" + resourceFolder))
-		{
-			throw std::logic_error("fatal : .exe and ResourceFolder[" + resourceFolder + "] must be in the same directory");
-		}
-
-		EngineResDir = EngineDir + "/" + resourceFolder;
-		EngineRelativeDir = "./";
-		EngineRelativeResDir = "./" + resourceFolder;
 	}
 
-	void FileTool::loadFiles(const std::string& path, FileInfoMap& outFiles)
+	FileType FileInfo::getFileType(const std::string& ext)
 	{
-		auto dir = EngineRelativeResDir + path;
-		findAllFiles(dir, outFiles);
+		auto it = sFileTypeUMap.find(ext);
+		if (it != sFileTypeUMap.end())
+		{
+			return it->second;
+		}
+
+		return FileType::FT_Unknown;
 	}
 
-	void FileTool::findAllFiles(const std::string& path, FileInfoMap& outFiles)
+	void FileTool::init()
+	{
+		//std::regex rg(R"(\\+)");
+		//
+		//EnginePath = std::filesystem::current_path();
+		//EngineDir = EnginePath.string();
+		//EngineDir = std::regex_replace(EngineDir, rg, "/");
+		//
+		//if (!std::filesystem::exists(EngineDir))
+		//{
+		//	throw std::logic_error("fatal : Engine RootPath not Exists!!!");
+		//}
+		//
+		//if (!std::filesystem::exists(EngineDir + "/" + resourceFolder))
+		//{
+		//	throw std::logic_error("fatal : .exe and ResourceFolder[" + resourceFolder + "] must be in the same directory");
+		//}
+		//
+		//EngineResDir = EngineDir + "/" + resourceFolder;
+		//EngineRelativeDir = "./";
+		//EngineRelativeResDir = "./" + resourceFolder;
+	}
+
+	void FileTool::loadFiles(const file_path& path, FileInfoMap& outFiles)
+	{
+		//auto dir = EngineRelativeResDir + path;
+		findAllFiles(path, outFiles);
+	}
+
+	void FileTool::findAllFiles(const file_path& path, FileInfoMap& outFiles)
 	{
 		std::filesystem::path temp(path);
 		std::filesystem::directory_entry entry(temp);
@@ -64,20 +85,12 @@ namespace tezcat::Tiny
 			{
 				if (it.is_directory())
 				{
-					auto child_path = path + "/" + it.path().filename().string();
-					findAllFiles(child_path, outFiles);
+					//auto child_path = path + "/" + it.path().filename().string();
+					findAllFiles(it.path(), outFiles);
 				}
 				else
 				{
-					FileInfo file_info;
-					file_info.path = it.path().string();
-
-					std::ranges::replace(file_info.path, '\\', '/');
-
-					file_info.name = it.path().stem().string();
-					file_info.ext = it.path().extension().string();
-
-					FileTool::parseFileType(file_info);
+					FileInfo file_info(it.path());
 					outFiles.emplace(file_info.name, std::move(file_info));
 				}
 			}
@@ -100,26 +113,6 @@ namespace tezcat::Tiny
 		}
 		io.close();
 		return data;
-	}
-
-	void FileTool::parseFileType(FileInfo& fileInfo)
-	{
-		auto it = sFileTypeUMap.find(fileInfo.ext);
-		if (it != sFileTypeUMap.end())
-		{
-			fileInfo.type = it->second;
-		}
-	}
-
-	FileType FileTool::getFileType(const std::string& ext)
-	{
-		auto it = sFileTypeUMap.find(ext);
-		if (it != sFileTypeUMap.end())
-		{
-			return it->second;
-		}
-
-		return FileType::FT_Unknown;
 	}
 
 	void FileTool::saveFile(const std::string& path, std::string& data)

@@ -25,6 +25,8 @@ namespace tezcat::Tiny
 	class ReplacedPipelinePass;
 	class RenderObserver;
 	class FrameBuffer;
+	class BaseRenderObserver;
+
 	class GameObjectManager
 	{
 	public:
@@ -44,11 +46,19 @@ namespace tezcat::Tiny
 		static const size_t getFreeCount() noexcept { return mFreeIDQueue.size(); }
 		static const size_t getSlotCount() noexcept { return mArray.size(); }
 		static const size_t getObjectCount() noexcept { return mArray.size() - mFreeIDQueue.size(); }
-		static GameObject* getObject(size_t index) noexcept { return mArray[index]; }
+		static GameObject* getObject(size_t index) noexcept
+		{
+			if (index <= 0 || index >= mArray.size())
+			{
+				return nullptr;
+			}
+
+			return mArray[index];
+		}
 		static void setIDObserver(RenderObserver* observer);
 
 	private:
-		static void createPass();
+		static void createPass(BaseRenderObserver* observer);
 		static void createFrameBuffer();
 
 	private:

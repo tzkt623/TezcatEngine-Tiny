@@ -23,10 +23,10 @@
 namespace tezcat::Tiny
 {
 	class MeshRenderer;
-	class TINY_API ModeAgent : public ComponentT<ModeAgent>
+	class TINY_API ModeAgent : public ComponentAutoID<ModeAgent>
 	{
 		ModeAgent();
-		TINY_OBJECT_H(ModeAgent, ComponentT<ModeAgent>)
+		TINY_OBJECT_H(ModeAgent, ComponentAutoID<ModeAgent>)
 
 	public:
 		virtual ~ModeAgent();

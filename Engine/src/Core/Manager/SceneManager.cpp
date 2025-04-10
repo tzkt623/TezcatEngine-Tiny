@@ -142,7 +142,6 @@ namespace tezcat::Tiny
 			return false;
 		}
 
-		sSceneArray.top()->update();
 		return true;
 	}
 

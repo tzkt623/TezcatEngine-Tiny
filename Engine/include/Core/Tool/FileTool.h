@@ -27,6 +27,7 @@ namespace tezcat::Tiny
 		FT_Text,
 		FT_Tysl,
 		FT_Tyin,
+		FT_TyMeta,
 		FT_Text_End,
 
 		FT_Img_Begin,
@@ -47,13 +48,14 @@ namespace tezcat::Tiny
 	struct FileInfo
 	{
 		FileType type;
-		std::string path;
+		file_path path;
 		std::string ext;
 		std::string name;
 
-		FileInfo()
-			: type(FileType::FT_Unknown)
-		{}
+		FileInfo(const file_path& path)
+		{
+			this->setPath(path);
+		}
 
 		FileInfo(FileInfo&& other) noexcept
 			: type(other.type)
@@ -63,6 +65,19 @@ namespace tezcat::Tiny
 		{
 
 		}
+
+		void setPath(const file_path& path)
+		{
+			this->path = path;
+			this->ext = path.extension().string();
+			this->name = path.filename().string();
+			parseFileType(*this);
+		}
+		static FileType getFileType(const std::string& ext);
+
+	private:
+		static void parseFileType(FileInfo& file_info);
+		static std::unordered_map<std::string, FileType> sFileTypeUMap;
 	};
 
 	typedef std::unordered_map<std::string, FileInfo> FileInfoMap;
@@ -70,21 +85,20 @@ namespace tezcat::Tiny
 	class TINY_API FileTool
 	{
 	public:
-		static void init(const std::string& resourceFolder);
+		static void init();
 		static const std::string& getRootDir() { return EngineDir; }
 		static const std::string& getRootResDir() { return EngineResDir; }
 
 		static const std::string& getRootRelativeDir() { return EngineRelativeDir; }
 		static const std::string& getRootRelativeResDir() { return EngineRelativeResDir; }
 
-		static void loadFiles(const std::string& path, FileInfoMap& outFiles);
+		static void loadFiles(const file_path& path, FileInfoMap& outFiles);
 
 		static std::string loadText(const std::string& path);
 		static void saveFile(const std::string& path, std::string& data);
 
-		static void findAllFiles(const std::string& path, FileInfoMap& outFiles);
+		static void findAllFiles(const file_path& path, FileInfoMap& outFiles);
 
-		static FileType getFileType(const std::string& ext);
 	private:
 		static std::string EngineDir;
 		static std::string EngineResDir;
@@ -92,10 +106,7 @@ namespace tezcat::Tiny
 		static std::string EngineRelativeDir;
 		static std::string EngineRelativeResDir;
 
-		static std::unordered_map<std::string, FileType> sFileTypeUMap;
-
 		static std::filesystem::path EnginePath;
-		static void parseFileType(FileInfo &file_info);
 	};
 }
 

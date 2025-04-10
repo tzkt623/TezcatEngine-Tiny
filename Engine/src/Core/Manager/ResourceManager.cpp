@@ -16,6 +16,7 @@
 */
 
 #include "Core/Manager/ResourceManager.h"
+#include "Core/Debug/Log.h"
 
 namespace tezcat::Tiny
 {
@@ -30,32 +31,54 @@ namespace tezcat::Tiny
 	std::unordered_map<file_path, Texture2D*> ResourceManager::mTexture2DUMap;
 	std::unordered_map<file_path, Image*> ResourceManager::mImageMap;
 	std::unordered_map<file_path, Image*> ResourceManager::mTinyImageMap;
+	std::unordered_map<std::string, std::function<void(std::string&)>> ResourceManager::mMetaLoadMap;
 
-
-
-	void ResourceManager::init(const std::string& folderPath)
+	void ResourceManager::init()
 	{
-		std::regex rg(R"(\\+)");
-
-		auto path = file_sys::current_path();
-		path = file_sys_helper::generic(path);
-		sEngineDir = path.string();
-
-		if (!std::filesystem::exists(sEngineDir))
-		{
-			throw std::logic_error("fatal : Engine Path not Exists!!!");
-		}
-
-		if (!std::filesystem::exists(std::format("{}/{}", sEngineDir, folderPath)))
-		{
-			throw std::logic_error(std::format("fatal : .exe and ResourceFolder[{}] must be in the same directory", folderPath));
-		}
-
-		sResDir = std::format("{}/{}", sEngineDir, folderPath);
-
 		sRelativeEngineDir = "./";
-		sRelativeResDir = std::format("./{}", folderPath);
+
+		mMetaLoadMap["RenderTexture"] = [](std::string& content)
+			{
+				//MetaFile
+			};
 	}
+
+	void ResourceManager::loadMetaFile(const file_path& path)
+	{
+		std::regex split(R"((\w)+ +(\w)+)");
+		std::ifstream file;
+		file.open(path, std::ios::binary);
+		if (!file.is_open())
+		{
+			return;
+		}
+
+		std::string line;
+		std::getline(file, line);
+
+		//获取元数据类型
+		std::vector<std::string> type;
+		auto split_string_view = line | std::ranges::views::split(' ');
+		for (auto&& subrange : split_string_view)
+		{
+			// 通过子范围的迭代器构造字符串
+			type.emplace_back(subrange.begin(), subrange.end());
+		}
+
+		auto it = mMetaLoadMap.find(type[1]);
+		if (it != mMetaLoadMap.end())
+		{
+			std::string content;
+			while (std::getline(file, line))
+			{
+				content.append(line);
+			}
+
+			it->second(content);
+		}
+
+		file.close();
+	}
+
+
 }
-
-

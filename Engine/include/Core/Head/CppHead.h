@@ -28,6 +28,7 @@
 #include <string>
 #include <string_view>
 #include <format>
+#include <streambuf>
 
 #include <vector>
 #include <stack>
@@ -118,6 +119,10 @@ namespace tezcat::Tiny
 
 #define TINY_FWD(x) std::forward<decltype(x)>(x)
 
+#define TINY_MASK_NONE_OF(value, mask) ((value & mask) == 0)
+#define TINY_MASK_ALL_OF(value, mask) ((value & mask) == mask)
+#define TINY_MASK_ANY_OF(value, mask) ((value & mask) != 0)
+
 #ifndef TINY_RELEASE
 #define TINY_THROW(x) throw x
 #define TINY_THROW_LOGIC(x) throw std::logic_error(x)
@@ -135,6 +140,7 @@ namespace tezcat::Tiny
 	template<class>
 	struct FileStringSelector
 	{
+
 	};
 
 	template<>
@@ -150,7 +156,7 @@ namespace tezcat::Tiny
 	};
 
 	namespace file_sys = std::filesystem;
-	using file_path = std::filesystem::path;
+	using file_path = file_sys::path;
 	using file_string = file_path::string_type;
 	using file_string_view = FileStringSelector<file_string>::string_view;
 

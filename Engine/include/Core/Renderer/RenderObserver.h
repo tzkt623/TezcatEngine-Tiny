@@ -16,7 +16,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "../Base/TinyObject.h"
-#include "../Head/CppHead.h"
+#include "../Head/TinyCpp.h"
 #include "../Head/GLMHead.h"
 #include "../Renderer/RenderConfig.h"
 
@@ -26,8 +26,8 @@ namespace tezcat::Tiny
 	class Transform;
 	class FrameBuffer;
 	class UniformBuffer;
-	class ObserverPipelinePass;
 	class GameObject;
+	class PipelineQueue;
 
 	enum class ViewType : uint8_t
 	{
@@ -48,6 +48,7 @@ namespace tezcat::Tiny
 		TINY_ABSTRACT_OBJECT_H(BaseRenderObserver, TinyObject)
 	protected:
 		BaseRenderObserver();
+		void init() override;
 
 	public:
 		virtual ~BaseRenderObserver();
@@ -55,7 +56,9 @@ namespace tezcat::Tiny
 
 	public:
 		virtual void preRender() {}
+
 		void createUniformBuffer();
+
 		UniformBuffer* getUniformBuffer() const { return mUniformBuffer; }
 
 		virtual bool culling(GameObject* gameObject) { return true; }
@@ -76,15 +79,10 @@ namespace tezcat::Tiny
 
 		const std::vector<uint32_t>& getCullLayerList() const { return mCullLayerList; }
 
-		void addToPipeline();
-		void removeFromPipeline();
-		bool isNeedRemove() const { return mNeedRemove; }
-		void onExitPipeline();
-
 	public:
 		void setViewRect(int32_t x, int32_t y, int32_t width, int32_t height);
 		void setViewRect(int32_t width, int32_t height);
-		ViewportInfo& getViewportInfo() { return mViewInfo; }
+		ViewportInfo& getViewRect() { return mViewInfo; }
 
 		float4x4& getProjectionMatrix() { return mProjectionMatrix; }
 
@@ -99,12 +97,20 @@ namespace tezcat::Tiny
 		void setClearOption(ClearOptionID option) { mClearOption = (ClearOption)option; }
 		const ClearOption& getClearOption() const { return mClearOption; }
 
+		TinyUID getUID() { return mUID; }
+
 	public:
-		int32_t getOrderID() const { return mOrder; }
-		//Range[-127,128]
-		void setOrderID(int8_t val)
+		int32_t getSortingID() const { return mSortingID; }
+		/*
+		* 值越大越先渲染
+		*/
+		void setSortingID(int32_t val)
 		{
-			mOrder = val;
+			mSortingID = val;
+			if (evtSortingIDChanged)
+			{
+				evtSortingIDChanged(mSortingID);
+			}
 		}
 
 		float getFOV() const { return mFOV; }
@@ -122,6 +128,7 @@ namespace tezcat::Tiny
 			mDirty = true;
 		}
 		float getNear() const { return mNearFace; }
+
 		void setFar(float far)
 		{
 			mFarFace = far;
@@ -133,11 +140,11 @@ namespace tezcat::Tiny
 
 		virtual void lookAt(Transform* transform) {}
 
+		PipelineQueue* getPipelineQueue() { return mQueue; }
+
 	public:
 		void setTransform(Transform* transform);
 		Transform* getTransform() { return mTransform; }
-
-		ObserverPipelinePass* createOrGetPass(Shader* shader);
 
 		FrameBuffer* getFrameBuffer() { return mFrameBuffer; }
 		void setFrameBuffer(FrameBuffer* frameBuffer);
@@ -145,10 +152,14 @@ namespace tezcat::Tiny
 		void setEnable(bool val);
 		bool getEnable() const { return mEnable; }
 
-		uint32_t getUID() const { return mUID; }
+		void setClearColor(float4 color) { mClearColor = color; }
+		const float4& getClearColor() const { return mClearColor; }
 
 	public:
 		bool updateObserverMatrix();
+
+	public:
+		std::function<void(int32_t)> evtSortingIDChanged;
 
 	protected:
 		virtual void onClose() override;
@@ -157,31 +168,33 @@ namespace tezcat::Tiny
 		Transform* mTransform;
 
 	protected:
-		uint32_t mUID;
 		bool mNeedRemove;
 		bool mEnable;
 		bool mDirty;
-		int32_t mOrder;
+		int32_t mSortingID;
 		ViewType mViewType;
 		float mNearFace;
 		float mFarFace;
 		float mFOV;
+		ClearOption mClearOption;
+		float4 mClearColor;
+		ViewportInfo mViewInfo;
 
 		float4x4 mProjectionMatrix;
-		ViewportInfo mViewInfo;
 
 	protected:
 		uint32_t mCullMask;
 		std::vector<uint32_t> mCullLayerList;
-		ClearOption mClearOption;
+
+	protected:
+		PipelineQueue* mQueue;
 
 	protected:
 		FrameBuffer* mFrameBuffer;
 		UniformBuffer* mUniformBuffer;
 
 	protected:
-		std::vector<ObserverPipelinePass*> mPassCache;
-		std::vector<ObserverPipelinePass*> mPassArray;
+		TinyUID mUID;
 	};
 
 	class TINY_API ShadowObserver : public BaseRenderObserver
@@ -261,10 +274,15 @@ public:\
 	float getNear() const { return memberName->getNear(); }\
 	float getFar() const { return memberName->getFar(); }\
 	float getAspect() const { return memberName->getAspect(); }\
-	int32_t getOrderID() const { return memberName->getOrderID(); }\
+	ViewportInfo& getViewRect() const { return memberName->getViewRect(); }\
+	int32_t getSortingID() const { return memberName->getSortingID(); }\
 	ViewType getViewType() const { return memberName->getViewType(); }\
+	void setClearColor(const float4& color) { memberName->setClearColor(color); }\
+	const float4& getClearColor() const { return memberName->getClearColor(); }\
+	FrameBuffer* getFrameBuffer() { return memberName->getFrameBuffer(); }\
+	void setFrameBuffer(FrameBuffer* frameBuffer) { memberName->setFrameBuffer(frameBuffer); }\
 public:\
-	void setOrderID(int32_t val) { memberName->setOrderID(val); }\
+	void setSortingID(int32_t val) { memberName->setSortingID(val); }\
 	void setOrtho(float near, float far) { return memberName->setOrtho(near, far); }\
 	void setPerspective(float fov, float near, float far) { return memberName->setPerspective(fov, near, far); }\
 	void setClearOption(ClearOptionID option) { memberName->setClearOption(option); }\
@@ -273,6 +291,5 @@ public:\
 	void setCullLayer(uint32_t index) { memberName->setCullLayer(index); }\
 	void addCullLayer(uint32_t index) { memberName->addCullLayer(index); }\
 	void removeCullLayer(uint32_t index) { memberName->removeCullLayer(index); }\
-	void setFrameBuffer(FrameBuffer* frameBuffer) { memberName->setFrameBuffer(frameBuffer); }\
 	void lookAt(Transform* transform) { memberName->lookAt(transform); }
 }

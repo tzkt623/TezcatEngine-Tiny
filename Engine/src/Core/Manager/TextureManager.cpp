@@ -29,7 +29,7 @@ namespace tezcat::Tiny
 	{
 		std::regex pattern(R"((skybox_\w+)_(\w+))");
 		std::smatch result;
-		std::array<Image*, 6> skybox_images;
+		std::array<Image*, 6> skybox_images {};
 		std::unordered_map<std::string, std::array<std::string, 6>> skybox_path_cache;
 
 		std::string temp_name;
@@ -49,32 +49,32 @@ namespace tezcat::Tiny
 				temp_name = result[2];
 				if (temp_name == "R")
 				{
-					skybox_path_cache[result[1]][0] = std::move(info.path);
+					skybox_path_cache[result[1]][0] = std::move(info.path.string());
 					//					skybox_images[0] = &img;
 				}
 				else if (temp_name == "L")
 				{
-					skybox_path_cache[result[1]][1] = std::move(info.path);
+					skybox_path_cache[result[1]][1] = std::move(info.path.string());
 					//					skybox_images[1] = &img;
 				}
 				else if (temp_name == "U")
 				{
-					skybox_path_cache[result[1]][2] = std::move(info.path);
+					skybox_path_cache[result[1]][2] = std::move(info.path.string());
 					//					skybox_images[2] = &img;
 				}
 				else if (temp_name == "D")
 				{
-					skybox_path_cache[result[1]][3] = std::move(info.path);
+					skybox_path_cache[result[1]][3] = std::move(info.path.string());
 					//					skybox_images[3] = &img;
 				}
 				else if (temp_name == "F")
 				{
-					skybox_path_cache[result[1]][4] = std::move(info.path);
+					skybox_path_cache[result[1]][4] = std::move(info.path.string());
 					//					skybox_images[4] = &img;
 				}
 				else if (temp_name == "B")
 				{
-					skybox_path_cache[result[1]][5] = std::move(info.path);
+					skybox_path_cache[result[1]][5] = std::move(info.path.string());
 					//					skybox_images[5] = &img;
 				}
 				else

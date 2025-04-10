@@ -52,21 +52,17 @@ namespace tezcat::Tiny
 		static FrameBuffer* find(const std::string& name);
 
 	public:
-		static void bind(FrameBuffer* buffer);
-		static void unbind(FrameBuffer* buffer);
 		static FrameBuffer* getDefaultBuffer() { return sDefaultBuffer; }
 
 	private:
 		static std::unordered_map<std::string_view, FrameBuffer*> sUMap;
 		static uint32_t sID;
 		static std::queue<uint32_t> sFreeIDs;
-		static std::stack<FrameBuffer*> sFrameBufferStack;
 		static FrameBuffer* sDefaultBuffer;
-
 		static FrameBuffer* sMainBuffer;
 	};
 
-constexpr auto TINY_FRAMEBUFFER_VIEWPORT = "Tiny_Viewport_FrameBuffer";
-constexpr auto TINY_FRAMEBUFFER_VIEWPORT_COLOR_TEXTURE = "Tiny_Viewport_ColorBuffer";
-constexpr auto TINY_FRAMEBUFFER_VIEWPORT_DEPTH_TEXTURE = "Tiny_Viewport_DepthBuffer";
+constexpr auto TINY_FRAMEBUFFER_VIEWPORT = "FB_Tiny_Viewport";
+constexpr auto TINY_FRAMEBUFFER_VIEWPORT_COLOR_TEXTURE = "T2D_Tiny_Viewport_Color";
+constexpr auto TINY_FRAMEBUFFER_VIEWPORT_DEPTH_TEXTURE = "T2D_Tiny_Viewport_Depth";
 }

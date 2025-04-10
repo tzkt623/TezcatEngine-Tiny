@@ -23,6 +23,10 @@ namespace tezcat::Tiny
 {
 	class CameraObserver : public RenderObserver
 	{
+		friend class CameraManager;
+		friend class CameraData;
+		friend class Camera;
+
 		CameraObserver();
 		TINY_OBJECT_H(CameraObserver, RenderObserver)
 	public:
@@ -31,7 +35,10 @@ namespace tezcat::Tiny
 		virtual void submit(Shader* shader) override;
 		virtual void preRender() override;
 
-	private:
+		void setCameraUID(TinyUID uid) { mCameraUID = uid; }
+		TinyUID getCameraUID() const { return mCameraUID; }
 
+	private:
+		TinyUID mCameraUID;
 	};
 }

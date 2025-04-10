@@ -108,8 +108,8 @@ namespace tezcat::Tiny
 		ShaderParam::initAllParam(std::bind(&EngineIniter::initYourShaderParam, mResourceLoader));
 
 		LayerMask::init();
-		ResourceManager::init(mResourceLoader->getResourceFolderName());
-		FileTool::init(mResourceLoader->getResourceFolderName());
+		ResourceManager::init();
+		FileTool::init();
 		VertexBufferManager::init();
 		return true;
 	}

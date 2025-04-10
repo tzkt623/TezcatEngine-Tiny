@@ -21,13 +21,13 @@ namespace tezcat::Tiny
 	*
 	* glm euler Angle order is XYZ!!!!
 	*/
-	class TINY_API Transform : public ComponentT<Transform>
+	class TINY_API Transform : public ComponentCustomID<Transform, 0u>
 	{
 		friend class Scene;
 		Transform();
 		Transform(Transform* parent);
 
-		TINY_OBJECT_H(Transform, ComponentT<Transform>)
+		TINY_OBJECT_H_TEMPLATE(Transform, ComponentCustomID, Transform, 0u)
 
 	public:
 		virtual ~Transform();

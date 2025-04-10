@@ -38,7 +38,7 @@ namespace tezcat::Tiny
 
 	void ModelManager::loadModel(const std::string& path)
 	{
-		if (SceneManager::empty())
+		if (SceneManager::isEmpty())
 		{
 			return;
 		}

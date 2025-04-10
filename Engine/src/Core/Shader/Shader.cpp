@@ -35,7 +35,7 @@ namespace tezcat::Tiny
 		, mPath(filePath)
 		, mUID(IDGenerator<Shader, uint32_t>::generate())
 		, mVersion(-1)
-		, mOrderID(0)
+		, mSortingOffset(0)
 		, mEnableBlend(false)
 		, mEnableZWrite(true)
 		, mDepthTest(DepthTest::Less, 0)

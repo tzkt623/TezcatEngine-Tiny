@@ -111,7 +111,7 @@ namespace tezcat::Tiny
 		std::unordered_map<std::string, Any> map;
 		ShaderParser::splitValue(content, map);
 		content = map["Name"].cast<std::string>();
-
+		
 		return content;
 	}
 
@@ -583,11 +583,11 @@ namespace tezcat::Tiny
 		auto it = mConfigUMap.find("OrderID");
 		if (it != mConfigUMap.end())
 		{
-			shader->setOrderID(it->second.cast<int>());
+			shader->setSortingOffset(it->second.cast<int>());
 		}
 		else
 		{
-			shader->setOrderID(2000);
+			shader->setSortingOffset(0);
 		}
 
 		//Queue
@@ -598,7 +598,7 @@ namespace tezcat::Tiny
 		}
 		else
 		{
-			shader->setRenderQueue(Queue::None);
+			shader->setRenderQueue(Queue::Opaque);
 		}
 
 		//LightMode

@@ -9,7 +9,7 @@
     #TINY_CFG_BEGIN
     {
         int Version = 330;
-        int OrderID = 50;
+        int OrderID = 0;
         str Queue = Opaque;
         str DepthTest = Less;
         bool ZWrite = true;
@@ -24,7 +24,7 @@
         TINY_LAYOUT_POSITION;
         TINY_LAYOUT_COLOR;
 
-        out float4 myColor;
+        out float4 myOutColor;
         out float4 myWorldPosition;
 
         void main()
@@ -32,7 +32,7 @@
             float4 position =  float4(tiny_layout_Position, 1.0);
             gl_Position = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM * position;
             
-            myColor = tiny_layout_Color;
+            myOutColor = tiny_layout_Color;
             myWorldPosition = TINY_MatrixM * position;
         }
     }
@@ -42,13 +42,16 @@
     {
         #include "../Include/tiny_fs.tyin"
 
-        in float4 myColor;
+        in float4 myOutColor;
         in float4 myWorldPosition;
+
+        [Editor(Color)]
+        uniform float3 myColor;
         out float4 myFinalColor;
 
         void main()
         {
-            myFinalColor = myColor;
+            myFinalColor = float4(myColor, 1.0f);
             //myFinalColor = float4(float3(242,141,0)/255.0, 1.0);
             //myFinalColor = float4(myWorldPosition.xyz / myWorldPosition.w, 1.0f);
         } 

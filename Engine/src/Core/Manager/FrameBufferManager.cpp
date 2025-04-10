@@ -28,15 +28,13 @@ namespace tezcat::Tiny
 	FrameBuffer* FrameBufferManager::sDefaultBuffer = nullptr;
 	uint32_t FrameBufferManager::sID = 0;
 	std::queue<uint32_t> FrameBufferManager::sFreeIDs;
-	std::stack<FrameBuffer*> FrameBufferManager::sFrameBufferStack;
 	std::unordered_map<std::string_view, FrameBuffer*> FrameBufferManager::sUMap;
 	FrameBuffer* FrameBufferManager::sMainBuffer = nullptr;
 
 	void FrameBufferManager::init()
 	{
-		sDefaultBuffer = FrameBuffer::create("Tiny_Default_FrameBuffer");
+		sDefaultBuffer = FrameBuffer::create("FB_Tiny_Default");
 		sDefaultBuffer->saveObject();
-		sFrameBufferStack.push(sDefaultBuffer);
 	}
 
 	std::tuple<FlagCreate, FrameBuffer*> FrameBufferManager::create(std::string name)
@@ -51,31 +49,6 @@ namespace tezcat::Tiny
 		frame_buffer->saveObject();
 		sUMap.emplace(frame_buffer->getEngineName().toView(), frame_buffer);
 		return { FlagCreate::Succeeded, frame_buffer };
-	}
-
-	void FrameBufferManager::bind(FrameBuffer* buffer)
-	{
-		buffer->saveObject();
-		sFrameBufferStack.push(buffer);
-		Graphics::getInstance()->bind(buffer);
-	}
-
-	void FrameBufferManager::unbind(FrameBuffer* buffer)
-	{
-		if (sFrameBufferStack.top() != buffer)
-		{
-			throw std::invalid_argument("Unbind FrameBuffer Error!!! the buffer must be the same");
-		}
-
-		sFrameBufferStack.top()->deleteObject();
-
-		if (sFrameBufferStack.empty())
-		{
-			return;
-		}
-
-		sFrameBufferStack.pop();
-		Graphics::getInstance()->bind(sFrameBufferStack.top());
 	}
 
 	FrameBuffer* FrameBufferManager::getMainFrameBufferBuildin()

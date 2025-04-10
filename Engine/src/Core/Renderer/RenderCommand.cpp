@@ -128,9 +128,13 @@ namespace tezcat::Tiny
 
 	void RenderCMD_DrawID::execute(PipelinePass* pass, Shader* shader)
 	{
+		TINY_PIPELINE_INFO_PUSH(mTransform->getGameObject()->getName());
+
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, mTransform->getModelMatrix());
 		Graphics::getInstance()->setUInt1(shader, "myObjectID", mTransform->getGameObject()->getUID());
 		Graphics::getInstance()->draw(mVertex);
+
+		TINY_PIPELINE_INFO_POP();
 	}
 
 	RenderCMD_DrawMeshWithMaterial::RenderCMD_DrawMeshWithMaterial(Vertex* vertex, Transform* transform, Material* material)
@@ -150,6 +154,8 @@ namespace tezcat::Tiny
 
 	void RenderCMD_DrawMeshWithMaterial::execute(PipelinePass* pass, Shader* shader)
 	{
+		TINY_PIPELINE_INFO_PUSH(mTransform->getGameObject()->getName());
+
 		auto& model_mat4 = mTransform->getModelMatrix();
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, model_mat4);
 
@@ -159,6 +165,8 @@ namespace tezcat::Tiny
 
 		mMaterial->submit(shader);
 		Graphics::getInstance()->draw(mVertex);
+
+		TINY_PIPELINE_INFO_POP();
 	}
 
 	RenderCMD_CreateVertex::RenderCMD_CreateVertex(Vertex* vertex)
@@ -261,8 +269,12 @@ namespace tezcat::Tiny
 
 	void RenderCMD_DrawMeshWithOutMaterial::execute(PipelinePass* pass, Shader* shader)
 	{
+		TINY_PIPELINE_INFO_PUSH(mTransform->getGameObject()->getName());
+
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, mTransform->getModelMatrix());
 		Graphics::getInstance()->draw(mVertex);
+
+		TINY_PIPELINE_INFO_POP();
 	}
 
 	RenderCMD_DrawSkybox::RenderCMD_DrawSkybox(Vertex* vertex
@@ -286,17 +298,25 @@ namespace tezcat::Tiny
 
 	void RenderCMD_DrawSkybox::execute(PipelinePass* pass, Shader* shader)
 	{
+		TINY_PIPELINE_INFO_PUSH("SkyBox");
+
 		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, mSkybox);
 		Graphics::getInstance()->setFloat1(shader, "myLod", mLod);
 		Graphics::getInstance()->setBool(shader, "myIsHDR", mIsHdr);
 		Graphics::getInstance()->setFloat1(shader, "myExposure", mExposure);
 		Graphics::getInstance()->draw(mVertex);
+
+		TINY_PIPELINE_INFO_POP();
 	}
 
-	RenderCMD_MakeHDR2Cube::RenderCMD_MakeHDR2Cube(Vertex* vertex, Texture2D* texHDR, TextureCube* skybox)
+	RenderCMD_MakeHDR2Cube::RenderCMD_MakeHDR2Cube(Vertex* vertex
+		, Texture2D* texHDR
+		, TextureCube* skybox
+		, std::array<int32_t, 2> viewSize)
 		: mVertex(vertex)
 		, mTexHDR(texHDR)
 		, mSkybox(skybox)
+		, mViewSize(viewSize)
 	{
 
 	}
@@ -333,13 +353,14 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->createMipmapTexCube(mSkybox, 0, 5);
 		*/
 
-		Graphics::getInstance()->makeHDR2Cube(shader, pass->getObserver(), mVertex, mTexHDR, mSkybox);
+		Graphics::getInstance()->makeHDR2Cube(shader, pass->getObserver(), mVertex, mTexHDR, mSkybox, mViewSize);
 	}
 
-	RenderCMD_MakeEnvIrradiance::RenderCMD_MakeEnvIrradiance(Vertex* vertex, TextureCube* skybox, TextureCube* irradiance)
+	RenderCMD_MakeEnvIrradiance::RenderCMD_MakeEnvIrradiance(Vertex* vertex, TextureCube* skybox, TextureCube* irradiance, std::array<int32_t, 2> viewSize)
 		: mVertex(vertex)
 		, mSkybox(skybox)
 		, mIrradiance(irradiance)
+		, mViewSize(viewSize)
 	{
 
 	}
@@ -353,7 +374,7 @@ namespace tezcat::Tiny
 
 	void RenderCMD_MakeEnvIrradiance::execute(PipelinePass* pass, Shader* shader)
 	{
-		Graphics::getInstance()->makeEnvIrradiance(shader, pass->getObserver(), mVertex, mSkybox, mIrradiance);
+		Graphics::getInstance()->makeEnvIrradiance(shader, pass->getObserver(), mVertex, mSkybox, mIrradiance, mViewSize);
 	}
 
 	RenderCMD_MakeEnvPrefilter::RenderCMD_MakeEnvPrefilter(Vertex* vertex
@@ -493,13 +514,10 @@ namespace tezcat::Tiny
 	void RenderCMD_ReadObjectID::execute(PipelinePass* pass, Shader* shader)
 	{
 		int32_t id;
-		FrameBufferManager::bind(mFrameBuffer);
+		Graphics::getInstance()->bind(mFrameBuffer);
 		Graphics::getInstance()->readObjectID(mX, mY, id);
-		FrameBufferManager::unbind(mFrameBuffer);
-		if (id > 0)
-		{
-			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_SelectObject, GameObjectManager::getObject(id) });
-		}
+		Graphics::getInstance()->unbind(mFrameBuffer);
+		EngineEvent::getInstance()->dispatch({ EngineEventID::EE_SelectObject, GameObjectManager::getObject(id) });
 		TINY_LOG_INFO(std::format("Pick ObjectID {}", id));
 	}
 
@@ -521,10 +539,10 @@ namespace tezcat::Tiny
 		frame_buffer->addAttachment(mTexture);
 
 		Graphics::getInstance()->createBuffer(frame_buffer);
-		FrameBufferManager::bind(frame_buffer);
+		Graphics::getInstance()->bind(frame_buffer);
 		Graphics::getInstance()->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		Graphics::getInstance()->clear(ClearOption::CO_Color);
-		FrameBufferManager::unbind(frame_buffer);
+		Graphics::getInstance()->unbind(frame_buffer);
 	}
 
 	RenderCMD_DeleteFrameBuffer::RenderCMD_DeleteFrameBuffer(FrameBuffer* frameBuffer)
@@ -572,10 +590,11 @@ namespace tezcat::Tiny
 
 	void RenderCMD_DeleteVertexBuffer::execute(PipelinePass* pass, Shader* shader)
 	{
-
+		Graphics::getInstance()->deleteVertexBuffer(mID);
 	}
 
 	RenderCMD_DeleteIndexBuffer::RenderCMD_DeleteIndexBuffer(IndexBuffer* buffer)
+		: mID(buffer->getBufferID())
 	{
 
 	}
@@ -587,10 +606,11 @@ namespace tezcat::Tiny
 
 	void RenderCMD_DeleteIndexBuffer::execute(PipelinePass* pass, Shader* shader)
 	{
-
+		Graphics::getInstance()->deleteIndexBuffer(mID);
 	}
 
 	RenderCMD_DeleteUniformBuffer::RenderCMD_DeleteUniformBuffer(UniformBuffer* buffer)
+		: mID(buffer->getBufferID())
 	{
 
 	}
@@ -602,7 +622,7 @@ namespace tezcat::Tiny
 
 	void RenderCMD_DeleteUniformBuffer::execute(PipelinePass* pass, Shader* shader)
 	{
-
+		Graphics::getInstance()->deleteUniformBuffer(mID);
 	}
 
 }

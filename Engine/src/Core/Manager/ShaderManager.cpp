@@ -36,7 +36,7 @@ namespace tezcat::Tiny
 
 		for (auto& pair : out_files)
 		{
-			createShader(pair.second.path);
+			createShader(pair.second.path.string());
 		}
 	}
 

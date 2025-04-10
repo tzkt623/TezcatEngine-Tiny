@@ -80,7 +80,7 @@ namespace tezcat::Tiny
 	public:
 		virtual ~VertexBuffer();
 
-		void setLayoutData(VertexPosition position, VertexLayoutType type);
+		void setLayoutData(VertexPosition position);
 		const VertexLayoutData& getLayoutData() const { return mLayoutData; }
 
 	protected:

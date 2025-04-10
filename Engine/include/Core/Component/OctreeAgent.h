@@ -7,10 +7,10 @@
 namespace tezcat::Tiny
 {
 	class OctreeNode;
-	class TINY_API OctreeAgent : public ComponentT<OctreeAgent>
+	class TINY_API OctreeAgent : public ComponentAutoID<OctreeAgent>
 	{
 		OctreeAgent();
-		TINY_OBJECT_H(OctreeAgent, ComponentT<OctreeAgent>)
+		TINY_OBJECT_H(OctreeAgent, ComponentAutoID<OctreeAgent>)
 
 	public:
 		virtual ~OctreeAgent();

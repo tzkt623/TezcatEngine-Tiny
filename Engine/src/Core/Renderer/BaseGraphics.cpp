@@ -46,6 +46,7 @@ namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
 		: mPolygonMode(ContextMap::PolygonModeArray[(uint32_t)PolygonMode::Face])
+		, mClearColor(0.0f, 0.0f, 0.0f, 1.0f)
 	{
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_ReadObjectID, this
 			, [this](const EventData& data)
@@ -116,4 +117,29 @@ namespace tezcat::Tiny
 		mPolygonMode = ContextMap::PolygonModeArray[(uint32_t)mode];
 	}
 
+	void BaseGraphics::unbind(FrameBuffer* frameBuffer)
+	{
+		if (mFrameBufferStack.top() != frameBuffer)
+		{
+			throw std::invalid_argument("Unbind FrameBuffer Error!!! the buffer must be the same");
+		}
+
+		mFrameBufferStack.top()->deleteObject();
+		mFrameBufferStack.pop();
+
+		if (mFrameBufferStack.empty())
+		{
+			this->bindImpl(FrameBufferManager::getDefaultBuffer());
+			return;
+		}
+
+		this->bindImpl(mFrameBufferStack.top());
+	}
+
+	void BaseGraphics::bind(FrameBuffer* frameBuffer)
+	{
+		frameBuffer->saveObject();
+		mFrameBufferStack.push(frameBuffer);
+		this->bindImpl(frameBuffer);
+	}
 }

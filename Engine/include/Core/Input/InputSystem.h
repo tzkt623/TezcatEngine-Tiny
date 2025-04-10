@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Head/CppHead.h"
 #include "Platform/OpenGL/GLHead.h"
@@ -17,6 +17,7 @@ namespace tezcat::Tiny
 
 		void push(Inputer* inputer);
 		void pop();
+		Inputer* currentInputer() { return mInputerStack.top(); }
 
 	public:
 		void setWindow(GLFWwindow* val) { mWindow = val; }

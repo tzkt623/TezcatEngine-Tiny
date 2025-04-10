@@ -11,10 +11,10 @@ namespace tezcat::Tiny
 	class ReplacedPipelinePass;
 	class Shader;
 
-	class TINY_API ShadowCaster : public ComponentT<ShadowCaster>
+	class TINY_API ShadowCaster : public ComponentAutoID<ShadowCaster>
 	{
 		ShadowCaster();
-		TINY_OBJECT_H(ShadowCaster, ComponentT<ShadowCaster>)
+		TINY_OBJECT_H(ShadowCaster, ComponentAutoID<ShadowCaster>)
 		TINY_RENDER_OBSERVER_FUNCTION(mShadowObserver)
 	public:
 		virtual ~ShadowCaster();

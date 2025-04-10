@@ -23,7 +23,7 @@
 
 namespace tezcat::Tiny
 {
-	struct StbiHelper
+	struct TINY_API StbiHelper
 	{
 		std::ifstream file;
 
@@ -71,10 +71,10 @@ namespace tezcat::Tiny
 
 	bool Image::openFile(const file_path& path, bool flip)
 	{
-		file_path generic_relative_path = file_sys_helper::generic(path);
+		file_path true_path = file_sys_helper::generic(path);
 
 		std::unique_ptr<StbiHelper> helper = std::make_unique<StbiHelper>();
-		helper->file.open(generic_relative_path, std::ios::binary);
+		helper->file.open(true_path, std::ios::binary);
 		if (!helper->file.is_open())
 		{
 			return false;
@@ -106,7 +106,7 @@ namespace tezcat::Tiny
 	bool Image::openFile(const FileInfo& info, bool flip /*= false*/)
 	{
 		stbi_set_flip_vertically_on_load(flip);
-		FILE* f = stbi__fopen(info.path.c_str(), "rb");
+		FILE* f = stbi__fopen(info.path.string().c_str(), "rb");
 		if (!f)
 		{
 			return stbi__errpuc("can't fopen", "Unable to open file");

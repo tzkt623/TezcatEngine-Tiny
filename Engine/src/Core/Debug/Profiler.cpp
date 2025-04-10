@@ -16,6 +16,7 @@
 */
 
 #include "Core/Debug/Profiler.h"
+#include "Core/Base/TinyObject.h"
 
 namespace tezcat::Tiny
 {
@@ -34,6 +35,12 @@ namespace tezcat::Tiny
 
 	double Profiler::RenderTime;
 	double Profiler::LogicTime;
+
+	std::vector<Profiler::PipelineInfo> Profiler::RenderInfoList;
+	int32_t Profiler::RenderInfoLayer = 0;
+	int32_t Profiler::CurrentRenderInfoLayer = 0;
+	int32_t Profiler::RenderInfoChecker = -1;
+	bool Profiler::EnableRenderInfo = false;
 
 	const unsigned char* Profiler::GPU;
 

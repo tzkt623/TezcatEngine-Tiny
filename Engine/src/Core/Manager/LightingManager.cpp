@@ -43,6 +43,7 @@
 #include "Core/Event/EngineEvent.h"
 
 #include "Core/Data/Image.h"
+#include "Core/Manager/SceneManager.h"
 
 namespace tezcat::Tiny
 {
@@ -73,9 +74,9 @@ namespace tezcat::Tiny
 
 	bool LightingManager::sCloseEnvLighting = true;
 	float LightingManager::sSkyboxLod = 0;
-	uint32_t LightingManager::sCubeSize = 1024;
-	uint32_t LightingManager::sPrefilterSize = 128;
-	uint32_t LightingManager::sIrrSize = 32;
+	int32_t LightingManager::sCubeSize = 1024;
+	int32_t LightingManager::sPrefilterSize = 128;
+	int32_t LightingManager::sIrrSize = 32;
 	bool LightingManager::sEnableSkyBox = false;
 	bool LightingManager::sIsSceneExited = true;
 	bool LightingManager::sRefreshSkyBox = false;
@@ -133,8 +134,27 @@ namespace tezcat::Tiny
 				sCurrentCubeMap = nullptr;
 			});
 
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_SetMainCamera
+			, &sIsSceneExited
+			, [](const EventData& data)
+			{
+				if (sSkyBoxPass)
+				{
+					sSkyBoxPass->removeFromPipeline();
+					sSkyBoxPass->deleteObject();
+					sSkyBoxPass = nullptr;
+				}
+			});
+
 		sSkyboxVertex = VertexBufferManager::create("Skybox");
 		sHDRVertex = VertexBufferManager::create("Cube");
+
+		sObserverHDR = createObserver();
+		sObserverHDR->saveObject();
+		sObserverHDR->setPerspective(90.0f, 0.1f, 10.0f);
+		sObserverHDR->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+		sObserverHDR->setSortingID(65535);
+
 		createHDR2Cube();
 		createIrradiance();
 		createPrefilter();
@@ -148,7 +168,7 @@ namespace tezcat::Tiny
 
 	void LightingManager::preRender()
 	{
-		if (sIsSceneExited)
+		if (SceneManager::isEmpty())
 		{
 			return;
 		}
@@ -157,43 +177,62 @@ namespace tezcat::Tiny
 		if (sEnableSkyBox)
 		{
 			//生成天空盒Pass
-			if (sSkyBoxPass == nullptr)
+			if (sSkyBoxPass == nullptr && CameraManager::isDataValied())
 			{
-				if (CameraManager::isDataValied())
+				if (auto camera = CameraManager::getMainCamera().lock())
 				{
-					auto shader = ShaderManager::find("Unlit/Skybox");
-					sSkyBoxPass = ReplacedPipelinePass::create(CameraManager::getMainCamera()->getRenderObserver()
-						, shader);
-					sSkyBoxPass->saveObject();
-					if (sCurrentCubeMap == nullptr)
+					if ((camera->getClearOption() & ClearOption::CO_Skybox) == ClearOption::CO_Skybox)
 					{
-						sCurrentCubeMap = sCubeTextureMap;
-					}
+						auto shader = ShaderManager::find("Unlit/Skybox");
+						sSkyBoxPass = ReplacedPipelinePass::create(camera->getRenderObserver()
+							, shader);
+						sSkyBoxPass->saveObject();
+						if (sCurrentCubeMap == nullptr)
+						{
+							sCurrentCubeMap = sCubeTextureMap;
+						}
 
-					sSkyBoxPass->setCustomCulling([=](ReplacedPipelinePass* pass)
-					{
-						pass->addCommand<RenderCMD_DrawSkybox>(sSkyboxVertex
-							, sCurrentCubeMap
-							, sSkyboxLod
-							, sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float
-							, sExposure);
-					});
+						sSkyBoxPass->setCustomCulling([=](ReplacedPipelinePass* pass)
+						{
+							pass->addCommand<RenderCMD_DrawSkybox>(sSkyboxVertex
+								, sCurrentCubeMap
+								, sSkyboxLod
+								, sCurrentCubeMap->getDataMemFormat().tiny == DataMemFormat::Float
+								, sExposure);
+						});
+					}
 				}
 			}
 
 			if (sSkyBoxPass)
 			{
-				if (sRefreshSkyBox)
+				if (auto camera = CameraManager::getMainCamera().lock())
 				{
-					sRefreshSkyBox = false;
-					sMakeCubeTexPass->addToPipeline();
-					sIrradiancePass->addToPipeline();
-					sPrefilterPass->addToPipeline();
-					sBRDFLUTPass->addToPipeline();
-				}
+					if ((camera->getClearOption() & ClearOption::CO_Skybox) != ClearOption::CO_Skybox)
+					{
+						sSkyBoxPass->removeFromPipeline();
+						return;
+					}
 
-				//把天空盒加入渲染
-				sSkyBoxPass->addToPipeline();
+
+					if (sRefreshSkyBox)
+					{
+						sRefreshSkyBox = false;
+						sMakeCubeTexPass->resetOnceMode();
+						sIrradiancePass->resetOnceMode();
+						sPrefilterPass->resetOnceMode();
+						//sBRDFLUTPass->resetOnceMode();
+
+						sMakeCubeTexPass->addToPipeline();
+						sIrradiancePass->addToPipeline();
+						sPrefilterPass->addToPipeline();
+						sBRDFLUTPass->addToPipeline();
+					}
+
+					//把天空盒加入渲染
+					//replacepass还有一个save在manager中
+					sSkyBoxPass->addToPipeline();
+				}
 			}
 		}
 		else
@@ -225,6 +264,7 @@ namespace tezcat::Tiny
 	void LightingManager::createHDR2Cube()
 	{
 		int cube_size = sCubeSize;
+		sObserverHDR->setViewRect(0, 0, cube_size, cube_size);
 
 		auto [flag2, frame_buffer] = FrameBufferManager::create("FB_Cube");
 		if (flag2 == FlagCreate::Succeeded)
@@ -262,21 +302,14 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		sObserverHDR = createObserver();
-		sObserverHDR->saveObject();
-		sObserverHDR->setPerspective(90.0f, 0.1f, 10.0f);
-		sObserverHDR->setViewRect(0, 0, cube_size, cube_size);
-		sObserverHDR->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		sObserverHDR->setOrderID(-127);
-
 		sMakeCubeTexPass = ReplacedPipelinePass::create(sObserverHDR, ShaderManager::find("Unlit/EnvMakeCube"));
 		sMakeCubeTexPass->setOnceMode();
 		sMakeCubeTexPass->setFrameBuffer(frame_buffer);
 		sMakeCubeTexPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 		{
-			pass->addCommand<RenderCMD_MakeHDR2Cube>(sHDRVertex, sTexHDR, sCubeTextureMap);
+			pass->addCommand<RenderCMD_MakeHDR2Cube>(sHDRVertex, sTexHDR, sCubeTextureMap, std::array<int32_t, 2>{ cube_size, cube_size });
 		});
-		sMakeCubeTexPass->setOrderID(0);
+		sMakeCubeTexPass->setUserSortingID(0);
 		sMakeCubeTexPass->saveObject();
 	}
 
@@ -301,23 +334,23 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		sObserverIrradiance = createObserver();
-		sObserverIrradiance->saveObject();
-		sObserverIrradiance->setPerspective(90.0f, 0.1f, 10.0f);
-		sObserverIrradiance->setViewRect(0, 0, irr_size, irr_size);
-		sObserverIrradiance->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		sObserverIrradiance->setOrderID(-127);
+		//sObserverIrradiance = createObserver();
+		//sObserverIrradiance->saveObject();
+		//sObserverIrradiance->setPerspective(90.0f, 0.1f, 10.0f);
+		//sObserverIrradiance->setViewRect(0, 0, irr_size, irr_size);
+		//sObserverIrradiance->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+		//sObserverIrradiance->setSortingID(65534);
 
 		auto shader = ShaderManager::find("Unlit/EnvMakeIrradiance");
 
-		sIrradiancePass = ReplacedPipelinePass::create(sObserverIrradiance, shader);
+		sIrradiancePass = ReplacedPipelinePass::create(sObserverHDR, shader);
 		sIrradiancePass->setOnceMode();
 		sIrradiancePass->setFrameBuffer(frame_buffer);
 		sIrradiancePass->setCustomCulling([=](ReplacedPipelinePass* pass)
 		{
-			pass->addCommand(new RenderCMD_MakeEnvIrradiance(sHDRVertex, sCubeTextureMap, sIrradianceMap));
+			pass->addCommand(new RenderCMD_MakeEnvIrradiance(sHDRVertex, sCubeTextureMap, sIrradianceMap, std::array<int32_t, 2>{irr_size, irr_size}));
 		});
-		sIrradiancePass->setOrderID(1);
+		sIrradiancePass->setUserSortingID(1);
 		sIrradiancePass->saveObject();
 	}
 
@@ -344,14 +377,14 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		sObserverPrefilter = createObserver();
-		sObserverPrefilter->saveObject();
-		sObserverPrefilter->setPerspective(90.0f, 0.1f, 10.0f);
-		sObserverPrefilter->setViewRect(0, 0, prefilter_size, prefilter_size);
-		sObserverPrefilter->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		sObserverPrefilter->setOrderID(-127);
+		//sObserverPrefilter = createObserver();
+		//sObserverPrefilter->saveObject();
+		//sObserverPrefilter->setPerspective(90.0f, 0.1f, 10.0f);
+		//sObserverPrefilter->setViewRect(0, 0, prefilter_size, prefilter_size);
+		//sObserverPrefilter->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+		//sObserverPrefilter->setSortingID(65533);
 
-		sPrefilterPass = ReplacedPipelinePass::create(sObserverPrefilter
+		sPrefilterPass = ReplacedPipelinePass::create(sObserverHDR
 			, ShaderManager::find("Unlit/EnvMakePrefilter"));
 		sPrefilterPass->setOnceMode();
 		sPrefilterPass->setFrameBuffer(frame_buffer);
@@ -365,7 +398,7 @@ namespace tezcat::Tiny
 				, prefilter_size
 				, sCubeSize));
 		});
-		sPrefilterPass->setOrderID(2);
+		sPrefilterPass->setUserSortingID(2);
 		sPrefilterPass->saveObject();
 	}
 
@@ -393,7 +426,7 @@ namespace tezcat::Tiny
 		sObserverBRDF_LUT->setPerspective(90.0f, 0.1f, 10.0f);
 		sObserverBRDF_LUT->setViewRect(0, 0, sCubeSize, sCubeSize);
 		sObserverBRDF_LUT->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
-		sObserverBRDF_LUT->setOrderID(-127);
+		sObserverBRDF_LUT->setSortingID(65532);
 
 		sBRDFLUTPass = ReplacedPipelinePass::create(sObserverBRDF_LUT
 			, ShaderManager::find("Unlit/EnvMakeBRDFLut"));
@@ -404,7 +437,7 @@ namespace tezcat::Tiny
 			auto rect_vertex = VertexBufferManager::create("Rect");
 			pass->addCommand(new RenderCMD_DrawVertex(rect_vertex));
 		});
-		sBRDFLUTPass->setOrderID(3);
+		sBRDFLUTPass->setUserSortingID(3);
 		sBRDFLUTPass->saveObject();
 	}
 	void LightingManager::showIrradianceMap()

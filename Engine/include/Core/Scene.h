@@ -58,12 +58,13 @@ namespace tezcat::Tiny
 
 	public:
 		void update();
+		void logic();
 
 	public:
 		void addLogicFunction(void* gameObject, const std::function<void()>& function);
 		void removeLogicFunction(void* gameObject);
 		void addTransform(Transform* transform);
-		void addGameObject(GameObject* gameObject);
+		void addNewGameObject(GameObject* gameObject);
 
 	public:
 		std::list<TinyWeakRef<Transform>>& getTransformList() { return mTransformList; }

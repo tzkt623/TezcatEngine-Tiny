@@ -25,7 +25,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(ModeAgent, ComponentT<ModeAgent>);
+	TINY_OBJECT_CPP(ModeAgent, ComponentAutoID<ModeAgent>);
 
 	ModeAgent::~ModeAgent()
 	{

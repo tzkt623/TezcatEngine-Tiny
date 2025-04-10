@@ -7,10 +7,10 @@
 namespace tezcat::Tiny
 {
 	class Transform;
-	class TINY_API FlyController : public ComponentT<FlyController>
+	class TINY_API FlyController : public ComponentAutoID<FlyController>
 	{
 		FlyController();
-		TINY_OBJECT_H(FlyController, ComponentT<FlyController>)
+		TINY_OBJECT_H(FlyController, ComponentAutoID<FlyController>)
 
 	public:
 		virtual ~FlyController();

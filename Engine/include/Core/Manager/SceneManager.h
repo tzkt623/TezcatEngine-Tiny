@@ -46,12 +46,10 @@ namespace tezcat::Tiny
 	public:
 		static void init();
 		static bool update();
-		static bool isSceneRunning() { return !sSceneArray.empty(); }
-
-	public:
 		static Scene* getCurrentScene() { return sSceneArray.top(); }
 
-		static bool empty() { return sSceneArray.empty(); }
+	public:
+		static bool isEmpty() { return sSceneArray.empty(); }
 		static void popScene();
 		static void pushScene(const std::string& name);
 		static void pushScene(Scene* scene);

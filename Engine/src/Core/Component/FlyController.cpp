@@ -17,10 +17,13 @@
 
 #include "Core/Component/FlyController.h"
 #include "Core/Component/Transform.h"
+#include "Core/Input/InputSystem.h"
+#include "Core/Input/Inputer.h"
+#include "Core/Tool/Singleton.h"
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(FlyController, ComponentT<FlyController>)
+	TINY_OBJECT_CPP(FlyController, ComponentAutoID<FlyController>)
 
 
 	/// <summary>
@@ -49,7 +52,7 @@ namespace tezcat::Tiny
 
 	void FlyController::onStart()
 	{
-
+		InputSys::getInstance()->currentInputer()->setController(this);
 	}
 
 	void FlyController::onEnable()

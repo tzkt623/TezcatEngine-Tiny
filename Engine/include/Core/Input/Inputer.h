@@ -1,10 +1,12 @@
-#pragma once
+﻿#pragma once
 #include "../Head/CppHead.h"
 #include "../Head/ConfigHead.h"
+#include "../Component/FlyController.h"
 
 namespace tezcat::Tiny
 {
 	class InputSystem;
+
 	class TINY_API Inputer
 	{
 	public:
@@ -18,6 +20,7 @@ namespace tezcat::Tiny
 		virtual void mouseButtonCallBack(int button, int action, int mods) = 0;
 		virtual void mouseCursorPosCallBack(double xpos, double ypos) = 0;
 		virtual void mouseScrollPosCallBack(double xoffset, double yoffset) = 0;
+		virtual void setController(FlyController* val) = 0;
 	};
 
 //	template<typename I, typename = typename std::enable_if<std::is_base_of<Inputer, I>::value>::type>
@@ -30,6 +33,14 @@ namespace tezcat::Tiny
 			static I instance;
 			return &instance;
 		}
+
+		void setController(FlyController* val)
+		{
+			mController = val;
+		}
+
+	protected:
+		TinyWeakRef<FlyController> mController;
 	};
 
 	class TINY_API EmptyInputer : public InputerT<EmptyInputer>

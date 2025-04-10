@@ -19,8 +19,8 @@
 
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/FrameBuffer.h"
-#include "Core/Renderer/Pipeline.h"
 #include "Core/Renderer/VertexBuffer.h"
+#include "Core/Renderer/PipelineWorker.h"
 
 #include "Core/Shader/Shader.h"
 #include "Core/Shader/ShaderParam.h"
@@ -28,13 +28,14 @@
 #include "Core/Component/Transform.h"
 
 #include "Core/Manager/CameraManager.h"
+#include "Core/Manager/ObserverManager.h"
 
 namespace tezcat::Tiny
 {
 #pragma region BaseRenderObserver
-	TINY_OBJECT_CPP(BaseRenderObserver, TinyObject)
+	TINY_OBJECT_CPP(BaseRenderObserver, TinyObject);
 
-		BaseRenderObserver::BaseRenderObserver()
+	BaseRenderObserver::BaseRenderObserver()
 		: mCullMask(0)
 		, mFrameBuffer(nullptr)
 		, mNearFace(0.1f)
@@ -42,25 +43,30 @@ namespace tezcat::Tiny
 		, mFOV(60.0f)
 		, mProjectionMatrix(1.0f)
 		, mViewType(ViewType::Screen)
-		, mOrder(0)
+		, mSortingID(0)
 		, mDirty(true)
 		, mClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth))
 		, mTransform(nullptr)
 		, mEnable(true)
 		, mNeedRemove(false)
-		, mUID(0)
 		, mUniformBuffer(nullptr)
+		, mClearColor(0.0f, 0.0f, 0.0f, 1.0f)
+		, mQueue(PipelineQueue::create())
 	{
 		mCullLayerList.reserve(32);
+		mUID = ObserverManager::giveID();
 	}
 
 	BaseRenderObserver::~BaseRenderObserver()
 	{
-		if (mUniformBuffer)
-		{
-			mUniformBuffer->deleteObject();
-			mUniformBuffer = nullptr;
-		}
+
+	}
+
+
+	void BaseRenderObserver::init()
+	{
+		mQueue->setObserver(this);
+		mQueue->saveObject();
 	}
 
 	void BaseRenderObserver::setOrtho(float near, float far)
@@ -148,29 +154,6 @@ namespace tezcat::Tiny
 		}
 	}
 
-	ObserverPipelinePass* BaseRenderObserver::createOrGetPass(Shader* shader)
-	{
-		auto uid = shader->getUID();
-		if (mPassCache.size() <= uid)
-		{
-			mPassCache.resize(static_cast<size_t>(uid + 1));
-		}
-
-		if (mPassCache[uid] == nullptr)
-		{
-			ObserverPipelinePass* pass = ObserverPipelinePass::create(this, shader);
-			pass->saveObject();
-			mPassCache[uid] = pass;
-			mPassArray.push_back(pass);
-			if (mEnable)
-			{
-				pass->addToPipeline();
-			}
-		}
-
-		return mPassCache[uid];
-	}
-
 	void BaseRenderObserver::setTransform(Transform* transform)
 	{
 		mTransform = transform;
@@ -179,16 +162,6 @@ namespace tezcat::Tiny
 
 	void BaseRenderObserver::onClose()
 	{
-		for (auto pass : mPassCache)
-		{
-			if (pass)
-			{
-				pass->deleteObject();
-			}
-		}
-		mPassCache.clear();
-		mPassArray.clear();
-
 		if (mFrameBuffer)
 		{
 			mFrameBuffer->deleteObject();
@@ -198,6 +171,17 @@ namespace tezcat::Tiny
 		{
 			mTransform->deleteObject();
 		}
+
+		if (mUniformBuffer)
+		{
+			mUniformBuffer->deleteObject();
+			mUniformBuffer = nullptr;
+		}
+
+		ObserverManager::recycle(mUID);
+
+		mQueue->removeFromPipeline();
+		mQueue->deleteObject();
 	}
 
 	void BaseRenderObserver::setEnable(bool val)
@@ -208,36 +192,6 @@ namespace tezcat::Tiny
 		}
 
 		mEnable = val;
-
-		if (mEnable)
-		{
-			for (auto pass : mPassArray)
-			{
-				pass->addToPipeline();
-			}
-		}
-		else
-		{
-			for (auto pass : mPassArray)
-			{
-				pass->removeFromPipeline();
-			}
-		}
-	}
-
-	void BaseRenderObserver::addToPipeline()
-	{
-		CameraManager::addRenderObserver(this);
-	}
-
-	void BaseRenderObserver::removeFromPipeline()
-	{
-		mNeedRemove = true;
-	}
-
-	void BaseRenderObserver::onExitPipeline()
-	{
-		mNeedRemove = false;
 	}
 
 	void BaseRenderObserver::createUniformBuffer()
@@ -270,6 +224,7 @@ namespace tezcat::Tiny
 		mCullLayerList.erase(std::find(mCullLayerList.begin(), mCullLayerList.end(), index));
 	}
 
+
 #pragma endregion
 
 
@@ -279,42 +234,18 @@ namespace tezcat::Tiny
 	RenderObserver::RenderObserver()
 		: mViewMatrix(1.0f)
 	{
-
 	}
 
 	RenderObserver::~RenderObserver()
 	{
-
 	}
 
 	void RenderObserver::submit(Shader* shader)
 	{
-		//this->updateObserverMatrix();
-
-		//if (mTransform)
-		//{
-		//
-		//}
-
-
-		//mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
-		//	, mTransform->getWorldPosition() + mTransform->getForward()
-		//	, mTransform->getUp());
-		//
-		//auto VP = mProjectionMatrix * mViewMatrix;
-
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixVP, VP);
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixMV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
-
-		//Graphics::getInstance()->setFloat3(shader, ShaderParam::CameraWorldPosition, mTransform->getWorldPosition());
-		//Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
-
-
 		if (mUniformBuffer)
 		{
 			Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
+			Graphics::getInstance()->bind(mUniformBuffer);
 		}
 	}
 
@@ -329,15 +260,15 @@ namespace tezcat::Tiny
 				, mTransform->getUp());
 
 
-			if (mUniformBuffer)
-			{
-				auto VP = mProjectionMatrix * mViewMatrix;
-				mUniformBuffer->update<float4x4>(0, glm::value_ptr(mProjectionMatrix));
-				mUniformBuffer->update<float4x4>(1, glm::value_ptr(mViewMatrix));
-				mUniformBuffer->update<float4x4>(2, glm::value_ptr(VP));
-				mUniformBuffer->update<float3>(3, glm::value_ptr(mTransform->getWorldPosition()));
-				mUniformBuffer->update<float2>(4, glm::value_ptr(float2(mNearFace, mFarFace)));
-			}
+			//if (mUniformBuffer)
+			//{
+			//	auto VP = mProjectionMatrix * mViewMatrix;
+			//	mUniformBuffer->update<float4x4>(0, glm::value_ptr(mProjectionMatrix));
+			//	mUniformBuffer->update<float4x4>(1, glm::value_ptr(mViewMatrix));
+			//	mUniformBuffer->update<float4x4>(2, glm::value_ptr(VP));
+			//	mUniformBuffer->update<float3>(3, glm::value_ptr(mTransform->getWorldPosition()));
+			//	mUniformBuffer->update<float2>(4, glm::value_ptr(float2(mNearFace, mFarFace)));
+			//}
 		}
 	}
 
@@ -418,7 +349,6 @@ namespace tezcat::Tiny
 
 	ShadowObserver::~ShadowObserver()
 	{
-
 	}
 
 	void ShadowObserver::preRender()

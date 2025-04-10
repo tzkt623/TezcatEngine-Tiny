@@ -515,7 +515,7 @@ namespace tezcat::Tiny
 						}
 						else
 						{
-							material->setUniform<UniformTex2D>(index_albedo, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyOne.png"));
+							material->setUniform<UniformTex2D>(index_albedo, ResourceManager::loadDefault<Texture2D>("Resource/Image/Tiny/TinyOne.png"));
 						}
 
 						//
@@ -526,7 +526,7 @@ namespace tezcat::Tiny
 						}
 						else
 						{
-							material->setUniform<UniformTex2D>(index_metallic, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png"));
+							material->setUniform<UniformTex2D>(index_metallic, ResourceManager::loadDefault<Texture2D>("Resource/Image/Tiny/TinyZero.png"));
 						}
 
 						tex_path = node->tryGetTexture(MaterialTextureSlot::PBR_TEX_ROUGHNESS);
@@ -536,7 +536,7 @@ namespace tezcat::Tiny
 						}
 						else
 						{
-							material->setUniform<UniformTex2D>(index_roughness, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png"));
+							material->setUniform<UniformTex2D>(index_roughness, ResourceManager::loadDefault<Texture2D>("Resource/Image/Tiny/TinyZero.png"));
 						}
 
 						tex_path = node->tryGetTexture(MaterialTextureSlot::PBR_TEX_AMBIENT_OCCLUSION);
@@ -546,7 +546,7 @@ namespace tezcat::Tiny
 						}
 						else
 						{
-							material->setUniform<UniformTex2D>(index_ao, ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png"));
+							material->setUniform<UniformTex2D>(index_ao, ResourceManager::loadDefault<Texture2D>("Resource/Image/Tiny/TinyZero.png"));
 						}
 
 						//material->setUniform<UniformTex2D>(index_albedo
@@ -601,7 +601,7 @@ namespace tezcat::Tiny
 						}
 						else
 						{
-							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyOne.png");
+							auto tex = ResourceManager::loadDefault<Texture2D>("Resource/Image/Tiny/TinyOne.png");
 							material->setUniform<UniformTex2D>(index_diffuse, tex);
 						}
 
@@ -613,7 +613,7 @@ namespace tezcat::Tiny
 						}
 						else
 						{
-							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png");
+							auto tex = ResourceManager::loadDefault<Texture2D>("Resource/Image/Tiny/TinyZero.png");
 							material->setUniform<UniformTex2D>(index_specular, tex);
 						}
 
@@ -625,7 +625,7 @@ namespace tezcat::Tiny
 						}
 						else
 						{
-							auto tex = ResourceManager::loadDefault<Texture2D>("Image/Tiny/TinyZero.png");
+							auto tex = ResourceManager::loadDefault<Texture2D>("Resource/Image/Tiny/TinyZero.png");
 							material->setUniform<UniformTex2D>(index_shininess, tex);
 						}
 					}

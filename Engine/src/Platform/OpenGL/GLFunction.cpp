@@ -95,6 +95,8 @@ namespace tezcat::Tiny::GL
 			{
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->getBufferID());
 			}
+
+			//vertex->setIndexCount(index_buffer->getDataSize());
 		}
 
 		glBindVertexArray(0);

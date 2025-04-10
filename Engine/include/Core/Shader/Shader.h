@@ -54,14 +54,15 @@ namespace tezcat::Tiny
 		std::string getMemoryInfo() override;
 
 	public:
-
 		Queue getRenderQueue() const { return mRenderQueue; }
 		void setRenderQueue(Queue val) { mRenderQueue = val; }
+
 		void setName(const std::string& name)
 		{
 			mName = name;
 			mEngineName = mName;
 		}
+
 		void setName(std::string& name)
 		{
 			mName.assign(name);
@@ -69,13 +70,21 @@ namespace tezcat::Tiny
 		}
 
 		uint32_t getProgramID() const { return mProgramID; }
-		int32_t getOrderID() const { return mOrderID; }
-		void setOrderID(int32_t orderID) { mOrderID = orderID; }
+
+		int16_t getSortingOffset() const { return mSortingOffset; }
+
+		void setSortingOffset(int16_t offset) { mSortingOffset = offset; }
+
 		int32_t getUID() const { return mUID; }
+
 		int32_t getVersion() const { return mVersion; }
+
 		void setVersion(int32_t val) { mVersion = val; }
+
 		void setLightMode(LightMode lightMode) { mLightMode = lightMode; }
+
 		LightMode getLightMode() const { return mLightMode; }
+
 		bool isShadowReceiver() const { return mIsShadowReceiver; }
 
 		int32_t getPropertyID(const std::string_view& name)
@@ -233,11 +242,11 @@ namespace tezcat::Tiny
 		std::string mPath;
 
 	private:
+		Queue mRenderQueue;
 		int32_t mUID;
-		int32_t mOrderID;
 		int32_t mVersion;
 		uint32_t mProgramID;
-		Queue mRenderQueue;
+		int16_t mSortingOffset;
 		uint8_t mLocalTexure;
 		uint8_t mGlobalTexture;
 	protected:

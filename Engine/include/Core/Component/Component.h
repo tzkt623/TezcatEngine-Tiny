@@ -73,7 +73,7 @@ namespace tezcat::Tiny
 	public://RTTI
 		virtual uint32_t getComponentTypeID() = 0;
 
-	private:
+	protected:
 		virtual void onClose() override;
 
 	protected:
@@ -96,16 +96,39 @@ namespace tezcat::Tiny
 		}
 	};
 
+
+	template<typename Com, uint32_t ID>
+	class TINY_API ComponentCustomID : public Component
+	{
+	protected:
+		ComponentCustomID() = default;
+	public:
+		virtual ~ComponentCustomID() = default;
+
+	public:
+		uint32_t getComponentTypeID() override { return sTypeID; }
+		bool isComponentID(const uint32_t& id) { return sTypeID == id; }
+
+	public:
+		static const uint32_t getComponentTypeIDStatic() { return sTypeID; }
+
+	private:
+		static uint32_t sTypeID;
+	};
+
+	template<typename Com, uint32_t ID>
+	uint32_t ComponentCustomID<Com, ID>::sTypeID = ID;
+
 	/// <summary>
 	/// ComponentT
 	/// </summary>
 	template<typename Com>
-	class TINY_API ComponentT : public Component
+	class TINY_API ComponentAutoID : public Component
 	{
 	protected:
-		ComponentT() = default;
+		ComponentAutoID() = default;
 	public:
-		virtual ~ComponentT() = default;
+		virtual ~ComponentAutoID() = default;
 
 	public:
 		uint32_t getComponentTypeID() override { return sTypeID; }
@@ -119,5 +142,5 @@ namespace tezcat::Tiny
 	};
 
 	template<typename Com>
-	uint32_t ComponentT<Com>::sTypeID = Component::giveID();
+	uint32_t ComponentAutoID<Com>::sTypeID = Component::giveID();
 }

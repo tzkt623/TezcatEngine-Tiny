@@ -102,7 +102,18 @@ namespace tezcat::Tiny
 		virtual void createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel) {}
 
 	public:
-		virtual void setClearColor(float r, float g, float b, float a) {}
+		void setClearColor(float r, float g, float b, float a)
+		{
+			mClearColor.r = r;
+			mClearColor.g = g;
+			mClearColor.b = b;
+			mClearColor.a = a;
+		}
+
+		void setClearColor(const float4& color)
+		{
+			mClearColor = color;
+		}
 
 
 		/*
@@ -125,12 +136,14 @@ namespace tezcat::Tiny
 			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, Texture2D* texHDR
-			, TextureCube* skybox) {}
+			, TextureCube* skybox
+			, std::array<int32_t, 2> viewSize) {}
 		virtual void makeEnvIrradiance(Shader* shader
 			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, TextureCube* skybox
-			, TextureCube* irradiance) {}
+			, TextureCube* irradiance
+			, std::array<int32_t, 2> viewSize) {}
 		virtual void makeEnvPrefilter(Shader* shader
 			, BaseRenderObserver* observer
 			, Vertex* vertex
@@ -251,11 +264,15 @@ namespace tezcat::Tiny
 		virtual void setViewport(const ViewportInfo& info) = 0;
 		virtual void setPassState(Shader* shader) = 0;
 		virtual void bind(Shader* shader) = 0;
-		virtual void bind(FrameBuffer* frameBuffer) = 0;
+		void bind(FrameBuffer* frameBuffer);
+		void unbind(FrameBuffer* frameBuffer);
 		virtual void bind(UniformBuffer* uniformBuffer) = 0;
 		virtual void bind(Texture2D* texture) = 0;
 		virtual void readPixel(int32_t x, int32_t y) = 0;
 		virtual void readObjectID(int32_t x, int32_t y, int32_t& id) = 0;
+
+	protected:
+		virtual void bindImpl(FrameBuffer* frameBuffer) = 0;
 
 		//----------------------------------------------------
 		//
@@ -277,9 +294,11 @@ namespace tezcat::Tiny
 	private:
 		std::vector<RenderCommadBuild*> mBuildCommandList;
 		std::queue<RenderCommadBuild*> mBuildCommandQueue;
+		std::stack<FrameBuffer*> mFrameBufferStack;
 
 	protected:
 		PolygonModeWrapper mPolygonMode;
+		float4 mClearColor;
 	};
 
 	using Graphics = SG<BaseGraphics>;

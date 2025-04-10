@@ -400,7 +400,7 @@ namespace tezcat::Tiny::GL
 		TINY_GL_CHECK(glUseProgram(shader->getProgramID()));
 	}
 
-	void GLGraphics::bind(FrameBuffer* frameBuffer)
+	void GLGraphics::bindImpl(FrameBuffer* frameBuffer)
 	{
 		TINY_GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->getFrameBufferID()));
 	}
@@ -425,14 +425,14 @@ namespace tezcat::Tiny::GL
 		}
 
 		GLbitfield mask = 0;
-		if ((option & ClearOption::CO_Color) == ClearOption::CO_Color)
+		if (TINY_MASK_ALL_OF(option, ClearOption::CO_Color))
 		{
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
 			//glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
 			mask |= GL_COLOR_BUFFER_BIT;
 		}
 
-		if ((option & ClearOption::CO_Depth) == ClearOption::CO_Depth)
+		if (TINY_MASK_ALL_OF(option, ClearOption::CO_Depth))
 		{
 			//如果深度缓冲不允许写入
 			//那么也无法clear
@@ -442,7 +442,7 @@ namespace tezcat::Tiny::GL
 			mask |= GL_DEPTH_BUFFER_BIT;
 		}
 
-		if ((option & ClearOption::CO_Stencil) == ClearOption::CO_Stencil)
+		if (TINY_MASK_ALL_OF(option, ClearOption::CO_Stencil))
 		{
 			glStencilMask(0xFF);
 			mask |= GL_STENCIL_BUFFER_BIT;
@@ -619,8 +619,11 @@ namespace tezcat::Tiny::GL
 		, BaseRenderObserver* observer
 		, Vertex* vertex
 		, Texture2D* texHDR
-		, TextureCube* skybox)
+		, TextureCube* skybox
+		, std::array<int32_t, 2> viewSize)
 	{
+		this->setViewport(ViewportInfo(0, 0, viewSize[0], viewSize[1]));
+
 		shader->resetLocalState();
 		auto uniform_config = shader->getUniformValueConfig("myTexHDR2D");
 		this->setTexture2D(shader, uniform_config->valueID, texHDR);
@@ -650,7 +653,7 @@ namespace tezcat::Tiny::GL
 				 , array[i]->getTextureID()
 				 , 0);
 			
-			this->clear(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
+			this->clear(ClearOption(ClearOption::CO_Depth | ClearOption::CO_Color));
 			this->draw(vertex);
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER
@@ -691,8 +694,11 @@ namespace tezcat::Tiny::GL
 		, BaseRenderObserver* observer
 		, Vertex* vertex
 		, TextureCube* skybox
-		, TextureCube* irradiance)
+		, TextureCube* irradiance
+		, std::array<int32_t, 2> viewSize)
 	{
+		this->setViewport(ViewportInfo(0, 0, viewSize[0], viewSize[1]));
+
 		shader->resetLocalState();
 		this->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
 		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
@@ -1229,11 +1235,6 @@ namespace tezcat::Tiny::GL
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 		TINY_GL_CHECK(glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id));
 		glReadBuffer(GL_NONE);
-	}
-
-	void GLGraphics::setClearColor(float r, float g, float b, float a)
-	{
-		glClearColor(r, g, b, a);
 	}
 
 	void GLGraphics::preRender()

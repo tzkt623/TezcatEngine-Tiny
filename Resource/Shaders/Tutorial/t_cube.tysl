@@ -9,9 +9,8 @@
     #TINY_CFG_BEGIN
     {
         int Version = 330;
-        int OrderID = 50;
-        str LightMode = Unlit;
-        str Queue = Prepare;
+        int OrderID = 0;
+        str Queue = Post;
         str DepthTest = Off;
         bool ZWrite = false;
         str CullFace = Off;

@@ -16,19 +16,22 @@
 
 ## **TinyEngine in progress**
 
+![Image](https://github.com/user-attachments/assets/bfecae67-9533-4ffa-8bc8-179ffbba2b2b)
+
 ![logo1](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/1faf72c8-36e8-4bb3-9e40-2b87a0656dfc)
 
 ![logo2](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/0a9e3960-eae2-4ea7-8d4c-149b9a3a0ef4)
 
 <img width="1280" alt="屏幕截图 2024-06-03 144114" src="https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/52484691-2753-4d82-8995-cba8439866ff">
 
-![Image](https://github.com/user-attachments/assets/f4bf38de-ef11-4aaf-92c9-e97182f81fca)
-
 -------------------------------------------------
 
 ## **Update**
 
 - [ ] Adding an internal engine name system
+- [x] Add a Pipeline Viwer
+- [x] Detach Editor Camera From Game
+- [x] Rewrote the resource loading method, no longer save the resource folder by default, you need to enter the full path
 - [x] You can now drag and drop the model into the overview to load it
 - [x] You can now drag and drop the image into the material to replace it
 - [x] You can now select the units in the scene, and the overview will automatically select them
@@ -41,9 +44,7 @@
 
 ## **Issue**
 
-- [ ] Model loading is not perfect, and there will be fail to load
 - [ ] PBR Shader some issues now
-- [ ] Refactoring resoure loader and managers
 - [ ] ShaderEditor has some issues now
 - [ ] Disabled multithreading mode for now
 
@@ -208,6 +209,10 @@ Try Drag image file to envlighting map widget
 
 Check the frame information
 
+### Pipeline Viewer
+
+Check the frame information
+
 ## **Memory Management**
 
 A simple reference counting based memory management, just still debugging......
@@ -352,20 +357,20 @@ mr2->setMaterial(wife_material2);
 auto shader = wife_material2->getShader();
 
 auto my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
-auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
+auto tex = Resource::loadOnly<Texture2D>("Resource/Image/wife.jpg");
 wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 ```
 
 - Load A Model
 
 ```cpp
-auto model = ResourceManager::loadAndSave<Model>("Model/szb.fbx");
+auto model = ResourceManager::loadAndSave<Model>("Resource/Model/szb.fbx");
 auto go_gundum_szb = model->generate();
 go_gundum_szb->getTransform()->setPosition(157.74f, 106.560f, 150.780f);
 go_gundum_szb->getTransform()->setRotation(-90.0f, 0.0f, 0.0f);
 go_gundum_szb->getTransform()->setScale(10.0f, 10.0f, 10.0f);
 
-model = ResourceManager::loadAndSave<Model>("Model/209790.fbx");
+model = ResourceManager::loadAndSave<Model>("Resource/Model/209790.fbx");
 auto go_dasd = model->generate();
 go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
 go_dasd->getTransform()->setRotation(0.0f, -90.0f, 0.0f);
@@ -424,7 +429,7 @@ if (flag == FlagCreate::Succeeded)
 //---------------------------------------
 
 //create a texture with image and not save in manager
-auto image = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
+auto image = Resource::loadOnly<Image>("Resource/Image/blocky_photo_studio_2k.hdr");
 texture = Texture2D::create("MyImage");
 //remember call saveObject to save this object
 texture->saveObject();
@@ -441,10 +446,10 @@ Attention! The .exe file must be in the same directory as the resource folder
 1. Inherit and implement the `MyEngineIniter` class
 
     ```cpp
-    class MyEngineIniter : public EngineIniter
+    class EditorEngineIniter : public EngineIniter
     {
     public:
-        MyEngineIniter();
+        EditorEngineIniter();
 
         void prepareEngine(Engine* engine) override;
         void prepareResource(Engine* engine) override;
@@ -452,19 +457,19 @@ Attention! The .exe file must be in the same directory as the resource folder
         void initYourShaderParam() override;
     };
     ```
+
     `prepareEngine`,`prepareResource`,`prepareGame`are invoked in this order
 
 2. Set your **ResourceFolder Name, ProgramName, ScreenSize**
 
     ```cpp
-    void MyEngineIniter::prepareEngine(Engine* engine)
+    void EditorEngineIniter::prepareEngine(Engine* engine)
     {
         EngineIniter::prepareEngine(engine);
         MyEvent::get()->init(MyEventID::Count);
 
         //engine->setEnableMultiThread();
 
-        mResourceFolderName = "Resource";
         mGameName = u8"V0.2(没有黄金树之影玩我要死了)";
         mWindowWidth = 1920;
         mWindowHeight = 1080;
@@ -476,27 +481,22 @@ Attention! The .exe file must be in the same directory as the resource folder
 3. Load resource files
 
     ```cpp
-    void MyEngineIniter::prepareResource(Engine* engine)
+    void EditorEngineIniter::prepareResource(Engine* engine)
     {
         EngineIniter::prepareResource(engine);
-        //设置图片文件夹名称自动加载所有图片文件
-        //注意,不同文件夹下面的图片文件也不能重名
-        //Set ImageFolder to auto load all images
-        //Note that the image files under different folders also must not have the same name
-        TextureMgr::loadResource("/Image");
     }
     ```
 
 4. Prepare Scene
 
     ```cpp
-    void MyEngineIniter::prepareGame(Engine* engine)
+    void EditorEngineIniter::prepareGame(Engine* engine)
     {
         EngineIniter::prepareGame(engine);
-        ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
+        ShaderManager::loadShaderFiles("Resource/Shaders/Tutorial");
 
         MyMainScene::create("MainScene")->prepare();
-        Tutorial01::create("Tutorial01")->prepare();
+        SceneHelper::prepareTutorialScene();
     }
     ```
 
@@ -561,8 +561,8 @@ auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
 auto index_specular = shader->getUniformIndex("myTexSpecular2D");
 auto index_shininess = shader->getUniformIndex("myShininess");
 
-auto tex_diff = Resource::loadOnly<Texture2D>("Image/stone_wall_diff.jpg");
-auto tex_spec = Resource::loadOnly<Texture2D>("Image/stone_wall_ao.jpg");
+auto tex_diff = Resource::loadOnly<Texture2D>("Resource/Image/stone_wall_diff.jpg");
+auto tex_spec = Resource::loadOnly<Texture2D>("Resource/Image/stone_wall_ao.jpg");
 
 //set value by using uniform index
 plane_material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
@@ -579,13 +579,14 @@ ShaderBuilder now combine header files to automatically generate a shader file
 ```cpp
 void EngineIniter::prepareResource(Engine* engine)
 {
-    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
-    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
-    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
+    ShaderManager::loadShaderFiles("Resource/Shaders/Standard");
+    ShaderManager::loadShaderFiles("Resource/Shaders/Unlit");
+    ShaderManager::loadShaderFiles("Resource/Shaders/Utility");
 
     this->createSomeMode();
 }
 ```
+
 You can create generic header files in the `Include` folder to avoid duplicating each shader file
 
 Header files support repetitive inclusion

@@ -42,13 +42,13 @@ namespace tezcat::Tiny
 
 	void EngineIniter::prepareResource(Engine* engine)
 	{
-		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
-		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
-		ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
+		ShaderManager::loadShaderFiles("Resource/Shaders/Standard");
+		ShaderManager::loadShaderFiles("Resource/Shaders/Unlit");
+		ShaderManager::loadShaderFiles("Resource/Shaders/Utility");
 
-		ResourceManager::loadDefault<Image>("Image/Tiny/TinyDiffuse.png");
-		ResourceManager::loadDefault<Image>("Image/Tiny/TinyShininess.png");
-		ResourceManager::loadDefault<Image>("Image/Tiny/TinySpecular.png");
+		ResourceManager::loadDefault<Image>("Resource/Image/Tiny/TinyDiffuse.png");
+		ResourceManager::loadDefault<Image>("Resource/Image/Tiny/TinyShininess.png");
+		ResourceManager::loadDefault<Image>("Resource/Image/Tiny/TinySpecular.png");
 
 		this->createBuildinModules();
 	}

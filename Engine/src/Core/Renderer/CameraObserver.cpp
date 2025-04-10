@@ -27,6 +27,7 @@ namespace tezcat::Tiny
 {
 	TINY_OBJECT_CPP(CameraObserver, RenderObserver);
 	CameraObserver::CameraObserver()
+		: mCameraUID(-1)
 	{
 		this->createUniformBuffer();
 
@@ -72,20 +73,6 @@ namespace tezcat::Tiny
 
 	void CameraObserver::submit(Shader* shader)
 	{
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixP, mProjectionMatrix);
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixV, mViewMatrix);
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixVP, VP);
-		//Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixMV, glm::value_ptr(glm::mat4(glm::mat3(mViewMatrix))));
-
-		//Graphics::getInstance()->setFloat3(shader, ShaderParam::CameraWorldPosition, mTransform->getWorldPosition());
-		//Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
-
-// 		mUniformBuffer->update<float4x4>(1, glm::value_ptr(mViewMatrix));
-// 		mUniformBuffer->update<float4x4>(2, glm::value_ptr(VP));
-// 		mUniformBuffer->update<float3>  (3, glm::value_ptr(mTransform->getWorldPosition()));
-// 		mUniformBuffer->update<float2>  (4, glm::value_ptr(float2(mNearFace, mFarFace)));
-
-
 		if (mUniformBuffer)
 		{
 			Graphics::getInstance()->setUniformBuffer(mUniformBuffer);

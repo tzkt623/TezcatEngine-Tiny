@@ -24,7 +24,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(MeshRenderer, ComponentT<MeshRenderer>)
+	TINY_OBJECT_CPP(MeshRenderer, ComponentAutoID<MeshRenderer>)
 
 	MeshRenderer::MeshRenderer()
 		: mRenderAgent(nullptr)
@@ -40,10 +40,12 @@ namespace tezcat::Tiny
 
 	void MeshRenderer::onEnable()
 	{
-		if (auto transform = mGameObject->getComponent<Transform>())
+		if (auto transform = mGameObject->getTransform())
 		{
 			mRenderAgent->setTransform(transform);
 		}
+
+		mRenderAgent->setLayer(this->getGameObject());
 	}
 
 	void MeshRenderer::onDisable()
@@ -53,7 +55,7 @@ namespace tezcat::Tiny
 
 	void MeshRenderer::onStart()
 	{
-		RenderObjectCache::addRenderAgent(this->getGameObject()->getLayerIndex(), mRenderAgent);
+		RenderObjectCache::addRenderAgent(this->getGameObject()->getLayerID(), mRenderAgent);
 	}
 
 	void MeshRenderer::onComponentAdded(Component* component)

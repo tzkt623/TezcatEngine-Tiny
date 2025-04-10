@@ -16,19 +16,22 @@
 
 ## **引擎二周目进行中**
 
+![Image](https://github.com/user-attachments/assets/bfecae67-9533-4ffa-8bc8-179ffbba2b2b)
+
 ![logo1](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/1faf72c8-36e8-4bb3-9e40-2b87a0656dfc)
 
 ![logo2](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/0a9e3960-eae2-4ea7-8d4c-149b9a3a0ef4)
 
 <img width="1280" alt="屏幕截图 2024-06-03 144114" src="https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/52484691-2753-4d82-8995-cba8439866ff">
 
-![Image](https://github.com/user-attachments/assets/f4bf38de-ef11-4aaf-92c9-e97182f81fca)
-
 -------------------------------------------------
 
 ## **Update**
 
 - [ ] 正在添加一个引擎内部的名称系统
+- [x] 添加管线查看器
+- [x] 分离了编辑器相机和游戏相机
+- [x] 重写了资源加载方式,不再默认保存资源文件夹,需要输入全路径
 - [x] 现在可以拖拽模型到总览中进行加载了
 - [x] 现在可以拖拽图片到材质中进行替换
 - [x] 现在可以选中场景中的单位,总览会进行自动选择
@@ -41,9 +44,7 @@
 
 ## **Issue**
 
-- [ ] 模型加载并不完善,会有加载失败的模型存在
 - [ ] PBR效果被我改坏了
-- [ ] 正在重构资源加载和管理方式
 - [ ] Shader编辑器有点问题
 - [ ] 暂时取消多线程模式
 
@@ -208,6 +209,10 @@ mPass->addToPipeline();
 
 查看当前的帧缓存信息
 
+### 管线查看器(Pipeline Viewer)
+
+查看当前的管线的渲染信息
+
 ## **内存管理(Memory Management)**
 
 做了一套简单的基于引用计数的内存管理,还在调试中......
@@ -352,20 +357,20 @@ mr2->setMaterial(wife_material2);
 auto shader = wife_material2->getShader();
 
 auto my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
-auto tex = Resource::loadOnly<Texture2D>("Image/wife.jpg");
+auto tex = Resource::loadOnly<Texture2D>("Resource/Image/wife.jpg");
 wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 ```
 
 - 加载模型
 
 ```cpp
-auto model = ResourceManager::loadAndSave<Model>("Model/szb.fbx");
+auto model = ResourceManager::loadAndSave<Model>("Resource/Model/szb.fbx");
 auto go_gundum_szb = model->generate();
 go_gundum_szb->getTransform()->setPosition(157.74f, 106.560f, 150.780f);
 go_gundum_szb->getTransform()->setRotation(-90.0f, 0.0f, 0.0f);
 go_gundum_szb->getTransform()->setScale(10.0f, 10.0f, 10.0f);
 
-model = ResourceManager::loadAndSave<Model>("Model/209790.fbx");
+model = ResourceManager::loadAndSave<Model>("Resource/Model/209790.fbx");
 auto go_dasd = model->generate();
 go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
 go_dasd->getTransform()->setRotation(0.0f, -90.0f, 0.0f);
@@ -424,7 +429,7 @@ if (flag == FlagCreate::Succeeded)
 //---------------------------------------
 
 //create a texture with image and not save in manager
-auto image = Resource::loadOnly<Image>("Image/blocky_photo_studio_2k.hdr");
+auto image = Resource::loadOnly<Image>("Resource/Image/blocky_photo_studio_2k.hdr");
 texture = Texture2D::create("MyImage");
 //remember call saveObject to save this object
 texture->saveObject();
@@ -442,7 +447,7 @@ texture->generate();
 1. 继承并实现`MyEngineIniter`类
 
     ```cpp
-    class MyEngineIniter : public EngineIniter
+    class EditorEngineIniter : public EngineIniter
     {
     public:
         MyEngineIniter();
@@ -459,14 +464,13 @@ texture->generate();
 2. 设置自己的资源文件夹名称,程序名称,屏幕大小
 
     ```cpp
-    void MyEngineIniter::prepareEngine(Engine* engine)
+    void EditorEngineIniter::prepareEngine(Engine* engine)
     {
         EngineIniter::prepareEngine(engine);
         MyEvent::get()->init(MyEventID::Count);
 
         //engine->setEnableMultiThread();
 
-        mResourceFolderName = "Resource";
         mGameName = u8"V0.2(没有黄金树之影玩我要死了)";
         mWindowWidth = 1920;
         mWindowHeight = 1080;
@@ -478,27 +482,22 @@ texture->generate();
 3. 加载资源文件
 
     ```cpp
-    void MyEngineIniter::prepareResource(Engine* engine)
+    void EditorEngineIniter::prepareResource(Engine* engine)
     {
         EngineIniter::prepareResource(engine);
-        //设置图片文件夹名称自动加载所有图片文件
-        //注意,不同文件夹下面的图片文件也不能重名
-        //Set ImageFolder to auto load all images
-        //Note that the image files under different folders also must not have the same name
-        TextureMgr::loadResource("/Image");
     }
     ```
 
 4. 准备场景
 
     ```cpp
-    void MyEngineIniter::prepareGame(Engine* engine)
+    void EditorEngineIniter::prepareGame(Engine* engine)
     {
         EngineIniter::prepareGame(engine);
-        ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Tutorial");
+        ShaderManager::loadShaderFiles("Resource/Shaders/Tutorial");
 
         MyMainScene::create("MainScene")->prepare();
-        Tutorial01::create("Tutorial01")->prepare();
+        SceneHelper::prepareTutorialScene();
     }
     ```
 
@@ -564,8 +563,8 @@ auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
 auto index_specular = shader->getUniformIndex("myTexSpecular2D");
 auto index_shininess = shader->getUniformIndex("myShininess");
 
-auto tex_diff = Resource::loadOnly<Texture2D>("Image/stone_wall_diff.jpg");
-auto tex_spec = Resource::loadOnly<Texture2D>("Image/stone_wall_ao.jpg");
+auto tex_diff = Resource::loadOnly<Texture2D>("Resource/Image/stone_wall_diff.jpg");
+auto tex_spec = Resource::loadOnly<Texture2D>("Resource/Image/stone_wall_ao.jpg");
 
 //set value by using uniform index
 plane_material->setUniform<UniformTex2D>(index_diffuse, tex_diff);
@@ -582,9 +581,9 @@ plane_material->setUniform<UniformF1>(index_shininess, 64.0f);
 ```cpp
 void EngineIniter::prepareResource(Engine* engine)
 {
-    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Standard");
-    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Unlit");
-    ShaderManager::loadShaderFiles(FileTool::getRootRelativeResDir() + "/Shaders/Utility");
+    ShaderManager::loadShaderFiles("Resource/Shaders/Standard");
+    ShaderManager::loadShaderFiles("Resource/Shaders/Unlit");
+    ShaderManager::loadShaderFiles("Resource/Shaders/Utility");
 
     this->createSomeMode();
 }

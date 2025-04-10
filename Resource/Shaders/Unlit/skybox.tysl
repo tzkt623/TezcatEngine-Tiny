@@ -9,7 +9,7 @@
     #TINY_CFG_BEGIN
     {
         int Version = 330;
-        int OrderID = 50;
+        int OrderID = 0;
         str Queue = Background;
         str DepthTest = LessEqual;
         bool ZWrite = false;

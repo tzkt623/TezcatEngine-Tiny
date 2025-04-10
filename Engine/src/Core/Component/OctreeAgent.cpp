@@ -21,7 +21,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(OctreeAgent, ComponentT<OctreeAgent>)
+	TINY_OBJECT_CPP(OctreeAgent, ComponentAutoID<OctreeAgent>)
 	OctreeAgent::OctreeAgent()
 	{
 

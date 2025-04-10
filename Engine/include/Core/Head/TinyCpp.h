@@ -20,6 +20,9 @@
 
 namespace tezcat::Tiny
 {
+	using TinyUID = int32_t;
+	using TinyUUID = uint32_t;
+
 	namespace v2
 	{
 		class TINY_API TinyBaseRef

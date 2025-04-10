@@ -46,7 +46,6 @@ namespace tezcat::Tiny::GL
 		void clear(const ClearOption& option) override;
 		void setPassState(Shader* shader) override;
 		void bind(Shader* shader) override;
-		void bind(FrameBuffer* frameBuffer) override;
 		void bind(UniformBuffer* uniformBuffer) override;
 		void bind(Texture2D* texture) override;
 		void readPixel(int32_t x, int32_t y) override;
@@ -55,6 +54,9 @@ namespace tezcat::Tiny::GL
 		void draw(Vertex* vertex) override;
 		void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f)) override;
 		void drawLine(Vertex* vertex, const uint32_t& needCount);
+
+	protected:
+		void bindImpl(FrameBuffer* frameBuffer) override;
 
 	public:
 		virtual void createVertex(Vertex* vertex) override;
@@ -67,10 +69,6 @@ namespace tezcat::Tiny::GL
 		void createTexture(TextureCube* texCube) override;
 		void createTexture(TextureRender2D* render2D) override;
 		virtual void createMipmapTexCube(TextureCube* texCube, int32_t minLevel, int32_t maxLevel) override;
-
-	public:
-		virtual void setClearColor(float r, float g, float b, float a) override;
-
 
 	public:
 		virtual void deleteVertex(const uint32_t& id) override;
@@ -88,12 +86,14 @@ namespace tezcat::Tiny::GL
 			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, Texture2D* texHDR
-			, TextureCube* skybox) override;
+			, TextureCube* skybox
+			, std::array<int32_t, 2> viewSize) override;
 		virtual void makeEnvIrradiance(Shader* shader
 			, BaseRenderObserver* observer
 			, Vertex* vertex
 			, TextureCube* skybox
-			, TextureCube* irradiance) override;
+			, TextureCube* irradiance
+			, std::array<int32_t, 2> viewSize) override;
 		virtual void makeEnvPrefilter(Shader* shader
 			, BaseRenderObserver* observer
 			, Vertex* vertex

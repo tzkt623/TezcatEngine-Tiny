@@ -62,12 +62,8 @@ namespace tezcat::Tiny
 			[](const EventData& evt)
 			{
 				file_path* path = (file_path*)evt.userData;
-				Model* model = Model::create();
-				if (model->load(*path))
-				{
-					model->setPath(*path);
-					model->generate();
-				}
+				Model* model = ResourceManager::loadAndSave<Model>(*path);
+				model->generate();
 			});
 
 		mCameraData = CameraData::create();
@@ -130,9 +126,6 @@ namespace tezcat::Tiny
 		mLogicList.erase(gameObject);
 	}
 
-	/// <summary>
-	/// 退出后这里可能有问题
-	/// </summary>
 	void Scene::update()
 	{
 		//#InitNewObjects
@@ -155,8 +148,7 @@ namespace tezcat::Tiny
 		auto end = mTransformList.end();
 		while (it != end)
 		{
-			auto& child = *it;
-			if (child.lock())
+			if (auto child = (*it).lock())
 			{
 				child->update();
 				it++;
@@ -167,7 +159,10 @@ namespace tezcat::Tiny
 				end = mTransformList.end();
 			}
 		}
+	}
 
+	void Scene::logic()
+	{
 		//#SceneUpdate
 		if (!mLogicList.empty())
 		{
@@ -226,7 +221,7 @@ namespace tezcat::Tiny
 		SceneManager::prepareScene(this);
 	}
 
-	void Scene::addGameObject(GameObject* gameObject)
+	void Scene::addNewGameObject(GameObject* gameObject)
 	{
 		mNewGameObjectList.push_back(gameObject);
 	}
@@ -235,4 +230,5 @@ namespace tezcat::Tiny
 	{
 
 	}
+
 }

@@ -57,51 +57,71 @@ namespace tezcat::Tiny
 		constexpr static uint32_t ID = 3;
 	};
 
+#define true_path true_path
+
 	class TINY_API ResourceManager
 	{
 		ResourceManager() = delete;
 		~ResourceManager() = delete;
+
+		enum class PathType : int8_t
+		{
+			Relative,
+			Absolute
+		};
+
 	public:
-		static void init(const std::string& folderPath);
+		static void init();
 		static const std::string& getEngineDir() { return sEngineDir; }
 		static const std::string& getResDir() { return sResDir; }
 
 		static const std::string& getRelativeEngineDir() { return sRelativeEngineDir; }
 		static const std::string& getRelativeResDir() { return sRelativeResDir; }
 
+		static file_path clearPath(const file_path& path)
+		{
+			//说明是加载
+			//if (path.is_relative())
+			//{
+			//	return file_sys_helper::generic(sRelativeResDir / path);
+			//}
+
+			return file_sys_helper::generic(path);
+		}
+
 		template<class Data>
-		static Data* loadAndSave(const file_path& relativePath)
+		static Data* loadAndSave(const file_path& path)
 		{
 			TINY_THROW_LOGIC("");
 			return nullptr;
 		}
 
 		template<class Data>
-		static Data* loadOnly(const file_path& relativePath)
+		static Data* loadOnly(const file_path& path)
 		{
 			TINY_THROW_LOGIC("");
 			return nullptr;
 		}
+
+		static void loadMetaFile(const file_path& path);
 
 		template<>
-		static Texture2D* loadAndSave<>(const file_path& relativePath)
+		static Texture2D* loadAndSave<>(const file_path& path)
 		{
-			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+			auto true_path = clearPath(path);
 
-			auto it = mTexture2DUMap.find(generic_relative_path);
+			auto it = mTexture2DUMap.find(true_path);
 			if (it == mTexture2DUMap.end())
 			{
-				auto image = loadAndSave<Image>(generic_relative_path);
+				auto image = loadAndSaveImageHelper(true_path);
 				if (image)
 				{
-					file_path file_path(sRelativeResDir / generic_relative_path);
-
-					Texture2D* t2d = Texture2D::create(file_path.filename().string());
+					Texture2D* t2d = Texture2D::create(true_path.filename().string());
 					t2d->setImage(image);
 					t2d->generate();
 					t2d->saveObject();
 
-					mTexture2DUMap.emplace(generic_relative_path, t2d);
+					mTexture2DUMap.emplace(true_path, t2d);
 					return t2d;
 				}
 
@@ -114,15 +134,13 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Texture2D* loadOnly<>(const file_path& relativePath)
+		static Texture2D* loadOnly<>(const file_path& path)
 		{
-			file_path generic_relative_path = file_sys_helper::generic(relativePath);
-
-			file_path file_path(sRelativeResDir / generic_relative_path);
+			auto true_path = clearPath(path);
 			Image* img = Image::create();
-			if (img->openFile(file_path.string(), true))
+			if (img->openFile(true_path, true))
 			{
-				Texture2D* t2d = Texture2D::create(generic_relative_path.filename().string());
+				Texture2D* t2d = Texture2D::create(true_path.filename().string());
 				t2d->setImage(img);
 				t2d->generate();
 				return t2d;
@@ -150,16 +168,18 @@ namespace tezcat::Tiny
 		//	return shader;
 		//}
 
-		template<>
-		static Image* loadAndSave<>(const file_path& relativePath)
-		{
-			file_path generic_relative_path = file_sys_helper::generic(relativePath);
 
-			auto result = mImageMap.try_emplace(generic_relative_path, nullptr);
+
+		template<>
+		static Image* loadAndSave<>(const file_path& path)
+		{
+			auto true_path = clearPath(path);
+
+			auto result = mImageMap.try_emplace(true_path, nullptr);
 			if (result.second)
 			{
 				Image* image = Image::create();
-				if (image->openFile(sRelativeResDir / generic_relative_path, true))
+				if (image->openFile(true_path, true))
 				{
 					image->saveObject();
 					result.first->second = image;
@@ -175,12 +195,12 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Image* loadOnly<>(const file_path& relativePath)
+		static Image* loadOnly<>(const file_path& path)
 		{
-			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+			auto true_path = clearPath(path);
 
 			Image* image = Image::create();
-			if (image->openFile(sRelativeResDir / generic_relative_path, true))
+			if (image->openFile(true_path, true))
 			{
 				return image;
 			}
@@ -190,15 +210,15 @@ namespace tezcat::Tiny
 
 
 		template<>
-		static Model* loadAndSave<>(const file_path& relativePath)
+		static Model* loadAndSave<>(const file_path& path)
 		{
-			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+			auto true_path = clearPath(path);
 
-			auto result = mModelMap.try_emplace(generic_relative_path, nullptr);
+			auto result = mModelMap.try_emplace(true_path, nullptr);
 			if (result.second)
 			{
 				Model* model = Model::create();
-				model->load(sRelativeResDir / generic_relative_path);
+				model->load(true_path);
 				model->saveObject();
 				model->setPath(result.first->first);
 				result.first->second = model;
@@ -208,12 +228,12 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Model* loadOnly<>(const file_path& relativePath)
+		static Model* loadOnly<>(const file_path& path)
 		{
-			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+			auto true_path = clearPath(path);
 
 			Model* model = Model::create();
-			model->load(sRelativeResDir / generic_relative_path);
+			model->load(true_path);
 			return model;
 		}
 
@@ -224,15 +244,15 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Image* loadDefault<Image>(const file_path& relativePath)
+		static Image* loadDefault<Image>(const file_path& path)
 		{
-			file_path generic_relative_path = file_sys_helper::generic(relativePath);
+			auto true_path = clearPath(path);
 
-			auto result = mTinyImageMap.try_emplace(generic_relative_path, nullptr);
+			auto result = mTinyImageMap.try_emplace(true_path, nullptr);
 			if (result.second)
 			{
 				Image* image = Image::create();
-				if (image->openFile(sRelativeResDir / generic_relative_path, true))
+				if (image->openFile(true_path, true))
 				{
 					image->saveObject();
 					result.first->second = image;
@@ -244,9 +264,9 @@ namespace tezcat::Tiny
 		}
 
 		template<>
-		static Texture2D* loadDefault<Texture2D>(const file_path& relativePath)
+		static Texture2D* loadDefault<Texture2D>(const file_path& path)
 		{
-			return loadAndSave<Texture2D>(relativePath);
+			return loadAndSave<Texture2D>(path);
 		}
 
 #pragma region Unload
@@ -333,6 +353,27 @@ namespace tezcat::Tiny
 			}
 		}
 
+		static Image* loadAndSaveImageHelper(const file_path& path)
+		{
+			auto result = mImageMap.try_emplace(path, nullptr);
+			if (result.second)
+			{
+				Image* image = Image::create();
+				if (image->openFile(path, true))
+				{
+					image->saveObject();
+					result.first->second = image;
+					return image;
+				}
+				else
+				{
+					return nullptr;
+				}
+			}
+
+			return result.first->second;
+		}
+
 #pragma endregion
 
 	private:
@@ -352,5 +393,8 @@ namespace tezcat::Tiny
 
 		static std::string sRelativeEngineDir;
 		static std::string sRelativeResDir;
+
+	private:
+		static std::unordered_map<std::string, std::function<void(std::string&)>> mMetaLoadMap;
 	};
 }

@@ -59,7 +59,7 @@ namespace tezcat::Tiny
 			std::sort(mShaders.begin(), mShaders.end(),
 				[](Shader* a, Shader* b)
 				{
-					return a->getOrderID() < b->getOrderID();
+					return a->getSortingOffset() < b->getSortingOffset();
 				});
 		}
 	}

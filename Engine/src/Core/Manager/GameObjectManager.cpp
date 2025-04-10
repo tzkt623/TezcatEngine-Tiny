@@ -19,8 +19,10 @@
 #include "Core/Manager/FrameBufferManager.h"
 #include "Core/Manager/TextureManager.h"
 #include "Core/Manager/ShaderManager.h"
+#include "Core/Manager/CameraManager.h"
 
 #include "Core/Component/GameObject.h"
+#include "Core/Component/Camera.h"
 
 #include "Core/Renderer/Texture.h"
 #include "Core/Renderer/FrameBuffer.h"
@@ -82,17 +84,25 @@ namespace tezcat::Tiny
 
 	void GameObjectManager::preRender()
 	{
+		if (!CameraManager::isDataValied())
+		{
+			return;
+		}
+
 		if (mPass == nullptr)
 		{
-			if (mObserver)
+			if (CameraManager::isDataValied())
 			{
 				if (mFrameBuffer == nullptr)
 				{
 					createFrameBuffer();
 				}
 
-				createPass();
-				mPass->addToPipeline();
+				if (mObserver)
+				{
+					createPass(mObserver);
+					mPass->addToPipeline();
+				}
 			}
 		}
 	}
@@ -104,27 +114,23 @@ namespace tezcat::Tiny
 
 	void GameObjectManager::exitScene()
 	{
-		if (mPass)
-		{
-			mPass->removeFromPipeline();
-			mPass->deleteObject();
-		}
-
-		mPass = nullptr;
-		mObserver = nullptr;
+		//if (mPass)
+		//{
+		//	mPass->removeFromPipeline();
+		//	mPass->deleteObject();
+		//}
+		//
+		//mPass = nullptr;
+		//mObserver = nullptr;
 	}
 
 	void GameObjectManager::setIDObserver(RenderObserver* observer)
 	{
-		if (observer == nullptr)
-		{
-			return;
-		}
-
-		if (mObserver != observer)
+ 		if (mObserver != observer)
 		{
 			if (mPass)
 			{
+				mPass->removeFromPipeline();
 				mPass->deleteObject();
 			}
 
@@ -133,16 +139,16 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void GameObjectManager::createPass()
+	void GameObjectManager::createPass(BaseRenderObserver* observer)
 	{
-		mPass = ReplacedPipelinePass::create(mObserver, ShaderManager::find("Unlit/ObjectID"));
+		mPass = ReplacedPipelinePass::create(observer, ShaderManager::find("Unlit/ObjectID"));
 		mPass->setFrameBuffer(mFrameBuffer);
 		mPass->setAutoCulling([](BaseMeshRenderer* renderer)
 			{
 				return new RenderCMD_DrawID(renderer->getVertex()
 					, renderer->getTransform());
 			});
-		mPass->setOrderID(1);
+		mPass->setUserSortingID(1);
 		mPass->saveObject();
 	}
 

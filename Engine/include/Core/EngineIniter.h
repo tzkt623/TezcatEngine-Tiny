@@ -70,11 +70,6 @@ namespace tezcat::Tiny
 			return name;
 		}
 
-		const std::string& getResourceFolderName() const
-		{
-			return mResourceFolderName;
-		}
-
 	private:
 		void createBuildinModules();
 		void createCube();
@@ -91,7 +86,6 @@ namespace tezcat::Tiny
 		int mWindowHeight;
 
 		std::u8string mGameName;
-		std::string mResourceFolderName;
 
 		bool mEnableVsync;
 

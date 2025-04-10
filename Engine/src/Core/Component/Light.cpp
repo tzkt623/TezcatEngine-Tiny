@@ -46,7 +46,7 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->setFloat3(shader, ShaderParam::LightDirection::Specular, glm::value_ptr(mSpecular));
 	}
 
-	void DirectionalLightAgent::makeRenderCommand(BaseRenderObserver* renderObserver)
+	void DirectionalLightAgent::makeRenderCommand(PipelineQueue* queue)
 	{
 		throw std::logic_error("The method or operation is not implemented.");
 	}
@@ -56,7 +56,7 @@ namespace tezcat::Tiny
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	TINY_OBJECT_CPP(LightComponent, ComponentT<LightComponent>);
+	TINY_OBJECT_CPP(LightComponent, ComponentAutoID<LightComponent>);
 
 		//------------------------------------------------------------------------
 	TINY_OBJECT_CPP(DirectionalLight, LightComponent);

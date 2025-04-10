@@ -44,7 +44,7 @@ namespace tezcat::Tiny
 	void GameObject::init()
 	{
 		mUID = GameObjectManager::addGameObject(this);
-		SceneManager::getCurrentScene()->addGameObject(this);
+		SceneManager::getCurrentScene()->addNewGameObject(this);
 	}
 
 	GameObject::~GameObject()
@@ -126,6 +126,11 @@ namespace tezcat::Tiny
 		mComponentList[id] = component;
 		component->saveObject();
 		component->onEnable();
+
+		if (mScene)
+		{
+			component->onStart();
+		}
 	}
 
 	void GameObject::onClose()
@@ -156,7 +161,7 @@ namespace tezcat::Tiny
 
 	void GameObject::removeComponent(Component* com)
 	{
-		for (uint32_t i = 0; i < mComponentList.size(); i++)
+		for (auto i = 0; i < mComponentList.size(); i++)
 		{		
 			if (auto ptr = mComponentList[i])
 			{

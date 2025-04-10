@@ -55,7 +55,7 @@ namespace tezcat::Tiny
 		virtual void submit(Shader* shader) override;
 
 
-		void makeRenderCommand(BaseRenderObserver* renderObserver) override;
+		void makeRenderCommand(PipelineQueue* queue) override;
 		void makeRenderCommand(ReplacedPipelinePass* pass) override;
 
 	private:
@@ -70,9 +70,9 @@ namespace tezcat::Tiny
 #pragma region Component
 
 
-	class TINY_API LightComponent : public ComponentT<LightComponent>
+	class TINY_API LightComponent : public ComponentAutoID<LightComponent>
 	{
-		TINY_ABSTRACT_OBJECT_H(LightComponent, ComponentT<LightComponent>);
+		TINY_ABSTRACT_OBJECT_H(LightComponent, ComponentAutoID<LightComponent>);
 
 	protected:
 		LightComponent() = default;

@@ -46,7 +46,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -169,8 +169,11 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Manager\ObserverManager.cpp" />
+    <ClCompile Include="src\Core\Manager\PipelineManager.cpp" />
     <ClCompile Include="src\Core\Component\ModeAgent.cpp" />
     <ClCompile Include="src\Core\Manager\GameObjectManager.cpp" />
+    <ClCompile Include="src\Core\Renderer\PipelineWorker.cpp" />
     <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
     <ClCompile Include="src\Core\Shader\ShaderParser.cpp" />
     <ClCompile Include="src\Core\Base\TinyGC.cpp" />
@@ -253,8 +256,10 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Base\TinyGCInfo.h" />
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="include\Core\Component\ShadowCaster.h" />
+    <ClInclude Include="include\Core\Data\MetaData.h" />
     <ClInclude Include="include\Core\Head\FlagConfig.h" />
     <ClInclude Include="include\Core\Manager\GameObjectManager.h" />
+    <ClInclude Include="include\Core\Manager\ObserverManager.h" />
     <ClInclude Include="include\Core\Manager\ResourceManager.h" />
     <ClInclude Include="include\Core\Data\Text.h" />
     <ClInclude Include="include\Core\Debug\Debug.h" />
@@ -264,12 +269,13 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Component\Camera.h" />
     <ClInclude Include="include\Core\Component\FlyController.h" />
     <ClInclude Include="include\Core\Head\ConfigHead.h" />
+    <ClInclude Include="include\Core\Renderer\PipelineWorker.h" />
     <ClInclude Include="include\Core\Renderer\RenderConfig.h" />
     <ClInclude Include="include\Core\LightLayer.h" />
     <ClInclude Include="include\Core\Manager\ModelManager.h" />
     <ClInclude Include="include\Core\Manager\ShadowCasterManager.h" />
     <ClInclude Include="include\Core\Manager\LightingManager.h" />
-    <ClInclude Include="include\Core\Manager\UniformBufferManager.h" />
+    <ClInclude Include="include\Core\Manager\PipelineManager.h" />
     <ClInclude Include="include\Core\Renderer\CameraObserver.h" />
     <ClInclude Include="include\Core\Renderer\GraphicsAgent.h" />
     <ClInclude Include="include\Core\Renderer\MeshRenderAgent.h" />

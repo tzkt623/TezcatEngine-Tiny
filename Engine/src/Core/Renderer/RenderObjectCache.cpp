@@ -19,6 +19,7 @@
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/RenderObserver.h"
 #include "Core/Renderer/Renderer.h"
+#include "Core/Renderer/CameraObserver.h"
 
 #include "Core/Event/EngineEvent.h"
 
@@ -81,7 +82,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void RenderObjectCache::culling(int layerIndex, BaseRenderObserver* renderObserver)
+	void RenderObjectCache::culling(int layerIndex, BaseRenderObserver* observer)
 	{
 		auto& render_object_list = sLayerAry[layerIndex]->mRenderObjectList;
 		if (render_object_list.empty())
@@ -89,13 +90,15 @@ namespace tezcat::Tiny
 			return;
 		}
 
+		auto queue = observer->getPipelineQueue();
+
 		auto it = render_object_list.begin();
 		auto end = render_object_list.end();
 		while (it != end)
 		{
 			if (auto renderer = it->lock())
 			{
-				renderer->makeRenderCommand(renderObserver);
+				renderer->makeRenderCommand(queue);
 				it++;
 			}
 			else

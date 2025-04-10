@@ -27,7 +27,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(Transform, ComponentT<Transform>)
+	TINY_OBJECT_CPP_TEMPLATE(Transform, ComponentCustomID, Transform, 0)
 
 	static float4x4 WORLD_MATRIX(1.0f);
 	const float3 Transform::XAxis(1.0f, 0.0f, 0.0f);
@@ -380,12 +380,14 @@ namespace tezcat::Tiny
 
 	void Transform::inverseTransformRotation(const float3& world, float3& local)
 	{
-		float3x3 temp_mat;
-		this->calculatePureLocalToWorldRotationMatrix(temp_mat);
-		glm::quat quat_parent_world_rotation(temp_mat);
-		glm::quat quat_child_world_rotation(glm::radians(world));
+		local = glm::inverse(mModelMatrix) * float4(world, 1.0f);
 
-		local = glm::degrees(glm::eulerAngles(glm::inverse(quat_parent_world_rotation) * quat_child_world_rotation));
+		//float3x3 temp_mat;
+		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
+		//glm::quat quat_parent_world_rotation(temp_mat);
+		//glm::quat quat_child_world_rotation(glm::radians(world));
+		//
+		//local = glm::degrees(glm::eulerAngles(glm::inverse(quat_parent_world_rotation) * quat_child_world_rotation));
 	}
 
 	void Transform::inverseTransformDirection(const float3& world, float3& local)

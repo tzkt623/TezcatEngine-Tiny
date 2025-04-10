@@ -26,11 +26,10 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(Camera, ComponentT<Camera>)
+	TINY_OBJECT_CPP(Camera, ComponentAutoID<Camera>)
 
 	Camera::Camera(bool mainCamera)
 		: mCameraAgent(CameraObserver::create())
-		, mIsMain(mainCamera)
 	{
 		mCameraAgent->saveObject();
 	}
@@ -43,7 +42,7 @@ namespace tezcat::Tiny
 
 	Camera::~Camera()
 	{
-		mCameraAgent->deleteObject();
+
 	}
 
 	void Camera::onStart()
@@ -58,19 +57,33 @@ namespace tezcat::Tiny
 
 	void Camera::onDisable()
 	{
-
+		CameraManager::removeCamera(this);
 	}
 
 	void Camera::setMain()
 	{
-		mIsMain = true;
-		GameObjectManager::setIDObserver(mCameraAgent);
+		//GameObjectManager::setIDObserver(mCameraAgent);
 		CameraManager::setMainCamera(this);
 	}
 
 	void Camera::clearMain()
 	{
-		mIsMain = false;
-		GameObjectManager::setIDObserver(nullptr);
+		//GameObjectManager::setIDObserver(nullptr);
+	}
+
+	bool Camera::isMain() const
+	{
+		return CameraManager::isMain(this);
+	}
+
+	void Camera::onClose()
+	{
+		Base::onClose();
+		if (CameraManager::isMain(this))
+		{
+			//GameObjectManager::setIDObserver(nullptr);
+			CameraManager::setMainCamera(nullptr);
+		}
+		mCameraAgent->deleteObject();
 	}
 }

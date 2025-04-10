@@ -15,10 +15,10 @@ namespace tezcat::Tiny
 	class MeshData;
 	class RenderAgent;
 
-	class TINY_API MeshRenderer : public ComponentT<MeshRenderer>
+	class TINY_API MeshRenderer : public ComponentAutoID<MeshRenderer>
 	{
 		MeshRenderer();
-		TINY_OBJECT_H(MeshRenderer, ComponentT<MeshRenderer>)
+		TINY_OBJECT_H(MeshRenderer, ComponentAutoID<MeshRenderer>)
 		TINY_MESH_RENDER_FUNCTION(mRenderAgent)
 
 	public:

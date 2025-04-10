@@ -39,7 +39,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(ShadowCaster, ComponentT<ShadowCaster>);
+	TINY_OBJECT_CPP(ShadowCaster, ComponentAutoID<ShadowCaster>);
 
 	ShadowCaster::ShadowCaster()
 		: mShadowObserver()
@@ -63,7 +63,7 @@ namespace tezcat::Tiny
 		mShadowObserver = ShadowObserver::create();
 		mShadowObserver->saveObject();
 		mShadowObserver->setCullLayer(0);
-		mShadowObserver->setOrderID(-126);
+		mShadowObserver->setSortingID(2);
 
 		mPipePass = ReplacedPipelinePass::create(mShadowObserver
 			, ShaderManager::find("Unlit/ShadowMap"));

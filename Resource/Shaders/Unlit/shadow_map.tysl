@@ -10,7 +10,7 @@
     {
         int Version = 330;
         int OrderID = 0;
-        str Queue = None;
+        str Queue = Prepare;
         str DepthTest = Less;
         bool ZWrite = true;
         str CullFace = Back;

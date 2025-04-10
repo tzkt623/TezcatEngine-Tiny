@@ -17,18 +17,21 @@
 
 
 #include "Core/Manager/CameraManager.h"
+
 #include "Core/Component/GameObject.h"
 #include "Core/Component/MeshRenderer.h"
-#include "Core/Component/Camera.h"
 
 #include "Core/Renderer/RenderObjectCache.h"
 #include "Core/Renderer/BaseGraphics.h"
+#include "Core/Renderer/PipelineWorker.h"
 
 #include "Core/Event/EngineEvent.h"
+#include "Core/Component/FlyController.h"
 
 namespace tezcat::Tiny
 {
 	CameraData* CameraManager::mCurrentData = nullptr;
+	RenderObserver* CameraManager::mEditorObserver = nullptr;
 
 	void CameraManager::addCamera(Camera* camera)
 	{
@@ -58,24 +61,30 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void CameraManager::addRenderObserver(BaseRenderObserver* renderObserver)
-	{
-		mCurrentData->addRenderObserver(renderObserver);
-	}
-
 	CameraManager::CameraManager()
 	{
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_FocusObject, this
 			, [](const EventData& data)
 			{
-				GameObject* go = (GameObject*)data.userData;
-				if (go)
-				{
-					auto camera_pos = mCurrentData->getMainCamera()->getTransform()->getWorldPosition();
-					mCurrentData->getMainCamera()->lookAt(go->getTransform());
-				}
+				//GameObject* go = (GameObject*)data.userData;
+				//if (go)
+				//{
+				//	auto camera_pos = mCurrentData->getMainCamera()->getTransform()->getWorldPosition();
+				//	mCurrentData->getMainCamera()->lookAt(go->getTransform());
+				//}
 			});
 	}
+
+	void CameraManager::removeCamera(Camera* camera)
+	{
+		mCurrentData->removeCamera(camera);
+	}
+
+	bool CameraManager::isMain(const Camera* camera)
+	{
+		return mCurrentData->mMain.get() == camera;
+	}
+
 
 	//--------------------------------------------------------
 	//
@@ -90,19 +99,40 @@ namespace tezcat::Tiny
 
 	}
 
-	Camera* CameraData::getMainCamera()
+	const TinyWeakRef<Camera>& CameraData::getMainCamera()
 	{
 		return mMain;
 	}
 
 	void CameraData::addCamera(Camera* camera)
 	{
-		auto result = mCameraWithName.try_emplace(camera->getGameObject()->getName(), nullptr);
-		if (result.second)
+		auto it = mCameraWithName.find(camera->getGameObject()->getName());
+		if (it != mCameraWithName.end())
 		{
-			result.first->second = camera;
-			this->addRenderObserver(camera->getRenderObserver());
+			throw std::runtime_error(std::format("CameraManager : The same name [{}]", it->first));
 		}
+
+		auto observer = (CameraObserver*)camera->getRenderObserver();
+		if (!mFreeIDs.empty())
+		{
+			observer->mUID = mFreeIDs.front();
+			mFreeIDs.pop();
+		}
+		else
+		{
+			observer->mUID = mRuningArray.size();
+		}
+
+		mRuningArray.push_back(observer);
+		mCameraWithName.emplace(camera->getGameObject()->getName(), camera);
+		mDirty = true;
+	}
+
+	void CameraData::removeCamera(Camera* camera)
+	{
+		 auto uid = camera->getCameraUID();
+		 mFreeIDs.push(uid);
+		 mCameraWithName.erase(camera->getGameObject()->getName());
 	}
 
 	Camera* CameraData::findCamera(const std::string& name)
@@ -118,18 +148,24 @@ namespace tezcat::Tiny
 
 	void CameraData::setMain(Camera* camera)
 	{
-		if (camera == mMain)
+		auto ptr = mMain.lock();
+		if (ptr == camera)
 		{
 			return;
 		}
 
-		if (mMain != nullptr)
+		if (ptr)
 		{
-			mMain->clearMain();
+			ptr->getGameObject()->removeComponent<FlyController>();
 		}
 
-		mMain = camera;
-		EngineEvent::getInstance()->dispatch({ EngineEventID::EE_SetMainCamera, mMain });
+		mMain.reset(camera);
+		if (camera->getGameObject()->getComponent<FlyController>() == nullptr)
+		{
+			camera->getGameObject()->addComponent<FlyController>();
+		}
+
+		EngineEvent::getInstance()->dispatch({ EngineEventID::EE_SetMainCamera, camera });
 	}
 
 	void CameraData::setMain(const std::string& name)
@@ -141,25 +177,25 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void CameraData::addRenderObserver(BaseRenderObserver* observer)
-	{
-		mDirty = true;
-		mObserverArray.push_back(observer);
-	}
-
+	/*
+	* 一个可渲染对象,利用他自己所在layer的ID与自身material中shader的ID
+	* 来创建/获得一个observerpipelinepass,并且生成相应的渲染命令
+	* 此pass在渲染时,需要知道哪个相机进入进行渲染
+	* 需要每帧设置当前相机的信息
+	*/
 	void CameraData::preRender()
 	{
 		if (mDirty)
 		{
 			mDirty = false;
-			std::ranges::sort(mObserverArray, [](TinyWeakRef<BaseRenderObserver>& a, TinyWeakRef<BaseRenderObserver>& b)
+			std::ranges::sort(mRuningArray, [](TinyWeakRef<CameraObserver>& a, TinyWeakRef<CameraObserver>& b)
 			{
-				return a->getOrderID() < b->getOrderID();
+				return a->getSortingID() < b->getSortingID();
 			});
 		}
 
-		auto it = mObserverArray.begin();
-		auto end = mObserverArray.end();
+		auto it = mRuningArray.begin();
+		auto end = mRuningArray.end();
 		while (it != end)
 		{
 			if (auto observer = it->lock())
@@ -172,26 +208,21 @@ namespace tezcat::Tiny
 
 				observer->preRender();
 
-				if (observer->isNeedRemove())
-				{
-					observer->onExitPipeline();
-					it = mObserverArray.erase(it);
-					end = mObserverArray.end();
-					continue;
-				}
-
 				//先剔除
 				for (auto& index : observer->getCullLayerList())
 				{
 					//剔除到对应的渲染通道
 					RenderObjectCache::culling(index, observer);
 				}
+
+				observer->getPipelineQueue()->addToPipeline();
+
 				it++;
 			}
 			else
 			{
-				it = mObserverArray.erase(it);
-				end = mObserverArray.end();
+				it = mRuningArray.erase(it);
+				end = mRuningArray.end();
 			}
 		}
 	}

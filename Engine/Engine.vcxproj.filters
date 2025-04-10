@@ -138,6 +138,9 @@
     <ClCompile Include="src\Core\Renderer\UniformBufferConfig.cpp" />
     <ClCompile Include="src\Core\Component\ModeAgent.cpp" />
     <ClCompile Include="src\Core\Manager\GameObjectManager.cpp" />
+    <ClCompile Include="src\Core\Manager\PipelineManager.cpp" />
+    <ClCompile Include="src\Core\Manager\ObserverManager.cpp" />
+    <ClCompile Include="src\Core\Renderer\PipelineWorker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1328,12 +1331,15 @@
     <ClInclude Include="include\Core\Renderer\GraphicsAgent.h" />
     <ClInclude Include="include\Core\Shader\ShaderParser.h" />
     <ClInclude Include="include\Core\Debug\Debug.h" />
-    <ClInclude Include="include\Core\Manager\UniformBufferManager.h" />
+    <ClInclude Include="include\Core\Manager\PipelineManager.h" />
     <ClInclude Include="include\Core\Renderer\UniformBufferConfig.h" />
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="ThirdParty\assimp\revision.h" />
     <ClInclude Include="include\Core\Manager\GameObjectManager.h" />
     <ClInclude Include="include\Core\Head\FlagConfig.h" />
+    <ClInclude Include="include\Core\Manager\ObserverManager.h" />
+    <ClInclude Include="include\Core\Renderer\PipelineWorker.h" />
+    <ClInclude Include="include\Core\Data\MetaData.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

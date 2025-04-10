@@ -418,7 +418,8 @@ namespace tezcat::Tiny
 	public:
 		RenderCMD_MakeHDR2Cube(Vertex* vertex
 			, Texture2D* texHDR
-			, TextureCube* skybox);
+			, TextureCube* skybox
+			, std::array<int32_t, 2> viewSize);
 		virtual ~RenderCMD_MakeHDR2Cube();
 
 		void execute(PipelinePass* pass, Shader* shader) override;
@@ -427,6 +428,7 @@ namespace tezcat::Tiny
 		Vertex* mVertex;
 		Texture2D* mTexHDR;
 		TextureCube* mSkybox;
+		std::array<int32_t, 2> mViewSize;
 	};
 
 	class RenderCMD_MakeEnvIrradiance : public RenderCommadDraw
@@ -434,7 +436,8 @@ namespace tezcat::Tiny
 	public:
 		RenderCMD_MakeEnvIrradiance(Vertex* vertex
 			, TextureCube* skybox
-			, TextureCube* irradiance);
+			, TextureCube* irradiance
+			, std::array<int32_t, 2> viewSize);
 		virtual ~RenderCMD_MakeEnvIrradiance();
 
 		void execute(PipelinePass* pass, Shader* shader) override;
@@ -443,6 +446,7 @@ namespace tezcat::Tiny
 		Vertex* mVertex;
 		TextureCube* mIrradiance;
 		TextureCube* mSkybox;
+		std::array<int32_t, 2> mViewSize;
 	};
 
 	class RenderCMD_MakeEnvPrefilter : public RenderCommadDraw

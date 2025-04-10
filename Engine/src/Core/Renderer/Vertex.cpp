@@ -35,7 +35,9 @@ namespace tezcat::Tiny
 	}
 
 	Vertex::Vertex(const std::string& name)
-		: mChildren(nullptr)
+		: mVertexID(0)
+		, mVertexCount(0)
+		, mIndexCount(0)
 		, mIndexBuffer(nullptr)
 	{
 		mEngineName = name;
@@ -52,12 +54,13 @@ namespace tezcat::Tiny
 		mVertexCount = (uint32_t)meshData->mVertices.size();
 		mEngineName = meshData->getName();
 
+		mVertexBuffers.reserve(meshData->mLayoutPositions.size());
 		for (auto& position : meshData->mLayoutPositions)
 		{
 			auto [size, data] = meshData->getVertexData(position);
 			auto buffer = VertexBuffer::create();
 			buffer->init(size, data);
-			buffer->setLayoutData(position, VertexLayout::getLayoutType(position));
+			buffer->setLayoutData(position);
 			this->setVertexBuffer(buffer);
 		}
 
@@ -76,16 +79,6 @@ namespace tezcat::Tiny
 		mEngineName = name;
 		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)drawMode];
 		mVertexCount = vertexCount;
-	}
-
-	void Vertex::addChild(Vertex* vertex)
-	{
-		if (mChildren == nullptr)
-		{
-			mChildren = new std::vector<Vertex*>();
-		}
-
-		mChildren->emplace_back(vertex);
 	}
 
 	void Vertex::setVertexBuffer(VertexBuffer* buffer)
@@ -118,16 +111,6 @@ namespace tezcat::Tiny
 		if (mIndexBuffer)
 		{
 			mIndexBuffer->deleteObject();
-		}
-
-		if (mChildren)
-		{
-			for (auto child : *mChildren)
-			{
-				child->deleteObject();
-			}
-
-			delete mChildren;
 		}
 	}
 

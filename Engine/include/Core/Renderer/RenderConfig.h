@@ -213,17 +213,17 @@ namespace tezcat::Tiny
 		Deferred
 	};
 
-	enum class TINY_API Queue : uint8_t
+	enum class TINY_API Queue : int16_t
 	{
 		None = 0,
-		Prepare,
-		Background,
-		Opaque,
-		AlphaTest,
-		OpaqueLast,
-		Transparent,
-		Overlay,
-		Post
+		Prepare = 1000,
+		Background = 2000,
+		Opaque = 3000,
+		AlphaTest = 4000,
+		OpaqueLast = 5000,
+		Transparent = 6000,
+		Overlay = 7000,
+		Post = 8000
 	};
 
 	using ClearOptionID = uint32_t;

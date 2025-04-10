@@ -34,6 +34,8 @@
 #include "Core/Renderer/RenderObserver.h"
 #include "Core/Renderer/Pipeline.h"
 #include "Core/Renderer/Material.h"
+#include "Core/Renderer/VertexBuffer.h"
+#include "Core/Renderer/RenderObjectCache.h"
 
 #include "Core/Manager/LightingManager.h"
 #include "Core/Manager/SceneManager.h"

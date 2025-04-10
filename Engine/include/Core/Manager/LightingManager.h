@@ -120,9 +120,9 @@ namespace tezcat::Tiny
 		static void createBRDF_LUT();
 
 	private:
-		static uint32_t sCubeSize;
-		static uint32_t sIrrSize;
-		static uint32_t sPrefilterSize;
+		static int32_t sCubeSize;
+		static int32_t sIrrSize;
+		static int32_t sPrefilterSize;
 
 		static TextureCube* sCubeTextureMap;
 		static TextureCube* sIrradianceMap;

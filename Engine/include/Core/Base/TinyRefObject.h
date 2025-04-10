@@ -344,23 +344,23 @@ namespace tezcat::Tiny
 	template<typename T>
 	class TINY_API TinyWeakRef : public TinyBaseRef
 	{
-		Type<T>* mType;
+		Type<T>* mObject;
 
 	public:
 		TinyWeakRef()
-			: mType(nullptr)
+			: mObject(nullptr)
 		{
 			mGCInfo = TinyGC::getDefaultGCInfo();
 		}
 
 		TinyWeakRef(std::nullptr_t)
-			: mType(nullptr)
+			: mObject(nullptr)
 		{
 			mGCInfo = TinyGC::getDefaultGCInfo();
 		}
 
 		TinyWeakRef(Type<T>* obj)
-			: mType(obj)
+			: mObject(obj)
 		{
 			if (obj)
 			{
@@ -369,7 +369,7 @@ namespace tezcat::Tiny
 					abort();
 				}
 
-				mGCInfo = mType->mGCInfo;
+				mGCInfo = mObject->mGCInfo;
 				mGCInfo->weakRef++;
 			}
 			else
@@ -387,10 +387,10 @@ namespace tezcat::Tiny
 		TinyWeakRef(TinyWeakRef&& other) noexcept
 		{
 			mGCInfo = other.mGCInfo;
-			mType = other.mType;
+			mObject = other.mObject;
 
 			other.mGCInfo = TinyGC::getDefaultGCInfo();
-			other.mType = nullptr;
+			other.mObject = nullptr;
 		}
 
 		virtual ~TinyWeakRef()
@@ -398,24 +398,30 @@ namespace tezcat::Tiny
 			this->release();
 
 			mGCInfo = nullptr;
-			mType = nullptr;
+			mObject = nullptr;
 		}
 
-		virtual TinyRefObject* getTinyRefObject() override { return mType; }
+		virtual TinyRefObject* getTinyRefObject() override { return mObject; }
 
-		void reset(TinyRefObject* other)
+		void reset(Type<T>* other)
 		{
-			if (other->mGCInfo->unique)
+			if (mObject == other)
 			{
-				abort();
+				return;
 			}
 
 			this->release();
+			if (other == nullptr)
+			{
+				return;
+			}
+
 			mGCInfo = other->mGCInfo;
 			mGCInfo->weakRef++;
+			mObject = other;
 		}
 
-		Type<T>* get() const { return mType; }
+		Type<T>* get() const { return mObject; }
 
 		Type<T>* lock()
 		{
@@ -424,19 +430,29 @@ namespace tezcat::Tiny
 				return nullptr;
 			}
 
-			return mType;
+			return mObject;
+		}
+
+		Type<T>* lock() const
+		{
+			if (mGCInfo->strongRef < 1)
+			{
+				return nullptr;
+			}
+
+			return mObject;
 		}
 
 		template<class To>
 		TinyWeakRef<ToType<To>> staticCast()
 		{
-			return TinyWeakRef(static_cast<To*>(mType));
+			return TinyWeakRef(static_cast<To*>(mObject));
 		}
 
 		template<class To>
 		TinyWeakRef<ToType<To>> dynamicCast()
 		{
-			return TinyWeakRef(dynamic_cast<To*>(mType));
+			return TinyWeakRef(dynamic_cast<To*>(mObject));
 		}
 
 	public:
@@ -448,7 +464,12 @@ namespace tezcat::Tiny
 
 		Type<T>* operator->()
 		{
-			return mType;
+			return mObject;
+		}
+
+		Type<T>* operator->() const
+		{
+			return mObject;
 		}
 
 	private:
@@ -466,13 +487,15 @@ namespace tezcat::Tiny
 					TinyGC::recycle(mGCInfo);
 				}
 			}
+
+			mGCInfo = TinyGC::getDefaultGCInfo();
 		}
 
 		void bind(const TinyWeakRef& other)
 		{
 			this->release();
 			mGCInfo = other.mGCInfo;
-			mType = other.mType;
+			mObject = other.mObject;
 			mGCInfo->weakRef++;
 		}
 	};
@@ -496,6 +519,7 @@ namespace tezcat::Tiny
 	{
 		using Base = typename std::enable_if_t<std::is_convertible_v<Current*, Parent*>, Parent>;
 	};
+#define TINY_TEMPLATE_NAME(x) x
 
 #define TINY_ABSTRACT_OBJECT_H(currentClass, parentClass)\
 private:\
@@ -524,7 +548,10 @@ visit:\
 	}\
 	TINY_ABSTRACT_OBJECT_H(currentClass, parentClass)
 
+
 #define TINY_OBJECT_H(currentClass, parentClass) TINY_OBJECT_H_VISIT(public, currentClass, parentClass)
+
+#define TINY_OBJECT_H_TEMPLATE(currentClass, parentClass, ...) TINY_OBJECT_H(currentClass, parentClass<__VA_ARGS__>)
 
 
 #define TINY_OBJECT_CPP(currentClass, parentClass)\
@@ -535,6 +562,8 @@ visit:\
 		typeid(currentClass),\
 		TinyRefObject::giveID()\
 	};
+
+#define	TINY_OBJECT_CPP_TEMPLATE(currentClass, parentClass, ...) TINY_OBJECT_CPP(currentClass, parentClass<__VA_ARGS__>)
 
 #define TINY_OBJECT_MEMORY_INFO_WTIH_NAME(engineName) std::format("{}", engineName.toString())
 #define TINY_OBJECT_MEMORY_INFO() TINY_OBJECT_MEMORY_INFO_WTIH_NAME(mEngineName)

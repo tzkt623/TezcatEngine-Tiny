@@ -15,282 +15,294 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test\main.cpp">
+    <ClCompile Include="Editor\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyInputer.cpp">
+    <ClCompile Include="Editor\EditorInputer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyEngineIniter.cpp">
+    <ClCompile Include="Editor\EditorEngineIniter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\MyMainScene.cpp">
+    <ClCompile Include="Editor\Scene\MyMainScene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyController.cpp">
+    <ClCompile Include="Editor\MyController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyOverviewWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorOverviewWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\MyGUIContext.cpp">
+    <ClCompile Include="Editor\MyGUI\EditorContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyLogWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorLogWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyObjectInfoWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorObjectInfoWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MySceneWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorSceneWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyInfoWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorInfoWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyMainWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorMainWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyEvent.cpp">
+    <ClCompile Include="Editor\EditorEvent.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\MySecondScene.cpp">
+    <ClCompile Include="Editor\Scene\MySecondScene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyGCInfoWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorGCInfoWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\Tutorial_Triangle.cpp">
+    <ClCompile Include="Editor\Scene\Tutorial_Triangle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyObserver.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorTextureViewerWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyTextureViewerWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorResourceWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyResourceWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorShaderEditorWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyShaderEditorWindow.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorLightingWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyLightingWindow.cpp">
+    <ClCompile Include="Editor\GUI\GUI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\GUI\GUI.cpp">
+    <ClCompile Include="Editor\GUI\GUIWidget.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\GUI\GUIWidget.cpp">
+    <ClCompile Include="Editor\WindowsEngine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\WindowsEngine.cpp">
+    <ClCompile Include="Editor\ThirdParty\imgui\TextEditor\TextEditor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imgui\TextEditor\TextEditor.cpp">
+    <ClCompile Include="Editor\ThirdParty\imgui\imgui.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imgui\imgui.cpp">
+    <ClCompile Include="Editor\ThirdParty\imgui\imgui_draw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imgui\imgui_draw.cpp">
+    <ClCompile Include="Editor\ThirdParty\imgui\imgui_impl_glfw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imgui\imgui_impl_glfw.cpp">
+    <ClCompile Include="Editor\ThirdParty\imgui\imgui_impl_opengl3.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imgui\imgui_impl_opengl3.cpp">
+    <ClCompile Include="Editor\ThirdParty\imgui\imgui_tables.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imgui\imgui_tables.cpp">
+    <ClCompile Include="Editor\ThirdParty\imgui\imgui_widgets.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imgui\imgui_widgets.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorFrameBufferViewerWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.cpp">
+    <ClCompile Include="Editor\Scene\Tutorial_Texture2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\Tutorial_Texture2D.cpp">
+    <ClCompile Include="Editor\Scene\Tutorial_Cube.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\Tutorial_Cube.cpp">
+    <ClCompile Include="Editor\Scene\Tutorial_Camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\Tutorial_Camera.cpp">
+    <ClCompile Include="Editor\Scene\Tutorial_FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\Scene\Tutorial_FrameBuffer.cpp">
+    <ClCompile Include="Editor\ThirdParty\imguizmo\GraphEditor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imguizmo\GraphEditor.cpp">
+    <ClCompile Include="Editor\ThirdParty\imguizmo\ImCurveEdit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imguizmo\ImCurveEdit.cpp">
+    <ClCompile Include="Editor\ThirdParty\imguizmo\ImGradient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imguizmo\ImGradient.cpp">
+    <ClCompile Include="Editor\ThirdParty\imguizmo\ImGuizmo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imguizmo\ImGuizmo.cpp">
+    <ClCompile Include="Editor\ThirdParty\imguizmo\ImSequencer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\imguizmo\ImSequencer.cpp">
+    <ClCompile Include="Editor\ThirdParty\nfd\nfd_common.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\nfd\nfd_common.c">
+    <ClCompile Include="Editor\ThirdParty\nfd\nfd_win.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test\ThirdParty\nfd\nfd_win.cpp">
+    <ClCompile Include="Editor\MyGUI\Window\EditorPipelineWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\MyGUI\Window\EditorGameWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditorCamera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Test\MyInputer.h">
+    <ClInclude Include="Editor\EditorInputer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyEngineIniter.h">
+    <ClInclude Include="Editor\EditorEngineIniter.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\MyMainScene.h">
+    <ClInclude Include="Editor\Scene\MyMainScene.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyController.h">
+    <ClInclude Include="Editor\MyController.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyOverviewWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorOverviewWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\MyGUIContext.h">
+    <ClInclude Include="Editor\MyGUI\EditorContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyLogWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorLogWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyObjectInfoWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorObjectInfoWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MySceneWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorSceneWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyInfoWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorInfoWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyMainWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorMainWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyEvent.h">
+    <ClInclude Include="Editor\EditorEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\MySecondScene.h">
+    <ClInclude Include="Editor\Scene\MySecondScene.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyGCInfoWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorGCInfoWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\Tutorial_Triangle.h">
+    <ClInclude Include="Editor\Scene\Tutorial_Triangle.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyObserver.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorTextureViewerWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyTextureViewerWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorResourceWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyResourceWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorShaderEditorWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyShaderEditorWindow.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorLightingWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyLightingWindow.h">
+    <ClInclude Include="Editor\GUI\GUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\GUI\GUI.h">
+    <ClInclude Include="Editor\GUI\GUIWidget.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\GUI\GUIWidget.h">
+    <ClInclude Include="Editor\WindowsEngine.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\WindowsEngine.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\TextEditor\TextEditor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\TextEditor\TextEditor.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imconfig.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imconfig.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imgui.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imgui.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imgui_impl_glfw.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imgui_impl_glfw.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imgui_impl_opengl3.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imgui_impl_opengl3.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imgui_impl_opengl3_loader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imgui_impl_opengl3_loader.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imgui_internal.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imgui_internal.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imstb_rectpack.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imstb_rectpack.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imstb_textedit.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imstb_textedit.h">
+    <ClInclude Include="Editor\ThirdParty\imgui\imstb_truetype.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imgui\imstb_truetype.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorFrameBufferViewerWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\MyGUI\Window\MyFrameBufferViewerWindow.h">
+    <ClInclude Include="Editor\Scene\Tutorial_Texture2D.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\Tutorial_Texture2D.h">
+    <ClInclude Include="Editor\Scene\SceneHead.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\SceneHead.h">
+    <ClInclude Include="Editor\Scene\Tutorial_Cube.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\Tutorial_Cube.h">
+    <ClInclude Include="Editor\Scene\Tutorial_Camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\Tutorial_Camera.h">
+    <ClInclude Include="Editor\Scene\TutorialHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\TutorialHelper.h">
+    <ClInclude Include="Editor\Scene\Tutorial_FrameBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\Scene\Tutorial_FrameBuffer.h">
+    <ClInclude Include="Editor\ThirdParty\imguizmo\GraphEditor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imguizmo\GraphEditor.h">
+    <ClInclude Include="Editor\ThirdParty\imguizmo\ImCurveEdit.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imguizmo\ImCurveEdit.h">
+    <ClInclude Include="Editor\ThirdParty\imguizmo\ImGradient.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imguizmo\ImGradient.h">
+    <ClInclude Include="Editor\ThirdParty\imguizmo\ImGuizmo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imguizmo\ImGuizmo.h">
+    <ClInclude Include="Editor\ThirdParty\imguizmo\ImSequencer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imguizmo\ImSequencer.h">
+    <ClInclude Include="Editor\ThirdParty\imguizmo\ImZoomSlider.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\imguizmo\ImZoomSlider.h">
+    <ClInclude Include="Editor\ThirdParty\nfd\include\nfd.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\nfd\include\nfd.h">
+    <ClInclude Include="Editor\ThirdParty\nfd\common.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\nfd\common.h">
+    <ClInclude Include="Editor\ThirdParty\nfd\nfd_common.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Test\ThirdParty\nfd\nfd_common.h">
+    <ClInclude Include="Editor\MyGUI\Window\EditorPipelineWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\MyGUI\Window\EditorGameWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EditorCamera.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

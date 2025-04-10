@@ -71,7 +71,7 @@ namespace tezcat::Tiny
 			}
 			else
 			{
-				mCasterAry.erase(it);
+				it = mCasterAry.erase(it);
 			}
 		}
 	}

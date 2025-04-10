@@ -95,11 +95,11 @@ namespace tezcat::Tiny
 		//Graphics::getInstance()->deleteBuffer(this);
 	}
 
-	void VertexBuffer::setLayoutData(VertexPosition position, VertexLayoutType type)
+	void VertexBuffer::setLayoutData(VertexPosition position)
 	{
 		mLayoutData.position = position;
-		mLayoutData.type = type;
-		mLayoutData.stride = VertexLayout::getTypeSize(type);
+		mLayoutData.type = VertexLayout::getLayoutType(position);
+		mLayoutData.stride = VertexLayout::getTypeSize(mLayoutData.type);
 	}
 
 	void VertexBuffer::onClose()
