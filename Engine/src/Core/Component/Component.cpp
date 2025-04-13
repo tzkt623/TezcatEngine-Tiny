@@ -83,7 +83,12 @@ namespace tezcat::Tiny
 
 	std::string Component::getMemoryInfo()
 	{
-		return TINY_OBJECT_MEMORY_INFO_WTIH_NAME(mGameObject->getEngineName());
+		if (mGameObject)
+		{
+			return TINY_OBJECT_MEMORY_INFO_WTIH_NAME(mGameObject->getEngineName());
+		}
+
+		return this->getClassName();
 	}
 
 }
