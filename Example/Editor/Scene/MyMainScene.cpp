@@ -20,12 +20,6 @@ void MyMainScene::onEnter()
 
 	InputSys::getInstance()->push(EditorInputer::getInstance());
 
-	// 	mController = GameObject::create("Controller");
-	// 	mController->addComponent<Transform>();
-	// 	mController->getTransform()->setPosition(float3(0.0f, 0.0f, 10.0f));
-	// 	mController->addComponent<FlyController>();
-	//  MyInputer::getInstance()->setController(mController->addComponent<FlyController>());
-
 	if (true)
 	{
 		auto go = GameObject::create("World1_Camera");
@@ -42,7 +36,6 @@ void MyMainScene::onEnter()
 		go->getTransform()->setRotation(float3(-13.093f, -27.649f, 0.0f));
 
 		go->addComponent<FlyController>();
-		EditorInputer::getInstance()->setController(go->addComponent<FlyController>());
 	}
 
 	//this->createInfinitePlane();
@@ -56,6 +49,16 @@ void MyMainScene::onEnter()
 
 	auto img = ResourceManager::loadOnly<Image>("Resource/Image/blocky_photo_studio_2k.hdr");
 	EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
+
+
+	quaternion rotation1(glm::radians(float3(30.0f, 0.0f, 0.0f)));
+	quaternion rotation2(glm::radians(float3(60.0f, 0.0f, 0.0f)));
+
+	auto rot1 = glm::degrees(glm::eulerAngles(rotation2 * rotation1));
+
+	auto rot_t = glm::inverse(rotation1 * rotation2) * quaternion(glm::radians(rot1));
+	rot_t = glm::normalize(rot_t);
+	auto rot2 = glm::degrees(glm::eulerAngles(rot_t));
 }
 
 void MyMainScene::onExit()
@@ -71,16 +74,16 @@ void MyMainScene::createModel()
 	go_gundum_szb->getTransform()->setRotation(0.0f, 0.0f, 0.0f);
 	go_gundum_szb->getTransform()->setScale(50.0f, 50.0f, 50.0f);
 
- 	model = ResourceManager::loadAndSave<Model>("Resource/Model/NekomiyaMana.pmx");
- 	auto go_dasd = model->generate();
- 	go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
- 	go_dasd->getTransform()->setScale(10.0f, 10.0f, 10.0f);
+	model = ResourceManager::loadAndSave<Model>("Resource/Model/NekomiyaMana.pmx");
+	auto go_dasd = model->generate();
+	go_dasd->getTransform()->setPosition(0.0f, 0.0f, 90.0f);
+	go_dasd->getTransform()->setScale(10.0f, 10.0f, 10.0f);
 }
 
 void MyMainScene::createGates(float gateWidth, float gateHigh)
 {
-// 	float gateWidth = 1920.0f / 4;
-// 	float gateHigh = 1080.0f / 4;
+	// 	float gateWidth = 1920.0f / 4;
+	// 	float gateHigh = 1080.0f / 4;
 
 	auto world1 = GameObject::create("World1_Gate");
 	world1->setLayerMaskIndex(1);

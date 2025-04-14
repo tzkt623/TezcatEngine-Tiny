@@ -47,6 +47,17 @@ namespace tezcat::Tiny
 	class GLMHelper
 	{
 	public:
+		static void buildMatrix(float4x4& m, const float3& translation, const quaternion& rotation, const float3& scale)
+		{
+			m = glm::mat4_cast(rotation);
+
+			m[0] *= scale[0];
+			m[1] *= scale[1];
+			m[2] *= scale[2];
+
+			m[3] = float4(translation, 1.0f);
+		}
+
 		static bool decompose(float4x4 const& ModelMatrix, float3& Translation, float3& Rotation, float3& Scale)
 		{
 			using namespace glm;

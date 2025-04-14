@@ -15,6 +15,7 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+
 #include "Core/Component/Transform.h"
 #include "Core/Component/GameObject.h"
 
@@ -23,11 +24,9 @@
 
 #include "Core/Scene.h"
 
-//#define QUAT_YZX;
-
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP_TEMPLATE(Transform, ComponentCustomID, Transform, 0)
+	TINY_OBJECT_CPP_TEMPLATE(Transform, ComponentCustomID, Transform, 0);
 
 	static float4x4 WORLD_MATRIX(1.0f);
 	const float3 Transform::XAxis(1.0f, 0.0f, 0.0f);
@@ -48,7 +47,7 @@ namespace tezcat::Tiny
 		, mModelMatrix(1.0f)
 		, mParent(parent)
 		, mIndex(0)
-		, mDelegateUpdate(std::bind(&Transform::updateMatrix, this, std::placeholders::_1))
+		, mDelegateUpdate(TINY_BIND_THIS(Transform::updateMatrix))
 		, mChildren(nullptr)
 	{
 
@@ -139,7 +138,8 @@ namespace tezcat::Tiny
 
 				// 				mParent->inverseTransformPoint(world_position, mLocalPosition);
 				// 				mParent->inverseTransformVector(world_rotation, mLocalRotation);
-				// 				mParent->inverseTransformVector(world_scale, mLocalScale);
+				// 				mParent->inverseTransformVector(world_scale, mLocalScale);
+
 			}
 #endif
 		}
@@ -195,8 +195,6 @@ namespace tezcat::Tiny
 			mLocalRotation.z += 360.0f;
 		}
 	}
-
-
 
 
 	/// <summary>
@@ -278,24 +276,31 @@ namespace tezcat::Tiny
 
 	void Transform::updateMatrix(Transform* self)
 	{
-#ifdef QUAT_YZX
-		auto qx = glm::angleAxis(glm::radians(mLocalRotation.x), XAxis);
-		auto qy = glm::angleAxis(glm::radians(mLocalRotation.y), YAxis);
-		auto qz = glm::angleAxis(glm::radians(mLocalRotation.z), ZAxis);
-		mModelMatrix = glm::translate(WORLD_MATRIX, mLocalPosition);
-		//Unity Rotation Order
-		mModelMatrix = mModelMatrix * glm::mat4_cast(qy * qx * qz);
-		mModelMatrix = glm::scale(mModelMatrix, mLocalScale);
-#else
-		mModelMatrix = glm::translate(WORLD_MATRIX, mLocalPosition);
-		mModelMatrix = mModelMatrix * glm::mat4_cast(glm::quat(glm::radians(mLocalRotation)));
-		mModelMatrix = glm::scale(mModelMatrix, mLocalScale);
-#endif // QUAT_YZX
+		mLocalRotationQ = quaternion(glm::radians(float3(mLocalRotation)));
 
 		if (mParent != nullptr)
 		{
-			mModelMatrix = mParent->getModelMatrix() * mModelMatrix;
+			mWorldPosition = mParent->mWorldScale * mLocalPosition;
+			mWorldPosition = quaternion(glm::radians(mParent->mWorldRotation)) * mWorldPosition;
+			mWorldPosition += mParent->mWorldPosition;
+
+			mWorldRotationQ = mLocalRotationQ * quaternion(glm::radians(mParent->mWorldRotation));
+			mWorldRotation = glm::degrees(glm::eulerAngles(mWorldRotationQ));
+
+			mWorldScale = mParent->mWorldScale * mLocalScale;
 		}
+		else
+		{
+			mWorldPosition = mLocalPosition;
+			mWorldRotation = mLocalRotation;
+			mWorldScale = mLocalScale;
+			mWorldRotationQ = mLocalRotationQ;
+		}
+
+		GLMHelper::buildMatrix(mModelMatrix, mWorldPosition, mWorldRotationQ, mWorldScale);
+		//mModelMatrix = glm::translate(WORLD_MATRIX, mWorldPosition);
+		//mModelMatrix = mModelMatrix * glm::mat4_cast(mWorldRotationQ);
+		//mModelMatrix = glm::scale(mModelMatrix, mWorldScale);
 	}
 
 	void Transform::manualUpdateMatrix()
@@ -344,7 +349,11 @@ namespace tezcat::Tiny
 	{
 		//world = glm::quat(glm::radians(mLocalRotation)) * (local * mLocalScale) + mLocalPosition;
 
-		world = mModelMatrix * float4(local, 1.0f);
+		world = mWorldScale * local;
+		world = mWorldRotationQ * world;
+		world += mWorldPosition;
+
+		//world = mModelMatrix * float4(local, 1.0f);
 	}
 
 	void Transform::transformVector(const float3& local, float3& world)
@@ -354,23 +363,31 @@ namespace tezcat::Tiny
 
 	void Transform::transformRotation(const float3& local, float3& world)
 	{
-		float3x3 temp_mat;
-		this->calculatePureLocalToWorldRotationMatrix(temp_mat);
-		glm::quat quat_parent_world_rotation(temp_mat);
-		glm::quat quat_child_world_rotation(glm::radians(world));
+		world = glm::eulerAngles(quaternion(glm::radians(local)) * mWorldRotationQ);
+		world = glm::degrees(world);
 
-		world = glm::degrees(glm::eulerAngles(quat_parent_world_rotation * quat_child_world_rotation));
+		//float3x3 temp_mat;
+		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
+		//glm::quat quat_parent_world_rotation(temp_mat);
+		//glm::quat quat_child_world_rotation(glm::radians(world));
+		//
+		//world = glm::degrees(glm::eulerAngles(quat_parent_world_rotation * quat_child_world_rotation));
 	}
 
 	void Transform::transformDirection(const float3& local, float3& world)
 	{
-		float3x3 temp_mat;
-		this->calculatePureLocalToWorldRotationMatrix(temp_mat);
-		world = temp_mat * local;	}
+		//float3x3 temp_mat;
+		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
+		//world = temp_mat * local;
+	}
 
 	void Transform::inverseTransformPoint(const float3& world, float3& local)
 	{
-		local = glm::inverse(mModelMatrix) * float4(world, 1.0f);
+		//local = glm::inverse(mModelMatrix) * float4(world, 1.0f);
+
+		local = world - mWorldPosition;
+		local = glm::inverse(mWorldRotationQ) * local;
+		local = local / mWorldScale;
 	}
 
 	void Transform::inverseTransformVector(const float3& world, float3& local)
@@ -380,7 +397,7 @@ namespace tezcat::Tiny
 
 	void Transform::inverseTransformRotation(const float3& world, float3& local)
 	{
-		local = glm::inverse(mModelMatrix) * float4(world, 1.0f);
+		//local = glm::inverse(mModelMatrix) * float4(world, 1.0f);
 
 		//float3x3 temp_mat;
 		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
@@ -388,68 +405,31 @@ namespace tezcat::Tiny
 		//glm::quat quat_child_world_rotation(glm::radians(world));
 		//
 		//local = glm::degrees(glm::eulerAngles(glm::inverse(quat_parent_world_rotation) * quat_child_world_rotation));
+
+		local = glm::eulerAngles(quaternion(glm::radians(world)) * glm::inverse(mWorldRotationQ));
+		local = glm::degrees(local);
 	}
 
 	void Transform::inverseTransformDirection(const float3& world, float3& local)
 	{
-		float3x3 temp_mat;
-		this->calculatePureLocalToWorldRotationMatrix(temp_mat);
-		local = glm::inverse(temp_mat) * local;
+		//float3x3 temp_mat;
+		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
+		//local = glm::inverse(temp_mat) * local;
 	}
 
 	float3 Transform::getWorldRotation()
 	{
-		float3x3 temp_mat;
-		this->calculatePureLocalToWorldRotationMatrix(temp_mat);
-		return glm::degrees(glm::eulerAngles(glm::quat_cast(temp_mat)));
+		//float3x3 temp_mat;
+		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
+		//return glm::degrees(glm::eulerAngles(glm::quat_cast(temp_mat)));
+
+		return mWorldRotation;
 	}
 
 	float3 Transform::getWorldScale() const
 	{
-		return { glm::length(this->getRight()), glm::length(this->getUp()), glm::length(this->getBackward()) };
-	}
-
-
-	void Transform::inverseTransform(const float3& worldPosition, const float3& worldRotation, const float3& worldScale, float3& localPosition, float3& localRotation, float3& localScale)
-	{
-		localScale = worldScale / this->getWorldScale();
-
-#ifdef QUAT_YZX
-		auto rotate = this->getWorldRotation();
-		auto qx = glm::angleAxis(glm::radians(rotate.x), XAxis);
-		auto qy = glm::angleAxis(glm::radians(rotate.y), YAxis);
-		auto qz = glm::angleAxis(glm::radians(rotate.z), ZAxis);
-
-		auto rq_ = glm::normalize(glm::inverse(qy * qx * qz));
-
-		auto qwx = glm::angleAxis(glm::radians(worldRotation.x), XAxis);
-		auto qwy = glm::angleAxis(glm::radians(worldRotation.y), YAxis);
-		auto qwz = glm::angleAxis(glm::radians(worldRotation.z), ZAxis);
-
-		//!!!!this glm::eulerAngles order is XYZ, so the angles of localRotation is error;
-		localRotation = glm::degrees(glm::eulerAngles((qwy * qwx * qwz) * rq_));
-#else
-		float3x3 temp_mat;
-		this->calculatePureLocalToWorldRotationMatrix(temp_mat);
-		glm::quat quat_parent_world_rotation(temp_mat);
-		glm::quat quat_child_world_rotation(glm::radians(worldRotation));
-
-		localRotation = glm::degrees(glm::eulerAngles(glm::inverse(quat_parent_world_rotation) * quat_child_world_rotation));
-#endif // QUAT_YZX
-
-		/*
-		* equal to current mothed
-		*
-		* auto mat_parent = glm::inverse(mModelMatrix);
-		* localPosition = mat_parent * float4(worldPosition, 1.0f);
-		*/
-		auto mat_parent = glm::inverse(mModelMatrix);
-		localPosition = mat_parent * float4(worldPosition, 1.0f);
-
-		//localPosition = glm::inverse(quat_parent_world_rotation) * (worldPosition - this->getWorldPosition());
-		//localPosition *= localScale;
-
-		//world = glm::quat(glm::radians(mLocalRotation)) * (local * mLocalScale) + mLocalPosition;
+		return mWorldScale;
+		//return { glm::length(this->getRight()), glm::length(this->getUp()), glm::length(this->getBackward()) };
 	}
 
 	void Transform::decomposeTransform()
@@ -459,12 +439,6 @@ namespace tezcat::Tiny
 		{
 			mat = glm::inverse(mParent->getModelMatrix()) * mModelMatrix;
 		}
-
-		//glm::vec3 skew;
-		//glm::vec4 perspective;
-		//glm::quat rotation;
-
-		//glm::decompose(mat, mLocalScale, rotation, mLocalPosition, skew, perspective);
 
 		GLMHelper::decompose(mat, mLocalPosition, mLocalRotation, mLocalScale);
 
@@ -477,6 +451,7 @@ namespace tezcat::Tiny
 	void Transform::setWorldPosition(const float3& world)
 	{
 		mIsDirty = true;
+		mWorldPosition = world;
 		if (mParent)
 		{
 			mParent->inverseTransformPoint(world, mLocalPosition);
@@ -490,6 +465,7 @@ namespace tezcat::Tiny
 	void Transform::setWorldRotation(const float3& worldRotation)
 	{
 		mIsDirty = true;
+		mWorldRotation = worldRotation;
 		if (mParent)
 		{
 			mParent->inverseTransformRotation(worldRotation, mLocalRotation);
@@ -498,29 +474,5 @@ namespace tezcat::Tiny
 		{
 			mLocalRotation = worldRotation;
 		}
-	}
-
-	//-------------------------------------------------
-	//
-	//	TransformList
-	//
-	TransformList::TransformList()
-	{
-
-	}
-
-	TransformList::~TransformList()
-	{
-
-	}
-
-	void TransformList::pushFront(Transform* transform)
-	{
-
-	}
-
-	void TransformList::pushBack(Transform* transform)
-	{
-
 	}
 }

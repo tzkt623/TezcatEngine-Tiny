@@ -159,7 +159,7 @@ namespace tezcat::Editor
 									transform->setWorldPosition(translation);
 									break;
 								case ImGuizmo::ROTATE:
-									transform->setRotation(rotation);
+									transform->setWorldRotation(rotation);
 									break;
 								case ImGuizmo::SCALE:
 									transform->setScale(scale);

@@ -108,14 +108,18 @@ namespace tezcat::Tiny
 			mLocalScale.z = z;
 		}
 
+		void setWorldPosition(const float3& world);
+		void setWorldRotation(const float3& worldRotation);
+
+		float3 getWorldRotation();
+		float3 getWorldPosition() const { return mModelMatrix[3]; }
+		float3 getWorldScale() const;
+
 	public:
 		float4x4& getModelMatrix() { return mModelMatrix; }
 
 		float4x4 getWorldToLocalMatrix();
 		const float4x4& getLocalToWorldMatrix() const { return mModelMatrix; }
-
-		void setWorldPosition(const float3& world);
-		void setWorldRotation(const float3& worldRotation);
 
 		float3 getRight() const { return mModelMatrix[0]; }
 		float3 getLeft() const { return -mModelMatrix[0]; }
@@ -123,10 +127,6 @@ namespace tezcat::Tiny
 		float3 getDown() const { return -mModelMatrix[1]; }
 		float3 getBackward() const { return mModelMatrix[2]; }
 		float3 getForward() const { return -mModelMatrix[2]; }
-
-		float3 getWorldRotation();
-		float3 getWorldPosition() const { return mModelMatrix[3]; }
-		float3 getWorldScale() const;
 
 	public:
 		void transformPoint(const float3& local, float3& world);
@@ -215,7 +215,15 @@ namespace tezcat::Tiny
 		float3 mLocalPosition;
 		float3 mLocalRotation;
 		float3 mLocalScale;
+
+		float3 mWorldPosition;
+		float3 mWorldRotation;
+		float3 mWorldScale;
+
 		float4x4 mModelMatrix;
+
+		quaternion mLocalRotationQ;
+		quaternion mWorldRotationQ;
 
 		std::function<void(Transform*)> mDelegateUpdate;
 
@@ -223,31 +231,5 @@ namespace tezcat::Tiny
 		static const float3 XAxis;
 		static const float3 YAxis;
 		static const float3 ZAxis;
-	};
-
-
-	//-------------------------------------------------
-	//
-	//	TransformList
-	//
-	class TransformList
-	{
-	public:
-		TransformList();
-		~TransformList();
-
-	public:
-		void pushFront(Transform* transform);
-		void pushBack(Transform* transform);
-
-	private:
-		Transform* mFront;
-		Transform* mBack;
-	};
-
-
-	class TINY_API Collider
-	{
-
 	};
 }
