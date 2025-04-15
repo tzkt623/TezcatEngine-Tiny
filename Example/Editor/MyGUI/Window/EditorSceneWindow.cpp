@@ -26,7 +26,10 @@ namespace tezcat::Editor
 
 	bool EditorSceneWindow::begin()
 	{
-		return ImGui::Begin(this->getName(), 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_MenuBar);
+		return ImGui::Begin(this->getName(), 0
+			, ImGuiWindowFlags_NoScrollbar
+			| ImGuiWindowFlags_MenuBar
+			| ImGuiWindowFlags_ChildMenu);
 	}
 
 	void EditorSceneWindow::onRender()
@@ -66,9 +69,47 @@ namespace tezcat::Editor
 				ImGui::EndCombo();
 			}
 
-			ImGui::Text("CameraSpeed");
-			ImGui::SetNextItemWidth(120);
-			ImGui::DragFloat("##editorcamera", &mCameraMoveSpeed);
+			if (ImGui::BeginMenu("CameraSettings"))
+			{
+				ImGui::Text("Speed");
+				ImGui::DragFloat("##speed", &mCameraMoveSpeed);
+
+				auto transform = EditorContext::EditorCamera->getTransform();
+				ImGui::Text("Position");
+				auto pos = transform->getPosition();
+				if (ImGui::InputFloat3("##position", &pos[0]))
+				{
+					transform->setPosition(pos);
+				}
+
+				ImGui::Text("Rotation");
+				auto rot = transform->getRotation();
+				if (ImGui::InputFloat3("##rotation", &rot[0]))
+				{
+					transform->setRotation(rot);
+				}
+				ImGui::Separator();
+				ImGui::Text("Clipping Plane");
+				float near = EditorContext::EditorCamera->getNear();
+				float far = EditorContext::EditorCamera->getFar();
+				if (ImGui::InputFloat("##near", &near))
+				{
+					EditorContext::EditorCamera->setNear(near);
+				}
+				if (ImGui::InputFloat("##far", &far))
+				{
+					EditorContext::EditorCamera->setFar(far);
+				}
+				ImGui::Separator();
+				ImGui::Text("FOV");
+				int fov = EditorContext::EditorCamera->getFOV();
+				if (ImGui::SliderInt("##fov", &fov, 1.0f, 180.0f))
+				{
+					EditorContext::EditorCamera->setFOV(fov);
+				}
+
+				ImGui::EndMenu();
+			}
 
 			auto size = ImGui::CalcTextSize("Info");
 			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - size.x);
@@ -198,17 +239,6 @@ namespace tezcat::Editor
 					{
 						this->control(EditorContext::EditorCamera->getTransform());
 					}
-					//EditorContext::EditorCamera->getTransform()->update();
-					//EditorContext::EditorCamera->preRender();
-					//
-					////先剔除
-					//for (auto& index : EditorContext::EditorCamera->getCullLayerList())
-					//{
-					//	//剔除到对应的渲染通道
-					//	RenderObjectCache::culling(index, EditorContext::EditorCamera);
-					//}
-					//
-					//EditorContext::EditorCamera->getPipelineQueue()->addToPipeline();
 				}
 			}
 
@@ -282,7 +312,6 @@ namespace tezcat::Editor
 
 	void EditorSceneWindow::control(Transform* transform)
 	{
-
 		bool flag = false;
 		float3 position(0.0f);
 
@@ -315,6 +344,7 @@ namespace tezcat::Editor
 
 				transform->setRotation(mPitch, mYaw, mRoll);
 			};
+		bool right_dragging = ImGui::IsMouseDragging(ImGuiMouseButton_Right);
 
 		//if (ImGui::IsMouseDragging(ImGuiMouseButton_Left))
 		//{
@@ -330,6 +360,25 @@ namespace tezcat::Editor
 		//	}
 		//}
 
+		//if (ImGui::IsKeyPressed(ImGuiKey_LeftAlt))
+		//{
+		//	ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+		//	if (!right_dragging)
+		//	{
+		//		return;
+		//	}
+		//	static ImVec2 old_drag = ImGui::GetMousePos();
+		//	ImVec2 current_drag = ImGui::GetMousePos();
+		//	ImVec2 delta_drag = current_drag - old_drag;
+		//	old_drag = current_drag;
+		//
+		//	float3 pos(current_drag.x * Engine::getDeltaTime(), current_drag.y * Engine::getDeltaTime(), 0.0f);
+		//	transform->translate(pos);
+		//
+		//	std::cout << delta_drag.x << "|" << delta_drag.y << "\n";
+		//}
+
+		
 		if (ImGui::IsMouseDragging(ImGuiMouseButton_Right))
 		{
 			static double old_time = ImGui::GetTime();
@@ -337,7 +386,7 @@ namespace tezcat::Editor
 			float delta = current_time - old_time;
 			old_time = current_time;
 
-			float speed = mCameraMoveSpeed * delta;
+			float speed = mCameraMoveSpeed * Engine::getDeltaTime();
 
 			if (ImGui::IsKeyPressed(ImGuiKey_W))
 			{
@@ -401,5 +450,6 @@ namespace tezcat::Editor
 		{
 			transform->translate(position);
 		}
+		
 	}
 }
