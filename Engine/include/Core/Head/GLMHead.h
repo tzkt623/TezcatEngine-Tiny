@@ -49,7 +49,30 @@ namespace tezcat::Tiny
 	public:
 		static void buildMatrix(float4x4& m, const float3& translation, const quaternion& rotation, const float3& scale)
 		{
-			m = glm::mat4_cast(rotation);
+			//m = glm::mat4_cast(rotation);
+
+			//mat<3, 3, T, Q> Result(T(1));
+			float qxx(rotation.x * rotation.x);
+			float qyy(rotation.y * rotation.y);
+			float qzz(rotation.z * rotation.z);
+			float qxz(rotation.x * rotation.z);
+			float qxy(rotation.x * rotation.y);
+			float qyz(rotation.y * rotation.z);
+			float qwx(rotation.w * rotation.x);
+			float qwy(rotation.w * rotation.y);
+			float qwz(rotation.w * rotation.z);
+
+			m[0][0] = float(1) - float(2) * (qyy + qzz);
+			m[0][1] = float(2) * (qxy + qwz);
+			m[0][2] = float(2) * (qxz - qwy);
+
+			m[1][0] = float(2) * (qxy - qwz);
+			m[1][1] = float(1) - float(2) * (qxx + qzz);
+			m[1][2] = float(2) * (qyz + qwx);
+
+			m[2][0] = float(2) * (qxz + qwy);
+			m[2][1] = float(2) * (qyz - qwx);
+			m[2][2] = float(1) - float(2) * (qxx + qyy);
 
 			m[0] *= scale[0];
 			m[1] *= scale[1];

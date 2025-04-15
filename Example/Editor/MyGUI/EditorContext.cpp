@@ -21,6 +21,7 @@ namespace tezcat::Editor
 	bool EditorContext::IsPause = false;
 	bool EditorContext::IsPlaying = false;
 	bool EditorContext::IsFocusOnGameView = false;
+	bool EditorContext::EditorSceneFoucsed = false;
 
 	void EditorContext::init()
 	{
@@ -253,7 +254,7 @@ namespace tezcat::Editor
 		shadow_caster->setShadowMap(4096, 4096, "Shadow");
 	}
 
-	void EditorContext::endOfFrame()
+	void EditorContext::endFrame()
 	{
 		if (!DeleteArray.empty())
 		{
@@ -264,8 +265,29 @@ namespace tezcat::Editor
 
 			DeleteArray.clear();
 		}
+
+		if (EditorContext::EditorSceneFoucsed && EditorContext::EditorCamera)
+		{
+			EditorContext::EditorCamera->getTransform()->update();
+			EditorContext::EditorCamera->preRender();
+
+			//先剔除
+			for (auto& index : EditorContext::EditorCamera->getCullLayerList())
+			{
+				//剔除到对应的渲染通道
+				RenderObjectCache::culling(index, EditorContext::EditorCamera);
+			}
+
+			EditorContext::EditorCamera->getPipelineQueue()->addToPipeline();
+		}
+
+		EditorContext::EditorSceneFoucsed = false;
 	}
 
+	void EditorContext::beginFrame()
+	{
+
+	}
 
 
 }

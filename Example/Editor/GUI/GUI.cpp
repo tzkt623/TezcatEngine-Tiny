@@ -65,6 +65,7 @@ namespace tezcat::Editor
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGuizmo::BeginFrame();
+		EditorContext::beginFrame();
 
 		auto it = mWindows.begin();
 		auto end = mWindows.end();
@@ -96,7 +97,7 @@ namespace tezcat::Editor
 		}
 
 		ImGuiHelper::clearInvalidDraging();
-		EditorContext::endOfFrame();
+		EditorContext::endFrame();
 	}
 
 #pragma region Helper

@@ -32,6 +32,7 @@ namespace tezcat::Editor
 	void EditorSceneWindow::onRender()
 	{
 		GUIWindow::onRender();
+		EditorContext::EditorSceneFoucsed = true;
 
 		if (ImGui::BeginMenuBar())
 		{
@@ -197,17 +198,17 @@ namespace tezcat::Editor
 					{
 						this->control(EditorContext::EditorCamera->getTransform());
 					}
-					EditorContext::EditorCamera->getTransform()->update();
-					EditorContext::EditorCamera->preRender();
-
-					//先剔除
-					for (auto& index : EditorContext::EditorCamera->getCullLayerList())
-					{
-						//剔除到对应的渲染通道
-						RenderObjectCache::culling(index, EditorContext::EditorCamera);
-					}
-
-					EditorContext::EditorCamera->getPipelineQueue()->addToPipeline();
+					//EditorContext::EditorCamera->getTransform()->update();
+					//EditorContext::EditorCamera->preRender();
+					//
+					////先剔除
+					//for (auto& index : EditorContext::EditorCamera->getCullLayerList())
+					//{
+					//	//剔除到对应的渲染通道
+					//	RenderObjectCache::culling(index, EditorContext::EditorCamera);
+					//}
+					//
+					//EditorContext::EditorCamera->getPipelineQueue()->addToPipeline();
 				}
 			}
 

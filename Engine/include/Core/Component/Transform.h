@@ -129,23 +129,29 @@ namespace tezcat::Tiny
 		float3 getForward() const { return -mModelMatrix[2]; }
 
 	public:
+		//转换一个点到世界坐标,受位移,缩放,旋转影响
 		void transformPoint(const float3& local, float3& world);
+		//转换一个向量到世界坐标,受缩放和旋转影响
 		void transformVector(const float3& local, float3& world);
+		//转换一个旋转到世界坐标,不受缩放和位移影响
 		void transformRotation(const float3& local, float3& world);
-		//朝向永远以原点作为中心
+		//转换一个朝向到世界坐标,不受缩放影响
 		void transformDirection(const float3& local, float3& world);
+		//转换一个缩放到世界坐标,不受旋转和位移影响
+		void transformScale(const float3& local, float3& world);
 
-		//转化一个点,受位移,缩放和旋转影响
+		//转化一个点到局部坐标,受位移,缩放,旋转影响
 		void inverseTransformPoint(const float3& world, float3& local);
-		//转化一个向量,受缩放和旋转影响
+		//转化一个向量到局部坐标,受缩放和旋转影响
 		void inverseTransformVector(const float3& world, float3& local);
+		//转化一个旋转到局部坐标,不受缩放和位移影响
 		void inverseTransformRotation(const float3& world, float3& local);
-
-		//朝向永远以原点作为中心
+		//转换一个方向到局部坐标,不受缩放影响
 		void inverseTransformDirection(const float3& world, float3& local);
+		//转换一个缩放到局部坐标,不受旋转和位移影响
+		void inverseTransformScale(const float3& world, float3& local);
 
 	private:
-		void inverseTransform(const float3& worldPosition, const float3& worldRotation, const float3& worldScale, float3& localPosition, float3& localRotation, float3& localScale);
 		void calculatePureLocalToWorldRotationMatrix(float3x3& outMatrix);
 
 	public:

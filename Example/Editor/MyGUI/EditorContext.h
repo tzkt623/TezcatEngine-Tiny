@@ -44,6 +44,7 @@ namespace tezcat::Editor
 
 
 		static EditorCamera* EditorCamera;
+		static bool EditorSceneFoucsed;
 		static FrameBuffer* EditorFrameBuffer;
 		static Texture2D* EditorTex2DColor;
 
@@ -57,7 +58,9 @@ namespace tezcat::Editor
 		static void createCamera();
 		static void createBuildinModel(const std::string& model);
 		static void createDirectionLight();
-		static void endOfFrame();
+
+		static void beginFrame();
+		static void endFrame();
 
 	private:
 		static std::vector<ValueConfig*> mValueConfigAry;
