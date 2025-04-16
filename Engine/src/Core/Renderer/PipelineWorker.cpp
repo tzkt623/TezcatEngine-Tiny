@@ -106,11 +106,12 @@ namespace tezcat::Tiny
 		TINY_PIPELINE_INFO_PUSH(std::format("Shader:{}", mShader->getName()));
 
 		Graphics::getInstance()->buildCommand();
-
+		mFrameBufferChanged = false;
 		if (mFrameBuffer != nullptr)
 		{
 			if (Pipeline::getFrameCount() != mFrameBuffer->currentFrame())
 			{
+				mFrameBufferChanged = true;
 				mFrameBuffer->updateCurrentFrame(Pipeline::getFrameCount());
 				Graphics::getInstance()->bind(mFrameBuffer);
 
@@ -145,7 +146,7 @@ namespace tezcat::Tiny
 
 	void PipelinePass::endRender()
 	{
-		if (mFrameBuffer != nullptr)
+		if (mFrameBufferChanged)
 		{
 			Graphics::getInstance()->unbind(mFrameBuffer);
 		}
@@ -381,6 +382,7 @@ namespace tezcat::Tiny
 	{
 		for (auto pass : mPreRenderPassArray)
 		{
+			pass->onExitPipeline();
 			pass->deleteObject();
 		}
 		mPreRenderPassArray.clear();

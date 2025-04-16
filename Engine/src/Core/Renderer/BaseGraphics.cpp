@@ -119,10 +119,12 @@ namespace tezcat::Tiny
 
 	void BaseGraphics::unbind(FrameBuffer* frameBuffer)
 	{
-		if (mFrameBufferStack.top() != frameBuffer)
-		{
-			throw std::invalid_argument("Unbind FrameBuffer Error!!! the buffer must be the same");
-		}
+		//if (mFrameBufferStack.top() != frameBuffer)
+		//{
+		//	throw std::invalid_argument("Unbind FrameBuffer Error!!! the buffer must be the same");
+		//}
+
+		TINY_ASSERT(mFrameBufferStack.top() == frameBuffer);
 
 		mFrameBufferStack.top()->deleteObject();
 		mFrameBufferStack.pop();

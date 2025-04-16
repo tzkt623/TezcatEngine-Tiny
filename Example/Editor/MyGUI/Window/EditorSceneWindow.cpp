@@ -15,6 +15,10 @@ namespace tezcat::Editor
 		, mCameraMoveSpeed(100.0f)
 		, mOldTime(0)
 		, mCurrentTime(0)
+		, mUseSnap(false)
+		, mSnapTranslation(1.0f)
+		, mSnapRotation(1.0f)
+		, mSnapScale(1.0f)
 	{
 
 	}
@@ -111,6 +115,23 @@ namespace tezcat::Editor
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Snap"))
+			{
+				ImGui::Text("Enable");
+				ImGui::SameLine();
+				ImGui::Checkbox("##useSnap", &mUseSnap);
+				ImGui::Separator();
+
+				ImGui::Text("Translation");
+				ImGui::DragFloat3("##translation", &mSnapTranslation[0]);
+				ImGui::Text("Rotation");
+				ImGui::DragFloat3("##rotation", &mSnapRotation[0]);
+				ImGui::Text("Scale");
+				ImGui::DragFloat3("##scale", &mSnapScale[0]);
+
+				ImGui::EndMenu();
+			}
+
 			auto size = ImGui::CalcTextSize("Info");
 			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - size.x);
 
@@ -178,16 +199,33 @@ namespace tezcat::Editor
 							auto size = ImGui::GetItemRectSize();
 							ImGuizmo::SetRect(window_pos.x, window_pos.y, size.x, size.y);
 
+							float3 snap;
+							switch (EditorContext::SelectedObjectOperation)
+							{
+							case ImGuizmo::TRANSLATE:
+								snap = mSnapTranslation;
+								break;
+							case ImGuizmo::ROTATE:
+								snap = mSnapRotation;
+								break;
+							case ImGuizmo::SCALE:
+								snap = mSnapScale;
+								break;
+							default:
+								break;
+							}
+
 							auto transform = EditorContext::SelectedGameObject->getTransform();
 
 							//这个matrix是一个世界坐标系的矩阵
 							auto& transform_matrix = transform->getModelMatrix();
-
 							ImGuizmo::Manipulate(glm::value_ptr(EditorContext::EditorCamera->getViewMatrix())
 								, glm::value_ptr(EditorContext::EditorCamera->getProjectionMatrix())
 								, EditorContext::SelectedObjectOperation
 								, EditorContext::SelectedObjectMode
-								, glm::value_ptr(transform_matrix));
+								, glm::value_ptr(transform_matrix)
+								, 0
+								, mUseSnap ? &snap[0] : nullptr);
 
 
 							if (ImGuizmo::IsUsing())

@@ -32,6 +32,7 @@
 #include "Core/Renderer/RenderObserver.h"
 
 #include "Core/Engine.h"
+#include "Core/Event/EngineEvent.h"
 
 namespace tezcat::Tiny
 {
@@ -71,10 +72,16 @@ namespace tezcat::Tiny
 	{
 		//第一个Object默认为空
 		mArray.push_back(nullptr);
+		//EngineEvent::getInstance()->addListener(EngineEventID::EE_AfterSceneEnter, &mFreeIDQueue,
+		//	[](const EventData& data)
+		//	{
+		//
+		//	});
 	}
 
 	void GameObjectManager::active()
 	{
+
 	}
 
 	void GameObjectManager::deactive()
@@ -104,6 +111,10 @@ namespace tezcat::Tiny
 					mPass->addToPipeline();
 				}
 			}
+		}
+		else 
+		{
+			mPass->addToPipeline();
 		}
 	}
 

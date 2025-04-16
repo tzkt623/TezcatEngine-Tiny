@@ -33,6 +33,10 @@ namespace tezcat::Editor
 
 		ImVec2 mControlMousePos;
 		ImVec2 mOldControlMousePos;
+		float3 mSnapTranslation;
+		float3 mSnapRotation;
+		float3 mSnapScale;
+		bool mUseSnap;
 
 		double mOldTime;
 		double mCurrentTime;

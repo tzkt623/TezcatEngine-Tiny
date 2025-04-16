@@ -59,40 +59,43 @@ namespace tezcat::Editor
 		{
 			if (!SceneManager::isEmpty() && CameraManager::isDataValied())
 			{
-				//mViewPortPos = ImGui::GetItemRectMin();
-				if (mColorBuffer)
+				auto main_camera = CameraManager::getMainCamera().lock();
+				//有图有相机
+				if (mColorBuffer && main_camera)
 				{
 					ImVec2 display_size, offset, uv0, uv1, texture_size;
-					auto main_camera = CameraManager::getMainCamera().lock();
-					if (main_camera)
+					texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
+
+					ImGuiHelper::fitImageToRect(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+					main_camera->setViewRect(0, 0, display_size.x, display_size.y);
+
+					ImGui::SetCursorPos(offset);
+					ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
+								, display_size
+								, uv0
+								, uv1);
+
+					if (ImGui::IsItemHovered())
 					{
-						texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
-
-						ImGuiHelper::fitImageToRect(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
-						main_camera->setViewRect(0, 0, display_size.x, display_size.y);
-						//EditorContext::sViewPortSize = display_size;
-
-						ImGui::SetCursorPos(offset);
-						ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
-									, display_size
-									, uv0
-									, uv1);
-
-						if (ImGui::IsItemHovered())
-						{
-							EditorContext::IsFocusOnGameView = true;
-						}
+						EditorContext::IsFocusOnGameView = true;
 					}
-					else
-					{
-						texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
-						ImGuiHelper::fitImageToRect(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
+				}
+				//只有图没有相机
+				else if(mColorBuffer)
+				{
+					ImVec2 display_size, offset, uv0, uv1, texture_size;
+					texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
+					ImGuiHelper::fitImageToRect(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
 
-						ImGui::SetCursorPos(offset);
-						ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
-									, display_size
-									, ImVec2(0, 1)
-									, ImVec2(1, 0));
+					ImGui::SetCursorPos(offset);
+					ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
+								, display_size
+								, ImVec2(0, 1)
+								, ImVec2(1, 0));
+
+					if (ImGui::IsItemHovered())
+					{
+						EditorContext::IsFocusOnGameView = true;
 					}
 				}
 				else
@@ -103,39 +106,7 @@ namespace tezcat::Editor
 					ImVec2 pos((avail.x - size.x) * 0.5f, (avail.y - size.y) * 0.5f);
 					ImGui::SetCursorPos(pos);
 					ImGui::Text(str);
-
-					//texture_size = ImVec2((float)mColorBuffer->getWidth(), (float)mColorBuffer->getHeight());
-					//ImGuiHelper::fitImageToRect(texture_size, ImGui::GetWindowSize(), display_size, offset, uv0, uv1);
-					//
-					//ImGui::SetCursorPos(offset);
-					//ImGui::Image((ImTextureID)mColorBuffer->getTextureID()
-					//			, display_size
-					//			, ImVec2(0, 1)
-					//			, ImVec2(1, 0));
 				}
-
-				//mFramePos.x = mViewPortPos.x + offset.x;
-				//mFramePos.y = mViewPortPos.y + offset.y;
-				//
-				//auto mouse_pos = ImGui::GetMousePos();
-				//mMousePos.x = (mouse_pos.x - mFramePos.x);
-				//mMousePos.y = ImGui::GetItemRectSize().y - (mouse_pos.y - mFramePos.y);
-				//
-				//if (ImGui::IsItemHovered())
-				//{
-				//	if (!ImGuizmo::IsOver() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-				//	{
-				//		if (GameObjectManager::allowPickObject())
-				//		{
-				//			int32_t pos[2]
-				//			{
-				//				mMousePos.x,
-				//				mMousePos.y
-				//			};
-				//			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ReadObjectID, pos });
-				//		}
-				//	}
-				//}
 			}
 		}
 

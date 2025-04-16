@@ -247,6 +247,7 @@ namespace tezcat::Tiny
 		std::string mName;
 		Mode mMode;
 		bool mIsOnceModeExecuted;
+		bool mFrameBufferChanged;
 		Shader* mShader;
 		FrameBuffer* mFrameBuffer;
 		std::vector<RenderCommand*> mCommandArray;
