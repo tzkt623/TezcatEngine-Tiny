@@ -45,7 +45,8 @@ namespace tezcat::Editor
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_AfterSceneEnter, EditorFrameBuffer,
 			[](const EventData& data)
 			{
-
+				EditorCamera->getTransform()->setPosition(0.0f, 0.0f, 20.0f);
+				EditorCamera->getTransform()->setRotation(40.0f, 0.0f, 0.0f);
 			});
 
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_AfterSceneExit, EditorFrameBuffer,
@@ -83,6 +84,7 @@ namespace tezcat::Editor
 		EditorCamera->setPerspective(60, 0.1, 2000);
 		EditorCamera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
 		EditorCamera->setSortingID(-100);
+		EditorCamera->setClearColor(float4(0.3f, 0.3f, 0.3f, 1.0f));
 		EditorCamera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth | ClearOption::CO_Color);
 		EditorCamera->setFrameBuffer(EditorFrameBuffer);
 		for (int32_t i = 0; i < 32; i++)
@@ -92,8 +94,8 @@ namespace tezcat::Editor
 		EditorCamera->saveObject();
 
 		auto transform = Transform::create();
-		//transform->setPosition(float3(-41.715f, 174.206f, 382.644f));
-		//transform->setRotation(float3(-13.093f, -27.649f, 0.0f));
+		transform->setPosition(float3(0, 20.0f, 30.f));
+		transform->setRotation(float3(-30.0f, 0.0f, 0.0f));
 
 		EditorCamera->setTransform(transform);
 
@@ -218,9 +220,9 @@ namespace tezcat::Editor
 
 		auto shader = ShaderManager::find("Standard/StdValue1");
 
-		auto index_diffuse = shader->getUniformIndex("myDiffuse");
-		auto index_specular = shader->getUniformIndex("mySpecular");
-		auto index_shininess = shader->getUniformIndex("myShininess");
+		auto index_diffuse = shader->getUserUniformIndex("myDiffuse");
+		auto index_specular = shader->getUserUniformIndex("mySpecular");
+		auto index_shininess = shader->getUserUniformIndex("myShininess");
 
 		auto go = GameObject::create(model);
 		go->addComponent<Transform>();
@@ -303,7 +305,17 @@ namespace tezcat::Editor
 
 	void EditorContext::beginFrame()
 	{
-
+		//auto& style = ImGuizmo::GetStyle();
+		//style.HatchedAxisLineThickness = 2;
+		//
+		//style.TranslationLineArrowSize = 8;
+		//style.TranslationLineThickness = 8;
+		//
+		//style.RotationLineThickness = 8;
+		//style.RotationOuterLineThickness = 8;
+		//
+		//style.ScaleLineThickness = 8;
+		//style.ScaleLineCircleSize = 8;
 	}
 
 

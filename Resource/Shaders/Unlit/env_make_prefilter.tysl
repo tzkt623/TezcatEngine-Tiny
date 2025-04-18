@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/EnvMakePrefilter;
+    str Name = Hide/EnvMakePrefilter;
 }
 #TINY_HEAD_END
 

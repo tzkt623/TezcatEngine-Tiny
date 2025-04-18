@@ -53,7 +53,7 @@
 
             myColor = tiny_layout_Color;
             myUV = tiny_layout_UV;
-            myNormal = TINY_MatrixN * tiny_layout_Normal;
+            myNormal = normalize(TINY_MatrixN * tiny_layout_Normal);
             myWorldPosition = float3(TINY_MatrixM * position);
             myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
         }
@@ -118,7 +118,7 @@
 
         void main()
         {
-            float3 normal = normalize(myNormal);
+            float3 normal = myNormal;
             float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
             myFinalColor = float4(calcDirectionLight(TINY_LitDir, view_dir, normal), 1.0f);
             //myFinalColor = float4(1.0f, 0.0f, 1.0f, 1.0f);

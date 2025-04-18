@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/EnvMakeIrradiance;
+    str Name = Hide/EnvMakeIrradiance;
 }
 #TINY_HEAD_END
 

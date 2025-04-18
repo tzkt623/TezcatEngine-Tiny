@@ -17,6 +17,7 @@ namespace tezcat::Editor
 
 	void EditorEngineIniter::prepareEngine(Engine* engine)
 	{
+		TINY_LOG_ENGINE("Prepare Engine.....");
 		EngineIniter::prepareEngine(engine);
 		EditorEvent::get()->init(EditorEventID::Count);
 
@@ -32,13 +33,15 @@ namespace tezcat::Editor
 
 	void EditorEngineIniter::prepareResource(Engine* engine)
 	{
+		TINY_LOG_ENGINE("Prepare Resource.....");
 		EngineIniter::prepareResource(engine);
+		ShaderManager::loadShaderFiles("Resource/Shaders/Tutorial");
 	}
 
 	void EditorEngineIniter::prepareGame(Engine* engine)
 	{
+		TINY_LOG_ENGINE("Prepare Scene.....");
 		EngineIniter::prepareGame(engine);
-		ShaderManager::loadShaderFiles("Resource/Shaders/Tutorial");
 
 		MyMainScene::create("MainScene")->prepare();
 		SceneHelper::prepareTutorialScene();
@@ -46,6 +49,6 @@ namespace tezcat::Editor
 
 	void EditorEngineIniter::initYourShaderParam()
 	{
-		std::cout << "Init My Shader Params\n";
+		//std::cout << "Init My Shader Params\n";
 	}
 }

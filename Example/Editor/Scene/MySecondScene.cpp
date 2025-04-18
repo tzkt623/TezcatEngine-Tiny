@@ -50,9 +50,9 @@ void MySeconedScene::onEnter()
 
 		auto shader = ShaderManager::find("Standard/Std1");
 
-		auto index_diffuse = shader->getUniformIndex("myTex2DDiffuse");
-		auto index_specular = shader->getUniformIndex("myTex2DSpecular");
-		auto index_shininess = shader->getUniformIndex("myShininess");
+		auto index_diffuse = shader->getUserUniformIndex("myTex2DDiffuse");
+		auto index_specular = shader->getUserUniformIndex("myTex2DSpecular");
+		auto index_shininess = shader->getUserUniformIndex("myShininess");
 
 		auto tex_diff = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_diff.jpg");
 		auto tex_spec = ResourceManager::loadOnly<Texture2D>("Image/metal_plate_spec.jpg");

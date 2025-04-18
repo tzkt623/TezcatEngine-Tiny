@@ -29,8 +29,8 @@ void Tutorial_Cube::onEnter()
 	mObserver->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 
 	auto shader = ShaderManager::find("Tutorial/Cube");
-	auto config_mvp = shader->getUniformValueConfig("MVP");
-	auto config_color = shader->getUniformValueConfig("myColor");
+	auto config_mvp = shader->getUserUniformValueConfig("MVP");
+	auto config_color = shader->getUserUniformValueConfig("myColor");
 
 	mPass = ReplacedPipelinePass::create(mObserver, shader);
 	mPass->setCustomCulling([=](ReplacedPipelinePass* pass)

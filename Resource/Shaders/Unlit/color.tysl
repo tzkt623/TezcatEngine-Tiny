@@ -45,7 +45,7 @@
         in float4 myOutColor;
         in float4 myWorldPosition;
 
-        [Editor(Color)]
+        [Editor(Color, Color)]
         uniform float3 myColor;
         out float4 myFinalColor;
 

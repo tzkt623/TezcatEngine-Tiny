@@ -1,0 +1,100 @@
+#TINY_HEAD_BEGIN
+{
+    str Name = Tutorial/Fresnel;
+}
+#TINY_HEAD_END
+
+#TINY_PASS_BEGIN
+{
+    #TINY_CFG_BEGIN
+    {
+        int Version = 330;
+        int OrderID = 0;
+        str Queue = Opaque;
+        str DepthTest = Less;
+        bool ZWrite = true;
+        str CullFace = Back;
+    }
+    #TINY_CFG_END
+
+    #TINY_VS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_NORMAL;
+        TINY_LAYOUT_UV;
+        TINY_LAYOUT_COLOR;
+
+        out float3 myNormal;
+        out float3 myWorldPos;
+
+        void main()
+        {
+            gl_Position = TINY_MatrixVP * TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
+            myNormal = normalize(TINY_MatrixN * tiny_layout_Normal);
+            myWorldPos = float3(TINY_MatrixM * float4(tiny_layout_Position, 1.0f));
+        }
+    }
+    #TINY_VS_END
+
+    #TINY_FS_BEGIN
+    {
+        #include "../Include/tiny_fs.tyin"
+
+        in float3 myNormal;
+        in float3 myWorldPos;
+        out float4 myFinalColor;
+
+        [Editor(Fresnel, Color)]
+        uniform float3 myFresnel;
+
+        [Editor(Switcher)]
+        uniform int mySwitcher;
+
+        void main()
+        {
+            float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPos);
+            float3 half = normalize(view_dir + (-TINY_LitDir.direction));
+            float NdotH = max(dot(myNormal, half), 0.0f);
+            float VdotH = max(dot(view_dir, half), 0.0f);
+            float NdotV = max(dot(view_dir, myNormal), 0.0f);
+
+            float3 F;
+            if(mySwitcher == 0)
+            {
+                F = fresnelSchlick(NdotV, myFresnel);
+            }
+            else
+            {
+                F = fresnelSchlick(VdotH, myFresnel);
+            }
+
+            myFinalColor = float4(F, 1.0f);
+       
+        } 
+    }
+    #TINY_FS_END
+}
+#TINY_PASS_END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -11,16 +11,19 @@ namespace tezcat::Editor
 	//
 	bool WindowsEditor::preInit()
 	{
+		TINY_LOG_ENGINE("Editor Pre Init.....");
 		return Engine::preInit();
 	}
 
 	bool WindowsEditor::onInit()
 	{
+		TINY_LOG_ENGINE("Editor On Init.....");
 		return Engine::onInit();
 	}
 
 	bool WindowsEditor::postInit()
 	{
+		TINY_LOG_ENGINE("Editor Post Init.....");
 		mWindow = ((GLGraphics*)mGraphics)->getGLFWwindow();
 		mInputSystem->setWindow(mWindow);
 
@@ -37,6 +40,7 @@ namespace tezcat::Editor
 
 	void WindowsEditor::beforeLoop()
 	{
+		TINY_LOG_ENGINE("Editor Before Loop.....");
 		Engine::beforeLoop();
 		mTimeOld = glfwGetTime();
 		mTimeNow = 0;
@@ -45,6 +49,7 @@ namespace tezcat::Editor
 
 	void WindowsEditor::endLoop()
 	{
+		TINY_LOG_ENGINE("Editor End Loop.....");
 		Engine::endLoop();
 		glfwTerminate();
 	}

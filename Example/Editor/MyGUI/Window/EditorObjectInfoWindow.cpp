@@ -6,14 +6,134 @@ namespace tezcat::Editor
 	TINY_EDITOR_WINDOW_INSTANCE_CPP(EditorObjectInfoWindow);
 	EditorObjectInfoWindow::EditorObjectInfoWindow()
 		: GUIWindow("物体信息(ObjectInfo)")
-		//, mGameObject(nullptr)
 		, mDrawFunctions()
-		, mNameBuffer(256, '\0')
 	{
-		// 		MyEvent::get()->addListener(MyEventID::Window_ObjectSelected, this, [this](const EventData& data)
-		// 			{
-		// 				mGameObject = static_cast<GameObject*>(data.userData);
-		// 			});
+		mShaderValueFunctionArray.resize((int32_t)UniformType::Count, {});
+		mShaderValueFunctionArray[(int32_t)UniformType::Bool] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
+			{
+				auto f1 = (UniformI1*)uniform;
+				ImGui::Text(config->editorName.c_str());
+				ImGui::PushID(id);
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				bool v = f1->value;
+				if (ImGui::Checkbox("", &v))
+				{
+					f1->value = v;
+				}
+				ImGui::PopID();
+
+				ImGui::Spacing();
+			};
+
+		mShaderValueFunctionArray[(int32_t)UniformType::Int] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
+			{
+				auto f1 = (UniformI1*)uniform;
+				ImGui::Text(config->editorName.c_str());
+				ImGui::PushID(id);
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				ImGui::DragInt("", &f1->value, 0.02f);
+				ImGui::PopID();
+
+				ImGui::Spacing();
+			};
+
+		mShaderValueFunctionArray[(int32_t)UniformType::Float] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
+			{
+				auto f1 = (UniformF1*)uniform;
+				auto range = (RangeFloat*)config->range.get();
+				ImGui::Text(config->editorName.c_str());
+				ImGui::PushID(id);
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				ImGui::DragFloat("", &f1->value, 0.02f, range->min, range->max);
+				ImGui::PopID();
+
+				ImGui::Spacing();
+			};
+		mShaderValueFunctionArray[(int32_t)UniformType::Float3] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
+			{
+				auto f3 = (UniformF3*)uniform;
+
+				ImGui::Text(config->editorName.c_str());
+				ImGui::PushID(id);
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				if (config->constraint == ShaderConstraint::Color)
+				{
+					ImGui::ColorEdit3("", glm::value_ptr(f3->value));
+				}
+				else
+				{
+					auto range = (RangeFloat*)config->range.get();
+					ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f, range->min, range->max);
+				}
+
+				ImGui::PopID();
+
+				ImGui::Spacing();
+			};
+		mShaderValueFunctionArray[(int32_t)UniformType::Float4] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
+			{
+				auto f4 = (UniformF4*)uniform;
+
+				ImGui::Text(config->editorName.c_str());
+				ImGui::PushID(id);
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				if (config->constraint == ShaderConstraint::Color)
+				{
+					ImGui::ColorEdit4("", glm::value_ptr(f4->value));
+				}
+				else
+				{
+					auto range = (RangeFloat*)config->range.get();
+					ImGui::DragFloat4("", glm::value_ptr(f4->value), 0.02f, range->min, range->max);
+				}
+
+				ImGui::PopID();
+
+				ImGui::Spacing();
+			};
+		mShaderValueFunctionArray[(int32_t)UniformType::Tex2D] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
+			{
+				auto tex = (UniformTex2D*)uniform;
+				ImGui::Text(config->editorName.c_str());
+				if (tex->value)
+				{
+					ImGui::Image((ImTextureID)tex->value->getTextureID()
+						, ImVec2(100, 100)
+						, ImVec2(0, 1)
+						, ImVec2(1, 0));
+				}
+				else
+				{
+					ImGui::PushID(id);
+					ImGui::ImageButton(""
+						, 0
+						, ImVec2(100, 100)
+						, ImVec2(0, 1)
+						, ImVec2(1, 0));
+					ImGui::PopID();
+				}
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+
+					if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+					{
+						tex->set(nullptr);
+					}
+				}
+
+				ImGuiHelper::dropResource([&tex](file_path path)
+				{
+					Texture2D* img = ResourceManager::loadAndSave<Texture2D>(path);
+					if (img)
+					{
+						tex->set(img);
+					}
+				});
+
+				ImGui::Spacing();
+			};
 
 		this->drawComponent<Transform>([](Component* com)
 		{
@@ -174,23 +294,29 @@ namespace tezcat::Editor
 
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
-					auto config = EditorContext::getValueConfig(ShaderParam::LightDirection::Ambient);
-					ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Ambient).data());
+					//auto config = EditorContext::getValueConfig(ShaderParam::LightDirection::Ambient);
+					//ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Ambient).data());
+					ImGui::Text("Ambient");
 					ImGui::TableNextColumn();
+					ImGui::SetNextItemWidth(-FLT_MIN);
 					ImGui::ColorEdit3("##0", glm::value_ptr(lit->getAmbient()));
 
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
-					config = EditorContext::getValueConfig(ShaderParam::LightDirection::Diffuse);
-					ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Diffuse).data());
+					//config = EditorContext::getValueConfig(ShaderParam::LightDirection::Diffuse);
+					//ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Diffuse).data());
+					ImGui::Text("Diffuse");
 					ImGui::TableNextColumn();
+					ImGui::SetNextItemWidth(-FLT_MIN);
 					ImGui::ColorEdit3("##1", glm::value_ptr(lit->getDiffuse()));
 
 					ImGui::TableNextRow();
 					ImGui::TableNextColumn();
-					config = EditorContext::getValueConfig(ShaderParam::LightDirection::Specular);
-					ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Specular).data());
+					//config = EditorContext::getValueConfig(ShaderParam::LightDirection::Specular);
+					//ImGui::Text(UniformID::staticGetString(ShaderParam::LightDirection::Specular).data());
+					ImGui::Text("Specular");
 					ImGui::TableNextColumn();
+					ImGui::SetNextItemWidth(-FLT_MIN);
 					ImGui::ColorEdit3("##2", glm::value_ptr(lit->getSpecular()));
 
 					ImGui::EndTable();
@@ -485,11 +611,11 @@ namespace tezcat::Editor
 		{
 			this->drawExtraMaterial();
 
-			if (ImGui::BeginPopup("ShaderManager##vaf"))
+			if (ImGui::BeginPopup("ShaderFiles##001"))
 			{
 				auto mt = mMeshRenderer->getMaterial();
 				auto shader = mt->getShader();
-				auto& shaders = ShaderManager::getAllShaders();
+				auto& shaders = ShaderManager::getAllowUseShaders();
 
 				for (auto& pair : shaders)
 				{
@@ -535,107 +661,19 @@ namespace tezcat::Editor
 			{
 				//MyEvent::get()->dispatch({ MyEventID::Window_OpenShaderManager, mMeshRenderer });
 
-				ImGui::OpenPopup("ShaderManager##vaf");
+				ImGui::OpenPopup("ShaderFiles##001");
 			}
 			ImGui::SameLine();
 			ImGui::Text(shader->getName().c_str());
 
-			//ImGuiHelper::textWithBG("{}", shader->getName());
-			//auto pos = ImGui::GetCursorPos();
-			//ImGui::CalcTextSize(shader->getName().c_str());
-			//ImGui::Text(shader->getName().c_str());
-			//ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetItemRectMin()
-			//	, ImGui::GetItemRectMax()
-			//	, ImColor(255, 100, 100, 255));
-			//ImGui::SetCursorPos(pos);
 
 			uint32_t widget_id = 0;
 			for (uint32_t i = 0; i < uniforms.size(); i++)
 			{
-				auto info = shader->getUniformValueConfig(i);
+				auto info = shader->getUserUniformValueConfig(i);
 				auto uniform = uniforms[i];
 
-				switch (uniform->getType())
-				{
-				case UniformType::Float:
-				{
-					auto f1 = (UniformF1*)uniform;
-					auto range = (RangeFloat*)info->range.get();
-					ImGui::Text(info->editorName.c_str());
-					ImGui::PushID(widget_id++);
-					ImGui::DragFloat("", &f1->value, 0.02f, range->min, range->max);
-					ImGui::PopID();
-
-					ImGui::Spacing();
-					break;
-				}
-				case UniformType::Float3:
-				{
-					auto f3 = (UniformF3*)uniform;
-
-					ImGui::Text(info->editorName.c_str());
-					ImGui::PushID(widget_id++);
-					if (info->constraint == ShaderConstraint::Color)
-					{
-						ImGui::ColorEdit3("", glm::value_ptr(f3->value));
-					}
-					else
-					{
-						auto range = (RangeFloat*)info->range.get();
-						ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f, range->min, range->max);
-					}
-
-					ImGui::PopID();
-
-					ImGui::Spacing();
-					break;
-				}
-				case UniformType::Tex2D:
-				{
-					auto tex = (UniformTex2D*)uniform;
-					ImGui::Text(info->editorName.c_str());
-					if (tex->value)
-					{
-						ImGui::Image((ImTextureID)tex->value->getTextureID()
-							, ImVec2(100, 100)
-							, ImVec2(0, 1)
-							, ImVec2(1, 0));
-					}
-					else
-					{
-						ImGuiHelper::rect(widget_id++
-							, ImVec2(100, 100)
-							, ImGui::GetColorU32(ImGuiCol_Button));
-
-						//ImGui::PushID(widget_id++);
-						//ImGui::Button("Empty", ImVec2(100, 100));
-						//ImGui::PopID();
-					}
-
-					if (ImGui::IsItemHovered())
-					{
-						ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-					}
-
-					ImGuiHelper::dropResource([&tex](file_path path)
-					{
-						Image* img = Image::create();
-						if (img->openFile(path))
-						{
-							Texture2D* new_tex = Texture2D::create();
-							new_tex->setImage(img);
-							new_tex->generate();
-
-							tex->set(new_tex);
-						}
-					});
-
-					ImGui::Spacing();
-					break;
-				}
-				default:
-					break;
-				}
+				mShaderValueFunctionArray[(int32_t)uniform->getType()](uniform, info, widget_id++);
 			}
 		}
 	}

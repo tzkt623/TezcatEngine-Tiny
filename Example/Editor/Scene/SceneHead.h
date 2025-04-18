@@ -6,6 +6,7 @@
 #include "Tutorial_Cube.h"
 #include "Tutorial_Camera.h"
 #include "Tutorial_FrameBuffer.h"
+#include "Tutorial_Lighting.h"
 
 class SceneHelper
 {
@@ -17,5 +18,6 @@ public:
 		Tutorial_Cube::create("Tutorial Cube")->prepare();
 		Tutorial_Camera::create("Tutorial Camera")->prepare();
 		Tutorial_FrameBuffer::create("Tutorial FrameBuffer")->prepare();
+		Tutorial_Lighting::create("Tutorial Lighting")->prepare();
 	}
 };

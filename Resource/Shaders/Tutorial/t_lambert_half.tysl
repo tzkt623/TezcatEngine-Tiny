@@ -1,0 +1,82 @@
+#TINY_HEAD_BEGIN
+{
+    str Name = Tutorial/LambertHalf;
+}
+#TINY_HEAD_END
+
+#TINY_PASS_BEGIN
+{
+    #TINY_CFG_BEGIN
+    {
+        int Version = 330;
+        int OrderID = 0;
+        str Queue = Opaque;
+        str DepthTest = Less;
+        bool ZWrite = true;
+        str CullFace = Back;
+    }
+    #TINY_CFG_END
+
+    #TINY_VS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_NORMAL;
+        TINY_LAYOUT_UV;
+        TINY_LAYOUT_COLOR;
+
+        out float3 myNormal;
+        out float3 myWorldPos;
+
+        void main()
+        {
+            gl_Position = TINY_MatrixVP * TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
+            myNormal = normalize(TINY_MatrixN * tiny_layout_Normal);
+            myWorldPos = float3(TINY_MatrixM * float4(tiny_layout_Position, 1.0f));
+        }
+    }
+    #TINY_VS_END
+
+    #TINY_FS_BEGIN
+    {
+        #include "../Include/tiny_fs.tyin"
+
+        in float3 myNormal;
+        in float3 myWorldPos;
+        out float4 myFinalColor;
+
+        [Editor(Color, Color)]
+        uniform float4 myColor;
+
+        void main()
+        {
+            //lambert
+            float diff = dot(myNormal, -TINY_LitDir.direction);
+            diff = max(0, diff) * 0.5f + 0.5f; //half lambert
+
+            float3 diffuse = myColor.rgb * TINY_LitDir.diffuse * diff;
+            myFinalColor = float4(diffuse, 1.0f);
+       
+        } 
+    }
+    #TINY_FS_END
+}
+#TINY_PASS_END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

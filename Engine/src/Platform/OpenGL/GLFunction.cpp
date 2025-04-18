@@ -696,7 +696,7 @@ namespace tezcat::Tiny::GL
 		, TextureCube* skybox) const
 	{
 		shader->resetLocalState();
-		auto uniform_config = shader->getUniformValueConfig("myTexHDR2D");
+		auto uniform_config = shader->getUserUniformValueConfig("myTexHDR2D");
 		Graphics::getInstance()->setTexture2D(shader, uniform_config->valueID, texHDR);
 
 		auto array = LightingManager::getCubeMapTextureArray();

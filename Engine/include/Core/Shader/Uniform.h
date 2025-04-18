@@ -90,7 +90,10 @@ namespace tezcat::Tiny
 				this->value->deleteObject();
 			}
 			this->value = TINY_FWD(value);
-			this->value->saveObject();
+			if (this->value)
+			{
+				this->value->saveObject();
+			}
 		}
 
 		void set(ValueType& value)
@@ -100,7 +103,10 @@ namespace tezcat::Tiny
 				this->value->deleteObject();
 			}
 			this->value = value;
-			this->value->saveObject();
+			if (this->value)
+			{
+				this->value->saveObject();
+			}
 		}
 
 		ValueType value;

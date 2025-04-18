@@ -82,7 +82,7 @@ namespace tezcat::Tiny
 		mShader = shader;
 		mShader->saveObject();
 
-		auto& umap = mShader->getUniformMap();
+		auto& umap = mShader->getUserUniformMap();
 		mUniforms.resize(umap.size(), nullptr);
 
 		for (auto& pair : umap)

@@ -40,7 +40,7 @@
 
             myColor = tiny_layout_Color;
             myUV = tiny_layout_UV;
-            myNormal = TINY_MatrixN * tiny_layout_Normal;
+            myNormal = normalize(TINY_MatrixN * tiny_layout_Normal);
             myWorldPosition = float3(position);
             myLightPosition = TINY_MatrixLightVP * float4(myWorldPosition, 1.0f);
 
@@ -70,7 +70,7 @@
             float roughness = myPBR.roughness;
             float ao = myPBR.ao;
 
-            float3 N = normalize(myNormal);
+            float3 N = myNormal;
             float3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
             float3 R = reflect(-V, N); 
 
@@ -139,6 +139,7 @@
     #TINY_FS_END
 }
 #TINY_PASS_END
+
 
 
 

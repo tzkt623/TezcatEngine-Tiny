@@ -11,7 +11,7 @@ namespace tezcat::Tiny
 	enum class TINY_API UniformType : int8_t
 	{
 		Error = -1,
-		Bool,
+		Bool = 0,
 		Int, Int2, Int3, Int4,
 		UInt, UInt2, UInt3, UInt4,
 		Float, Float2, Float3, Float4,

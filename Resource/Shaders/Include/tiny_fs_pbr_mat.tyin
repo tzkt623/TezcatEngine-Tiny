@@ -12,6 +12,8 @@ struct MatPBR_Test
 
 struct MatPBR_Std1
 {
+    [Editor(Normal2D)]
+    tex2D normal2D;
     [Editor(Albedo2D)]
     tex2D albedo2D;
     [Editor(Metallic2D)]

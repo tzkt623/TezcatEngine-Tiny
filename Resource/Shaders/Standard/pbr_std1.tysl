@@ -30,7 +30,7 @@
 
         out float4 myColor;
         out float2 myUV;
-        out float3 myNormal;
+        //out float3 myNormal;
         out float3 myWorldPosition;
         out float4 myLightPosition;
 
@@ -40,7 +40,7 @@
 
             myColor = tiny_layout_Color;
             myUV = tiny_layout_UV;
-            myNormal = TINY_MatrixN * tiny_layout_Normal;
+            //myNormal = normalize(TINY_MatrixN * tiny_layout_Normal);
             myWorldPosition = float3(position);
 
             gl_Position = TINY_MatrixP * TINY_MatrixV * position;
@@ -54,7 +54,7 @@
 
         in float4 myColor;
         in float2 myUV;
-        in float3 myNormal;
+        //in float3 myNormal;
         in float3 myWorldPosition;
         
         out float4 myFinalColor;
@@ -70,7 +70,7 @@
             float3 F0 = float3(0.04); 
             F0 = mix(F0, albedo, metallic);
 
-            float3 N = normalize(myNormal);
+            float3 N = normalize(texture(myPBR.normal2D, myUV).xyz * 2.0f - 1.0f);
             float3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
             float3 R = reflect(-V, N); 
 

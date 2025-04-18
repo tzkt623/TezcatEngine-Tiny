@@ -251,6 +251,7 @@ namespace tezcat::Tiny
 
 		virtual void setGlobalTexture2D(Shader* shader, const int32_t& valueID, Texture2D* data) = 0;
 		virtual void setTexture2D(Shader* shader, const int32_t& valueID, Texture2D* data) = 0;
+		virtual void setNullTexture2D(Shader* shader, const int32_t& valueID) = 0;
 
 		virtual void setGlobalTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data) = 0;
 		virtual void setTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data) = 0;

@@ -190,6 +190,7 @@ namespace tezcat::Tiny::GL
 
 		void setGlobalTexture2D(Shader* shader, const int32_t& valueID, Texture2D* data) override;
 		void setTexture2D(Shader* shader, const int32_t& valueID, Texture2D* data) override;
+		void setNullTexture2D(Shader* shader, const int32_t& valueID) override;
 		void setGlobalTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data) override;
 		void setTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data) override;
 

@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/EnvMakeCube;
+    str Name = Hide/EnvMakeCube;
 }
 #TINY_HEAD_END
 

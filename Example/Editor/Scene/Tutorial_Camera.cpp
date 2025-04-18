@@ -28,8 +28,8 @@ void Tutorial_Camera::onEnter()
 	mObserver->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 
 	auto shader = ShaderManager::find("Tutorial/Cube");
-	auto config_mvp = shader->getUniformValueConfig("MVP");
-	auto config_color = shader->getUniformValueConfig("myColor");
+	auto config_mvp = shader->getUserUniformValueConfig("MVP");
+	auto config_color = shader->getUserUniformValueConfig("myColor");
 
 	mProjectionMatrix = glm::perspective(glm::radians(75.0f), (float)Engine::getScreenWidth() / Engine::getScreenHeight(), 0.01f, 100.0f);
 	mViewMatrix = glm::lookAt(float3(0.0f, 0.0f, 0.0f)

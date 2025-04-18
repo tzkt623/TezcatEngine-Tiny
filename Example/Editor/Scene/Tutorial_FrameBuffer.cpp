@@ -30,8 +30,8 @@ void Tutorial_FrameBuffer::onEnter()
 	mObserver->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 
 	auto shader = ShaderManager::find("Tutorial/Cube");
-	auto config_mvp = shader->getUniformValueConfig("MVP");
-	auto config_color = shader->getUniformValueConfig("myColor");
+	auto config_mvp = shader->getUserUniformValueConfig("MVP");
+	auto config_color = shader->getUserUniformValueConfig("myColor");
 
 	mTimeBegin = std::chrono::high_resolution_clock::now();
 

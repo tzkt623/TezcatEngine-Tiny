@@ -152,7 +152,7 @@ namespace tezcat::Tiny
 
 	void GameObjectManager::createPass(BaseRenderObserver* observer)
 	{
-		mPass = ReplacedPipelinePass::create(observer, ShaderManager::find("Unlit/ObjectID"));
+		mPass = ReplacedPipelinePass::create(observer, ShaderManager::find("Hide/ObjectID"));
 		mPass->setFrameBuffer(mFrameBuffer);
 		mPass->setAutoCulling([](BaseMeshRenderer* renderer)
 			{

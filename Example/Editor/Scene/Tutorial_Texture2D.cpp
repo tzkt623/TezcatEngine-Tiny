@@ -30,7 +30,7 @@ void Tutorial_Texture2D::onEnter()
 	auto mTexture = ResourceManager::loadAndSave<Texture2D>("Resource/Image/eldenring2.jpg");
 
 	auto shader = ShaderManager::find("Tutorial/Texture2D");
-	auto config = shader->getUniformValueConfig("myTexColor2D");
+	auto config = shader->getUserUniformValueConfig("myTexColor2D");
 	mPass = ReplacedPipelinePass::create(mObserver, shader);
 	mPass->setCustomCulling([=](ReplacedPipelinePass* pass)
 	{

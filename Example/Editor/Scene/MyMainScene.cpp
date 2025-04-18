@@ -101,7 +101,7 @@ void MyMainScene::createGates(float gateWidth, float gateHigh)
 
 	auto shader = world1_material->getShader();
 	auto tex = (Texture2D*)TextureManager::find("RB_World1");
-	auto index = shader->getUniformIndex("myTexColor2D");
+	auto index = shader->getUserUniformIndex("myTexColor2D");
 	world1_material->setUniform<UniformTex2D>(index, tex);
 
 
@@ -118,7 +118,7 @@ void MyMainScene::createGates(float gateWidth, float gateHigh)
 	mr2->setMaterial(world2_material);
 
 	tex = (Texture2D*)TextureManager::find("RB_World2");
-	index = shader->getUniformIndex("myTexColor2D");
+	index = shader->getUserUniformIndex("myTexColor2D");
 	world2_material->setUniform<UniformTex2D>(index, tex);
 }
 
@@ -141,7 +141,7 @@ void MyMainScene::createPaintings()
 
 	auto wife_material2 = Material::create("Unlit/Texture");
 	auto shader = wife_material2->getShader();
-	auto my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
+	auto my_tex2d_color_index = shader->getUserUniformIndex("myTexColor2D");
 	auto tex = ResourceManager::loadOnly<Texture2D>("Resource/Image/wife.jpg");
 	wife_material2->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 	mr2->setMaterial(wife_material2);
@@ -200,7 +200,7 @@ void MyMainScene::createPaintings()
 	mg->setMesh("Square");
 
 	shader = gaussian_material->getShader();
-	my_tex2d_color_index = shader->getUniformIndex("myTexColor2D");
+	my_tex2d_color_index = shader->getUserUniformIndex("myTexColor2D");
 	gaussian_material->setUniform<UniformTex2D>(my_tex2d_color_index, hdr);
 }
 
@@ -219,9 +219,9 @@ void MyMainScene::createPlane()
 	mr->setMaterial(plane_material);
 
 	auto shader = plane_material->getShader();
-	auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
-	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
-	auto index_shininess = shader->getUniformIndex("myTexShininess2D");
+	auto index_diffuse = shader->getUserUniformIndex("myTexDiffuse2D");
+	auto index_specular = shader->getUserUniformIndex("myTexSpecular2D");
+	auto index_shininess = shader->getUserUniformIndex("myTexShininess2D");
 
 	auto tex_diff = ResourceManager::loadOnly<Texture2D>("Resource/Image/stone_wall_diff.jpg");
 	auto tex_spec = ResourceManager::loadOnly<Texture2D>("Resource/Image/stone_wall_ao.jpg");
@@ -244,9 +244,9 @@ void MyMainScene::createCubes0()
 
 	auto shader = ShaderManager::find("Standard/Std1");
 
-	auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
-	auto index_specular = shader->getUniformIndex("myTexSpecular2D");
-	auto index_shininess = shader->getUniformIndex("myTexShininess2D");
+	auto index_diffuse = shader->getUserUniformIndex("myTexDiffuse2D");
+	auto index_specular = shader->getUserUniformIndex("myTexSpecular2D");
+	auto index_shininess = shader->getUserUniformIndex("myTexShininess2D");
 
 	auto tex_diff = ResourceManager::loadOnly<Texture2D>("Resource/Image/metal_plate_diff.jpg");
 	auto tex_spec = ResourceManager::loadOnly<Texture2D>("Resource/Image/metal_plate_spec.jpg");
@@ -297,7 +297,7 @@ void MyMainScene::createTransparentObject()
 		mr->setMaterial(material);
 
 		auto shader = material->getShader();
-		auto index_color = shader->getUniformIndex("myTexColor2D");
+		auto index_color = shader->getUserUniformIndex("myTexColor2D");
 		auto tex = ResourceManager::loadOnly<Texture2D>("Resource/Image/transparent_window.png");
 		material->setUniform<UniformTex2D>(index_color, tex);
 	}
@@ -355,10 +355,10 @@ void MyMainScene::createPBR()
 	transform->setPosition(float3(0.0f, 0.0f, -20.0f));
 
 	auto shader = ShaderManager::find("Standard/PBRTest1");
-	auto index_albedo = shader->getUniformIndex("myPBR.albedo");
-	auto index_metallic = shader->getUniformIndex("myPBR.metallic");
-	auto index_roughness = shader->getUniformIndex("myPBR.roughness");
-	auto index_ao = shader->getUniformIndex("myPBR.ao");
+	auto index_albedo = shader->getUserUniformIndex("myPBR.albedo");
+	auto index_metallic = shader->getUserUniformIndex("myPBR.metallic");
+	auto index_roughness = shader->getUserUniformIndex("myPBR.roughness");
+	auto index_ao = shader->getUserUniformIndex("myPBR.ao");
 
 	int number = 5;
 	float rate = 1.0f / (float)number;

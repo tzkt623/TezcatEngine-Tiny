@@ -120,12 +120,20 @@ namespace tezcat::Editor
 				{
 					EditorContext::EditorCamera->setFar(far);
 				}
-				ImGui::Separator();
 				ImGui::Text("FOV");
 				int fov = EditorContext::EditorCamera->getFOV();
 				if (ImGui::SliderInt("##fov", &fov, 1.0f, 180.0f))
 				{
 					EditorContext::EditorCamera->setFOV(fov);
+				}
+
+				ImGui::Separator();
+
+				ImGui::Text("ClearOption");
+				float4 clear_color = EditorContext::EditorCamera->getClearColor();
+				if (ImGui::ColorEdit4("##clear", &clear_color[0]))
+				{
+					EditorContext::EditorCamera->setClearColor(clear_color);
 				}
 
 				ImGui::EndMenu();

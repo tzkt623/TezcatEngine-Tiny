@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/EnvMakeBRDFLut;
+    str Name = Hide/EnvMakeBRDFLut;
 }
 #TINY_HEAD_END
 

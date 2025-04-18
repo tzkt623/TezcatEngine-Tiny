@@ -94,21 +94,21 @@ namespace tezcat::Tiny
 			return it->second->index;
 		}
 
-		int getUniformIndex(const std::string_view& name)
+		int32_t getUserUniformIndex(const std::string_view& name)
 		{
 			auto it = mUserUniformValueConfigMap.find(name);
 			TINY_THROW_RUNTIME(it == mUserUniformValueConfigMap.end(), name);
 			return it->second->index;
 		}
 
-		UniformValueConfig* getUniformValueConfig(const std::string_view& name) const
+		UniformValueConfig* getUserUniformValueConfig(const std::string_view& name) const
 		{
 			auto it = mUserUniformValueConfigMap.find(name);
 			TINY_THROW_RUNTIME(it == mUserUniformValueConfigMap.end(), name);
 			return it->second;
 		}
 
-		UniformValueConfig* getUniformValueConfig(const uint32_t& index) const
+		UniformValueConfig* getUserUniformValueConfig(const uint32_t& index) const
 		{
 			return mUserUniformValueConfigAry[index];
 		}
@@ -168,12 +168,12 @@ namespace tezcat::Tiny
 			return mTinyUniformList;
 		}
 
-		const auto& getUniformMap() const
+		const auto& getUserUniformMap() const
 		{
 			return mUserUniformValueConfigMap;
 		}
 
-		const auto& getUniformAry() const
+		const auto& getUserUniformAry() const
 		{
 			return mUserUniformValueConfigAry;
 		}

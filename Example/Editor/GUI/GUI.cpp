@@ -64,6 +64,18 @@ namespace tezcat::Editor
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init(glsl_version);
+
+		auto& style = ImGuizmo::GetStyle();
+		style.HatchedAxisLineThickness = 2;
+
+		style.TranslationLineArrowSize = 8;
+		style.TranslationLineThickness = 8;
+
+		style.RotationLineThickness = 8;
+		style.RotationOuterLineThickness = 8;
+
+		style.ScaleLineThickness = 8;
+		style.ScaleLineCircleSize = 8;
 	}
 
 	void GUI::render()

@@ -28,6 +28,7 @@
 namespace tezcat::Tiny
 {
 	std::unordered_map<std::string_view, Shader*> ShaderManager::mShaderUMap;
+	std::unordered_map<std::string_view, Shader*> ShaderManager::mCanUseUMap;
 
 	void ShaderManager::loadShaderFiles(const std::string& path)
 	{
@@ -78,10 +79,20 @@ namespace tezcat::Tiny
 
 	void ShaderManager::registerShader(Shader* shader)
 	{
-		auto result = mShaderUMap.try_emplace(shader->getName(), shader);
+		auto& name = shader->getName();
+		auto result = mShaderUMap.try_emplace(name, shader);
 		if (result.second)
 		{
 			shader->saveObject();
+
+			if (name.find_first_of("Hide") == 0)
+			{
+
+			}
+			else
+			{
+				mCanUseUMap.emplace(shader->getName(), shader);
+			}
 		}
 	}
 }

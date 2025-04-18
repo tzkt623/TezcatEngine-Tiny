@@ -302,7 +302,7 @@ namespace tezcat::Tiny
 			frame_buffer->generate();
 		}
 
-		sMakeCubeTexPass = ReplacedPipelinePass::create(sObserverHDR, ShaderManager::find("Unlit/EnvMakeCube"));
+		sMakeCubeTexPass = ReplacedPipelinePass::create(sObserverHDR, ShaderManager::find("Hide/EnvMakeCube"));
 		sMakeCubeTexPass->setOnceMode();
 		sMakeCubeTexPass->setFrameBuffer(frame_buffer);
 		sMakeCubeTexPass->setCustomCulling([=](ReplacedPipelinePass* pass)
@@ -341,7 +341,7 @@ namespace tezcat::Tiny
 		//sObserverIrradiance->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 		//sObserverIrradiance->setSortingID(65534);
 
-		auto shader = ShaderManager::find("Unlit/EnvMakeIrradiance");
+		auto shader = ShaderManager::find("Hide/EnvMakeIrradiance");
 
 		sIrradiancePass = ReplacedPipelinePass::create(sObserverHDR, shader);
 		sIrradiancePass->setOnceMode();
@@ -385,7 +385,7 @@ namespace tezcat::Tiny
 		//sObserverPrefilter->setSortingID(65533);
 
 		sPrefilterPass = ReplacedPipelinePass::create(sObserverHDR
-			, ShaderManager::find("Unlit/EnvMakePrefilter"));
+			, ShaderManager::find("Hide/EnvMakePrefilter"));
 		sPrefilterPass->setOnceMode();
 		sPrefilterPass->setFrameBuffer(frame_buffer);
 		sPrefilterPass->setCustomCulling([=](ReplacedPipelinePass* pass)
@@ -429,7 +429,7 @@ namespace tezcat::Tiny
 		sObserverBRDF_LUT->setSortingID(65532);
 
 		sBRDFLUTPass = ReplacedPipelinePass::create(sObserverBRDF_LUT
-			, ShaderManager::find("Unlit/EnvMakeBRDFLut"));
+			, ShaderManager::find("Hide/EnvMakeBRDFLut"));
 		sBRDFLUTPass->setOnceMode();
 		sBRDFLUTPass->setFrameBuffer(frame_buffer);
 		sBRDFLUTPass->setCustomCulling([](ReplacedPipelinePass* pass)

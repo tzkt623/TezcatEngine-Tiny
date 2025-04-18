@@ -38,9 +38,8 @@ namespace tezcat::Editor
 		void drawExtraMaterial();
 
 	private:
-		std::string mNameBuffer;
-		//TinyWeakRef<GameObject> mGameObject;
 		std::vector<std::function<void(Component*)>> mDrawFunctions;
+		std::vector<std::function<void(Uniform*, UniformValueConfig*, const int32_t&)>> mShaderValueFunctionArray;
 		MeshRenderer* mMeshRenderer;
 	};
 

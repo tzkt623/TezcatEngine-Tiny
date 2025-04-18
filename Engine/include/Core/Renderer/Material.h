@@ -71,7 +71,7 @@ namespace tezcat::Tiny
 		template<typename UniformType, typename ValueType>
 		void setUniform(const std::string& name, ValueType&& value)
 		{
-			auto id = mShader->getUniformIndex(name);
+			auto id = mShader->getUserUniformIndex(name);
 			if (id != -1)
 			{
 				static_cast<UniformType*>(mUniforms[id])->set(std::forward<ValueType>(value));

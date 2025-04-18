@@ -625,7 +625,7 @@ namespace tezcat::Tiny::GL
 		this->setViewport(ViewportInfo(0, 0, viewSize[0], viewSize[1]));
 
 		shader->resetLocalState();
-		auto uniform_config = shader->getUniformValueConfig("myTexHDR2D");
+		auto uniform_config = shader->getUserUniformValueConfig("myTexHDR2D");
 		this->setTexture2D(shader, uniform_config->valueID, texHDR);
 
 		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
@@ -1248,4 +1248,11 @@ namespace tezcat::Tiny::GL
 		TINY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, mSavePolygonMode));
 	}
 
+	void GLGraphics::setNullTexture2D(Shader* shader, const int32_t& valueID)
+	{
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
+		shader->addLocalTextureIndex();
+	}
 }

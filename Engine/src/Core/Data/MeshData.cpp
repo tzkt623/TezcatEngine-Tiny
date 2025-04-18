@@ -501,10 +501,10 @@ namespace tezcat::Tiny
 						auto material = Material::create(shader);
 						mr->setMaterial(material);
 
-						auto index_albedo = shader->getUniformIndex("myPBR.albedo2D");
-						auto index_metallic = shader->getUniformIndex("myPBR.metallic2D");
-						auto index_roughness = shader->getUniformIndex("myPBR.roughness2D");
-						auto index_ao = shader->getUniformIndex("myPBR.ao2D");
+						auto index_albedo = shader->getUserUniformIndex("myPBR.albedo2D");
+						auto index_metallic = shader->getUserUniformIndex("myPBR.metallic2D");
+						auto index_roughness = shader->getUserUniformIndex("myPBR.roughness2D");
+						auto index_ao = shader->getUserUniformIndex("myPBR.ao2D");
 
 
 						//albedo
@@ -564,10 +564,10 @@ namespace tezcat::Tiny
 						auto material = Material::create(shader);
 						mr->setMaterial(material);
 
-						auto index_albedo = shader->getUniformIndex("myPBR.albedo");
-						auto index_metallic = shader->getUniformIndex("myPBR.metallic");
-						auto index_roughness = shader->getUniformIndex("myPBR.roughness");
-						auto index_ao = shader->getUniformIndex("myPBR.ao");
+						auto index_albedo = shader->getUserUniformIndex("myPBR.albedo");
+						auto index_metallic = shader->getUserUniformIndex("myPBR.metallic");
+						auto index_roughness = shader->getUserUniformIndex("myPBR.roughness");
+						auto index_ao = shader->getUserUniformIndex("myPBR.ao");
 
 						auto& color_albedo = node->getValueMap().at(MaterialTextureSlot::PBR_BASE_COLOR);
 						material->setUniform<UniformF3>(index_albedo
@@ -589,9 +589,9 @@ namespace tezcat::Tiny
 						auto material = Material::create(shader);
 						mr->setMaterial(material);
 
-						auto index_diffuse = shader->getUniformIndex("myTexDiffuse2D");
-						auto index_specular = shader->getUniformIndex("myTexSpecular2D");
-						auto index_shininess = shader->getUniformIndex("myTexShininess2D");
+						auto index_diffuse = shader->getUserUniformIndex("myTexDiffuse2D");
+						auto index_specular = shader->getUserUniformIndex("myTexSpecular2D");
+						auto index_shininess = shader->getUserUniformIndex("myTexShininess2D");
 
 						auto diff = node->tryGetTexture(MaterialTextureSlot::TEX_DIFFUSE);
 						if (diff && std::filesystem::exists(*diff))
@@ -635,9 +635,9 @@ namespace tezcat::Tiny
 						auto material = Material::create(shader);
 						mr->setMaterial(material);
 
-						auto index_diffuse = shader->getUniformIndex("myDiffuse");
-						auto index_specular = shader->getUniformIndex("mySpecular");
-						auto index_shininess = shader->getUniformIndex("myShininess");
+						auto index_diffuse = shader->getUserUniformIndex("myDiffuse");
+						auto index_specular = shader->getUserUniformIndex("mySpecular");
+						auto index_shininess = shader->getUserUniformIndex("myShininess");
 
 						auto v1 = node->tryGetValue(MaterialTextureSlot::DIFFUSE);
 						if (v1)

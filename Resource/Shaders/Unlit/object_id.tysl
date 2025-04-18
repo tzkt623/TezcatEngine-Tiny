@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Unlit/ObjectID;
+    str Name = Hide/ObjectID;
 }
 #TINY_HEAD_END
 

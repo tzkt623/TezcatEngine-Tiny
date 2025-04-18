@@ -77,7 +77,7 @@ namespace tezcat::Tiny
 	void EngineIniter::createCube()
 	{
 		MeshData* mesh_data = MeshData::create("Cube");
-		mesh_data->mNormals = new std::vector<float3>();
+		mesh_data->createNormals();
 
 		float size = 0.5f;
 		//
@@ -147,9 +147,9 @@ namespace tezcat::Tiny
 		mesh_data->mNormals->emplace_back(1.0f, 0.0f, 0.0f);
 
 
-		mesh_data->mIndices = new std::vector<uint32_t>();
-		mesh_data->mColors = new std::vector<float4>();
-		mesh_data->mUVs = new std::vector<float2>();
+		mesh_data->createIndices();
+		mesh_data->createColors();
+		mesh_data->createUVs();
 		for (int i = 0; i < 6; i++)
 		{
 			int offset = i * 4;
@@ -239,7 +239,7 @@ namespace tezcat::Tiny
 		}
 
 		//indices.clear();
-		mesh_data->generate(DrawMode::Triangles_Strip);
+		mesh_data->generate();
 
 		VertexBufferManager::addMeshData(mesh_data);
 	}
@@ -252,10 +252,10 @@ namespace tezcat::Tiny
 		};
 
 		MeshData* mesh_data = MeshData::create("Sphere");
-		mesh_data->mUVs = new std::vector<float2>();
-		mesh_data->mNormals = new std::vector<float3>();
-		mesh_data->mColors = new std::vector<float4>();
-		mesh_data->mIndices = new std::vector<uint32_t>();
+		mesh_data->createUVs();
+		mesh_data->createNormals();
+		mesh_data->createColors();
+		mesh_data->createIndices();
 
 		auto vertices_num = (prec + 1) * (prec + 1);
 		auto indices_num = prec * prec * 6;
@@ -275,9 +275,8 @@ namespace tezcat::Tiny
 				float y = (float)cos(toRadians(180.0f - i * 180.0f / prec));
 				float x = -(float)cos(toRadians(j * 360.0f / prec)) * (float)abs(cos(asin(y)));
 				float z = (float)sin(toRadians(j * 360.0f / prec)) * (float)abs(cos(asin(y)));
-				mesh_data->mVertices[i * (prec + 1) + j] = glm::vec3(x, y, z);
+				mesh_data->mVertices[i * (prec + 1) + j] = glm::vec3(x, y, z) * 0.5f;
 				uvs[i * (prec + 1) + j] = glm::vec2(((float)j / prec), ((float)i / prec));
-				//mesh_data->uv[i * (prec + 1) + j] = glm::vec2(0.5f);
 				normals[i * (prec + 1) + j] = glm::vec3(x, y, z);
 			}
 		}
@@ -305,10 +304,10 @@ namespace tezcat::Tiny
 	void EngineIniter::createSquare()
 	{
 		MeshData* mesh_data = MeshData::create("Square");
-		mesh_data->mIndices = new std::vector<uint32_t>();
-		mesh_data->mColors = new std::vector<float4>();
-		mesh_data->mUVs = new std::vector<float2>();
-		mesh_data->mNormals = new std::vector<float3>();
+		mesh_data->createUVs();
+		mesh_data->createNormals();
+		mesh_data->createColors();
+		mesh_data->createIndices();
 
 		mesh_data->mVertices.emplace_back(-0.5f, -0.5f, 0.0f);
 		mesh_data->mVertices.emplace_back(0.5f, -0.5f, 0.0f);
@@ -346,10 +345,10 @@ namespace tezcat::Tiny
 	void EngineIniter::createRect()
 	{
 		MeshData* mesh_data = MeshData::create("Rect");
-		mesh_data->mIndices = new std::vector<uint32_t>();
-		mesh_data->mColors = new std::vector<float4>();
-		mesh_data->mUVs = new std::vector<float2>();
-		mesh_data->mNormals = new std::vector<float3>();
+		mesh_data->createUVs();
+		mesh_data->createNormals();
+		mesh_data->createColors();
+		mesh_data->createIndices();
 
 		mesh_data->mVertices.emplace_back(-1.0f, -1.0f, 0.0f);
 		mesh_data->mVertices.emplace_back(1.0f, -1.0f, 0.0f);
@@ -409,14 +408,14 @@ namespace tezcat::Tiny
 	void EngineIniter::createPlane()
 	{
 		MeshData* mesh_data = MeshData::create("Plane");
-		mesh_data->mIndices = new std::vector<uint32_t>();
-		mesh_data->mColors = new std::vector<float4>();
-		mesh_data->mUVs = new std::vector<float2>();
-		mesh_data->mNormals = new std::vector<float3>();
+		mesh_data->createUVs();
+		mesh_data->createNormals();
+		mesh_data->createColors();
+		mesh_data->createIndices();
 
 		mesh_data->mVertices.emplace_back(-300.0f, 0.0f, 300.0f);	//
 		mesh_data->mVertices.emplace_back(300.0f, 0.0f, 300.0f);	//
-		mesh_data->mVertices.emplace_back(300.0f, 0.0f, -300.0f);		//
+		mesh_data->mVertices.emplace_back(300.0f, 0.0f, -300.0f);	//
 		mesh_data->mVertices.emplace_back(-300.0f, 0.0f, -300.0f);	//
 
 		mesh_data->mIndices->emplace_back(0);
