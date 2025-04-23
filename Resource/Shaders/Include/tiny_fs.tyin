@@ -8,3 +8,12 @@
 #include "tiny_fs_std_mat.tyin"
 #include "tiny_fs_function.tyin"
 
+in float3x3 TINY_MatrixTBN;
+
+float3 tinyCalcNormalWithTBN(tex2D normalMap, float2 uv)
+{
+    float3 normal = texture(normalMap, uv).rgb;
+    normal = normalize(normal * 2.0f - 1.0f);   
+    normal = normalize(TINY_MatrixTBN * normal);
+    return normal;
+}

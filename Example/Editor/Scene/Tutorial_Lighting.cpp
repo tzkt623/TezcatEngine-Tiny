@@ -112,6 +112,34 @@ void Tutorial_Lighting::onEnter()
 		material->setUniform<UniformF3>("myFresnel", float3(0.04f));
 		mr->setMaterial(material);
 	}
+
+	{
+		GameObject* go = GameObject::create("SpecularNormalDistribution");
+		auto transform_cube = go->addComponent<Transform>();
+		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(2.0f, 2.0f, 0.0f);
+
+		auto mr = go->addComponent<MeshRenderer>();
+		mr->setMesh("Sphere");
+
+		auto material = Material::create("Tutorial/SpecularNormalDistribution");
+		material->setUniform<UniformF1>("myRoughness", 0.1f);
+		mr->setMaterial(material);
+	}
+
+	{
+		GameObject* go = GameObject::create("SpecularGeometry");
+		auto transform_cube = go->addComponent<Transform>();
+		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(4.0f, 2.0f, 0.0f);
+
+		auto mr = go->addComponent<MeshRenderer>();
+		mr->setMesh("Sphere");
+
+		auto material = Material::create("Tutorial/SpecularGeometry");
+		material->setUniform<UniformF1>("myRoughness", 0.1f);
+		mr->setMaterial(material);
+	}
 }
 
 void Tutorial_Lighting::onExit()

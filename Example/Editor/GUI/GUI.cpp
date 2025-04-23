@@ -35,7 +35,6 @@ namespace tezcat::Editor
 
 	void GUI::init(GLFWwindow* window)
 	{
-
 		const char* glsl_version = "#version 410 core";
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
@@ -65,7 +64,10 @@ namespace tezcat::Editor
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init(glsl_version);
 
+		//ImGuizmo
+		ImGuizmo::AllowAxisFlip(false);
 		auto& style = ImGuizmo::GetStyle();
+	
 		style.HatchedAxisLineThickness = 2;
 
 		style.TranslationLineArrowSize = 8;

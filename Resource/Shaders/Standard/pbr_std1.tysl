@@ -26,6 +26,8 @@
         TINY_LAYOUT_POSITION;
         TINY_LAYOUT_NORMAL;
         TINY_LAYOUT_UV;
+        TINY_LAYOUT_TANGENT;
+        TINY_LAYOUT_BITANGENT;
         TINY_LAYOUT_COLOR;
 
         out float4 myColor;
@@ -44,6 +46,8 @@
             myWorldPosition = float3(position);
 
             gl_Position = TINY_MatrixP * TINY_MatrixV * position;
+
+            tinyCalcTBNMatrix(tiny_layout_Normal, tiny_layout_Tangent, tiny_layout_BiTangent);
         }
     }
     #TINY_VS_END
@@ -62,17 +66,17 @@
 
         void main()
         {
-            float3 albedo = pow(texture(myPBR.albedo2D, myUV).rgb, float3(2.2));
+            float3 albedo = pow(texture(myPBR.albedo2D, myUV).rgb, float3(2.2f));
             float metallic = texture(myPBR.metallic2D, myUV).r;
             float roughness = texture(myPBR.roughness2D, myUV).r;
             float ao = texture(myPBR.ao2D, myUV).r;
 
-            float3 F0 = float3(0.04); 
+            float3 F0 = float3(0.04);
             F0 = mix(F0, albedo, metallic);
 
-            float3 N = normalize(texture(myPBR.normal2D, myUV).xyz * 2.0f - 1.0f);
+            float3 N = tinyCalcNormalWithTBN(myPBR.normal2D, myUV);
             float3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
-            float3 R = reflect(-V, N); 
+            float3 R = reflect(-V, N);
 
             //计算一个灯的光照
             float3 Lo = float3(0.0);
@@ -109,11 +113,12 @@
             float3 diffuse = irradiance * albedo;
 
             const float MAX_REFLECTION_LOD = 4.0;
-            float3 prefilteredColor = textureLod(TINY_TexPrefilter, R,  roughness * MAX_REFLECTION_LOD).rgb;    
+            float3 prefilteredColor = textureLod(TINY_TexPrefilter, R, roughness * MAX_REFLECTION_LOD).rgb;    
             float2 brdf = texture(TINY_TexBRDFLUT, float2(max(dot(N, V), 0.0), roughness)).rg;
             float3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-            float3 ambient = (kD * diffuse + specular) * ao;
+            //float3 ambient = (kD * diffuse + specular) * ao;
+            float3 ambient = (kD * diffuse + specular);
             float3 color = ambient + Lo;
 
             color = color / (color + float3(1.0));

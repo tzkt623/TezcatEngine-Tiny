@@ -52,7 +52,7 @@ namespace tezcat::Tiny
 		, mUVs(nullptr)
 		, mColors(nullptr)
 		, mTangents(nullptr)
-		, mBitTangents(nullptr)
+		, mBiTangents(nullptr)
 		, mIndices(nullptr)
 	{
 
@@ -86,10 +86,10 @@ namespace tezcat::Tiny
 			delete mTangents;
 		}
 
-		if (mBitTangents)
+		if (mBiTangents)
 		{
-			mBitTangents->clear();
-			delete mBitTangents;
+			mBiTangents->clear();
+			delete mBiTangents;
 		}
 
 		if (mIndices)
@@ -107,6 +107,10 @@ namespace tezcat::Tiny
 			return { this->vertexSize(), mVertices.data() };
 		case VertexPosition::VP_Normal:
 			return { this->normalSize(), mNormals->data() };
+		case VertexPosition::VP_Tangent:
+			return { this->tangentSize(), mTangents->data() };
+		case VertexPosition::VP_BiTangent:
+			return { this->bitangentSize(), mBiTangents->data() };
 		case VertexPosition::VP_Color:
 			return  { this->colorSize(), mColors->data() };
 		case VertexPosition::VP_UV:
@@ -143,10 +147,147 @@ namespace tezcat::Tiny
 			mLayoutPositions.emplace_back(VertexPosition::VP_UV);
 		}
 
+		if (mTangents)
+		{
+			mLayoutPositions.emplace_back(VertexPosition::VP_Tangent);
+		}
+
+		if (mBiTangents)
+		{
+			mLayoutPositions.emplace_back(VertexPosition::VP_BiTangent);
+		}
+
 		if (mColors)
 		{
 			mLayoutPositions.emplace_back(VertexPosition::VP_Color);
 		}
+	}
+
+	bool MeshData::generateTangents()
+	{
+		if (mTangents == nullptr && mUVs != nullptr)
+		{
+			this->createTangents();
+			mTangents->resize(mVertices.size(), float3(0.0f));
+			mBiTangents->resize(mVertices.size(), float3(0.0f));
+
+			auto& tangents = *mTangents;
+			auto& bitangents = *mBiTangents;
+			auto& uv = *mUVs;
+
+			if (mIndices)
+			{
+				auto& indices = *mIndices;
+				for (uint64_t i = 0; i < mIndices->size(); i += 3)
+				{
+					auto& i1 = indices[i];
+					auto& i2 = indices[i + 1];
+					auto& i3 = indices[i + 2];
+
+					float3& pos1 = mVertices[i1];
+					float3& pos2 = mVertices[i2];
+					float3& pos3 = mVertices[i3];
+
+					float2& uv1 = uv[i1];
+					float2& uv2 = uv[i2];
+					float2& uv3 = uv[i3];
+
+					// 计算边向量
+					float3 deltaPos1 = pos2 - pos1;
+					float3 deltaPos2 = pos3 - pos1;
+					float2 deltaUV1 = uv2 - uv1;
+					float2 deltaUV2 = uv3 - uv1;
+
+					// 解线性方程组
+					float det = deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x;
+
+					if (det == 0)
+					{
+						continue; // 避免除以零
+					}
+
+
+					float invDet = 1.0f / det;
+					float3 tangent = invDet * (deltaUV2.y * deltaPos1 - deltaUV1.y * deltaPos2);
+					float3 bitangent = invDet * (-deltaUV2.x * deltaPos1 + deltaUV1.x * deltaPos2);
+
+					// 累加到顶点
+					tangents[i1] += tangent;
+					tangents[i2] += tangent;
+					tangents[i3] += tangent;
+
+					bitangents[i1] += bitangent;
+					bitangents[i2] += bitangent;
+					bitangents[i3] += bitangent;
+				}
+			}
+			else
+			{
+				for (uint64_t i = 0; i < mVertices.size(); i += 3)
+				{
+					auto i1 = i;
+					auto i2 = i + 1;
+					auto i3 = i + 2;
+
+					float3& pos1 = mVertices[i1];
+					float3& pos2 = mVertices[i2];
+					float3& pos3 = mVertices[i3];
+
+					float2& uv1 = uv[i1];
+					float2& uv2 = uv[i2];
+					float2& uv3 = uv[i3];
+
+					// 计算边向量
+					float3 deltaPos1 = pos2 - pos1;
+					float3 deltaPos2 = pos3 - pos1;
+					float2 deltaUV1 = uv2 - uv1;
+					float2 deltaUV2 = uv3 - uv1;
+
+					// 解线性方程组
+					float det = deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x;
+
+					if (det == 0)
+					{
+						continue; // 避免除以零
+					}
+
+
+					float invDet = 1.0f / det;
+					float3 tangent = invDet * (deltaUV2.y * deltaPos1 - deltaUV1.y * deltaPos2);
+					float3 bitangent = invDet * (-deltaUV2.x * deltaPos1 + deltaUV1.x * deltaPos2);
+
+					// 累加到顶点
+					tangents[i1] += tangent;
+					tangents[i2] += tangent;
+					tangents[i3] += tangent;
+
+					bitangents[i1] += bitangent;
+					bitangents[i2] += bitangent;
+					bitangents[i3] += bitangent;
+				}
+			}
+
+			for (uint64_t i = 0; i < mVertices.size(); i++)
+			{
+				auto& normal = mNormals->at(i);
+				auto& tangent = tangents[i];
+				auto& bitangent = bitangents[i];
+
+				// 格拉姆-施密特正交化
+				tangent = glm::normalize(tangent - glm::dot(tangent, normal) * normal);
+				bitangent = glm::normalize(bitangent);
+
+				// 确保副切线方向正确（右手系）
+				if (glm::dot(glm::cross(normal, tangent), bitangent) < 0)
+				{
+					tangent *= -1.0f;
+				}
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	//--------------------------------------------------
@@ -280,16 +421,17 @@ namespace tezcat::Tiny
 	bool Model::load(const file_path& path)
 	{
 		mPath = path;
-		uint32_t load_flag = aiProcess_CalcTangentSpace
-			| aiProcess_Triangulate
+		uint32_t load_flag
+			= aiProcess_Triangulate
+			| aiProcess_CalcTangentSpace
 			| aiProcess_JoinIdenticalVertices
 			| aiProcess_SortByPType
-			| aiProcess_GenSmoothNormals
+			| aiProcess_GenNormals
 			//| aiProcess_FlipUVs			//DX需要这一段,GL不需要
 			| aiProcess_RemoveComponent
 			//| aiProcess_OptimizeMeshes	//当前参数执行后会自动优化mesh个数
 			| aiProcess_OptimizeGraph
-			| aiProcess_SplitLargeMeshes
+			//| aiProcess_SplitLargeMeshes
 			;
 
 		uint32_t remove_flag = aiComponent_LIGHTS
@@ -393,14 +535,14 @@ namespace tezcat::Tiny
 		meshData->mUVs = new std::vector<float2>();
 		meshData->mColors = new std::vector<float4>();
 		meshData->mTangents = new std::vector<float3>();
-		meshData->mBitTangents = new std::vector<float3>();
+		meshData->mBiTangents = new std::vector<float3>();
 
 		meshData->mVertices.reserve(aimesh->mNumVertices);
 		meshData->mNormals->reserve(aimesh->mNumVertices);
 		meshData->mUVs->reserve(aimesh->mNumVertices);
 		meshData->mColors->reserve(aimesh->mNumVertices);
 		meshData->mTangents->reserve(aimesh->mNumVertices);
-		meshData->mBitTangents->reserve(aimesh->mNumVertices);
+		meshData->mBiTangents->reserve(aimesh->mNumVertices);
 
 		bool has_normal = aimesh->HasNormals();
 		bool has_uv0 = aimesh->HasTextureCoords(0);
@@ -454,7 +596,7 @@ namespace tezcat::Tiny
 										   , ai_tangents.z);
 
 				auto& ai_bit = aimesh->mBitangents[ver_i];
-				meshData->mBitTangents->emplace_back(ai_bit.x
+				meshData->mBiTangents->emplace_back(ai_bit.x
 											  , ai_bit.y
 											  , ai_bit.z);
 			}

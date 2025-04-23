@@ -133,14 +133,26 @@ namespace tezcat::Tiny
 		if (splitConfig(content, config, shader_content, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
 		{
 			ShaderParser::splitValue(config, mConfigUMap);
-			this->parseShader(shader_content
+			if (!this->parseShader(shader_content
 				, rootPath
 				, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
-				, mVertexShader);
-			this->parseShader(shader_content
+				, mVertexShader))
+			{
+				TINY_LOG_ERROR("ShaderParser: Shader Format Error");
+			}
+
+			if (!this->parseShader(shader_content
 				, rootPath
 				, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
-				, mFragShader);
+				, mFragShader))
+			{
+				TINY_LOG_ERROR("ShaderParser: Shader Format Error");
+			}
+
+			this->parseShader(shader_content
+				, rootPath
+				, R"(#TINY_GS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_GS_END)"
+				, mGeometryShader);
 		}
 		else
 		{
@@ -158,7 +170,7 @@ namespace tezcat::Tiny
 		content = std::regex_replace(content, regex_comment, "");
 	}
 
-	void ShaderParser::parseShader(std::string& content
+	bool ShaderParser::parseShader(std::string& content
 		, std::string& rootPath
 		, const char* regex
 		, std::string& outContent)
@@ -169,20 +181,16 @@ namespace tezcat::Tiny
 		{
 			std::string shader_content(result[1]);
 
-			this->removeComment(shader_content);
 			this->splitInclude(shader_content, rootPath);
 			this->splitUniformBuffer(shader_content);
 			this->splitStruct(shader_content);
 			this->writeShaderHead(shader_content);
 
 			outContent = std::move(shader_content);
+			return true;
 		}
-		else
-		{
-			//throw std::logic_error("GLShader: Shader Format Error");
 
-			TINY_LOG_ERROR("ShaderParser: Shader Format Error");
-		}
+		return false;
 	}
 
 
@@ -373,12 +381,12 @@ namespace tezcat::Tiny
 				show_name = std::regex_replace(show_name, regex_space, "");
 				range = std::regex_replace(range, regex_space, "");
 
-				ShaderConstraint constraint = ShaderConstraint::Error;
+				ShaderMemberConstraint constraint = ShaderMemberConstraint::Null;
 				size_t pos;
 				std::shared_ptr<BaseRange> rangePtr;
 				if ((pos = range.find_first_of("Range")) != range.npos)
 				{
-					constraint = ShaderConstraint::Range;
+					constraint = ShaderMemberConstraint::Range;
 
 					range = range.substr(pos + 5, range.size() - pos);
 					range.erase(range.begin());
@@ -414,7 +422,7 @@ namespace tezcat::Tiny
 				}
 				else if ((pos = range.find_first_of("Color")) != range.npos)
 				{
-					constraint = ShaderConstraint::Color;
+					constraint = ShaderMemberConstraint::Color;
 				}
 				else
 				{
@@ -427,8 +435,8 @@ namespace tezcat::Tiny
 		//分析struct
 		for (auto struct_i = std::sregex_iterator(content.begin(), content.end(), regex_struct); struct_i != end; struct_i++)
 		{
-			std::shared_ptr<ArgMetaData> meta_data(new ArgMetaData());
-			auto struct_info = meta_data->createInfo<ArgStructInfo>(UniformType::Struct);
+			std::shared_ptr<ShaderUniformMember> meta_data(new ShaderUniformMember());
+			auto struct_info = meta_data->createInfo<ShaderStructInfo>(UniformType::Struct);
 			struct_info->structName = (*struct_i)[1];
 			meta_data->valueName = (*struct_i)[1];
 			mStructUMap[meta_data->valueName] = meta_data;
@@ -447,7 +455,7 @@ namespace tezcat::Tiny
 					array_count = std::stoi(arg_count);
 				}
 
-				std::shared_ptr<ArgMetaData> member(new ArgMetaData());
+				std::shared_ptr<ShaderUniformMember> member(new ShaderUniformMember());
 				member->valueName = arg_name;
 				member->valueCount = array_count;
 
@@ -456,14 +464,14 @@ namespace tezcat::Tiny
 				{
 					auto [show_name, constraint, rangePtr] = progress_constraint((*argument_i)[1], it->second);
 
-					auto member_info = member->createInfo<ArgMemberInfo>(it->second);
+					auto member_info = member->createInfo<ShaderMemberInfo>(it->second);
 					member_info->editorName = show_name;
 					member_info->constraint = constraint;
 					member_info->range = rangePtr;
 				}
 				else
 				{
-					auto member_info = member->createInfo<ArgStructInfo>(UniformType::Struct);
+					auto member_info = member->createInfo<ShaderStructInfo>(UniformType::Struct);
 					member_info->structName = arg_type;
 				}
 
@@ -498,13 +506,13 @@ namespace tezcat::Tiny
 			//如果是结构类型,转到处理结构类型的方式
 			if (it != mStructUMap.end())
 			{
-				std::shared_ptr<ArgMetaData> uniform_value = std::make_shared<ArgMetaData>();
-				auto uniform_info = uniform_value->createInfo<ArgStructInfo>(it->second->valueType);
+				std::shared_ptr<ShaderUniformMember> uniform_value = std::make_shared<ShaderUniformMember>();
+				auto uniform_info = uniform_value->createInfo<ShaderStructInfo>(it->second->valueType);
 				uniform_value->valueName = uniform_match_name;
 				uniform_value->valueCount = array_count;
 
-				uniform_info->structName = it->second->getInfo<ArgStructInfo>()->structName;
-				auto& members = it->second->getInfo<ArgStructInfo>()->members;
+				uniform_info->structName = it->second->getInfo<ShaderStructInfo>()->structName;
+				auto& members = it->second->getInfo<ShaderStructInfo>()->members;
 				uniform_info->members.assign(members.begin(), members.end());
 
 				if (uniform_value->valueName.starts_with("TINY_"))
@@ -518,8 +526,8 @@ namespace tezcat::Tiny
 			}
 			else
 			{
-				std::shared_ptr<ArgMetaData> uniform_value = std::make_shared<ArgMetaData>();
-				auto uniform_info = uniform_value->createInfo<ArgMemberInfo>(ContextMap::UniformTypeUMap[uniform_match_type]);
+				std::shared_ptr<ShaderUniformMember> uniform_value = std::make_shared<ShaderUniformMember>();
+				auto uniform_info = uniform_value->createInfo<ShaderMemberInfo>(ContextMap::UniformTypeUMap[uniform_match_type]);
 				uniform_value->valueName = uniform_match_name;
 				uniform_value->valueCount = array_count;
 
@@ -562,12 +570,15 @@ namespace tezcat::Tiny
 		auto root = std::filesystem::path(path).parent_path().string();
 
 		auto content = FileTool::loadText(path);
+		this->removeComment(content);
+
 		this->parseHeader(content);
 		this->parseShaders(content, root);
 	}
 
 	void ShaderParser::parse(std::string& content, const std::string& path)
 	{
+		this->removeComment(content);
 		auto root = std::filesystem::path(path).parent_path().string();
 
 		this->parseHeader(content);
@@ -576,6 +587,17 @@ namespace tezcat::Tiny
 
 	void ShaderParser::updateShaderConfig(Shader* shader)
 	{
+		for (auto& pair : mTinyUMap)
+		{
+			shader->registerTinyUniform(pair.second.get());
+		}
+
+		shader->resizeUserUniformArray(mUserUMap.size());
+		for (auto& pair : mUserUMap)
+		{
+			shader->registerUserUniform(pair.second.get());
+		}
+
 		shader->setName(mHeadUMap["Name"].cast<std::string>());
 		shader->setVersion(mConfigUMap["Version"].cast<int>());
 
@@ -654,6 +676,5 @@ namespace tezcat::Tiny
 			shader->setCullFace(ContextMap::CullFaceMap[it->second.cast<std::string>()]);
 		}
 	}
-
 }
 

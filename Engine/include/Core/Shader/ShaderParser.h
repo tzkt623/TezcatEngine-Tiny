@@ -47,7 +47,7 @@ namespace tezcat::Tiny
 		void parseShaders(std::string& content, std::string& rootPath);
 
 	private:
-		void parseShader(std::string& content, std::string& rootPath, const char* regex, std::string& outContent);
+		bool parseShader(std::string& content, std::string& rootPath, const char* regex, std::string& outContent);
 		void removeComment(std::string& content);
 		void splitInclude(std::string& content, const std::string& rootPath);
 		void splitUniformBuffer(std::string& content);
@@ -67,12 +67,13 @@ namespace tezcat::Tiny
 		UniformID::USet mUniformSet;
 		std::unordered_set<std::string> mUserSet;
 
-		std::unordered_map<std::string_view, std::shared_ptr<ArgMetaData>> mTinyUMap;
-		std::unordered_map<std::string_view, std::shared_ptr<ArgMetaData>> mUserUMap;
-		std::unordered_map<std::string_view, std::shared_ptr<ArgMetaData>> mStructUMap;
+		std::unordered_map<std::string_view, std::shared_ptr<ShaderUniformMember>> mTinyUMap;
+		std::unordered_map<std::string_view, std::shared_ptr<ShaderUniformMember>> mUserUMap;
+		std::unordered_map<std::string_view, std::shared_ptr<ShaderUniformMember>> mStructUMap;
 
 		std::string mVertexShader;
 		std::string mFragShader;
+		std::string mGeometryShader;
 
 		std::unordered_map<std::string, int32_t> mUBOMap;
 	};

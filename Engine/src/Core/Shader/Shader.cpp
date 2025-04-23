@@ -84,15 +84,15 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->addCommand<RenderCMD_CreateShader>(this);
 	}
 
-	void Shader::setupUserUniformID(ArgMetaData* metaData, const std::string& name, const int& shaderID, const int& arrayIndex)
+	void Shader::setupUserUniformID(ShaderUniformMember* metaData, const std::string& name, const int& shaderID, const int& arrayIndex)
 	{
 		if (shaderID < 0)
 		{
-			TINY_LOG_WARNING(fmt::format("{}--{} ID is -1"
+			TINY_LOG_WARNING(std::format("{}--{} ID is -1"
 				, mPath, name));
 		}
 
-		auto member_info = metaData->getInfo<ArgMemberInfo>();
+		auto member_info = metaData->getInfo<ShaderMemberInfo>();
 
 		std::string editor_name;
 		if (arrayIndex < 0)
@@ -101,7 +101,7 @@ namespace tezcat::Tiny
 		}
 		else
 		{
-			editor_name = member_info->editorName.empty() ? name : fmt::format("{}[{}]", member_info->editorName, arrayIndex);
+			editor_name = member_info->editorName.empty() ? name : std::format("{}[{}]", member_info->editorName, arrayIndex);
 		}
 
 		auto info = new UniformValueConfig
@@ -119,9 +119,9 @@ namespace tezcat::Tiny
 		mUserUniformValueConfigMap.try_emplace(info->name, info);
 	}
 
-	void Shader::setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex)
+	void Shader::setupTinyUniform(ShaderUniformMember* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex)
 	{
-		auto member_info = metaData->getInfo<ArgMemberInfo>();
+		auto member_info = metaData->getInfo<ShaderMemberInfo>();
 
 		std::string editor_name;
 		if (arrayIndex < 0)
@@ -130,7 +130,7 @@ namespace tezcat::Tiny
 		}
 		else
 		{
-			editor_name = member_info->editorName.empty() ? name : fmt::format("{}[{}]", member_info->editorName, arrayIndex);
+			editor_name = member_info->editorName.empty() ? name : std::format("{}[{}]", member_info->editorName, arrayIndex);
 		}
 
 		mTinyUniformList[index]->name = name;
@@ -142,12 +142,7 @@ namespace tezcat::Tiny
 		mTinyUniformList[index]->range = member_info->range;
 	}
 
-	void Shader::resizeTinyUniformAry(uint64_t size)
-	{
-		//mTinyUniformList.resize(size, new UniformInfo{ "", UniformType::Error, -1 , -1 });
-	}
-
-	void Shader::resizeUserUniformAry(uint64_t size)
+	void Shader::resizeUserUniformArray(uint64_t size)
 	{
 		mUserUniformValueConfigMap.reserve(size);
 	}
@@ -176,6 +171,156 @@ namespace tezcat::Tiny
 	std::string Shader::getMemoryInfo()
 	{
 		return TINY_OBJECT_MEMORY_INFO();
+	}
+
+	void Shader::registerTinyUniform(ShaderUniformMember* memberData)
+	{
+		this->parseTinyUniform(memberData, "");
+	}
+
+	void Shader::parseTinyUniform(ShaderUniformMember* memberData, const std::string& parentName)
+	{
+		auto& name = memberData->valueName;
+		auto array_size = memberData->valueCount;
+		auto is_root = parentName.empty();
+
+		//如果是类,需要拼接名称
+		if (memberData->valueType == UniformType::Struct)
+		{
+			auto& members = memberData->getInfo<ShaderStructInfo>()->members;
+
+			if (array_size > 0)
+			{
+				for (int32_t i = 0; i < array_size; i++)
+				{
+					for (auto& m : members)
+					{
+						std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
+						this->parseTinyUniform(m.get(), true_name);
+					}
+				}
+			}
+			else
+			{
+				for (auto& m : members)
+				{
+					std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
+					this->parseTinyUniform(m.get(), true_name);
+				}
+			}
+		}
+		else
+		{
+			if (array_size > 0)
+			{
+				for (int32_t i = 0; i < array_size; i++)
+				{
+					std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
+					auto uid = UniformID::staticGetUID(true_name);
+					if (uid < this->getTinyUniformCount())
+					{
+						this->setupTinyUniform(memberData, true_name, uid, -1, i);
+					}
+					else
+					{
+						TINY_LOG_ERROR(std::format("This TinyUniform is not register [{}]", true_name));
+					}
+				}
+			}
+			else
+			{
+				std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
+				auto uid = UniformID::staticGetUID(true_name);
+				if (uid < this->getTinyUniformCount())
+				{
+					this->setupTinyUniform(memberData, true_name, uid, -1);
+				}
+				else
+				{
+					TINY_LOG_ERROR(std::format("This TinyUniform is not register [{}]", true_name));
+				}
+			}
+		}
+	}
+
+	void Shader::registerUserUniform(ShaderUniformMember* memberData)
+	{
+		this->parseUserUniform(memberData, "");
+	}
+
+	void Shader::parseUserUniform(ShaderUniformMember* memberData, const std::string& parentName)
+	{
+		auto& name = memberData->valueName;
+		auto array_size = memberData->valueCount;
+		auto is_root = parentName.empty();
+
+		//如果是类,需要拼接名称
+		if (memberData->valueType == UniformType::Struct)
+		{
+			auto& members = memberData->getInfo<ShaderStructInfo>()->members;
+
+			if (array_size > 0)
+			{
+				for (int32_t i = 0; i < array_size; i++)
+				{
+					for (auto& m : members)
+					{
+						std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
+						this->parseUserUniform(m.get(), true_name);
+					}
+				}
+			}
+			else
+			{
+				for (auto& m : members)
+				{
+					std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
+					this->parseUserUniform(m.get(), true_name);
+				}
+			}
+		}
+		else
+		{
+			if (array_size > 0)
+			{
+				for (int32_t i = 0; i < array_size; i++)
+				{
+					std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
+					this->setupUserUniformID(memberData, true_name, -1, i);
+				}
+			}
+			else
+			{
+				std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
+				this->setupUserUniformID(memberData, true_name, -1);
+			}
+		}
+	}
+
+	void Shader::setTinyUniform(const std::string& name, const int32_t& shaderID)
+	{
+		auto uid = UniformID::staticGetUID(name);
+		if (uid < this->getTinyUniformCount())
+		{
+			mTinyUniformList[uid]->valueID = shaderID;
+		}
+		else
+		{
+			TINY_LOG_ERROR(std::format("This TinyUniform is not register [{}]", name));
+		}
+	}
+
+	void Shader::setUserUniform(const std::string& name, const int32_t& shaderID)
+	{
+		auto it = mUserUniformValueConfigMap.find(name);
+		if (it != mUserUniformValueConfigMap.end())
+		{
+			it->second->valueID = shaderID;
+		}
+		else
+		{
+			TINY_LOG_ERROR(std::format("This TinyUniform is not register [{}]", name));
+		}
 	}
 
 }

@@ -25,6 +25,8 @@
 #include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/RenderCommand.h"
 
+#include "Core/Debug/Debug.h"
+
 namespace tezcat::Tiny
 {
 	std::unordered_map<std::string_view, Shader*> ShaderManager::mShaderUMap;
@@ -67,6 +69,7 @@ namespace tezcat::Tiny
 			return result->second;
 		}
 
+		TINY_LOG_ERROR(std::format("Shader Not Find {}", name));
 		return mShaderUMap["Unlit/Color"];
 	}
 

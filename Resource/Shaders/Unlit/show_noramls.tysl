@@ -1,0 +1,99 @@
+#TINY_HEAD_BEGIN
+{
+    str Name = Unlit/ShowNormals;
+}
+#TINY_HEAD_END
+
+#TINY_PASS_BEGIN
+{
+    #TINY_CFG_BEGIN
+    {
+        int Version = 330;
+        int OrderID = 0;
+        str Queue = Post;
+        str DepthTest = Less;
+        bool ZWrite = true;
+        str CullFace = Back;
+    }
+    #TINY_CFG_END
+
+    #TINY_VS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_NORMAL;
+
+        out VS_OUT
+        {
+            float3 normal;
+        } vs_out;
+        void main()
+        {
+            gl_Position = float4(tiny_layout_Position, 1.0f);
+            vs_out.normal = tiny_layout_Normal;
+        }
+    }
+    #TINY_VS_END
+
+    #TINY_GS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        layout (triangles) in;
+        layout (line_strip, max_vertices = 6) out; // 每个三角形生成3条法线
+
+        in VS_OUT
+        {
+            float3 normal;
+        } gs_in[];
+
+        [Editor(NormalLength)]
+        uniform float myNormalLength; // 法线显示长度
+
+        const float MAGNITUDE = 0.1;
+
+        void drawNormalLine(int index)
+        {
+            float4x4 mvp = TINY_MatrixP * TINY_MatrixV * TINY_MatrixM;
+
+            // 原始顶点位置（世界空间）
+            float4 begin = mvp * gl_in[index].gl_Position;
+            
+            // 计算线段终点
+            float4 end = mvp * (gl_in[index].gl_Position + float4(gs_in[index].normal * myNormalLength, 0.0f));
+            
+            // 应用变换矩阵
+            gl_Position = begin;
+            EmitVertex();
+            gl_Position = end;
+            EmitVertex();
+            EndPrimitive();
+        }
+
+        void main()
+        {
+            drawNormalLine(0);
+            drawNormalLine(1);
+            drawNormalLine(2);
+        }
+    }
+    #TINY_GS_END
+
+    #TINY_FS_BEGIN
+    {
+        #include "../Include/tiny_config.tyin"
+
+        out float4 myFinalColor;
+
+        void main()
+        {
+            myFinalColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
+        } 
+    }
+    #TINY_FS_END
+}
+#TINY_PASS_END
+
+
+

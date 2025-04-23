@@ -36,6 +36,8 @@ namespace tezcat::Tiny
 	class TINY_API Shader : public TinyObject
 	{
 		friend class BaseGraphics;
+		friend class ShaderParser;
+
 		Shader(const std::string& filePath);
 		TINY_OBJECT_H(Shader, TinyObject)
 
@@ -173,16 +175,15 @@ namespace tezcat::Tiny
 			return mUserUniformValueConfigMap;
 		}
 
-		const auto& getUserUniformAry() const
+		const auto& getUserUniformArray() const
 		{
 			return mUserUniformValueConfigAry;
 		}
 
-		void setupTinyUniform(ArgMetaData* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex = -1);
-		void resizeTinyUniformAry(uint64_t size);
+		void setTinyUniform(const std::string& name, const int32_t& shaderID);
+		void setUserUniform(const std::string& name, const int32_t& shaderID);
 
-		void setupUserUniformID(ArgMetaData* metaData, const std::string& name, const int& shaderID, const int& arrayIndex = -1);
-		void resizeUserUniformAry(uint64_t size);
+		void resizeUserUniformArray(uint64_t size);
 
 	public:
 		void setZWrite(bool val) { mEnableZWrite = val; }
@@ -236,6 +237,16 @@ namespace tezcat::Tiny
 	public:
 		std::unique_ptr<ShaderParser> mParser;
 		std::string mContent;
+
+	private:
+		void setupTinyUniform(ShaderUniformMember* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex = -1);
+		void setupUserUniformID(ShaderUniformMember* metaData, const std::string& name, const int& shaderID, const int& arrayIndex = -1);
+
+		void registerTinyUniform(ShaderUniformMember* memberData);
+		void registerUserUniform(ShaderUniformMember* memberData);
+
+		void parseTinyUniform(ShaderUniformMember* memberData, const std::string& parentName);
+		void parseUserUniform(ShaderUniformMember* memberData, const std::string& parentName);
 
 	protected:
 		std::string mName;

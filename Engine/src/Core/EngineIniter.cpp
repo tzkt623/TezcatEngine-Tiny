@@ -413,10 +413,12 @@ namespace tezcat::Tiny
 		mesh_data->createColors();
 		mesh_data->createIndices();
 
-		mesh_data->mVertices.emplace_back(-300.0f, 0.0f, 300.0f);	//
-		mesh_data->mVertices.emplace_back(300.0f, 0.0f, 300.0f);	//
-		mesh_data->mVertices.emplace_back(300.0f, 0.0f, -300.0f);	//
-		mesh_data->mVertices.emplace_back(-300.0f, 0.0f, -300.0f);	//
+		float size = 300.0f;
+
+		mesh_data->mVertices.emplace_back(-size, 0.0f, size);	//
+		mesh_data->mVertices.emplace_back(size, 0.0f, size);	//
+		mesh_data->mVertices.emplace_back(size, 0.0f, -size);	//
+		mesh_data->mVertices.emplace_back(-size, 0.0f, -size);	//
 
 		mesh_data->mIndices->emplace_back(0);
 		mesh_data->mIndices->emplace_back(1);
@@ -441,6 +443,7 @@ namespace tezcat::Tiny
 		mesh_data->mNormals->emplace_back(0.0f, 1.0f, 0.0f);
 		mesh_data->mNormals->emplace_back(0.0f, 1.0f, 0.0f);
 
+		mesh_data->generateTangents();
 		mesh_data->generate();
 		VertexBufferManager::addMeshData(mesh_data);
 	}

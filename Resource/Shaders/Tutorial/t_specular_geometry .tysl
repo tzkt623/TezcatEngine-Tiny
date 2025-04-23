@@ -1,6 +1,6 @@
 #TINY_HEAD_BEGIN
 {
-    str Name = Tutorial/Fresnel;
+    str Name = Tutorial/SpecularGeometry;
 }
 #TINY_HEAD_END
 
@@ -46,31 +46,16 @@
         in float3 myWorldPos;
         out float4 myFinalColor;
 
-        [Editor(Fresnel, Color)]
-        uniform float3 myFresnel;
-
-        [Editor(Switcher)]
-        uniform int mySwitcher;
+        [Editor(Roughness, Range(0, 1))]
+        uniform float myRoughness;
 
         void main()
         {
             float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPos);
-            float3 half = normalize(view_dir + (-TINY_LitDir.direction));
-            float NdotH = max(dot(myNormal, half), 0.0f);
-            float HdotV = max(dot(half, view_dir), 0.0f);
-            float NdotV = max(dot(myNormal, view_dir), 0.0f);
+            
+            float3 color = float3(geometrySmith(myNormal, view_dir, -TINY_LitDir.direction, myRoughness));
 
-            float3 F;
-            if(mySwitcher == 0)
-            {
-                F = fresnelSchlick(NdotV, myFresnel);
-            }
-            else
-            {
-                F = fresnelSchlick(HdotV, myFresnel);
-            }
-
-            myFinalColor = float4(F, 1.0f);
+            myFinalColor = float4(color, 1.0f);
         } 
     }
     #TINY_FS_END

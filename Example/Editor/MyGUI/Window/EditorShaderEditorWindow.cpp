@@ -196,9 +196,12 @@ namespace tezcat::Editor
 				ImGui::SetTooltip("DoubleClicked To Open");
 				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
-					mShaderFileData.mSelected = pair.second;
-					std::filesystem::path path(mShaderFileData.mSelected->getFilePath());
-					this->loadFile(path);
+					if (mShaderFileData.mSelected != pair.second)
+					{
+						mShaderFileData.mSelected = pair.second;
+						std::filesystem::path path(mShaderFileData.mSelected->getFilePath());
+						this->loadFile(path);
+					}
 				}
 			}
 		}

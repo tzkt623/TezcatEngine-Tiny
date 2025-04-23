@@ -26,9 +26,9 @@ namespace tezcat::Tiny
 		VP_Position = 0,
 		VP_Normal,
 		VP_UV,
-		VP_Color,
 		VP_Tangent,
-		VP_BitTangent,
+		VP_BiTangent,
+		VP_Color,
 		VP_ModuleMatrix
 	};
 

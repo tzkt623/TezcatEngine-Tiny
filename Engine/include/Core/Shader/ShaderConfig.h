@@ -21,11 +21,11 @@
 
 namespace tezcat::Tiny
 {
-	struct ArgMetaData;
+	struct ShaderUniformMember;
 
-	enum class TINY_API ShaderConstraint : int8_t
+	enum class TINY_API ShaderMemberConstraint : int8_t
 	{
-		Error = -1,
+		Null = -1,
 		Color,
 		Range,
 		Count
@@ -64,7 +64,7 @@ namespace tezcat::Tiny
 		Type getType() final { return BaseRange::Type::Float; }
 	};
 
-	struct TINY_API RangeInt : public RangeT<int>
+	struct TINY_API RangeInt : public RangeT<int32_t>
 	{
 		using RangeT::RangeT;
 		Type getType() final { return BaseRange::Type::Int; }
@@ -76,30 +76,30 @@ namespace tezcat::Tiny
 		Type getType() final { return BaseRange::Type::UInt; }
 	};
 
-	struct TINY_API BaseArgInfo
+	struct TINY_API BaseShaderInfo
 	{
 
 	};
 
-	struct TINY_API ArgMemberInfo : public BaseArgInfo
+	struct TINY_API ShaderMemberInfo : public BaseShaderInfo
 	{
 		//编辑器中的名称
 		std::string editorName;
 		//约束
-		ShaderConstraint constraint;
+		ShaderMemberConstraint constraint;
 		//范围
 		std::shared_ptr<BaseRange> range;
 	};
 
-	struct TINY_API ArgStructInfo : public BaseArgInfo
+	struct TINY_API ShaderStructInfo : public BaseShaderInfo
 	{
 		//类类型名
 		std::string structName;
 		//类成员变量
-		std::vector<std::shared_ptr<ArgMetaData>> members;
+		std::vector<std::shared_ptr<ShaderUniformMember>> members;
 	};
 
-	struct TINY_API ArgMetaData
+	struct TINY_API ShaderUniformMember
 	{
 		//值名称
 		std::string valueName;
@@ -108,16 +108,16 @@ namespace tezcat::Tiny
 		//值数量
 		int valueCount;
 
-		std::shared_ptr<BaseArgInfo> info;
+		std::shared_ptr<BaseShaderInfo> info;
 
-		ArgMetaData()
+		ShaderUniformMember()
 			: valueCount(0)
 			, valueType(UniformType::Error)
 		{
 
 		}
 
-		~ArgMetaData()
+		~ShaderUniformMember()
 		{
 
 		}
@@ -146,7 +146,7 @@ namespace tezcat::Tiny
 		UniformType type;
 		//id in Graphic shader
 		int32_t valueID;
-		ShaderConstraint constraint;
+		ShaderMemberConstraint constraint;
 		std::string editorName;
 
 		std::shared_ptr<BaseRange> range;

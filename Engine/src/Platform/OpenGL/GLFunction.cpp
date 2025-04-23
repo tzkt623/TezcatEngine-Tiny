@@ -350,10 +350,15 @@ namespace tezcat::Tiny::GL
 
 		auto& vertex = parser->mVertexShader;
 		auto& frag = parser->mFragShader;
+		auto& geometry = parser->mGeometryShader;
 
 		auto pid = glCreateProgram();
 		this->build(shader, pid, vertex.c_str(), GL_VERTEX_SHADER);
 		this->build(shader, pid, frag.c_str(), GL_FRAGMENT_SHADER);
+		if (!geometry.empty())
+		{
+			this->build(shader, pid, geometry.c_str(), GL_GEOMETRY_SHADER);
+		}
 
 		glLinkProgram(pid);
 
@@ -364,22 +369,21 @@ namespace tezcat::Tiny::GL
 		{
 			glGetProgramInfoLog(pid, 512, nullptr, infoLog);
 			TINY_LOG_ERROR(shader->getName() + "|" + infoLog);
-			std::cout << shader->getName() + "|" + infoLog + "\n";
 			TINY_ASSERT(false);
 			return;
 		}
 
-		std::function<void(ArgMetaData*, const std::string&)> progress_tiny =
-			[&progress_tiny, &pid, &shader](ArgMetaData* metaData, const std::string& parentName)
+		std::function<void(ShaderUniformMember*, const std::string&)> progress_tiny =
+			[&progress_tiny, &pid, &shader](ShaderUniformMember* memberData, const std::string& parentName)
 			{
-				auto& name = metaData->valueName;
-				auto array_size = metaData->valueCount;
+				auto& name = memberData->valueName;
+				auto array_size = memberData->valueCount;
 				auto is_root = parentName.empty();
 
 				//如果是类,需要拼接名称
-				if (metaData->valueType == UniformType::Struct)
+				if (memberData->valueType == UniformType::Struct)
 				{
-					auto& members = metaData->getInfo<ArgStructInfo>()->members;
+					auto& members = memberData->getInfo<ShaderStructInfo>()->members;
 
 					if (array_size > 0)
 					{
@@ -387,7 +391,7 @@ namespace tezcat::Tiny::GL
 						{
 							for (auto& m : members)
 							{
-								std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+								std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
 								progress_tiny(m.get(), true_name);
 							}
 						}
@@ -396,7 +400,7 @@ namespace tezcat::Tiny::GL
 					{
 						for (auto& m : members)
 						{
-							std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
+							std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
 							progress_tiny(m.get(), true_name);
 						}
 					}
@@ -407,45 +411,49 @@ namespace tezcat::Tiny::GL
 					{
 						for (int32_t i = 0; i < array_size; i++)
 						{
-							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
-							auto uid = UniformID::staticGetUID(true_name);
-							if (uid < shader->getTinyUniformCount())
-							{
-								shader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()), i);
-							}
-							else
-							{
-								TINY_LOG_ERROR(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
-							}
+							std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
+							shader->setTinyUniform(true_name, glGetUniformLocation(pid, true_name.c_str()));
+
+							//auto uid = UniformID::staticGetUID(true_name);
+							//if (uid < shader->getTinyUniformCount())
+							//{
+							//}
+							//else
+							//{
+							//	TINY_LOG_ERROR(std::format("Tiny Shader`s buildin value name[{}] write error!!!", true_name));
+							//}
 						}
 					}
 					else
 					{
-						std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
-						auto uid = UniformID::staticGetUID(true_name);
-						if (uid < shader->getTinyUniformCount())
-						{
-							shader->setupTinyUniform(metaData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()));
-						}
-						else
-						{
-							TINY_LOG_ERROR(fmt::format("Your Shader`s buildin value name[{}] write error!!!", true_name));
-						}
+						std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
+						shader->setTinyUniform(true_name, glGetUniformLocation(pid, true_name.c_str()));
+
+
+						//auto uid = UniformID::staticGetUID(true_name);
+						//if (uid < shader->getTinyUniformCount())
+						//{
+						//	shader->setTinyUniform(memberData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()));
+						//}
+						//else
+						//{
+						//	TINY_LOG_ERROR(std::format("Tiny Shader`s buildin value name[{}] write error!!!", true_name));
+						//}
 					}
 				}
 			};
 
-		std::function<void(ArgMetaData*, const std::string&)> progress_user =
-			[&progress_user, &pid, &shader](ArgMetaData* metaData, const std::string& parentName)
+		std::function<void(ShaderUniformMember*, const std::string&)> progress_user =
+			[&progress_user, &pid, &shader](ShaderUniformMember* memberData, const std::string& parentName)
 			{
-				auto& name = metaData->valueName;
-				auto array_size = metaData->valueCount;
+				auto& name = memberData->valueName;
+				auto array_size = memberData->valueCount;
 				auto is_root = parentName.empty();
 
 				//如果是类,需要拼接名称
-				if (metaData->valueType == UniformType::Struct)
+				if (memberData->valueType == UniformType::Struct)
 				{
-					auto& members = metaData->getInfo<ArgStructInfo>()->members;
+					auto& members = memberData->getInfo<ShaderStructInfo>()->members;
 
 					if (array_size > 0)
 					{
@@ -453,7 +461,7 @@ namespace tezcat::Tiny::GL
 						{
 							for (auto& m : members)
 							{
-								std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
+								std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
 								progress_user(m.get(), true_name);
 							}
 						}
@@ -462,7 +470,7 @@ namespace tezcat::Tiny::GL
 					{
 						for (auto& m : members)
 						{
-							std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
+							std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
 							progress_user(m.get(), true_name);
 						}
 					}
@@ -473,19 +481,18 @@ namespace tezcat::Tiny::GL
 					{
 						for (int32_t i = 0; i < array_size; i++)
 						{
-							std::string true_name = is_root ? fmt::format("{}[{}]", name, i) : fmt::format("{}.{}[{}]", parentName, name, i);
-							shader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()), i);
+							std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
+							shader->setUserUniform(true_name, glGetUniformLocation(pid, true_name.c_str()));
 						}
 					}
 					else
 					{
-						std::string true_name = is_root ? name : fmt::format("{}.{}", parentName, name);
-						shader->setupUserUniformID(metaData, true_name, glGetUniformLocation(pid, true_name.c_str()));
+						std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
+						shader->setUserUniform(true_name, glGetUniformLocation(pid, true_name.c_str()));
 					}
 				}
 			};
 
-		shader->resizeTinyUniformAry(UniformID::allStringCount());
 		for (auto& pair : parser->mTinyUMap)
 		{
 			progress_tiny(pair.second.get(), "");
@@ -530,7 +537,7 @@ namespace tezcat::Tiny::GL
 
 		shader->apply(pid);
 
-		TINY_LOG_ENGINE(fmt::format("Shader[{}] Build Complete[{}] ({})"
+		TINY_LOG_ENGINE(std::format("Shader[{}] Build Complete[{}] ({})"
 			, shader->getName()
 			, shader->getProgramID()
 			, shader->getFilePath()));
@@ -551,12 +558,13 @@ namespace tezcat::Tiny::GL
 			switch (shaderType)
 			{
 			case GL_VERTEX_SHADER:
-				std::cout << "GLShader [" + shader->getName() + "]: [VERTEX] COMPILATION_FAILED > " << infoLog << std::endl;
-				TINY_LOG_ERROR(fmt::format("GLShader[{}]: [VERTEX] COMPILATION_FAILED > {})", shader->getName(), infoLog));
+				TINY_LOG_ERROR(std::format("GLShader[{}]: [VERTEX] COMPILATION_FAILED > {}", shader->getName(), infoLog));
 				break;
 			case GL_FRAGMENT_SHADER:
-				std::cout << "GLShader [" + shader->getName() + "]: [FRAGMENT] COMPILATION_FAILED > " << infoLog << std::endl;
-				TINY_LOG_ERROR(fmt::format("GLShader[{}]: [FRAGMENT] COMPILATION_FAILED > {})", shader->getName(), infoLog));
+				TINY_LOG_ERROR(std::format("GLShader[{}]: [FRAGMENT] COMPILATION_FAILED > {}", shader->getName(), infoLog));
+				break;
+			case GL_GEOMETRY_SHADER:
+				TINY_LOG_ERROR(std::format("GLShader[{}]: [GEOMETRY] COMPILATION_FAILED > {}", shader->getName(), infoLog));
 				break;
 			default:
 				break;

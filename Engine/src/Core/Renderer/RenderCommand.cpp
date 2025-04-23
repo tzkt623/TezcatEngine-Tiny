@@ -58,7 +58,9 @@ namespace tezcat::Tiny
 
 	void RenderCMD_Lambda::execute(PipelinePass* pass, Shader* shader)
 	{
+		TINY_PIPELINE_INFO_PUSH("LambdaDraw");
 		mFuncion(pass, shader);
+		TINY_PIPELINE_INFO_POP();
 	}
 
 #pragma region Shader

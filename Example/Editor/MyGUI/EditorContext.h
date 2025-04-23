@@ -67,6 +67,12 @@ namespace tezcat::Editor
 		static bool IsPause;
 		static bool IsFocusOnGameView;
 
+		static bool IsShowNormal;
+		static float NormalLength;
+
+		static bool IsShowMeshFrame;
+		static float MeshFrameLineWidth;
+
 	public:
 		static file_path openFile(const char* filter);
 
@@ -77,9 +83,16 @@ namespace tezcat::Editor
 		static void beginFrame();
 		static void endFrame();
 
+		static void showNormal();
+		static void hideNormal();
+
+		static void showMeshFrame();
+		static void hideMeshFrame();
+
 	private:
 		static std::vector<ValueConfig*> mValueConfigAry;
-		
+		static ReplacedPipelinePass* mShowNormalPass;
+		static ReplacedPipelinePass* mShowMeshFramePass;
 	};
 
 #define TINY_EDITOR_WINDOW_INSTANCE_H(class_name)\

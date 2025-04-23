@@ -8,6 +8,7 @@ uniform float4x4 TINY_MatrixM;
 //uniform float4x4 TINY_MatrixVP;
 //uniform float4x4 TINY_MatrixMVP;
 uniform float3x3 TINY_MatrixN;
+out float3x3 TINY_MatrixTBN;
 
 //light
 uniform float4x4 TINY_MatrixLightVP;
@@ -15,4 +16,18 @@ uniform float4x4 TINY_MatrixLightVP;
 #define TINY_LAYOUT_POSITION layout (location = 0) in float3 tiny_layout_Position
 #define TINY_LAYOUT_NORMAL layout (location = 1) in float3 tiny_layout_Normal
 #define TINY_LAYOUT_UV layout (location = 2) in float2 tiny_layout_UV
-#define TINY_LAYOUT_COLOR layout (location = 3) in float4 tiny_layout_Color
+#define TINY_LAYOUT_TANGENT layout (location = 3) in float3 tiny_layout_Tangent
+#define TINY_LAYOUT_BITANGENT layout (location = 4) in float3 tiny_layout_BiTangent
+#define TINY_LAYOUT_COLOR layout (location = 5) in float4 tiny_layout_Color
+
+
+void tinyCalcTBNMatrix(float3 normal, float3 tangent, float3 bitangent)
+{
+    float3x3 mat = float3x3(TINY_MatrixM);
+    float3 N = normalize(TINY_MatrixN * normal);
+
+    float3 T = normalize(mat * tangent);
+    float3 B = normalize(mat * bitangent);
+
+    TINY_MatrixTBN = float3x3(T, B, N);
+}

@@ -72,16 +72,18 @@
 
             float3 N = myNormal;
             float3 V = normalize(TINY_CameraWorldPosition - myWorldPosition);
-            float3 R = reflect(-V, N); 
+            float3 R = reflect(-V, N);
 
             float3 F0 = float3(0.04); 
             F0 = mix(F0, albedo, metallic);
 
+            float3 L = normalize(-TINY_LitDir.direction);
+            float3 H = normalize(V + L);
+
             //计算一个灯的光照
             float3 Lo = float3(0.0);
             {
-                float3 L = normalize(-TINY_LitDir.direction);
-                float3 H = normalize(V + L); 
+
                 float cosTheta = max(dot(N, L), 0.0);
                 float3 radiance = TINY_LitDir.diffuse * cosTheta * 10;
 
@@ -139,6 +141,7 @@
     #TINY_FS_END
 }
 #TINY_PASS_END
+
 
 
 

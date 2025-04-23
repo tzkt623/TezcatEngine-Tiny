@@ -156,6 +156,49 @@ namespace tezcat::Editor
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Gizmo"))
+			{
+				ImGui::Text("ShowMeshFrame");
+				ImGui::SameLine();
+				if (ImGui::Checkbox("##001", &EditorContext::IsShowMeshFrame))
+				{
+					if (EditorContext::IsShowMeshFrame)
+					{
+						EditorContext::showMeshFrame();
+					}
+					else
+					{
+						EditorContext::hideMeshFrame();
+					}
+				}
+
+				ImGui::Text("LineWidth");
+				ImGui::SameLine();
+				ImGui::DragFloat("##002", &EditorContext::MeshFrameLineWidth, 0.1f);
+
+				ImGui::Separator();
+
+				ImGui::Text("ShowNormal");
+				ImGui::SameLine();
+				if (ImGui::Checkbox("##003", &EditorContext::IsShowNormal))
+				{
+					if (EditorContext::IsShowNormal)
+					{
+						EditorContext::showNormal();
+					}
+					else
+					{
+						EditorContext::hideNormal();
+					}
+				}
+
+				ImGui::Text("NormalLength");
+				ImGui::SameLine();
+				ImGui::DragFloat("##004", &EditorContext::NormalLength, 0.01f);
+
+				ImGui::EndMenu();
+			}
+
 			auto size = ImGui::CalcTextSize("Info");
 			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - size.x);
 

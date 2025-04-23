@@ -124,14 +124,14 @@ namespace tezcat::Tiny
 		mesh_data->mUVs = new std::vector<float2>();
 		mesh_data->mNormals = new std::vector<float3>();
 		mesh_data->mTangents = new std::vector<float3>();
-		mesh_data->mBitTangents = new std::vector<float3>();
+		mesh_data->mBiTangents = new std::vector<float3>();
 
 		mesh_data->mVertices.reserve(aimesh->mNumVertices);
 		mesh_data->mNormals->reserve(aimesh->mNumVertices);
 		mesh_data->mUVs->reserve(aimesh->mNumVertices);
 		mesh_data->mColors->reserve(aimesh->mNumVertices);
 		mesh_data->mTangents->reserve(aimesh->mNumVertices);
-		mesh_data->mBitTangents->reserve(aimesh->mNumVertices);
+		mesh_data->mBiTangents->reserve(aimesh->mNumVertices);
 
 		bool has_normal = aimesh->HasNormals();
 		bool has_uv0 = aimesh->HasTextureCoords(0);
@@ -176,7 +176,7 @@ namespace tezcat::Tiny
 										   , ai_tangents.z);
 
 				auto ai_bit = aimesh->mBitangents[ver_i];
-				mesh_data->mBitTangents->emplace_back(ai_bit.x
+				mesh_data->mBiTangents->emplace_back(ai_bit.x
 											  , ai_bit.y
 											  , ai_bit.z);
 			}

@@ -27,6 +27,8 @@ namespace tezcat::Tiny
 		virtual void onComponentAdded(Component* component) override;
 		virtual void onComponentRemoved(Component* component) override;
 
+		MeshRenderAgent* getRenderAgent() { return mRenderAgent; }
+
 	protected:
 		void onEnable() override;
 		void onDisable() override;

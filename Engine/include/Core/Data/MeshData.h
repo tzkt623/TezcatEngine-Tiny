@@ -61,6 +61,16 @@ namespace tezcat::Tiny
 			return mNormals->size() * sizeof(float3);
 		}
 
+		uint64_t tangentSize() const
+		{
+			return mTangents->size() * sizeof(float3);
+		}
+
+		uint64_t bitangentSize() const
+		{
+			return mBiTangents->size() * sizeof(float3);
+		}
+
 		uint64_t colorSize() const
 		{
 			return mColors->size() * sizeof(float4);
@@ -80,6 +90,8 @@ namespace tezcat::Tiny
 		std::tuple<uint64_t, const void*> getIndexData();
 
 		void generate(DrawMode drawMode = DrawMode::Triangles);
+
+		bool generateTangents();
 
 		void createNormals()
 		{
@@ -112,7 +124,7 @@ namespace tezcat::Tiny
 				return;
 			}
 			mTangents = new std::vector<float3>();
-			mBitTangents = new std::vector<float3>();
+			mBiTangents = new std::vector<float3>();
 		}
 
 		void createIndices()
@@ -135,7 +147,7 @@ namespace tezcat::Tiny
 		std::vector<float4>* mColors;
 		std::vector<float2>* mUVs;
 		std::vector<float3>* mTangents;
-		std::vector<float3>* mBitTangents;
+		std::vector<float3>* mBiTangents;
 
 		std::vector<uint32_t>* mIndices;
 	};

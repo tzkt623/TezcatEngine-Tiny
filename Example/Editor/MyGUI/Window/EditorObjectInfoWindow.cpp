@@ -56,7 +56,7 @@ namespace tezcat::Editor
 				ImGui::Text(config->editorName.c_str());
 				ImGui::PushID(id);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (config->constraint == ShaderConstraint::Color)
+				if (config->constraint == ShaderMemberConstraint::Color)
 				{
 					ImGui::ColorEdit3("", glm::value_ptr(f3->value));
 				}
@@ -77,7 +77,7 @@ namespace tezcat::Editor
 				ImGui::Text(config->editorName.c_str());
 				ImGui::PushID(id);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (config->constraint == ShaderConstraint::Color)
+				if (config->constraint == ShaderMemberConstraint::Color)
 				{
 					ImGui::ColorEdit4("", glm::value_ptr(f4->value));
 				}
@@ -276,7 +276,6 @@ namespace tezcat::Editor
 				auto vertex = mr->getVertex();
 				ImGui::Text("Name: %s", vertex->getEngineName().toData());
 				ImGui::Text("VertexID: %d", vertex->getVertexID());
-				ImGui::Text("VertexCount: %d", vertex->getVertexCount());
 				ImGui::Text("IndexCount: %d", vertex->getIndexCount());
 				ImGui::Text("Face: %d", vertex->getIndexCount() / 3);
 			}
