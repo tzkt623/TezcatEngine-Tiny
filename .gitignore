@@ -40,5 +40,5 @@
 /build
 /Resource/Image/SkyboxHDR/**
 !/Resource/Image/SkyboxHDR/newport_loft.hdr
-/Resource/Image/pbr/**
-!/Resource/Image/pbr/wood_table_001_2k
+/Resource/Image/pbr/*
+!/Resource/Image/pbr/wood_table_001_2k/

@@ -18,11 +18,11 @@
 
 ![Image](https://github.com/user-attachments/assets/bfecae67-9533-4ffa-8bc8-179ffbba2b2b)
 
+![Image](https://github.com/user-attachments/assets/9375aac2-c786-418e-ab1a-3e38430c4655)
+
 ![logo1](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/1faf72c8-36e8-4bb3-9e40-2b87a0656dfc)
 
 ![logo2](https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/0a9e3960-eae2-4ea7-8d4c-149b9a3a0ef4)
-
-<img width="1280" alt="屏幕截图 2024-06-03 144114" src="https://github.com/tzkt623/TezcatEngine-Tiny/assets/6510903/52484691-2753-4d82-8995-cba8439866ff">
 
 -------------------------------------------------
 
