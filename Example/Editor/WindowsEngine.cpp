@@ -58,7 +58,7 @@ namespace tezcat::Editor
 	{
 		Engine::preUpdate();
 		mTimeNow = glfwGetTime();
-		sDeltaTime = static_cast<float>(mTimeNow - mTimeOld);
+		EngineContext::DeltaTime = static_cast<float>(mTimeNow - mTimeOld);
 		mTimeOld = mTimeNow;
 	}
 

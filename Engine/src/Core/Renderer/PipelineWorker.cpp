@@ -129,6 +129,17 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->bind(mShader);
 		Graphics::getInstance()->setPassState(mShader);
 		mRenderObserver->submit(mShader);
+		switch (mShader->getLightMode())
+		{
+		case LightMode::Forward:
+			break;
+		case LightMode::Deferred:
+			break;
+		case LightMode::ForwardAdd:
+			break;
+		default:
+			break;
+		}
 
 		for (auto& fun : mGlobalSubmitArray)
 		{
@@ -306,12 +317,12 @@ namespace tezcat::Tiny
 		mName = shader->getName();
 		mEngineName = mName;
 
-		mAutoCulling = TINY_BIND_THIS(ReplacedPipelinePass::createCommand);
+		mAutoGenerateCommand = TINY_BIND_THIS(ReplacedPipelinePass::createCommand);
 	}
 
 	ReplacedPipelinePass::~ReplacedPipelinePass()
 	{
-		mAutoCulling = nullptr;
+		mAutoGenerateCommand = nullptr;
 		mCustomCulling = nullptr;
 	}
 
@@ -338,12 +349,12 @@ namespace tezcat::Tiny
 			mCustomCulling(this);
 		}
 
-		mRenderObserver->getPipelineQueue()->addToPipeline();
+		mQueue->addToPipeline();
 	}
 
 	void ReplacedPipelinePass::pushCommand(BaseMeshRenderer* meshRenderer)
 	{
-		this->addCommand(mAutoCulling(meshRenderer));
+		this->addCommand(mAutoGenerateCommand(meshRenderer));
 	}
 
 	RenderCommand* ReplacedPipelinePass::createCommand(BaseMeshRenderer* renderer)

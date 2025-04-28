@@ -316,12 +316,12 @@ namespace tezcat::Tiny
 		void setAutoCulling(const std::function<RenderCommand* (BaseMeshRenderer*)>& func)
 		{
 			mIsAutoCulling = true;
-			mAutoCulling = func;
+			mAutoGenerateCommand = func;
 		}
 
 		void setAutoCulling()
 		{
-			mAutoCulling = TINY_BIND_THIS(ReplacedPipelinePass::createCommand);
+			mAutoGenerateCommand = TINY_BIND_THIS(ReplacedPipelinePass::createCommand);
 		}
 
 	private:
@@ -336,7 +336,7 @@ namespace tezcat::Tiny
 		union
 		{
 			std::function<void(ReplacedPipelinePass*)> mCustomCulling;
-			std::function<RenderCommand* (BaseMeshRenderer*)> mAutoCulling;
+			std::function<RenderCommand* (BaseMeshRenderer*)> mAutoGenerateCommand;
 		};
 
 	public:

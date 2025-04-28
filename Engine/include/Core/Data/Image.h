@@ -49,6 +49,10 @@ namespace tezcat::Tiny
 			return temp;
 		}
 		bool isHDR() const { return mIsHDR; }
+	private:
+		void loadWithSTBI(const file_path& path, bool flip);
+		void loadWithTinyExr(const file_path& path, bool flip);
+
 
 	private:
 		int32_t mWidth;

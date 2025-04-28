@@ -45,7 +45,7 @@
 namespace tezcat::Tiny
 {
 	BaseGraphics::BaseGraphics()
-		: mPolygonMode(ContextMap::PolygonModeArray[(uint32_t)PolygonMode::Face])
+		: mPolygonMode(GraphicsConfig::PolygonModeArray[(uint32_t)PolygonMode::Face])
 		, mClearColor(0.0f, 0.0f, 0.0f, 1.0f)
 	{
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_ReadObjectID, this
@@ -114,7 +114,7 @@ namespace tezcat::Tiny
 
 	void BaseGraphics::setPolygonMode(PolygonMode mode)
 	{
-		mPolygonMode = ContextMap::PolygonModeArray[(uint32_t)mode];
+		mPolygonMode = GraphicsConfig::PolygonModeArray[(uint32_t)mode];
 	}
 
 	void BaseGraphics::unbind(FrameBuffer* frameBuffer)

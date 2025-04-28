@@ -16,10 +16,18 @@
 */
 
 #include "Core/Data/Image.h"
+#include "Core/Debug/Debug.h"
 
 #define STBI_WINDOWS_UTF8
 #define STB_IMAGE_IMPLEMENTATION
-#include "ThirdParty/stb_image.h"
+#include "ThirdParty/ImageLoad/stb_image.h"
+
+#define TINYEXR_USE_STB_ZLIB 1
+#define TINYEXR_USE_PIZ 1
+//#define TINYEXR_USE_ZFP 1
+#define TINYEXR_USE_THREAD 1
+#define TINYEXR_IMPLEMENTATION
+#include "ThirdParty/ImageLoad/tinyexr.h"
 
 namespace tezcat::Tiny
 {
@@ -69,15 +77,13 @@ namespace tezcat::Tiny
 		mData = nullptr;
 	}
 
-	bool Image::openFile(const file_path& path, bool flip)
+	void Image::loadWithSTBI(const file_path& path, bool flip)
 	{
-		file_path true_path = file_sys_helper::generic(path);
-
 		std::unique_ptr<StbiHelper> helper = std::make_unique<StbiHelper>();
-		helper->file.open(true_path, std::ios::binary);
+		helper->file.open(path, std::ios::binary);
 		if (!helper->file.is_open())
 		{
-			return false;
+			return;
 		}
 
 		stbi_io_callbacks callbacks
@@ -98,6 +104,20 @@ namespace tezcat::Tiny
 		{
 			helper->file.seekg(0);
 			mData = stbi_load_from_callbacks(&callbacks, (void*)helper.get(), &mWidth, &mHeight, &mChannels, 0);
+		}
+	}
+
+	bool Image::openFile(const file_path& path, bool flip)
+	{
+		file_path true_path = file_sys_helper::generic(path);
+
+		if (true_path.extension() == ".exr")
+		{
+			this->loadWithTinyExr(true_path, flip);
+		}
+		else
+		{
+			this->loadWithSTBI(true_path, flip);
 		}
 
 		return mData != nullptr;
@@ -125,4 +145,25 @@ namespace tezcat::Tiny
 		fclose(f);
 		return mData != nullptr;
 	}
+
+	void Image::loadWithTinyExr(const file_path& path, bool flip)
+	{
+		float* out = nullptr;
+		const char* err = nullptr;
+		int ret = LoadEXR(&out, &mWidth, &mHeight, path.string().c_str(), &err);
+
+		if (ret != TINYEXR_SUCCESS)
+		{
+			if (err)
+			{
+				TINY_LOG_WARNING(err);
+				FreeEXRErrorMessage(err); // release memory of error message.
+			}
+		}
+		else
+		{
+			free(out); // release memory of image data
+		}
+	}
+
 }

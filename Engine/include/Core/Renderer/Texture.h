@@ -71,6 +71,7 @@ namespace tezcat::Tiny
 		virtual void clearInGPU() {}
 
 		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() = 0;
+		virtual void setSizeWHL(uint32_t width, uint32_t height, uint32_t length) = 0;
 
 		const uint32_t& getTextureID() const { return mTextureID; }
 		virtual void apply(uint32_t id) { mTextureID = id; }
@@ -93,7 +94,7 @@ namespace tezcat::Tiny
 		const DataMemFormatWrapper& getDataMemFormat() const { return mDataMemFormat; }
 		void setDataMemFormat(const DataMemFormat& memFormat)
 		{
-			mDataMemFormat = ContextMap::DataMemFormatArray[(uint32_t)memFormat];
+			mDataMemFormat = GraphicsConfig::DataMemFormatArray[(uint32_t)memFormat];
 		}
 
 		const TextureAttachPosition& getAttachPosition() const { return mAttachPosition; }
@@ -105,18 +106,18 @@ namespace tezcat::Tiny
 
 		void setMinFilter(const TextureFilter& filter)
 		{
-			mMinFilter = ContextMap::TextureFilterArray[(uint32_t)filter];
+			mMinFilter = GraphicsConfig::TextureFilterArray[(uint32_t)filter];
 		}
 
 		void setMagFilter(const TextureFilter& filter)
 		{
-			mMagFilter = ContextMap::TextureFilterArray[(uint32_t)filter];
+			mMagFilter = GraphicsConfig::TextureFilterArray[(uint32_t)filter];
 		}
 
 		void setFilter(const TextureFilter& min, const TextureFilter& mag)
 		{
-			mMinFilter = ContextMap::TextureFilterArray[(uint32_t)min];
-			mMagFilter = ContextMap::TextureFilterArray[(uint32_t)mag];
+			mMinFilter = GraphicsConfig::TextureFilterArray[(uint32_t)min];
+			mMagFilter = GraphicsConfig::TextureFilterArray[(uint32_t)mag];
 		}
 
 	public:
@@ -125,18 +126,18 @@ namespace tezcat::Tiny
 
 		void setTexFormat(const TextureFormat& channel)
 		{
-			mFormat = ContextMap::TextureFormatArray[(uint32_t)channel];
+			mFormat = GraphicsConfig::TextureFormatArray[(uint32_t)channel];
 		}
 
 		void setInternalFormat(const TextureInternalFormat& channel)
 		{
-			mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)channel];
+			mInternalFormat = GraphicsConfig::TextureInternalFormatArray[(uint32_t)channel];
 		}
 
 		void setFormat(const TextureInternalFormat& internalChannel, const TextureFormat& channel)
 		{
-			mInternalFormat = ContextMap::TextureInternalFormatArray[(uint32_t)internalChannel];
-			mFormat = ContextMap::TextureFormatArray[(uint32_t)channel];
+			mInternalFormat = GraphicsConfig::TextureInternalFormatArray[(uint32_t)internalChannel];
+			mFormat = GraphicsConfig::TextureFormatArray[(uint32_t)channel];
 		}
 
 	public:
@@ -190,7 +191,13 @@ namespace tezcat::Tiny
 			return { mWidth, mHeight, 0 };
 		}
 
-		void setSize(const int& width, const int& height)
+		void setSizeWHL(uint32_t width, uint32_t height, uint32_t length) override
+		{
+			mWidth = width;
+			mHeight = height;
+		}
+
+		void setSize(const uint32_t& width, const uint32_t& height)
 		{
 			mWidth = width;
 			mHeight = height;
@@ -209,8 +216,8 @@ namespace tezcat::Tiny
 
 		void setWrap(const TextureWrap& S, const TextureWrap& T)
 		{
-			mWrapS = ContextMap::TextureWrapArray[(uint32_t)S];
-			mWrapT = ContextMap::TextureWrapArray[(uint32_t)T];
+			mWrapS = GraphicsConfig::TextureWrapArray[(uint32_t)S];
+			mWrapT = GraphicsConfig::TextureWrapArray[(uint32_t)T];
 		}
 
 	protected:
@@ -245,9 +252,16 @@ namespace tezcat::Tiny
 		uint32_t getHeight() const { return mHeight; }
 		uint32_t getLength() const { return mLength; }
 
-		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() final override
+		std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() final override
 		{
 			return { mWidth, mHeight, mLength };
+		}
+
+		void setSizeWHL(uint32_t width, uint32_t height, uint32_t length) override
+		{
+			mWidth = width;
+			mHeight = height;
+			mLength = length;
 		}
 
 
@@ -294,7 +308,14 @@ namespace tezcat::Tiny
 		void* getData(uint32_t index) const { return mDatas[index]; }
 		void apply(uint32_t id);
 
-		virtual std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() final override { return { mSize, mSize, mSize }; }
+		std::tuple<uint32_t, uint32_t, uint32_t> getSizeWHL() final override { return { mSize, mSize, mSize }; }
+
+		void setSizeWHL(uint32_t width, uint32_t height, uint32_t length) override
+		{
+			mSize = width;
+			mSize = height;
+			mSize = length;
+		}
 
 	protected:
 		uint32_t mSize;
@@ -324,6 +345,12 @@ namespace tezcat::Tiny
 
 		uint32_t getWidth() const { return mWidth; }
 		uint32_t getHeight() const { return mHeight; }
+
+		void setSizeWHL(uint32_t width, uint32_t height, uint32_t length) override
+		{
+			mWidth = width;
+			mHeight = height;
+		}
 
 		const TexWrapWrapper& getWrapS() const { return mWrapS; }
 		const TexWrapWrapper& getWrapT() const { return mWrapT; }

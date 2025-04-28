@@ -41,6 +41,7 @@
     #TINY_FS_BEGIN
     {
         #include "../Include/tiny_fs.tyin"
+        #include "../Include/tiny_fs_pbr.tyin"
 
         in float3 myNormal;
         in float3 myWorldPos;

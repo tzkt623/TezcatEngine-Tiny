@@ -16,10 +16,10 @@
 */
 
 #include "Core/Renderer/VertexConfig.h"
+#include "Core/Debug/Debug.h"
 
 namespace tezcat::Tiny
 {
-
 	int32_t VertexLayout::getTypeLength(VertexLayoutType type)
 	{
 		switch (type)
@@ -56,12 +56,15 @@ namespace tezcat::Tiny
 		{
 		case VertexPosition::VP_Position:
 		case VertexPosition::VP_Normal:
+		case VertexPosition::VP_Tangent:
+		case VertexPosition::VP_BiTangent:
 			return VertexLayoutType::Float3;
 		case VertexPosition::VP_UV:
 			return VertexLayoutType::Float2;
 		case VertexPosition::VP_Color:
 			return VertexLayoutType::Float4;
 		default:
+			TINY_LOG_ERROR(std::format("VertexLayoutType Error!"));
 			return VertexLayoutType::None;
 		}
 	}

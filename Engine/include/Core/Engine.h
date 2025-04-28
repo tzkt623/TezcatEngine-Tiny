@@ -19,6 +19,7 @@
 
 #include "Head/ConfigHead.h"
 #include "Head/TinyCpp.h"
+#include "EngineContext.h"
 
 namespace tezcat::Tiny
 {
@@ -73,18 +74,6 @@ namespace tezcat::Tiny
 		std::thread mRenderThread;
 		std::condition_variable mThreadCondition;
 		std::atomic<bool> mRenderThreadInited;
-
-	public:
-		static const int32_t& getScreenWidth() { return ScreenWidth; }
-		static const int32_t& getScreenHeight() { return ScreenHeight; }
-		static const float& getDeltaTime() { return sDeltaTime; }
-		static const std::string& getName() { return sName; }
-
-	protected:
-		static std::string sName;
-		static int32_t ScreenWidth;
-		static int32_t ScreenHeight;
-		static float sDeltaTime;
 
 	public:
 		static bool sMultiThread;

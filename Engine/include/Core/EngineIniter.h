@@ -47,11 +47,7 @@ namespace tezcat::Tiny
 		/// </summary>
 		virtual void prepareGame(Engine* engine);
 		virtual void initYourShaderParam() {}
-
 	public:
-		int getWindowHeight() const { return mWindowHeight; }
-		int getWindowWidth() const { return mWindowWidth; }
-		bool isEnabelVsync() const { return mEnableVsync; }
 
 		void setGLVersion(int major, int minor)
 		{
@@ -62,12 +58,6 @@ namespace tezcat::Tiny
 		auto getGLVersion()
 		{
 			return std::tuple(mGLMinor, mGLMajor);
-		}
-
-		const std::string& getName() const
-		{
-			static std::string name(mGameName.begin(), mGameName.end());
-			return name;
 		}
 
 	private:
@@ -81,14 +71,8 @@ namespace tezcat::Tiny
 		void createGridSquare();
 		void createSphere2(uint32_t X_SEGMENTS, uint32_t Y_SEGMENTS);
 		void createRect();
+
 	protected:
-		int mWindowWidth;
-		int mWindowHeight;
-
-		std::u8string mGameName;
-
-		bool mEnableVsync;
-
 		int mGLMajor;
 		int mGLMinor;
 	};

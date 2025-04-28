@@ -1,4 +1,4 @@
-struct MatPBR_Test
+struct TinyPBR_Test
 {
     [Editor(Albedo, Color)]
     float3 albedo;
@@ -10,7 +10,7 @@ struct MatPBR_Test
     float ao;
 };
 
-struct MatPBR_Std1
+struct TinyPBR_Std
 {
     [Editor(Normal2D)]
     tex2D normal2D;
@@ -22,4 +22,14 @@ struct MatPBR_Std1
     tex2D roughness2D;
     [Editor(AO2D)]
     tex2D ao2D;
+};
+
+struct TinyPBR_Std_ARM
+{
+    [Editor(Normal2D)]
+    tex2D normal2D;
+    [Editor(Albedo2D)]
+    tex2D albedo2D;
+    [Editor(ARM2D)]
+    tex2D arm2D;
 };

@@ -23,7 +23,7 @@ namespace tezcat::Editor
 			return;
 		}
 
-		float speed = 100 * Engine::getDeltaTime();
+		float speed = 100 * EngineContext::DeltaTime;
 		bool flag = false;
 		auto transform = mController->getTransform();
 		glm::vec3 position(0.0f);
@@ -70,7 +70,7 @@ namespace tezcat::Editor
 			mController->roll(speed);
 		}
 
-		float rollspeed = 20 * Engine::getDeltaTime();
+		float rollspeed = 20 * EngineContext::DeltaTime;
 		float current_x;
 		float current_y;
 		system->getMousePosition(current_x, current_y);

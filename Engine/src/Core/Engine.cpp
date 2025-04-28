@@ -37,10 +37,6 @@
 
 namespace tezcat::Tiny
 {
-	int32_t Engine::ScreenHeight = 0;
-	int32_t Engine::ScreenWidth = 0;
-	float Engine::sDeltaTime = 0;
-	std::string Engine::sName;
 	bool Engine::mIsRunning = true;
 
 	std::mutex Engine::sMainMutex;
@@ -101,9 +97,6 @@ namespace tezcat::Tiny
 	bool Engine::preInit()
 	{
 		mResourceLoader->prepareEngine(this);
-		ScreenWidth = mResourceLoader->getWindowWidth();
-		ScreenHeight = mResourceLoader->getWindowHeight();
-		sName = mResourceLoader->getName();
 
 		ShaderParam::initAllParam(std::bind(&EngineIniter::initYourShaderParam, mResourceLoader));
 
@@ -278,6 +271,4 @@ namespace tezcat::Tiny
 		//sCVRenderThread.notify_one();
 		sSemRenderThread.release();
 	}
-
-
 }

@@ -15,6 +15,9 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+#include "FlagConfig.h"
+
 #ifdef TINY_PLATFORM_WINDOWS
 
 #ifdef TINY_DYNAMIC_LIB

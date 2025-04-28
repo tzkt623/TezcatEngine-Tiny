@@ -25,7 +25,7 @@ void Tutorial_Cube::onEnter()
 	mObserver->saveObject();
 	mObserver->setSortingID(0);
 	//mObserver->setPerspective(75.0f, 0.01f, 100.0f);
-	mObserver->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+	mObserver->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 	mObserver->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 
 	auto shader = ShaderManager::find("Tutorial/Cube");
@@ -37,7 +37,7 @@ void Tutorial_Cube::onEnter()
 	{
 		pass->addCommand<RenderCMD_Lambda>([=](PipelinePass* pass, Shader* shader)
 			{
-				auto projection = glm::perspective(glm::radians(75.0f), (float)Engine::getScreenWidth() / Engine::getScreenHeight(), 0.01f, 100.0f);
+				auto projection = glm::perspective(glm::radians(75.0f), (float)EngineContext::ScreenWidth / EngineContext::ScreenHeight, 0.01f, 100.0f);
 				auto view = glm::lookAt(float3(0.0f, 0.0f, 2.0f)
 					, float3(0.0f, 0.0f, -1.0f)
 					, float3(0.0f, 1.0f, 0.0f));

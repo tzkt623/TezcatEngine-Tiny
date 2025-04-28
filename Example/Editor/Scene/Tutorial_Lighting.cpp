@@ -37,7 +37,7 @@ void Tutorial_Lighting::onEnter()
 	camera->setClearColor(float4(0.3f, 0.3f, 0.3f, 1.0f));
 	camera->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 	camera->setCullLayer(0);
-	camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+	camera->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 	camera->setFrameBuffer(FrameBufferManager::getMainFrameBufferBuildin());
 
 

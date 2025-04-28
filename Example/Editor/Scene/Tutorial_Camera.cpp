@@ -24,14 +24,14 @@ void Tutorial_Camera::onEnter()
 	mObserver = RenderObserver::create();
 	mObserver->saveObject();
 	mObserver->setSortingID(0);
-	mObserver->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+	mObserver->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 	mObserver->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 
 	auto shader = ShaderManager::find("Tutorial/Cube");
 	auto config_mvp = shader->getUserUniformValueConfig("MVP");
 	auto config_color = shader->getUserUniformValueConfig("myColor");
 
-	mProjectionMatrix = glm::perspective(glm::radians(75.0f), (float)Engine::getScreenWidth() / Engine::getScreenHeight(), 0.01f, 100.0f);
+	mProjectionMatrix = glm::perspective(glm::radians(75.0f), (float)EngineContext::ScreenWidth / EngineContext::ScreenHeight, 0.01f, 100.0f);
 	mViewMatrix = glm::lookAt(float3(0.0f, 0.0f, 0.0f)
 		, float3(0.0f, 0.0f, -1.0f)
 		, float3(0.0f, 1.0f, 0.0f));
@@ -39,7 +39,7 @@ void Tutorial_Camera::onEnter()
 	mPass = ReplacedPipelinePass::create(mObserver, shader);
 	mPass->setCustomCulling([=, this](ReplacedPipelinePass* pass)
 	{
-		mViewMatrix = glm::rotate(mViewMatrix, glm::radians(18.0f) * Engine::getDeltaTime(), float3(0.0f, 1.0f, 0.0f));
+		mViewMatrix = glm::rotate(mViewMatrix, glm::radians(18.0f) * EngineContext::DeltaTime, float3(0.0f, 1.0f, 0.0f));
 
 		{//cube
 			pass->addCommand<RenderCMD_Lambda>([=, this](PipelinePass* pass, Shader* shader)

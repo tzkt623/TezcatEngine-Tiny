@@ -24,6 +24,7 @@
 		
 #include "Core/Renderer/RenderObjectCache.h"
 #include "Core/Renderer/BaseGraphics.h"
+
 #include "Core/Event/EngineEvent.h"
 
 namespace tezcat::Tiny
@@ -33,12 +34,16 @@ namespace tezcat::Tiny
 	std::list<TinyWeakRef<ShadowCaster>> ShadowCasterManager::mCasterAry;
 	bool ShadowCasterManager::mAdded = false;
 
+	ShadowCasterManager::TexturePool<Texture2D> ShadowCasterManager::mDirectionalLightShadowMaps;
+
 	void ShadowCasterManager::init()
 	{
 		EngineEvent::getInstance()->addListener(EngineEventID::EE_BeforeSceneExit, &mCasterAry, [](const EventData& data)
 		{
 			mCasterAry.clear();
 		});
+
+		mDirectionalLightShadowMaps.setSizeWHL(4096, 4096, 0);
 	}
 
 	uint32_t ShadowCasterManager::add(ShadowCaster* caster)
@@ -75,5 +80,47 @@ namespace tezcat::Tiny
 			}
 		}
 	}
+
+	Texture2D* ShadowCasterManager::getOrCreateDirectionalShadowMap()
+	{
+		auto [flag, tex] = mDirectionalLightShadowMaps.createOrGet();
+		if (flag == FlagCreate::Succeeded)
+		{
+			tex->setName("DirectionalShadowMap");
+			tex->setWrap(TextureWrap::Clamp_To_Edge, TextureWrap::Clamp_To_Edge);
+			tex->setFilter(TextureFilter::Linear, TextureFilter::Linear);
+			tex->setFormat(TextureInternalFormat::Depth, TextureFormat::Depth);
+			tex->setAttachPosition(TextureAttachPosition::DepthComponent);
+			tex->generate();
+		}
+
+		return tex;
+	}
+
+	TextureCube* ShadowCasterManager::getOrCreatePointShadowMap()
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	Texture2D* ShadowCasterManager::getOrCreateSpotShadowMap()
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void ShadowCasterManager::recycleDirectionalShadowMap(Texture2D* tex)
+	{
+		mDirectionalLightShadowMaps.recycle(tex);
+	}
+
+	void ShadowCasterManager::recyclePointShadowMap(TextureCube* tex)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void ShadowCasterManager::recycleSpotShadowMap(Texture2D* tex)
+	{
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
 }
 

@@ -41,6 +41,7 @@ namespace tezcat::Editor
 	{
 	public:
 		static void init();
+
 		static ValueConfig* getValueConfig(const UniformID& ID);
 		static void clearOnPopScene();
 
@@ -73,6 +74,11 @@ namespace tezcat::Editor
 		static bool IsShowMeshFrame;
 		static float MeshFrameLineWidth;
 
+		static bool IsShowTangents;
+		static float TangentLength;
+
+		static float SelectRectThickness;
+
 	public:
 		static file_path openFile(const char* filter);
 
@@ -89,10 +95,26 @@ namespace tezcat::Editor
 		static void showMeshFrame();
 		static void hideMeshFrame();
 
+		static void showTangents();
+		static void hideTangents();
+
+	private:
+		static void initEvent();
+		static void initGizmo();
+		static void initShowMeshFrame();
+		static void initShowNormals();
+		static void initShowSelectObject();
+		static void initCamera();
+		static void initShadowPass();
+		static void initShowTangents();
+
 	private:
 		static std::vector<ValueConfig*> mValueConfigAry;
 		static ReplacedPipelinePass* mShowNormalPass;
+		static ReplacedPipelinePass* mShowTangentsPass;
 		static ReplacedPipelinePass* mShowMeshFramePass;
+		static ReplacedPipelinePass* mShowSelectedObjectPass;
+		static ReplacedPipelinePass* mShadowPass;
 	};
 
 #define TINY_EDITOR_WINDOW_INSTANCE_H(class_name)\

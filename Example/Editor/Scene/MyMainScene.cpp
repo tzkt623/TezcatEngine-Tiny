@@ -25,7 +25,7 @@ void MyMainScene::onEnter()
 		auto go = GameObject::create("World1_Camera");
 		auto camera = go->addComponent<Camera>();
 		camera->setMain();
-		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+		camera->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
 		camera->setCullLayer(0);
 		camera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth | ClearOption::CO_Color);
@@ -47,7 +47,7 @@ void MyMainScene::onEnter()
 	this->createModel();
 	this->createCubes0();
 
-	auto img = ResourceManager::loadOnly<Image>("Resource/Image/blocky_photo_studio_2k.hdr");
+	auto img = ResourceManager::loadOnly<Image>("Resource/Image/SkyboxHDR/newport_loft.hdr");
 	EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
 
 
@@ -147,61 +147,63 @@ void MyMainScene::createPaintings()
 	mr2->setMaterial(wife_material2);
 
 
+	if (true)
+	{
+		//--------------------------------------
+		auto elden_ring1 = GameObject::create("ED1");
+		elden_ring1->addComponent<Transform>();
+		elden_ring1->getTransform()->setPosition(float3(0.0f, 0.0f, -960.0f));
+		elden_ring1->getTransform()->setRotation(float3(0.0f, 0.0f, 0.0f));
+		elden_ring1->getTransform()->setScale(float3(1920.0f / 2, 1080.0f / 2, 1.0f));
+		elden_ring1->getTransform()->setParent(transform);
 
+		auto mre1 = elden_ring1->addComponent<MeshRenderer>();
+		auto elden_ring1_material = Material::create("Unlit/Texture");
+		mre1->setMaterial(elden_ring1_material);
+		mre1->setMesh("Square");
 
-	//--------------------------------------
-	auto elden_ring1 = GameObject::create("ED1");
-	elden_ring1->addComponent<Transform>();
-	elden_ring1->getTransform()->setPosition(float3(0.0f, 0.0f, -960.0f));
-	elden_ring1->getTransform()->setRotation(float3(0.0f, 0.0f, 0.0f));
-	elden_ring1->getTransform()->setScale(float3(1920.0f / 2, 1080.0f / 2, 1.0f));
-	elden_ring1->getTransform()->setParent(transform);
+		tex = ResourceManager::loadOnly<Texture2D>("Resource/Image/eldenring1.jpg");
+		elden_ring1_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 
-	auto mre1 = elden_ring1->addComponent<MeshRenderer>();
-	auto elden_ring1_material = Material::create("Unlit/Texture");
-	mre1->setMaterial(elden_ring1_material);
-	mre1->setMesh("Square");
+		//--------------------------------------
+		auto elden_ring2 = GameObject::create("ED2");
+		elden_ring2->addComponent<Transform>();
+		elden_ring2->getTransform()->setPosition(float3(0.0f, 0.0f, 960.0f));
+		elden_ring2->getTransform()->setRotation(float3(0.0f, -180.0f, 0.0f));
+		elden_ring2->getTransform()->setScale(float3(1920.0f / 2, 1080.0f / 2, 1.0f));
+		elden_ring2->getTransform()->setParent(transform);
 
-	tex = ResourceManager::loadOnly<Texture2D>("Resource/Image/eldenring1.jpg");
-	elden_ring1_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
+		auto mre2 = elden_ring2->addComponent<MeshRenderer>();
+		auto elden_ring2_material = Material::create("Unlit/Texture");
+		mre2->setMaterial(elden_ring2_material);
+		mre2->setMesh("Square");
 
+		tex = ResourceManager::loadOnly<Texture2D>("Resource/Image/eldenring2.jpg");
+		elden_ring2_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
 
-	auto elden_ring2 = GameObject::create("ED2");
-	elden_ring2->addComponent<Transform>();
-	elden_ring2->getTransform()->setPosition(float3(0.0f, 0.0f, 960.0f));
-	elden_ring2->getTransform()->setRotation(float3(0.0f, -180.0f, 0.0f));
-	elden_ring2->getTransform()->setScale(float3(1920.0f / 2, 1080.0f / 2, 1.0f));
-	elden_ring2->getTransform()->setParent(transform);
+		//--------------------------------------
+		auto img = ResourceManager::loadOnly<Image>("Resource/Image/SkyboxHDR/newport_loft.hdr");
+		auto hdr = Texture2D::create();
+		hdr->setImage(img);
+		hdr->setMinFilter(TextureFilter::Linear_Mipmap_Linear);
+		hdr->generate();
 
-	auto mre2 = elden_ring2->addComponent<MeshRenderer>();
-	auto elden_ring2_material = Material::create("Unlit/Texture");
-	mre2->setMaterial(elden_ring2_material);
-	mre2->setMesh("Square");
+		auto gaussian = GameObject::create("Gaussian");
+		gaussian->addComponent<Transform>();
+		gaussian->getTransform()->setPosition(float3(960.0f, 0.0f, 0.0f));
+		gaussian->getTransform()->setRotation(float3(0.0f, -90.0f, 0.0f));
+		gaussian->getTransform()->setScale(float3(hdr->getWidth() / 2, hdr->getHeight() / 2, 1.0f));
+		gaussian->getTransform()->setParent(transform);
 
-	tex = ResourceManager::loadOnly<Texture2D>("Resource/Image/eldenring2.jpg");
-	elden_ring2_material->setUniform<UniformTex2D>(my_tex2d_color_index, tex);
+		auto mg = gaussian->addComponent<MeshRenderer>();
+		auto gaussian_material = Material::create("Unlit/GaussianBlur");
+		mg->setMaterial(gaussian_material);
+		mg->setMesh("Square");
 
-
-	auto img = ResourceManager::loadOnly<Image>("Resource/Image/solitude_night_2k.hdr");
-	auto hdr = Texture2D::create();
-	hdr->setImage(img);
-	hdr->setMinFilter(TextureFilter::Linear_Mipmap_Linear);
-	hdr->generate();
-	auto gaussian = GameObject::create("Gaussian");
-	gaussian->addComponent<Transform>();
-	gaussian->getTransform()->setPosition(float3(960.0f, 0.0f, 0.0f));
-	gaussian->getTransform()->setRotation(float3(0.0f, -90.0f, 0.0f));
-	gaussian->getTransform()->setScale(float3(hdr->getWidth() / 2, hdr->getHeight() / 2, 1.0f));
-	gaussian->getTransform()->setParent(transform);
-
-	auto mg = gaussian->addComponent<MeshRenderer>();
-	auto gaussian_material = Material::create("Unlit/GaussianBlur");
-	mg->setMaterial(gaussian_material);
-	mg->setMesh("Square");
-
-	shader = gaussian_material->getShader();
-	my_tex2d_color_index = shader->getUserUniformIndex("myTexColor2D");
-	gaussian_material->setUniform<UniformTex2D>(my_tex2d_color_index, hdr);
+		shader = gaussian_material->getShader();
+		my_tex2d_color_index = shader->getUserUniformIndex("myTexColor2D");
+		gaussian_material->setUniform<UniformTex2D>(my_tex2d_color_index, hdr);
+	}
 }
 
 void MyMainScene::createPlane()
@@ -324,11 +326,11 @@ void MyMainScene::createDirectionLight()
 	go->getTransform()->setScale(float3(100.0f));
 	go->getTransform()->setRotation(-60.0f, 0.0f, 0.0f);
 
-	auto mr = go->addComponent<MeshRenderer>();
-	mr->setMesh("Sphere");
-
-	auto light_material = Material::create("Unlit/Color");
-	mr->setMaterial(light_material);
+	//auto mr = go->addComponent<MeshRenderer>();
+	//mr->setMesh("Sphere");
+	//
+	//auto light_material = Material::create("Unlit/Color");
+	//mr->setMaterial(light_material);
 
 	auto dir_light = go->addComponent<DirectionalLight>();
 	dir_light->setDiffuse(float3(1.0f, 1.0f, 1.0f));
@@ -343,7 +345,7 @@ void MyMainScene::createDirectionLight()
 
 	// 	dir_light->startLogic([=]()
 	// 	{
-	// 		go->getTransform()->rotate(float3(0.0f, 10.0f * Engine::getDeltaTime(), 0.0f));
+	// 		go->getTransform()->rotate(float3(0.0f, 10.0f * EngineContext::DeltaTime, 0.0f));
 	// 	});
 }
 
@@ -360,27 +362,48 @@ void MyMainScene::createPBR()
 	auto index_roughness = shader->getUserUniformIndex("myPBR.roughness");
 	auto index_ao = shader->getUserUniformIndex("myPBR.ao");
 
-	int number = 5;
-	float rate = 1.0f / (float)number;
-	for (int y = 0; y <= number; y++)
-	{
-		for (int x = 0; x <= number; x++)
-		{
-			go = GameObject::create(std::format("PBRBall_{}_{}", x, y));
-			go->addComponent<Transform>();
-			go->getTransform()->setPosition(float3(x * 25.0f, y * 25.0f, -60.0f));
-			go->getTransform()->setScale(float3(10.0f));
-			go->getTransform()->setRotation(float3(90.0f, 0.0f, 0.0f));
-			go->getTransform()->setParent(transform);
 
-			auto mr = go->addComponent<MeshRenderer>();
-			auto material = Material::create(shader);
-			material->setUniform<UniformF3>(index_albedo, float3(1.0f, 1.0f, 1.0f));
-			material->setUniform<UniformF1>(index_metallic, x * rate);
-			material->setUniform<UniformF1>(index_roughness, y * rate);
-			material->setUniform<UniformF1>(index_ao, 1.0f);
-			mr->setMaterial(material);
-			mr->setMesh("Sphere");
+	//go = GameObject::create("PBRBall_Test");
+	//go->addComponent<Transform>();
+	//go->getTransform()->setPosition(float3(0.0f));
+	//go->getTransform()->setScale(float3(10.0f));
+	//go->getTransform()->setRotation(float3(90.0f, 0.0f, 0.0f));
+	//go->getTransform()->setParent(transform);
+	//
+	//auto mr = go->addComponent<MeshRenderer>();
+	//auto material = Material::create(shader);
+	//material->setUniform<UniformF3>(index_albedo, float3(1.0f, 1.0f, 1.0f));
+	//material->setUniform<UniformF1>(index_metallic, 0.5f);
+	//material->setUniform<UniformF1>(index_roughness, 0.5f);
+	//material->setUniform<UniformF1>(index_ao, 1.0f);
+	//mr->setMaterial(material);
+	//mr->setMesh("Sphere");
+
+
+	if (true)
+	{
+		int number = 5;
+		float rate = 1.0f / (float)number;
+		for (int y = 0; y <= number; y++)
+		{
+			for (int x = 0; x <= number; x++)
+			{
+				go = GameObject::create(std::format("PBRBall_{}_{}", x, y));
+				go->addComponent<Transform>();
+				go->getTransform()->setPosition(float3(x * 32.0f, y * 32.0f, 0.0f));
+				go->getTransform()->setScale(float3(30.0f));
+				//go->getTransform()->setRotation(float3(90.0f, 0.0f, 0.0f));
+				go->getTransform()->setParent(transform);
+
+				auto mr = go->addComponent<MeshRenderer>();
+				auto material = Material::create(shader);
+				material->setUniform<UniformF3>(index_albedo, float3(1.0f, 1.0f, 1.0f));
+				material->setUniform<UniformF1>(index_metallic, x * rate);
+				material->setUniform<UniformF1>(index_roughness, y * rate);
+				material->setUniform<UniformF1>(index_ao, 1.0f);
+				mr->setMaterial(material);
+				mr->setMesh("Sphere");
+			}
 		}
 	}
 }

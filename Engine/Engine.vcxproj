@@ -169,6 +169,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\EngineContext.cpp" />
     <ClCompile Include="src\Core\Manager\ObserverManager.cpp" />
     <ClCompile Include="src\Core\Manager\PipelineManager.cpp" />
     <ClCompile Include="src\Core\Component\ModeAgent.cpp" />
@@ -251,12 +252,14 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="ThirdParty\glm\detail\glm.cpp" />
     <ClCompile Include="ThirdParty\Hash\city.cc" />
     <ClCompile Include="src\Core\Tool\StringTool.cpp" />
+    <ClCompile Include="ThirdParty\ImageLoad\miniz.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Base\TinyGCInfo.h" />
     <ClInclude Include="include\Core\Component\ModeAgent.h" />
     <ClInclude Include="include\Core\Component\ShadowCaster.h" />
     <ClInclude Include="include\Core\Data\MetaData.h" />
+    <ClInclude Include="include\Core\EngineContext.h" />
     <ClInclude Include="include\Core\Head\FlagConfig.h" />
     <ClInclude Include="include\Core\Manager\GameObjectManager.h" />
     <ClInclude Include="include\Core\Manager\ObserverManager.h" />
@@ -729,12 +732,14 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="ThirdParty\glm\vec4.hpp" />
     <ClInclude Include="ThirdParty\glm\vector_relational.hpp" />
     <ClInclude Include="ThirdParty\Hash\city.h" />
-    <ClInclude Include="ThirdParty\stb_image.h" />
+    <ClInclude Include="ThirdParty\ImageLoad\miniz.h" />
+    <ClInclude Include="ThirdParty\ImageLoad\stb_image.h" />
     <ClInclude Include="include\Tiny.h" />
     <ClInclude Include="include\Core\Tool\Bitmask.h" />
     <ClInclude Include="include\Core\Tool\Singleton.h" />
     <ClInclude Include="include\Core\Tool\StringTool.h" />
     <ClInclude Include="include\Core\Tool\Tool.h" />
+    <ClInclude Include="ThirdParty\ImageLoad\tinyexr.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\assimp\color4.inl" />

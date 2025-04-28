@@ -26,11 +26,8 @@
 namespace tezcat::Tiny
 {
 	EngineIniter::EngineIniter(RenderAPI renderAPI)
-		: mWindowWidth(0)
-		, mWindowHeight(0)
-		, mGLMajor(0)
+		: mGLMajor(0)
 		, mGLMinor(0)
-		, mEnableVsync(true)
 	{
 		EngineConfig::sRenderAPI = renderAPI;
 	}
@@ -45,6 +42,7 @@ namespace tezcat::Tiny
 		ShaderManager::loadShaderFiles("Resource/Shaders/Standard");
 		ShaderManager::loadShaderFiles("Resource/Shaders/Unlit");
 		ShaderManager::loadShaderFiles("Resource/Shaders/Utility");
+		ShaderManager::loadShaderFiles("Resource/Shaders/Hide");
 
 		ResourceManager::loadDefault<Image>("Resource/Image/Tiny/TinyDiffuse.png");
 		ResourceManager::loadDefault<Image>("Resource/Image/Tiny/TinyShininess.png");
@@ -172,6 +170,7 @@ namespace tezcat::Tiny
 			mesh_data->mUVs->emplace_back(0.0f, 1.0f);
 		}
 
+		mesh_data->generateTangents();
 		mesh_data->generate();
 
 		VertexBufferManager::addMeshData(mesh_data);
@@ -179,7 +178,7 @@ namespace tezcat::Tiny
 
 	void EngineIniter::createSphere()
 	{
-		this->createSphere(48);
+		this->createSphere(32);
 		//this->createSphere2(64, 64);
 	}
 
@@ -296,7 +295,7 @@ namespace tezcat::Tiny
 			}
 		}
 
-
+		mesh_data->generateTangents();
 		mesh_data->generate();
 		VertexBufferManager::addMeshData(mesh_data);
 	}
@@ -337,6 +336,7 @@ namespace tezcat::Tiny
 		mesh_data->mNormals->emplace_back(0.0f, 0.0f, 1.0f);
 		mesh_data->mNormals->emplace_back(0.0f, 0.0f, 1.0f);
 
+		mesh_data->generateTangents();
 		mesh_data->generate();
 
 		VertexBufferManager::addMeshData(mesh_data);
@@ -378,6 +378,7 @@ namespace tezcat::Tiny
 		mesh_data->mNormals->emplace_back(0.0f, 0.0f, 1.0f);
 		mesh_data->mNormals->emplace_back(0.0f, 0.0f, 1.0f);
 
+		mesh_data->generateTangents();
 		mesh_data->generate();
 
 		VertexBufferManager::addMeshData(mesh_data);

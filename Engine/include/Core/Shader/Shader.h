@@ -56,8 +56,8 @@ namespace tezcat::Tiny
 		std::string getMemoryInfo() override;
 
 	public:
-		Queue getRenderQueue() const { return mRenderQueue; }
-		void setRenderQueue(Queue val) { mRenderQueue = val; }
+		PipelineQueueType getRenderQueue() const { return mRenderQueue; }
+		void setRenderQueue(PipelineQueueType val) { mRenderQueue = val; }
 
 		void setName(const std::string& name)
 		{
@@ -190,7 +190,7 @@ namespace tezcat::Tiny
 
 		void setCullFace(const CullFace& value)
 		{
-			mCullFace = ContextMap::CullFaceArray[(uint32_t)value];
+			mCullFace = GraphicsConfig::CullFaceArray[(uint32_t)value];
 		}
 
 		void setCullFace(const CullFaceWrapper& value)
@@ -202,8 +202,8 @@ namespace tezcat::Tiny
 
 		void setBlendFunction(const Blend& source, const Blend& target)
 		{
-			mBlendSource = ContextMap::BlendArray[(uint32_t)source];
-			mBlendTarget = ContextMap::BlendArray[(uint32_t)target];
+			mBlendSource = GraphicsConfig::BlendArray[(uint32_t)source];
+			mBlendTarget = GraphicsConfig::BlendArray[(uint32_t)target];
 		}
 
 		void setBlendFunction(const BlendWrapper& source, const BlendWrapper& target)
@@ -219,7 +219,7 @@ namespace tezcat::Tiny
 
 		void setDepthTest(const DepthTest& value)
 		{
-			mDepthTest = ContextMap::DepthTestArray[(uint32_t)value];
+			mDepthTest = GraphicsConfig::DepthTestArray[(uint32_t)value];
 		}
 
 	public:
@@ -236,7 +236,8 @@ namespace tezcat::Tiny
 
 	public:
 		std::unique_ptr<ShaderParser> mParser;
-		std::string mContent;
+		std::unique_ptr<std::string> mContent;
+		//std::string mContent;
 
 	private:
 		void setupTinyUniform(ShaderUniformMember* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex = -1);
@@ -253,7 +254,7 @@ namespace tezcat::Tiny
 		std::string mPath;
 
 	private:
-		Queue mRenderQueue;
+		PipelineQueueType mRenderQueue;
 		int32_t mUID;
 		int32_t mVersion;
 		uint32_t mProgramID;

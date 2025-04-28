@@ -1,0 +1,112 @@
+#TINY_HEAD_BEGIN
+{
+    str Name = Hide/ShowSelectedObject;
+}
+#TINY_HEAD_END
+
+#TINY_PASS_BEGIN
+{
+    #TINY_CFG_BEGIN
+    {
+        int Version = 330;
+        int OrderID = -1;
+        str Queue = Background;
+        //bool Blend = true;
+        //str BlendSrc = SrcA;
+        //str BlendTar = 1-SrcA;
+        str DepthTest = Always;
+        bool ZWrite = false;
+        str CullFace = Back;
+    }
+    #TINY_CFG_END
+
+    #TINY_VS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_NORMAL;
+
+        out VS_OUT
+        {
+            float3 normal;
+        } vs_out;
+
+        void main()
+        {
+            gl_Position = TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
+            vs_out.normal = normalize(TINY_MatrixN * tiny_layout_Normal);
+
+            //gl_Position = TINY_MatrixVP * TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
+            //vs_out.normal = normalize(TINY_MatrixVP * float4(TINY_MatrixN * tiny_layout_Normal, 1.0f)).xyz;
+        }
+    }
+    #TINY_VS_END
+
+    #TINY_GS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        layout (triangles) in;
+        layout (triangle_strip, max_vertices = 3) out;
+
+        in VS_OUT
+        {
+            float3 normal;
+        } gs_in[];
+
+        uniform float myThickness;
+
+        void main()
+        {
+            //float4x4 mvp = TINY_MatrixVP * TINY_MatrixM;
+
+            gl_Position = TINY_MatrixVP * (gl_in[0].gl_Position + float4(gs_in[0].normal * myThickness, 0.0));
+            EmitVertex();
+            gl_Position = TINY_MatrixVP * (gl_in[1].gl_Position + float4(gs_in[1].normal * myThickness, 0.0));
+            EmitVertex();
+            gl_Position = TINY_MatrixVP * (gl_in[2].gl_Position + float4(gs_in[2].normal * myThickness, 0.0));
+            EmitVertex();
+            EndPrimitive();
+
+            //gl_Position = TINY_MatrixVP * (gl_in[0].gl_Position + float4(gs_in[0].normal * myThickness, 0.0));
+            //EmitVertex();
+            //gl_Position = TINY_MatrixVP * (gl_in[1].gl_Position + float4(gs_in[1].normal * myThickness, 0.0));
+            //EmitVertex();
+            //gl_Position = TINY_MatrixVP * (gl_in[2].gl_Position + float4(gs_in[2].normal * myThickness, 0.0));
+            //EmitVertex();
+            //EndPrimitive();
+        }
+    }
+    #TINY_GS_END
+
+    #TINY_FS_BEGIN
+    {
+        #include "../Include/tiny_config.tyin"
+
+        out float4 myFinalColor;
+
+        void main()
+        {
+            myFinalColor = float4(1.0f, 0.5f, 0.1f, 1.0f);
+        } 
+    }
+    #TINY_FS_END
+}
+#TINY_PASS_END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

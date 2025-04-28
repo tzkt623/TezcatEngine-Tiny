@@ -88,7 +88,7 @@ namespace tezcat::Tiny
 		if (mDirty)
 		{
 			mDirty = false;
-			std::ranges::sort(mQueueArray.begin(), mQueueArray.end(), [](PipelineQueue* a, PipelineQueue* b)
+			std::ranges::sort(mQueueArray, [](PipelineQueue* a, PipelineQueue* b)
 			{
 				return a->getSortingID() > b->getSortingID();
 			});

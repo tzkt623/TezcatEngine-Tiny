@@ -52,6 +52,7 @@
     #TINY_FS_BEGIN
     {
         #include "../Include/tiny_fs.tyin"
+        #include "../Include/tiny_fs_pbr.tyin"
 
         in float4 myColor;
         in float2 myUV;
@@ -61,7 +62,7 @@
         
         out float4 myFinalColor;
 
-        uniform MatPBR_Test myPBR;
+        uniform TinyPBR_Test myPBR;
 
         void main()
         {
@@ -132,6 +133,7 @@
 
             float shadow = calcShadow(myLightPosition, N, normalize(-TINY_LitDir.direction), TINY_TexShadow);
 
+            //myFinalColor = float4(color, 1.0) * myColor;
             myFinalColor = float4(color, 1.0) * myColor * (1.0 - shadow);
             //myFinalColor = float4(specular, 1.0);
             //myFinalColor = float4(R, 1.0);

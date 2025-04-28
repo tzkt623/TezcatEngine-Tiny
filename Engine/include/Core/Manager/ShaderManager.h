@@ -33,7 +33,7 @@ namespace tezcat::Tiny
 		static Shader* find(const std::string& name);
 		static Shader* createShader(const std::string& filePath);
 		static std::unordered_map<std::string_view, Shader*>& getAllShaders() { return mShaderUMap; }
-		static std::unordered_map<std::string_view, Shader*>& getAllowUseShaders() { return mCanUseUMap; }
+		static const std::vector<Shader*>& getAllowUseShaders();
 		static void registerShader(Shader* shader);
 
 	public:
@@ -44,7 +44,10 @@ namespace tezcat::Tiny
 
 	private:
 		static std::unordered_map<std::string_view, Shader*> mShaderUMap;
+
 		static std::unordered_map<std::string_view, Shader*> mCanUseUMap;
+		static std::vector<Shader*> mCanUseArray;
+		static bool mIsDirty;
 	};
 }
 

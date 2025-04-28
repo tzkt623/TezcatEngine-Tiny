@@ -44,169 +44,31 @@ namespace tezcat::Editor
 	bool EditorContext::IsShowNormal = false;
 	ReplacedPipelinePass* EditorContext::mShowNormalPass = nullptr;
 
+	float EditorContext::TangentLength = 0.1f;
+	bool EditorContext::IsShowTangents = false;
+	ReplacedPipelinePass* EditorContext::mShowTangentsPass = nullptr;
+
 	bool EditorContext::IsShowMeshFrame = false;
 	float EditorContext::MeshFrameLineWidth = 2.0f;
 	ReplacedPipelinePass* EditorContext::mShowMeshFramePass = nullptr;
 
+	ReplacedPipelinePass* EditorContext::mShowSelectedObjectPass = nullptr;
+	float EditorContext::SelectRectThickness = 0.1f;
+
+	ReplacedPipelinePass* EditorContext::mShadowPass = nullptr;
+
 	void EditorContext::init()
 	{
-		EngineEvent::getInstance()->addListener(EngineEventID::EE_AfterSceneEnter, EditorFrameBuffer,
-			[](const EventData& data)
-			{
-				EditorCamera->getTransform()->setPosition(0.0f, 0.0f, 20.0f);
-				EditorCamera->getTransform()->setRotation(0.0f, 0.0f, 0.0f);
-			});
-
-		EngineEvent::getInstance()->addListener(EngineEventID::EE_AfterSceneExit, EditorFrameBuffer,
-			[](const EventData& data)
-			{
-				EditorTex2DColor->clearInGPU();
-			});
+		initEvent();
 
 		mValueConfigAry.resize(UniformID::allStringCount(), nullptr);
 		mValueConfigAry[ShaderParam::LightDirection::Ambient.toUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
 		mValueConfigAry[ShaderParam::LightDirection::Diffuse.toUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
 		mValueConfigAry[ShaderParam::LightDirection::Specular.toUID()] = new ValueConfig{ true, 0.005f, 0.0f, 1.0f };
 
-		{
-			auto [flag, fb] = FrameBufferManager::create("FB_Editor");
-			EditorFrameBuffer = fb;
-			EditorFrameBuffer->saveObject();
-
-			EditorTex2DColor = Texture2D::create("T2D_Tiny_Editor_Color");
-			EditorTex2DColor->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
-					, TextureInternalFormat::RGBA
-					, TextureFormat::RGBA);
-			EditorTex2DColor->setAttachPosition(TextureAttachPosition::ColorComponent);
-
-			auto tex_depth = Texture2D::create("T2D_Tiny_Editor_Depth");
-			tex_depth->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
-				, TextureInternalFormat::Depth
-				, TextureFormat::Depth);
-			tex_depth->setAttachPosition(TextureAttachPosition::DepthComponent);
-
-			EditorFrameBuffer->addAttachment(EditorTex2DColor);
-			EditorFrameBuffer->addAttachment(tex_depth);
-			EditorFrameBuffer->generate();
-
-			EditorCamera = EditorCamera::create();
-			EditorCamera->setPerspective(60, 0.1, 2000);
-			EditorCamera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
-			EditorCamera->setSortingID(-100);
-			EditorCamera->setClearColor(float4(0.3f, 0.3f, 0.3f, 1.0f));
-			EditorCamera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth | ClearOption::CO_Color);
-			EditorCamera->setFrameBuffer(EditorFrameBuffer);
-			for (int32_t i = 0; i < 32; i++)
-			{
-				EditorCamera->addCullLayer(i);
-			}
-			EditorCamera->saveObject();
-
-			auto transform = Transform::create();
-			transform->setPosition(float3(0, 20.0f, 30.f));
-			transform->setRotation(float3(-30.0f, 0.0f, 0.0f));
-
-			EditorCamera->setTransform(transform);
-
-			GameObjectManager::setIDObserver(EditorCamera);
-		}
-
-		{
-			Shader* shader = ShaderManager::find("Unlit/ShowNormals");
-			auto config = shader->getUserUniformValueConfig("myNormalLength");
-			mShowNormalPass = ReplacedPipelinePass::create(EditorCamera, shader);
-			mShowNormalPass->setCustomCulling([config](ReplacedPipelinePass* fPass)
-				{
-					if (!SelectedGameObject)
-					{
-						return;
-					}
-
-					std::function<void(ReplacedPipelinePass*, GameObject*)> foreach_object =
-						[&foreach_object, config](ReplacedPipelinePass* pass, GameObject* go)
-						{
-							auto transform = go->getTransform();
-							auto mr = go->getComponent<MeshRenderer>();
-							if (mr)
-							{
-								pass->addCommand<RenderCMD_Lambda>([mr, config, transform](PipelinePass* pass, Shader* shader)
-									{
-										Graphics::getInstance()->setFloat1(shader, config->valueID, EditorContext::NormalLength);
-										Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, transform->getModelMatrix());
-										Graphics::getInstance()->draw(mr->getVertex());
-									});
-							}
-
-							auto children = transform->getChildren();
-							if (children)
-							{
-								auto it = children->begin();
-								while (it != children->end())
-								{
-									if (auto tran = it->lock())
-									{
-										foreach_object(pass, tran->getGameObject());
-									}
-									it++;
-								}
-							}
-						};
-
-					foreach_object(fPass, SelectedGameObject);
-				});
-
-			mShowNormalPass->saveObject();
-		}
-
-		{
-			Shader* shader = ShaderManager::find("Unlit/ShowMeshFrame");
-			auto config = shader->getUserUniformValueConfig("myViewPortSize");
-			auto config_linewidth = shader->getUserUniformValueConfig("myLineWidth");
-			mShowMeshFramePass = ReplacedPipelinePass::create(EditorCamera, shader);
-			mShowMeshFramePass->setCustomCulling([config, config_linewidth](ReplacedPipelinePass* fPass)
-				{
-					if (!SelectedGameObject)
-					{
-						return;
-					}
-
-					std::function<void(ReplacedPipelinePass*, GameObject*)> foreach_object =
-						[&foreach_object, config, config_linewidth](ReplacedPipelinePass* pass, GameObject* go)
-						{
-							auto transform = go->getTransform();
-							auto mr = go->getComponent<MeshRenderer>();
-							if (mr)
-							{
-								pass->addCommand<RenderCMD_Lambda>([mr, transform, config, config_linewidth](PipelinePass* pass, Shader* shader)
-									{
-										float2 size(EditorCamera->getViewRect().Width, EditorCamera->getViewRect().Height);
-										Graphics::getInstance()->setFloat2(shader, config->valueID, size);
-										Graphics::getInstance()->setFloat1(shader, config_linewidth->valueID, EditorContext::MeshFrameLineWidth * 0.001f);
-										Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, transform->getModelMatrix());
-										Graphics::getInstance()->draw(mr->getVertex());
-									});
-							}
-
-							auto children = transform->getChildren();
-							if (children)
-							{
-								auto it = children->begin();
-								while (it != children->end())
-								{
-									if (auto tran = it->lock())
-									{
-										foreach_object(pass, tran->getGameObject());
-									}
-									it++;
-								}
-							}
-						};
-
-					foreach_object(fPass, SelectedGameObject);
-				});
-
-			mShowMeshFramePass->saveObject();
-		}
+		initCamera();
+		initGizmo();
+		//initShadowPass();
 	}
 
 	ValueConfig* EditorContext::getValueConfig(const UniformID& ID)
@@ -304,7 +166,7 @@ namespace tezcat::Editor
 			go->addComponent<Transform>()->setPosition(float3(0.0f, 0.0f, 10.0f));
 
 			auto camera = go->addComponent<Camera>();
-			camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+			camera->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 			camera->setPerspective(60.0f, 0.1f, 2000.0f);
 			camera->setCullLayer(0);
 			camera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth | ClearOption::CO_Color);
@@ -374,10 +236,7 @@ namespace tezcat::Editor
 		dir_light->setSpecular(float3(0.5f));
 
 		auto shadow_caster = go->addComponent<ShadowCaster>();
-		shadow_caster->setOrtho(0.1f, 2000.0f);
-		shadow_caster->setViewRect(0, 0, 1024, 1024);
 		shadow_caster->setCullLayer(0);
-		shadow_caster->setShadowMap(4096, 4096, "Shadow");
 	}
 
 	void EditorContext::endFrame()
@@ -435,6 +294,16 @@ namespace tezcat::Editor
 		mShowNormalPass->removeFromPipeline();
 	}
 
+	void EditorContext::showTangents()
+	{
+		mShowTangentsPass->addToPipeline();
+	}
+
+	void EditorContext::hideTangents()
+	{
+		mShowTangentsPass->removeFromPipeline();
+	}
+
 	void EditorContext::showMeshFrame()
 	{
 		mShowMeshFramePass->addToPipeline();
@@ -445,5 +314,301 @@ namespace tezcat::Editor
 		mShowMeshFramePass->removeFromPipeline();
 	}
 
+	void EditorContext::initCamera()
+	{
+
+		auto [flag, fb] = FrameBufferManager::create("FB_Editor");
+		EditorFrameBuffer = fb;
+		EditorFrameBuffer->saveObject();
+
+		EditorTex2DColor = Texture2D::create("T2D_Tiny_Editor_Color");
+		EditorTex2DColor->setConfig(EngineContext::ScreenWidth, EngineContext::ScreenHeight
+				, TextureInternalFormat::RGBA
+				, TextureFormat::RGBA);
+		EditorTex2DColor->setAttachPosition(TextureAttachPosition::ColorComponent);
+
+		auto tex_depth = Texture2D::create("T2D_Tiny_Editor_Depth");
+		tex_depth->setConfig(EngineContext::ScreenWidth, EngineContext::ScreenHeight
+			, TextureInternalFormat::Depth
+			, TextureFormat::Depth);
+		tex_depth->setAttachPosition(TextureAttachPosition::DepthComponent);
+
+		EditorFrameBuffer->addAttachment(EditorTex2DColor);
+		EditorFrameBuffer->addAttachment(tex_depth);
+		EditorFrameBuffer->generate();
+
+		EditorCamera = EditorCamera::create();
+		EditorCamera->setPerspective(60, 0.1, 2000);
+		EditorCamera->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
+		EditorCamera->setSortingID(-100);
+		EditorCamera->setClearColor(float4(0.3f, 0.3f, 0.3f, 1.0f));
+		EditorCamera->setClearOption(ClearOption::CO_Skybox | ClearOption::CO_Depth | ClearOption::CO_Color);
+		EditorCamera->setFrameBuffer(EditorFrameBuffer);
+		for (int32_t i = 0; i < 32; i++)
+		{
+			EditorCamera->addCullLayer(i);
+		}
+		EditorCamera->saveObject();
+
+		auto transform = Transform::create();
+		transform->setPosition(float3(0, 20.0f, 30.f));
+		transform->setRotation(float3(-30.0f, 0.0f, 0.0f));
+
+		EditorCamera->setTransform(transform);
+
+		GameObjectManager::setIDObserver(EditorCamera);
+
+	}
+
+	void EditorContext::initShowNormals()
+	{
+		Shader* shader = ShaderManager::find("Hide/ShowNormals");
+		auto config = shader->getUserUniformValueConfig("myNormalLength");
+		mShowNormalPass = ReplacedPipelinePass::create(EditorCamera, shader);
+		mShowNormalPass->setCustomCulling([config](ReplacedPipelinePass* fPass)
+			{
+				if (!SelectedGameObject)
+				{
+					return;
+				}
+
+				std::function<void(ReplacedPipelinePass*, GameObject*)> foreach_object =
+					[&foreach_object, config](ReplacedPipelinePass* pass, GameObject* go)
+					{
+						auto transform = go->getTransform();
+						auto mr = go->getComponent<MeshRenderer>();
+						if (mr)
+						{
+							pass->addCommand<RenderCMD_Lambda>([mr, config, transform](PipelinePass* pass, Shader* shader)
+								{
+								Graphics::getInstance()->setFloat1(shader, config->valueID, EditorContext::NormalLength);
+
+								auto& m = transform->getModelMatrix();
+								Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, m);
+								glm::mat3 normal_matrix(m);
+								Graphics::getInstance()->setMat3(shader, ShaderParam::MatrixN
+									, glm::inverseTranspose(normal_matrix));
+
+								Graphics::getInstance()->draw(mr->getVertex());
+								});
+						}
+
+						auto children = transform->getChildren();
+						if (children)
+						{
+							auto it = children->begin();
+							while (it != children->end())
+							{
+								if (auto tran = it->lock())
+								{
+									foreach_object(pass, tran->getGameObject());
+								}
+								it++;
+							}
+						}
+					};
+
+				foreach_object(fPass, SelectedGameObject);
+			});
+
+		mShowNormalPass->saveObject();
+	}
+
+	void EditorContext::initShowMeshFrame()
+	{
+		Shader* shader = ShaderManager::find("Hide/ShowMeshFrame");
+		auto config = shader->getUserUniformValueConfig("myViewPortSize");
+		auto config_linewidth = shader->getUserUniformValueConfig("myLineWidth");
+		mShowMeshFramePass = ReplacedPipelinePass::create(EditorCamera, shader);
+		mShowMeshFramePass->setCustomCulling([config, config_linewidth](ReplacedPipelinePass* fPass)
+			{
+				if (!SelectedGameObject)
+				{
+					return;
+				}
+
+				std::function<void(ReplacedPipelinePass*, GameObject*)> foreach_object =
+					[&foreach_object, config, config_linewidth](ReplacedPipelinePass* pass, GameObject* go)
+					{
+						auto transform = go->getTransform();
+						auto mr = go->getComponent<MeshRenderer>();
+						if (mr)
+						{
+							pass->addCommand<RenderCMD_Lambda>([mr, transform, config, config_linewidth](PipelinePass* pass, Shader* shader)
+								{
+								float2 size(EditorCamera->getViewRect().Width, EditorCamera->getViewRect().Height);
+								Graphics::getInstance()->setFloat2(shader, config->valueID, size);
+								Graphics::getInstance()->setFloat1(shader, config_linewidth->valueID, EditorContext::MeshFrameLineWidth * 0.001f);
+								Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, transform->getModelMatrix());
+								Graphics::getInstance()->draw(mr->getVertex());
+								});
+						}
+
+						auto children = transform->getChildren();
+						if (children)
+						{
+							auto it = children->begin();
+							while (it != children->end())
+							{
+								if (auto tran = it->lock())
+								{
+									foreach_object(pass, tran->getGameObject());
+								}
+								it++;
+							}
+						}
+					};
+
+				foreach_object(fPass, SelectedGameObject);
+			});
+
+		mShowMeshFramePass->saveObject();
+	}
+
+	void EditorContext::initGizmo()
+	{
+		initShowNormals();
+		initShowTangents();
+		initShowMeshFrame();
+		initShowSelectObject();
+	}
+
+	void EditorContext::initEvent()
+	{
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_AfterSceneEnter, EditorFrameBuffer,
+			[](const EventData& data)
+			{
+				EditorCamera->getTransform()->setPosition(0.0f, 0.0f, 20.0f);
+				EditorCamera->getTransform()->setRotation(0.0f, 0.0f, 0.0f);
+				mShowSelectedObjectPass->addToPipeline();
+			});
+
+		EngineEvent::getInstance()->addListener(EngineEventID::EE_AfterSceneExit, EditorFrameBuffer,
+			[](const EventData& data)
+			{
+				EditorTex2DColor->clearInGPU();
+				mShowSelectedObjectPass->removeFromPipeline();
+			});
+	}
+
+	void EditorContext::initShowSelectObject()
+	{
+		Shader* shader = ShaderManager::find("Hide/ShowSelectedObject");
+		auto config_thickness = shader->getUserUniformValueConfig("myThickness");
+		mShowSelectedObjectPass = ReplacedPipelinePass::create(EditorCamera, shader);
+		mShowSelectedObjectPass->setCustomCulling([config_thickness](ReplacedPipelinePass* fPass)
+			{
+				if (!SelectedGameObject)
+				{
+					return;
+				}
+
+				std::function<void(ReplacedPipelinePass*, GameObject*)> foreach_object =
+					[&foreach_object, config_thickness](ReplacedPipelinePass* pass, GameObject* go)
+					{
+						auto transform = go->getTransform();
+						auto mr = go->getComponent<MeshRenderer>();
+						if (mr)
+						{
+							pass->addCommand<RenderCMD_Lambda>([mr, transform, config_thickness](PipelinePass* pass, Shader* shader)
+								{
+									Graphics::getInstance()->setFloat1(shader, config_thickness->valueID, EditorContext::SelectRectThickness);
+
+									auto& m = transform->getModelMatrix();
+									Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, m);
+									glm::mat3 normal_matrix(m);
+									Graphics::getInstance()->setMat3(shader, ShaderParam::MatrixN
+										, glm::inverseTranspose(normal_matrix));
+
+									Graphics::getInstance()->draw(mr->getVertex());
+								});
+						}
+
+						auto children = transform->getChildren();
+						if (children)
+						{
+							auto it = children->begin();
+							while (it != children->end())
+							{
+								if (auto tran = it->lock())
+								{
+									foreach_object(pass, tran->getGameObject());
+								}
+								it++;
+							}
+						}
+					};
+
+				foreach_object(fPass, SelectedGameObject);
+			});
+
+		mShowSelectedObjectPass->saveObject();
+	}
+
+	void EditorContext::initShadowPass()
+	{
+		Shader* shader = ShaderManager::find("Hide/Shadow");
+		mShadowPass = ReplacedPipelinePass::create(EditorCamera, shader);
+		mShadowPass->setAutoCulling([](BaseMeshRenderer* renderer)
+			{
+				return new RenderCMD_DrawShadow(renderer->getVertex(), renderer->getTransform());
+			});
+		mShadowPass->saveObject();
+		mShadowPass->addToPipeline();
+	}
+
+	void EditorContext::initShowTangents()
+	{
+		Shader* shader = ShaderManager::find("Hide/ShowTangents");
+		auto config = shader->getUserUniformValueConfig("myTangentLength");
+		mShowTangentsPass = ReplacedPipelinePass::create(EditorCamera, shader);
+		mShowTangentsPass->setCustomCulling([config](ReplacedPipelinePass* fPass)
+			{
+				if (!SelectedGameObject)
+				{
+					return;
+				}
+
+				std::function<void(ReplacedPipelinePass*, GameObject*)> foreach_object =
+					[&foreach_object, config](ReplacedPipelinePass* pass, GameObject* go)
+					{
+						auto transform = go->getTransform();
+						auto mr = go->getComponent<MeshRenderer>();
+						if (mr)
+						{
+							pass->addCommand<RenderCMD_Lambda>([mr, config, transform](PipelinePass* pass, Shader* shader)
+								{
+									Graphics::getInstance()->setFloat1(shader, config->valueID, EditorContext::TangentLength);
+
+									auto& m = transform->getModelMatrix();
+									Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, m);
+									glm::mat3 normal_matrix(m);
+									Graphics::getInstance()->setMat3(shader, ShaderParam::MatrixN
+										, glm::inverseTranspose(normal_matrix));
+
+									Graphics::getInstance()->draw(mr->getVertex());
+								});
+						}
+
+						auto children = transform->getChildren();
+						if (children)
+						{
+							auto it = children->begin();
+							while (it != children->end())
+							{
+								if (auto tran = it->lock())
+								{
+									foreach_object(pass, tran->getGameObject());
+								}
+								it++;
+							}
+						}
+					};
+
+				foreach_object(fPass, SelectedGameObject);
+			});
+
+		mShowTangentsPass->saveObject();
+	}
 
 }

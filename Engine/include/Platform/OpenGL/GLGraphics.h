@@ -52,6 +52,8 @@ namespace tezcat::Tiny::GL
 		void readObjectID(int32_t x, int32_t y, int32_t& id) override;
 
 		void draw(Vertex* vertex) override;
+		void draw(const DrawMode& mode, Vertex* vertex) override;
+
 		void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f)) override;
 		void drawLine(Vertex* vertex, const uint32_t& needCount);
 

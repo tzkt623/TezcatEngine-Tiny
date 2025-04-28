@@ -24,7 +24,7 @@ void Tutorial_Triangle::onEnter()
 	mObserver = RenderObserver::create();
 	mObserver->saveObject();
 	mObserver->setSortingID(0);
-	mObserver->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+	mObserver->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 	mObserver->setClearOption(ClearOption(ClearOption::CO_Color | ClearOption::CO_Depth));
 
 	auto shader = ShaderManager::find("Tutorial/Triangle");

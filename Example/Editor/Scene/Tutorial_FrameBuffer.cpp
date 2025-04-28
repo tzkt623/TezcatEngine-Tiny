@@ -26,7 +26,7 @@ void Tutorial_FrameBuffer::onEnter()
 	mObserver = RenderObserver::create();
 	mObserver->saveObject();
 	mObserver->setSortingID(-127);
-	mObserver->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+	mObserver->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 	mObserver->setClearOption({ ClearOption::CO_Color | ClearOption::CO_Depth });
 
 	auto shader = ShaderManager::find("Tutorial/Cube");
@@ -40,7 +40,7 @@ void Tutorial_FrameBuffer::onEnter()
 	{
 		pass->addCommand<RenderCMD_Lambda>([=](PipelinePass* pass, Shader* shader)
 			{
-				auto projection = glm::perspective(glm::radians(75.0f), (float)Engine::getScreenWidth() / Engine::getScreenHeight(), 0.01f, 100.0f);
+				auto projection = glm::perspective(glm::radians(75.0f), (float)EngineContext::ScreenWidth / EngineContext::ScreenHeight, 0.01f, 100.0f);
 				auto view = glm::lookAt(float3(0.0f, 0.0f, 2.0f)
 					, float3(0.0f, 0.0f, -1.0f)
 					, float3(0.0f, 1.0f, 0.0f));
@@ -62,7 +62,7 @@ void Tutorial_FrameBuffer::onEnter()
 		auto [flag2, tex_color] = TextureManager::create2D("Tutorial_FrameBuffer_TexColor");
 		if (flag2 == FlagCreate::Succeeded)
 		{
-			tex_color->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
+			tex_color->setConfig(EngineContext::ScreenWidth, EngineContext::ScreenHeight
 				, TextureInternalFormat::RGBA
 				, TextureFormat::RGBA);
 			tex_color->setAttachPosition(TextureAttachPosition::ColorComponent);
@@ -72,7 +72,7 @@ void Tutorial_FrameBuffer::onEnter()
 		auto [flag3, tex_depth] = TextureManager::create2D("Tutorial_FrameBuffer_TexDepth");
 		if (flag3 == FlagCreate::Succeeded)
 		{
-			tex_depth->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
+			tex_depth->setConfig(EngineContext::ScreenWidth, EngineContext::ScreenHeight
 				, TextureInternalFormat::Depth
 				, TextureFormat::Depth);
 			tex_depth->setAttachPosition(TextureAttachPosition::DepthComponent);

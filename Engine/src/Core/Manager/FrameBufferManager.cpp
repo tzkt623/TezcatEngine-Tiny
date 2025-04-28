@@ -61,7 +61,7 @@ namespace tezcat::Tiny
 				auto [flag2, tex_color] = TextureManager::create2D(TINY_FRAMEBUFFER_VIEWPORT_COLOR_TEXTURE);
 				if (flag2 == FlagCreate::Succeeded)
 				{
-					tex_color->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
+					tex_color->setConfig(EngineContext::ScreenWidth, EngineContext::ScreenHeight
 						, TextureInternalFormat::RGBA
 						, TextureFormat::RGBA);
 					tex_color->setAttachPosition(TextureAttachPosition::ColorComponent);
@@ -71,7 +71,7 @@ namespace tezcat::Tiny
 				auto [flag3, tex_depth] = TextureManager::create2D(TINY_FRAMEBUFFER_VIEWPORT_DEPTH_TEXTURE);
 				if (flag3 == FlagCreate::Succeeded)
 				{
-					tex_depth->setConfig(Engine::getScreenWidth(), Engine::getScreenHeight()
+					tex_depth->setConfig(EngineContext::ScreenWidth, EngineContext::ScreenHeight
 						, TextureInternalFormat::Depth
 						, TextureFormat::Depth);
 					tex_depth->setAttachPosition(TextureAttachPosition::DepthComponent);

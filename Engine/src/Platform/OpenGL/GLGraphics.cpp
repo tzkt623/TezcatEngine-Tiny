@@ -66,8 +66,8 @@ namespace tezcat::Tiny::GL
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, min);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		mWindow = glfwCreateWindow(engine->getScreenWidth(), engine->getScreenHeight()
-			, engine->getResourceLoader()->getName().c_str(), nullptr, nullptr);
+		mWindow = glfwCreateWindow(EngineContext::ScreenWidth, EngineContext::ScreenHeight
+			, std::string(EngineContext::Name.begin(), EngineContext::Name.end()).c_str(), nullptr, nullptr);
 		if (mWindow == nullptr)
 		{
 			//std::cout << "Failed to create GLFW window" << std::endl;
@@ -77,7 +77,7 @@ namespace tezcat::Tiny::GL
 		}
 
 		glfwMakeContextCurrent(mWindow);
-		glfwSwapInterval(engine->getResourceLoader()->isEnabelVsync() ? 1 : 0);
+		glfwSwapInterval(EngineContext::EnableVsync ? 1 : 0);
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
 			TINY_LOG_ERROR("Failed to initialize GLAD");
@@ -148,6 +148,16 @@ namespace tezcat::Tiny::GL
 		get_default_color_buffer(max);
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+		int count = 0;
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &count);
+		TINY_LOG_ENGINE(std::format("Fragment Texture Count {}", count));
+		glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &count);
+		TINY_LOG_ENGINE(std::format("Vertex Texture Count {}", count));
+		glGetIntegerv(GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS, &count);
+		TINY_LOG_ENGINE(std::format("Geometry Texture Count {}", count));
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &count);
+		TINY_LOG_ENGINE(std::format("VS+FS+GS Texture Count {}", count));
+
 		this->initContext();
 		BaseGraphics::init(engine);
 	}
@@ -156,7 +166,7 @@ namespace tezcat::Tiny::GL
 	{
 		Profiler::GPU = glGetString(GL_RENDERER);
 
-		ContextMap::DataMemFormatArray =
+		GraphicsConfig::DataMemFormatArray =
 		{
 			DataMemFormatWrapper(DataMemFormat::Byte,		GL_BYTE),
 			DataMemFormatWrapper(DataMemFormat::UByte,		GL_UNSIGNED_BYTE),
@@ -171,7 +181,7 @@ namespace tezcat::Tiny::GL
 			DataMemFormatWrapper(DataMemFormat::UInt_24_8,	GL_UNSIGNED_INT_24_8),
 		};
 
-		ContextMap::DrawModeArray =
+		GraphicsConfig::DrawModeArray =
 		{
 			DrawModeWrapper(DrawMode::Points,			GL_POINTS),
 			DrawModeWrapper(DrawMode::Lines,			GL_LINES),
@@ -182,7 +192,7 @@ namespace tezcat::Tiny::GL
 			DrawModeWrapper(DrawMode::Triangles_Fan,	GL_TRIANGLE_FAN)
 		};
 
-		ContextMap::TextureTypeArray =
+		GraphicsConfig::TextureTypeArray =
 		{
 			TexTypeWrapper(TextureType::Texture1D,			GL_TEXTURE_1D),
 			TexTypeWrapper(TextureType::Texture2D,			GL_TEXTURE_2D),
@@ -193,14 +203,14 @@ namespace tezcat::Tiny::GL
 			TexTypeWrapper(TextureType::TextureRender2D,	GL_RENDERBUFFER),
 		};
 
-		ContextMap::TextureFilterArray =
+		GraphicsConfig::TextureFilterArray =
 		{
 			TexFilterWrapper(TextureFilter::Nearest,				GL_NEAREST),
 			TexFilterWrapper(TextureFilter::Linear,					GL_LINEAR),
 			TexFilterWrapper(TextureFilter::Linear_Mipmap_Linear,	GL_LINEAR_MIPMAP_LINEAR),
 		};
 
-		ContextMap::TextureWrapArray =
+		GraphicsConfig::TextureWrapArray =
 		{
 			TexWrapWrapper(TextureWrap::Repeat,				GL_REPEAT),
 			TexWrapWrapper(TextureWrap::Mirrored_Repeat,	GL_MIRRORED_REPEAT),
@@ -208,7 +218,7 @@ namespace tezcat::Tiny::GL
 			TexWrapWrapper(TextureWrap::Clamp_To_Border,	GL_CLAMP_TO_BORDER)
 		};
 
-		ContextMap::TextureInternalFormatArray =
+		GraphicsConfig::TextureInternalFormatArray =
 		{
 			TexInternalFormatWrapper(TextureInternalFormat::None,			GL_NONE),
 			TexInternalFormatWrapper(TextureInternalFormat::Depth,			GL_DEPTH_COMPONENT),
@@ -236,7 +246,7 @@ namespace tezcat::Tiny::GL
 			TexInternalFormatWrapper(TextureInternalFormat::R32UI,			GL_R32UI),
 		};
 
-		ContextMap::TextureFormatArray =
+		GraphicsConfig::TextureFormatArray =
 		{
 			TexFormatWrapper(TextureFormat::None,			GL_NONE),
 			TexFormatWrapper(TextureFormat::Depth,			GL_DEPTH_COMPONENT),
@@ -251,7 +261,7 @@ namespace tezcat::Tiny::GL
 			TexFormatWrapper(TextureFormat::RI,				GL_RED_INTEGER),
 		};
 
-		ContextMap::ColorBufferArray =
+		GraphicsConfig::ColorBufferArray =
 		{
 			ColorBufferWrapper(ColorBuffer::None,	GL_NONE),
 			ColorBufferWrapper(ColorBuffer::A0,		GL_FRONT_LEFT),
@@ -265,7 +275,7 @@ namespace tezcat::Tiny::GL
 			ColorBufferWrapper(ColorBuffer::All,	GL_FRONT_AND_BACK)
 		};
 
-		ContextMap::BlendMap =
+		GraphicsConfig::BlendMap =
 		{
 			{"0",			BlendWrapper(Blend::Zero,					GL_ZERO)},
 			{"1",			BlendWrapper(Blend::One,					GL_ONE)},
@@ -284,7 +294,7 @@ namespace tezcat::Tiny::GL
 		};
 		//		std::cout << ContextMap::BlendMap.size() << std::endl;
 
-		ContextMap::BlendArray =
+		GraphicsConfig::BlendArray =
 		{
 			BlendWrapper(Blend::Zero,					GL_ZERO),
 			BlendWrapper(Blend::One,					GL_ONE),
@@ -302,7 +312,7 @@ namespace tezcat::Tiny::GL
 			BlendWrapper(Blend::One_Minus_ConstAlpha,	GL_ONE_MINUS_CONSTANT_ALPHA)
 		};
 
-		ContextMap::CullFaceMap =
+		GraphicsConfig::CullFaceMap =
 		{
 			{"Off",		CullFaceWrapper(CullFace::Off,		0)},
 			{"Front",	CullFaceWrapper(CullFace::Front,	GL_FRONT)},
@@ -310,7 +320,7 @@ namespace tezcat::Tiny::GL
 			{"All",		CullFaceWrapper(CullFace::All,		GL_FRONT_AND_BACK)}
 		};
 
-		ContextMap::CullFaceArray =
+		GraphicsConfig::CullFaceArray =
 		{
 			CullFaceWrapper(CullFace::Off,		0),
 			CullFaceWrapper(CullFace::Front,	GL_FRONT),
@@ -318,7 +328,7 @@ namespace tezcat::Tiny::GL
 			CullFaceWrapper(CullFace::All,		GL_FRONT_AND_BACK),
 		};
 
-		ContextMap::DepthTestMap =
+		GraphicsConfig::DepthTestMap =
 		{
 			{"Off",				DepthTestWrapper(DepthTest::Off,			0)},
 			{"Always",			DepthTestWrapper(DepthTest::Always,			GL_ALWAYS)},
@@ -331,7 +341,7 @@ namespace tezcat::Tiny::GL
 			{"NotEqual",		DepthTestWrapper(DepthTest::NotEqual,		GL_NOTEQUAL)}
 		};
 
-		ContextMap::DepthTestArray =
+		GraphicsConfig::DepthTestArray =
 		{
 			DepthTestWrapper(DepthTest::Off,			0),
 			DepthTestWrapper(DepthTest::Always,			GL_ALWAYS),
@@ -344,7 +354,7 @@ namespace tezcat::Tiny::GL
 			DepthTestWrapper(DepthTest::NotEqual,		GL_NOTEQUAL)
 		};
 
-		ContextMap::PolygonModeArray =
+		GraphicsConfig::PolygonModeArray =
 		{
 			PolygonModeWrapper(PolygonMode::Point,  GL_POINT),
 			PolygonModeWrapper(PolygonMode::Line,	GL_LINE),
@@ -359,7 +369,7 @@ namespace tezcat::Tiny::GL
 
 	void GLGraphics::setPassState(Shader* shader)
 	{
-		if (shader->getCullFaceWrapper().platform != 0)
+		if (shader->getCullFaceWrapper().tiny != CullFace::Off)
 		{
 			glEnable(GL_CULL_FACE);
 			glCullFace(shader->getCullFaceWrapper().platform);
@@ -370,27 +380,28 @@ namespace tezcat::Tiny::GL
 			glDisable(GL_CULL_FACE);
 		}
 
-		if (shader->getDepthTestWrapper().platform != 0)
+		if (shader->getDepthTestWrapper().tiny != DepthTest::Off)
 		{
 			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(shader->getDepthTestWrapper().platform);
+			TINY_GL_CHECK(glDepthFunc(shader->getDepthTestWrapper().platform));
+			TINY_GL_CHECK(glDepthMask(shader->isEnableZWrite() ? GL_TRUE : GL_FALSE));
 		}
 		else
 		{
 			glDisable(GL_DEPTH_TEST);
+			TINY_GL_CHECK(glDepthMask(GL_FALSE));
 		}
 
 		//只有在深度测试启用的情况下才有用
-		glDepthMask(shader->isEnableZWrite() ? GL_TRUE : GL_FALSE);
 
 		if (shader->isEnableBlend())
 		{
-			glEnable(GL_BLEND);
-			glBlendFunc(shader->getBlendSourceWrapper().platform, shader->getBlendTargetWrapper().platform);
+			TINY_GL_CHECK(glEnable(GL_BLEND));
+			TINY_GL_CHECK(glBlendFunc(shader->getBlendSourceWrapper().platform, shader->getBlendTargetWrapper().platform));
 		}
 		else
 		{
-			glDisable(GL_BLEND);
+			TINY_GL_CHECK(glDisable(GL_BLEND));
 		}
 	}
 
@@ -473,6 +484,23 @@ namespace tezcat::Tiny::GL
 		//{
 		//	TINY_GL_CHECK(glDrawArrays(vertex->getDrawMode().platform, 0, vertex->getVertexCount()));
 		//}
+
+		TINY_PROFILER_DRAWCALL(1);
+	}
+
+	void GLGraphics::draw(const DrawMode& mode, Vertex* vertex)
+	{
+		TINY_GL_CHECK(glBindVertexArray(vertex->getVertexID()));
+
+		switch (vertex->getIndexCount())
+		{
+		case 0u:
+			TINY_GL_CHECK(glDrawArrays(GraphicsConfig::DrawModeArray[(int32_t)mode].platform, 0, vertex->getVertexCount()));
+			break;
+		default:
+			TINY_GL_CHECK(glDrawElements(GraphicsConfig::DrawModeArray[(int32_t)mode].platform, vertex->getIndexCount(), GL_UNSIGNED_INT, nullptr));
+			break;
+		}
 
 		TINY_PROFILER_DRAWCALL(1);
 	}
@@ -780,17 +808,17 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
-		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
 	void GLGraphics::setGlobalTexture2D(Shader* shader, const int& valueID, Texture2D* data)
 	{
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
-		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
@@ -802,17 +830,17 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
-		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addLocalTextureIndex();
 	}
 
 	void GLGraphics::setTexture2D(Shader* shader, const int32_t& valueID, Texture2D* data)
 	{
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, data->getTextureID()));
-		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		shader->addLocalTextureIndex();
 	}
 
@@ -824,17 +852,17 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
-		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
 	void GLGraphics::setGlobalTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data)
 	{
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
-		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		shader->addGlobalTextureIndex();
 	}
 
@@ -846,17 +874,25 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
+		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
-		TINY_GL_CHECK(glUniform1i(value_id, shader->getTextureIndex()));
 		shader->addLocalTextureIndex();
 	}
 
 	void GLGraphics::setTextureCube(Shader* shader, const int32_t& valueID, TextureCube* data)
 	{
+		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
 		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
 		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_CUBE_MAP, data->getTextureID()));
+		shader->addLocalTextureIndex();
+	}
+
+	void GLGraphics::setNullTexture2D(Shader* shader, const int32_t& valueID)
+	{
 		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
+		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
+		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
 		shader->addLocalTextureIndex();
 	}
 
@@ -1248,11 +1284,4 @@ namespace tezcat::Tiny::GL
 		TINY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, mSavePolygonMode));
 	}
 
-	void GLGraphics::setNullTexture2D(Shader* shader, const int32_t& valueID)
-	{
-		TINY_GL_CHECK(glActiveTexture(GL_TEXTURE0 + shader->getTextureIndex()));
-		TINY_GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
-		TINY_GL_CHECK(glUniform1i(valueID, shader->getTextureIndex()));
-		shader->addLocalTextureIndex();
-	}
 }

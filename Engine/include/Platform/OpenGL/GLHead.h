@@ -82,8 +82,8 @@ GLChecker::push(#x);\
 	}\
 }
 #else
-constexpr const char* GLCheckerFMT = "=======GL Error=======\n{}\n{}\n{}\n==================\n";
-constexpr const char* GLCheckerFMTPre = "=======GL Pre Error=======\n{}\n{}\n{}\n==================\n";
+constexpr const char* GLCheckerFMT = "=======GL Error=======\n{}\n{}\n{} Line:{}\n==================\n";
+constexpr const char* GLCheckerFMTPre = "=======GL Pre Error=======\n{}\n{}\n{} Line:{}\n==================\n";
 
 #define TINY_GL_ERROR(func)\
 {\

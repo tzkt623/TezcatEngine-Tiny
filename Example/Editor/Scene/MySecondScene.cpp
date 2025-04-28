@@ -25,7 +25,7 @@ void MySeconedScene::onEnter()
 	{
 		auto go = GameObject::create("World2_Camera");
 		auto camera = go->addComponent<Camera>(true);
-		camera->setViewRect(0, 0, Engine::getScreenWidth(), Engine::getScreenHeight());
+		camera->setViewRect(0, 0, EngineContext::ScreenWidth, EngineContext::ScreenHeight);
 		camera->setPerspective(60.0f, 0.1f, 2000.0f);
 		camera->setCullLayer(0);
 		camera->setSortingID(0);

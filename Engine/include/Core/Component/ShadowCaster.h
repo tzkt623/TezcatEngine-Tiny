@@ -7,9 +7,10 @@
 namespace tezcat::Tiny
 {
 	class FrameBuffer;
-	class Texture2D;
+	class Texture;
 	class ReplacedPipelinePass;
 	class Shader;
+	enum class LightType;
 
 	class TINY_API ShadowCaster : public ComponentAutoID<ShadowCaster>
 	{
@@ -21,7 +22,7 @@ namespace tezcat::Tiny
 		void setShadowMap(int width, int height, const std::string& shaderName);
 
 		uint32_t getUID() const { return mUID; }
-		Texture2D* getShadowTexutre() { return mShadowTexture; }
+		Texture* getShadowTexutre() { return mShadowTexture; }
 
 		void submit(Shader* shader);
 
@@ -36,9 +37,10 @@ namespace tezcat::Tiny
 
 	private:
 		uint32_t mUID;
-		Texture2D* mShadowTexture;
+		Texture* mShadowTexture;
 		ShadowObserver* mShadowObserver;
 		ReplacedPipelinePass* mPipePass;
 		FrameBuffer* mFrameBuffer;
+		LightType mLightType;
 	};
 }

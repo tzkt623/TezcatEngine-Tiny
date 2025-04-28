@@ -213,7 +213,7 @@ namespace tezcat::Tiny
 		Deferred
 	};
 
-	enum class TINY_API Queue : int16_t
+	enum class TINY_API PipelineQueueType : int16_t
 	{
 		None = 0,
 		Prepare = 1000,
@@ -339,7 +339,7 @@ namespace tezcat::Tiny
 	using DepthTestWrapper = TinyValueConventor<DepthTest, uint32_t>;
 	using PolygonModeWrapper = TinyValueConventor<PolygonMode, uint32_t>;
 
-	struct TINY_API ContextMap
+	struct TINY_API GraphicsConfig
 	{
 		static std::array<DataMemFormatWrapper, (uint32_t)DataMemFormat::Count> DataMemFormatArray;
 
@@ -407,7 +407,7 @@ namespace tezcat::Tiny
 		static std::array<DepthTestWrapper, (uint32_t)DepthTest::Count> DepthTestArray;
 
 		static std::unordered_map<std::string, LightMode> LightModeMap;
-		static std::unordered_map<std::string, Queue> QueueMap;
+		static std::unordered_map<std::string, PipelineQueueType> QueueMap;
 		static std::unordered_map<std::string, UniformType> UniformTypeUMap;
 	};
 

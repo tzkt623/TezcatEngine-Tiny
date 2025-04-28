@@ -18,6 +18,7 @@
 #include "Core/Component/ShadowCaster.h"
 #include "Core/Component/Transform.h"
 #include "Core/Component/GameObject.h"
+#include "Core/Component/Light.h"
 
 #include "Core/Shader/ShaderParam.h"
 #include "Core/Shader/Shader.h"
@@ -66,7 +67,7 @@ namespace tezcat::Tiny
 		mShadowObserver->setSortingID(2);
 
 		mPipePass = ReplacedPipelinePass::create(mShadowObserver
-			, ShaderManager::find("Unlit/ShadowMap"));
+			, ShaderManager::find("Hide/ShadowMap"));
 		//mPipePass->setAutoCulling([](BaseMeshRenderer* renderer)
 		//	{
 		//		return new RenderCMD_DrawMeshWithOutMaterial(renderer->getVertex(), renderer->getTransform());
@@ -77,6 +78,31 @@ namespace tezcat::Tiny
 	void ShadowCaster::onStart()
 	{
 		mShadowObserver->setTransform(mGameObject->getTransform());
+
+		mLightType = mGameObject->getComponent<LightComponent>()->getLightType();
+		switch (mLightType)
+		{
+		case LightType::Directional:
+			mShadowTexture = ShadowCasterManager::getOrCreateDirectionalShadowMap();
+			break;
+		case LightType::Point:
+			mShadowTexture = ShadowCasterManager::getOrCreatePointShadowMap();
+			break;
+		case LightType::Spot:
+			mShadowTexture = ShadowCasterManager::getOrCreateSpotShadowMap();
+			break;
+		default:
+			break;
+		}
+
+		mFrameBuffer = FrameBuffer::create(std::format("{}{}", mGameObject->getName(), mUID));
+		mFrameBuffer->saveObject();
+		mFrameBuffer->addAttachment(mShadowTexture);
+		mFrameBuffer->generate();
+
+		auto [w, h, l] = mShadowTexture->getSizeWHL();
+		mShadowObserver->setFrameBuffer(mFrameBuffer);
+		mShadowObserver->setViewRect(0, 0, w, h);
 	}
 
 	void ShadowCaster::onEnable()
@@ -94,13 +120,28 @@ namespace tezcat::Tiny
 
 	void ShadowCaster::onDestroy()
 	{
+		switch (mLightType)
+		{
+		case LightType::Directional:
+			ShadowCasterManager::recycleDirectionalShadowMap((Texture2D*)mFrameBuffer->getAttachment(0));
+			break;
+		case LightType::Point:
+			ShadowCasterManager::recyclePointShadowMap((TextureCube*)mFrameBuffer->getAttachment(0));
+			break;
+		case LightType::Spot:
+			ShadowCasterManager::recycleSpotShadowMap((Texture2D*)mFrameBuffer->getAttachment(0));
+			break;
+		default:
+			break;
+		}
+
 		ShadowCasterManager::recycle(this);
 		mUID = 0;
 
 		mFrameBuffer->deleteObject();
 		mShadowObserver->deleteObject();
-		mShadowTexture->deleteObject();
 		mPipePass->deleteObject();
+		mShadowTexture = nullptr;
 	}
 
 	void ShadowCaster::setShadowMap(int width, int height, const std::string& shaderName)
@@ -109,28 +150,24 @@ namespace tezcat::Tiny
 		{
 			return;
 		}
-
-		mShadowTexture = Texture2D::create("Shadow");
-		mShadowTexture->saveObject();
-		mShadowTexture->setConfig(width, height
-			, TextureInternalFormat::Depth
-			, TextureFormat::Depth
-			, DataMemFormat::Float);
-		mShadowTexture->setAttachPosition(TextureAttachPosition::DepthComponent);
-
-		mFrameBuffer = FrameBuffer::create(std::format("{}{}", shaderName, mUID));
-		mFrameBuffer->saveObject();
-		mFrameBuffer->addAttachment(mShadowTexture);
-		mFrameBuffer->generate();
-
-		mShadowObserver->setFrameBuffer(mFrameBuffer);
-		mShadowObserver->setViewRect(0, 0, width, height);
 	}
 
 	void ShadowCaster::submit(Shader* shader)
 	{
 		auto pv = mShadowObserver->getProjectionMatrix() * mShadowObserver->getViewMatrix();
 		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixLightVP, pv);
-		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexShadow, mShadowTexture);
+
+		switch (mLightType)
+		{
+		case LightType::Directional:
+			Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexShadow, (Texture2D*)mShadowTexture);
+			break;
+		case LightType::Point:
+			break;
+		case LightType::Spot:
+			break;
+		default:
+			break;
+		}
 	}
 }

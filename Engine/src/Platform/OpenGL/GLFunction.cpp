@@ -368,7 +368,7 @@ namespace tezcat::Tiny::GL
 		if (!success)
 		{
 			glGetProgramInfoLog(pid, 512, nullptr, infoLog);
-			TINY_LOG_ERROR(shader->getName() + "|" + infoLog);
+			TINY_LOG_ERROR(std::format("{}|{}", shader->getName(), infoLog));
 			TINY_ASSERT(false);
 			return;
 		}
@@ -515,7 +515,7 @@ namespace tezcat::Tiny::GL
 			{
 				int32_t block_size = 0;
 				TINY_GL_CHECK(glGetActiveUniformBlockiv(pid, ubID, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size));
-				TINY_LOG_ENGINE(pair.first + std::to_string(block_size));
+				TINY_LOG_ENGINE(std::format("{}{}", pair.first, block_size));
 				info->mSize = block_size;
 				
 				for (auto& slot : info->mSlot)

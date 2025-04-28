@@ -28,6 +28,8 @@ namespace tezcat::Tiny
 	class VertexBuffer;
 	class IndexBuffer;
 
+	using VertexBufferArray = TinyLitArray<VertexBuffer*>;
+
 	/// <summary>
 	/// 对应gl的VAO
 	/// 

@@ -206,6 +206,7 @@
     <ClCompile Include="Editor\Scene\Tutorial_Cube.cpp" />
     <ClCompile Include="Editor\Scene\Tutorial_FrameBuffer.cpp" />
     <ClCompile Include="Editor\Scene\Tutorial_Lighting.cpp" />
+    <ClCompile Include="Editor\Scene\Tutorial_Normal.cpp" />
     <ClCompile Include="Editor\Scene\Tutorial_Texture2D.cpp" />
     <ClCompile Include="Editor\Scene\Tutorial_Triangle.cpp" />
     <ClCompile Include="Editor\ThirdParty\imguizmo\GraphEditor.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="Editor\Scene\Tutorial_Cube.h" />
     <ClInclude Include="Editor\Scene\Tutorial_FrameBuffer.h" />
     <ClInclude Include="Editor\Scene\Tutorial_Lighting.h" />
+    <ClInclude Include="Editor\Scene\Tutorial_Normal.h" />
     <ClInclude Include="Editor\Scene\Tutorial_Texture2D.h" />
     <ClInclude Include="Editor\Scene\Tutorial_Triangle.h" />
     <ClInclude Include="Editor\ThirdParty\imguizmo\GraphEditor.h" />

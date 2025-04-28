@@ -50,11 +50,12 @@ namespace tezcat::Tiny
 
 	void Vertex::setMesh(MeshData* meshData)
 	{
-		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)meshData->mDrawMode];
+		mDrawModeWrapper = GraphicsConfig::DrawModeArray[(uint32_t)meshData->mDrawMode];
 		mVertexCount = (uint32_t)meshData->mVertices.size();
 		mEngineName = meshData->getName();
 
 		mVertexBuffers.reserve(meshData->mLayoutPositions.size());
+
 		for (auto& position : meshData->mLayoutPositions)
 		{
 			auto [size, data] = meshData->getVertexData(position);
@@ -77,7 +78,7 @@ namespace tezcat::Tiny
 	void Vertex::setMesh(const std::string& name, const uint32_t& vertexCount, const DrawMode& drawMode)
 	{
 		mEngineName = name;
-		mDrawModeWrapper = ContextMap::DrawModeArray[(uint32_t)drawMode];
+		mDrawModeWrapper = GraphicsConfig::DrawModeArray[(uint32_t)drawMode];
 		mVertexCount = vertexCount;
 	}
 

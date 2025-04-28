@@ -52,13 +52,18 @@ namespace tezcat::Tiny
 			mBufferID = id;
 			mGenerated = true;
 		}
+
 		const uint32_t& getBufferID() const { return mBufferID; }
 
 		const void* getData() const { return mData; }
 
-		uint64_t getDataSize() const { return mDataSize; }
+		const uint64_t getDataSize() const { return mDataSize; }
 
-		void release() { free(mData); }
+		void release()
+		{
+			free(mData);
+			mData = nullptr;
+		}
 
 		const bool isGenerated() const { return mGenerated; }
 

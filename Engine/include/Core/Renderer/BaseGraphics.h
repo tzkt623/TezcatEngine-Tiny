@@ -281,6 +281,7 @@ namespace tezcat::Tiny
 		//
 	public:
 		virtual void draw(Vertex* vertex) = 0;
+		virtual void draw(const DrawMode& mode, Vertex* vertex) = 0;
 		virtual void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f));
 
 	public:

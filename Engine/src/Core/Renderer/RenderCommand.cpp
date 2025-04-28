@@ -627,4 +627,32 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->deleteUniformBuffer(mID);
 	}
 
+	RenderCMD_DrawShadow::RenderCMD_DrawShadow(Vertex* vertex, Transform* transform)
+		: mVertex(vertex)
+		, mTransform(transform)
+	{
+
+	}
+
+	RenderCMD_DrawShadow::~RenderCMD_DrawShadow()
+	{
+
+	}
+
+	void RenderCMD_DrawShadow::execute(PipelinePass* pass, Shader* shader)
+	{
+		TINY_PIPELINE_INFO_PUSH(mTransform->getGameObject()->getName());
+
+		auto& model_mat4 = mTransform->getModelMatrix();
+		Graphics::getInstance()->setMat4(shader, ShaderParam::MatrixM, model_mat4);
+
+		glm::mat3 normal_matrix(model_mat4);
+		Graphics::getInstance()->setMat3(shader, ShaderParam::MatrixN
+			, glm::inverseTranspose(normal_matrix));
+
+		Graphics::getInstance()->draw(mVertex);
+
+		TINY_PIPELINE_INFO_POP();
+	}
+
 }

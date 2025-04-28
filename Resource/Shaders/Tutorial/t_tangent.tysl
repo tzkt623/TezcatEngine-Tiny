@@ -123,9 +123,11 @@
         void main()
         {
             float3 normal = tinyCalcNormalWithTBN(myTexNormal2D, myUV);
-            float3 rgb = texture(myTexNormal2D, myUV).rgb;
-            //float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
-            myFinalColor = float4(rgb, 1.0f);
+            //float3 rgb = texture(myTexNormal2D, myUV).rgb;
+            float3 view_dir = normalize(TINY_CameraWorldPosition - myWorldPosition);
+
+            float3 color = calcDirectionLight(TINY_LitDir, view_dir, normal);
+            myFinalColor = float4(color, 1.0f);
         }
     }
     #TINY_FS_END

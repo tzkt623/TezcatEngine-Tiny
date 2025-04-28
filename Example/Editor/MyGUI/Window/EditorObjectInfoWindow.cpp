@@ -616,11 +616,11 @@ namespace tezcat::Editor
 				auto shader = mt->getShader();
 				auto& shaders = ShaderManager::getAllowUseShaders();
 
-				for (auto& pair : shaders)
+				for (auto& s : shaders)
 				{
-					if (ImGui::Selectable(pair.first.data(), pair.second == shader))
+					if (ImGui::Selectable(s->getName().c_str(), s == shader))
 					{
-						mt->setShader(pair.second);
+						mt->setShader(s);
 					}
 				}
 

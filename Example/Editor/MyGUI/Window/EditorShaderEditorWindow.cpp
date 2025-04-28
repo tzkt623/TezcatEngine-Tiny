@@ -20,7 +20,7 @@ namespace tezcat::Editor
 		uniforms.push_back("gl_FragDepth");
 
 		mShaderEditor = std::make_unique<TextEditor>();
-		mShaderEditor->setFontScale(1.5f);
+		mShaderEditor->setFontScale(1.0f);
 		mShaderEditor->SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL_TINY(
 			{
 				"vec2", "vec3", "vec4"
@@ -40,7 +40,7 @@ namespace tezcat::Editor
 	{
 		mFilePath = std::move(file);
 		mName = mFilePath.filename().string();
-		mIsShader = mFilePath.extension().string() == ".tysl" ? true : false;
+		mIsShader = mFilePath.extension() == ".tysl" ? true : false;
 
 		auto tex = FileTool::loadText(mFilePath.string());
 		mShaderEditor->SetText(tex);
@@ -210,7 +210,6 @@ namespace tezcat::Editor
 		ImGui::SameLine();
 
 		ImGui::BeginChild("##ShaderEditor", ImGui::GetContentRegionAvail(), true);
-
 		auto cpos = mShaderEditor->GetCursorPosition();
 		ImGui::Text("%6d/%-6d %6d 行(lines)  | %s | %s | %s | %s"
 			, cpos.mLine + 1, cpos.mColumn + 1

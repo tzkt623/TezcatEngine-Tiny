@@ -31,6 +31,8 @@ namespace tezcat::Tiny
 {
 	std::unordered_map<std::string_view, Shader*> ShaderManager::mShaderUMap;
 	std::unordered_map<std::string_view, Shader*> ShaderManager::mCanUseUMap;
+	std::vector<Shader*> ShaderManager::mCanUseArray;
+	bool ShaderManager::mIsDirty = false;
 
 	void ShaderManager::loadShaderFiles(const std::string& path)
 	{
@@ -56,7 +58,7 @@ namespace tezcat::Tiny
 		auto it = mShaderUMap.find(shaderName);
 		if (it != mShaderUMap.end())
 		{
-			it->second->mContent = std::move(data);
+			it->second->mContent = std::make_unique<std::string>(std::move(data));
 			Graphics::getInstance()->addCommand<RenderCMD_RebuildShader>(it->second);
 		}
 	}
@@ -88,15 +90,30 @@ namespace tezcat::Tiny
 		{
 			shader->saveObject();
 
-			if (name.find_first_of("Hide") == 0)
+			if (!name.starts_with("Hide"))
 			{
-
-			}
-			else
-			{
+				mIsDirty = true;
 				mCanUseUMap.emplace(shader->getName(), shader);
+				mCanUseArray.push_back(shader);
 			}
 		}
 	}
+
+	const std::vector<Shader*>& ShaderManager::getAllowUseShaders()
+	{
+		if (mIsDirty)
+		{
+			mIsDirty = false;
+			std::ranges::sort(mCanUseArray, [](Shader* a, Shader* b)
+				{
+					auto result = a->getName().compare(b->getName());
+
+					return result;
+				});
+		}
+
+		return mCanUseArray;
+	}
+
 }
 

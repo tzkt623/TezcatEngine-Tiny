@@ -1,0 +1,70 @@
+#TINY_HEAD_BEGIN
+{
+    str Name = Hide/Shadow;
+}
+#TINY_HEAD_END
+
+#TINY_PASS_BEGIN
+{
+    #TINY_CFG_BEGIN
+    {
+        int Version = 330;
+        int OrderID = -10;
+        str Queue = Post;
+        bool Blend = true;
+        str BlendSrc = SrcA;
+        str BlendTar = 1-SrcA;
+        str DepthTest = Less;
+        bool ZWrite = false;
+        str CullFace = Back;
+    }
+    #TINY_CFG_END
+
+    #TINY_VS_BEGIN
+    {
+        #include "../Include/tiny_vs.tyin"
+
+        TINY_LAYOUT_POSITION;
+        TINY_LAYOUT_NORMAL;
+        
+        out float3 myNormal;
+        out float3 myLightPosition;
+
+        out VS_Data
+        {
+            float3 normal;
+            float4 lightPosition;
+        } myVSOut;
+
+        void main()
+        {
+            float4 world_position = TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
+            gl_Position = TINY_MatrixVP * world_position;
+
+            myVSOut.normal = normalize(TINY_MatrixN * tiny_layout_Normal);
+            myVSOut.lightPosition = TINY_MatrixLightVP * world_position;
+        }
+    }
+    #TINY_VS_END
+
+    #TINY_FS_BEGIN
+    {
+        #include "../Include/tiny_fs.tyin"
+
+        in VS_Data
+        {
+            float3 normal;
+            float4 lightPosition;
+        } myVSIn;
+
+        out float4 myColor;
+
+        void main()
+        {
+            float shadow = calcShadow(myVSIn.lightPosition, myVSIn.normal, normalize(-TINY_LitDir.direction), TINY_TexShadow);        
+            myColor = float4(0.0f, 0.0f, 0.0f, shadow);
+        }
+    }
+    #TINY_FS_END
+}
+#TINY_PASS_END

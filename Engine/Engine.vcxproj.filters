@@ -141,6 +141,8 @@
     <ClCompile Include="src\Core\Manager\PipelineManager.cpp" />
     <ClCompile Include="src\Core\Manager\ObserverManager.cpp" />
     <ClCompile Include="src\Core\Renderer\PipelineWorker.cpp" />
+    <ClCompile Include="src\Core\EngineContext.cpp" />
+    <ClCompile Include="ThirdParty\ImageLoad\miniz.c" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -241,7 +243,7 @@
     <ClInclude Include="ThirdParty\glad\khrplatform.h">
       <Filter>Engine\Thirdparty\glad</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\stb_image.h">
+    <ClInclude Include="ThirdParty\ImageLoad\stb_image.h">
       <Filter>Engine\Thirdparty</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\glm\common.hpp">
@@ -1340,6 +1342,9 @@
     <ClInclude Include="include\Core\Manager\ObserverManager.h" />
     <ClInclude Include="include\Core\Renderer\PipelineWorker.h" />
     <ClInclude Include="include\Core\Data\MetaData.h" />
+    <ClInclude Include="include\Core\EngineContext.h" />
+    <ClInclude Include="ThirdParty\ImageLoad\tinyexr.h" />
+    <ClInclude Include="ThirdParty\ImageLoad\miniz.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

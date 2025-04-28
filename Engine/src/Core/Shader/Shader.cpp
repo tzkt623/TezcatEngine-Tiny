@@ -39,7 +39,7 @@ namespace tezcat::Tiny
 		, mEnableBlend(false)
 		, mEnableZWrite(true)
 		, mDepthTest(DepthTest::Less, 0)
-		, mRenderQueue(Queue::Opaque)
+		, mRenderQueue(PipelineQueueType::Opaque)
 		, mBlendSource(Blend::One, 0)
 		, mBlendTarget(Blend::One, 0)
 		, mCullFace(CullFace::Back, 0)
@@ -77,7 +77,7 @@ namespace tezcat::Tiny
 
 		mParser->parse(mPath);
 		mParser->updateShaderConfig(this);
-		mContent.clear();
+		mContent.reset();
 
 		ShaderManager::registerShader(this);
 
@@ -86,11 +86,10 @@ namespace tezcat::Tiny
 
 	void Shader::setupUserUniformID(ShaderUniformMember* metaData, const std::string& name, const int& shaderID, const int& arrayIndex)
 	{
-		if (shaderID < 0)
-		{
-			TINY_LOG_WARNING(std::format("{}--{} ID is -1"
-				, mPath, name));
-		}
+		//if (shaderID < 0)
+		//{
+		//	TINY_LOG_WARNING(std::format("{}--{} ID is -1", mPath, name));
+		//}
 
 		auto member_info = metaData->getInfo<ShaderMemberInfo>();
 
@@ -149,10 +148,10 @@ namespace tezcat::Tiny
 
 	bool Shader::checkAndLoadContent()
 	{
-		if (mContent.empty())
+		if (!mContent)
 		{
-			mContent = FileTool::loadText(mPath);
-			if (mContent.empty())
+			mContent = std::make_unique<std::string>(std::move(FileTool::loadText(mPath)));
+			if (mContent->empty())
 			{
 				return false;
 			}
@@ -164,8 +163,9 @@ namespace tezcat::Tiny
 	void Shader::rebuild()
 	{
 		mParser = std::make_unique<ShaderParser>();
-		mParser->parse(mContent, mPath);
-		mContent.clear();
+		mParser->parse(*mContent.get(), mPath);
+		mContent->clear();
+		mContent.reset();
 	}
 
 	std::string Shader::getMemoryInfo()
@@ -322,6 +322,5 @@ namespace tezcat::Tiny
 			TINY_LOG_ERROR(std::format("This TinyUniform is not register [{}]", name));
 		}
 	}
-
 }
 

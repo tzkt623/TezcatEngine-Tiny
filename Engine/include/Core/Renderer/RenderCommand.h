@@ -383,6 +383,20 @@ namespace tezcat::Tiny
 		Transform* mTransform;
 	};
 
+	class RenderCMD_DrawShadow : public RenderCommadDraw
+	{
+		/*此命令可以合并,优化DrawCall*/
+	public:
+		RenderCMD_DrawShadow(Vertex* vertex, Transform* transform);
+		virtual ~RenderCMD_DrawShadow();
+		virtual void execute(PipelinePass* pass, Shader* shader) override;
+
+	private:
+		Vertex* mVertex;
+		Transform* mTransform;
+	};
+
+
 	class RenderCMD_DrawID : public RenderCommadDraw
 	{
 		/*此命令可以合并,优化DrawCall*/

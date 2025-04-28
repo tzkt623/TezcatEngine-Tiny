@@ -23,6 +23,34 @@ namespace tezcat::Tiny
 	using TinyUID = int32_t;
 	using TinyUUID = uint32_t;
 
+	template<class T>
+	class TINY_API TinyLitArray
+	{
+		T* mArray = nullptr;
+		uint32_t mSize = 0;
+
+	public:
+		void init(uint32_t size)
+		{
+			if (mArray)
+			{
+				delete[] mArray;
+			}
+			mArray = new T[size];
+			mSize = size;
+		}
+
+		~TinyLitArray()
+		{
+			delete[] mArray;
+		}
+
+		T& operator[](uint32_t index) { return mArray[index]; }
+		const T& operator[](uint32_t index) const { return mArray[index]; }
+
+		const uint32_t& getSize() const { return mSize; }
+	};
+
 	namespace v2
 	{
 		class TINY_API TinyBaseRef

@@ -59,35 +59,35 @@ namespace tezcat::Editor
 
 		if (ImGui::BeginMenuBar())
 		{
-			static bool bInfo;
-			static PolygonMode polygon_mode = PolygonMode::Face;
-			static std::string polygon_mode_name = "Face";
-			ImGui::SetNextItemWidth(200);
-			if (ImGui::BeginCombo("##PylgonMode", polygon_mode_name.c_str()))
-			{
-				if (ImGui::Selectable("Face##face0", polygon_mode == PolygonMode::Face))
-				{
-					polygon_mode = PolygonMode::Face;
-					polygon_mode_name = "Face";
-					Graphics::getInstance()->setPolygonMode(polygon_mode);
-				}
-
-				if (ImGui::Selectable("Line##line1", polygon_mode == PolygonMode::Line))
-				{
-					polygon_mode = PolygonMode::Line;
-					polygon_mode_name = "Line";
-					Graphics::getInstance()->setPolygonMode(polygon_mode);
-				}
-
-				if (ImGui::Selectable("Point##point2", polygon_mode == PolygonMode::Point))
-				{
-					polygon_mode = PolygonMode::Point;
-					polygon_mode_name = "Point";
-					Graphics::getInstance()->setPolygonMode(polygon_mode);
-				}
-
-				ImGui::EndCombo();
-			}
+			//static bool bInfo;
+			//static PolygonMode polygon_mode = PolygonMode::Face;
+			//static std::string polygon_mode_name = "Face";
+			//ImGui::SetNextItemWidth(200);
+			//if (ImGui::BeginCombo("##PylgonMode", polygon_mode_name.c_str()))
+			//{
+			//	if (ImGui::Selectable("Face##face0", polygon_mode == PolygonMode::Face))
+			//	{
+			//		polygon_mode = PolygonMode::Face;
+			//		polygon_mode_name = "Face";
+			//		Graphics::getInstance()->setPolygonMode(polygon_mode);
+			//	}
+			//
+			//	if (ImGui::Selectable("Line##line1", polygon_mode == PolygonMode::Line))
+			//	{
+			//		polygon_mode = PolygonMode::Line;
+			//		polygon_mode_name = "Line";
+			//		Graphics::getInstance()->setPolygonMode(polygon_mode);
+			//	}
+			//
+			//	if (ImGui::Selectable("Point##point2", polygon_mode == PolygonMode::Point))
+			//	{
+			//		polygon_mode = PolygonMode::Point;
+			//		polygon_mode_name = "Point";
+			//		Graphics::getInstance()->setPolygonMode(polygon_mode);
+			//	}
+			//
+			//	ImGui::EndCombo();
+			//}
 
 			if (ImGui::BeginMenu("CameraSettings"))
 			{
@@ -97,29 +97,26 @@ namespace tezcat::Editor
 				auto transform = EditorContext::EditorCamera->getTransform();
 				ImGui::Text("Position");
 				auto pos = transform->getPosition();
-				if (ImGui::InputFloat3("##position", &pos[0]))
+				if (ImGui::DragFloat3("##position", &pos[0]))
 				{
 					transform->setPosition(pos);
 				}
 
 				ImGui::Text("Rotation");
 				auto rot = transform->getRotation();
-				if (ImGui::InputFloat3("##rotation", &rot[0]))
+				if (ImGui::DragFloat3("##rotation", &rot[0]))
 				{
 					transform->setRotation(rot);
 				}
 				ImGui::Separator();
 				ImGui::Text("Clipping Plane");
-				float near = EditorContext::EditorCamera->getNear();
-				float far = EditorContext::EditorCamera->getFar();
-				if (ImGui::InputFloat("##near", &near))
+				float near_far[2] = { EditorContext::EditorCamera->getNear(), EditorContext::EditorCamera->getFar() };
+				if (ImGui::DragFloat2("##near_far", near_far))
 				{
-					EditorContext::EditorCamera->setNear(near);
+					EditorContext::EditorCamera->setNear(near_far[0]);
+					EditorContext::EditorCamera->setNear(near_far[1]);
 				}
-				if (ImGui::InputFloat("##far", &far))
-				{
-					EditorContext::EditorCamera->setFar(far);
-				}
+
 				ImGui::Text("FOV");
 				int fov = EditorContext::EditorCamera->getFOV();
 				if (ImGui::SliderInt("##fov", &fov, 1.0f, 180.0f))
@@ -158,9 +155,17 @@ namespace tezcat::Editor
 
 			if (ImGui::BeginMenu("Gizmo"))
 			{
+				ImGui::Text("SelectRectThickness");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(120);
+				ImGui::DragFloat("##001", &EditorContext::SelectRectThickness, 0.1f);
+
+				ImGui::Separator();
+
 				ImGui::Text("ShowMeshFrame");
 				ImGui::SameLine();
-				if (ImGui::Checkbox("##001", &EditorContext::IsShowMeshFrame))
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				if (ImGui::Checkbox("##002", &EditorContext::IsShowMeshFrame))
 				{
 					if (EditorContext::IsShowMeshFrame)
 					{
@@ -174,13 +179,15 @@ namespace tezcat::Editor
 
 				ImGui::Text("LineWidth");
 				ImGui::SameLine();
-				ImGui::DragFloat("##002", &EditorContext::MeshFrameLineWidth, 0.1f);
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				ImGui::DragFloat("##003", &EditorContext::MeshFrameLineWidth, 0.1f);
 
 				ImGui::Separator();
 
 				ImGui::Text("ShowNormal");
 				ImGui::SameLine();
-				if (ImGui::Checkbox("##003", &EditorContext::IsShowNormal))
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				if (ImGui::Checkbox("##004", &EditorContext::IsShowNormal))
 				{
 					if (EditorContext::IsShowNormal)
 					{
@@ -194,7 +201,64 @@ namespace tezcat::Editor
 
 				ImGui::Text("NormalLength");
 				ImGui::SameLine();
-				ImGui::DragFloat("##004", &EditorContext::NormalLength, 0.01f);
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				ImGui::DragFloat("##005", &EditorContext::NormalLength, 0.01f);
+
+				ImGui::Separator();
+
+				ImGui::Text("ShowTangents");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				if (ImGui::Checkbox("##006", &EditorContext::IsShowTangents))
+				{
+					if (EditorContext::IsShowTangents)
+					{
+						EditorContext::showTangents();
+					}
+					else
+					{
+						EditorContext::hideTangents();
+					}
+				}
+
+				ImGui::Text("TangentLength");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				ImGui::DragFloat("##007", &EditorContext::TangentLength, 2.0f);
+
+				ImGui::Separator();
+
+				//----------------------------
+				//
+				//
+				static PolygonMode polygon_mode = PolygonMode::Face;
+				static std::string polygon_mode_name = "Face";
+				ImGui::SetNextItemWidth(-FLT_MIN);
+				if (ImGui::BeginCombo("##PylgonMode", polygon_mode_name.c_str()))
+				{
+					if (ImGui::Selectable("Face##face0", polygon_mode == PolygonMode::Face))
+					{
+						polygon_mode = PolygonMode::Face;
+						polygon_mode_name = "Face";
+						Graphics::getInstance()->setPolygonMode(polygon_mode);
+					}
+
+					if (ImGui::Selectable("Line##line1", polygon_mode == PolygonMode::Line))
+					{
+						polygon_mode = PolygonMode::Line;
+						polygon_mode_name = "Line";
+						Graphics::getInstance()->setPolygonMode(polygon_mode);
+					}
+
+					if (ImGui::Selectable("Point##point2", polygon_mode == PolygonMode::Point))
+					{
+						polygon_mode = PolygonMode::Point;
+						polygon_mode_name = "Point";
+						Graphics::getInstance()->setPolygonMode(polygon_mode);
+					}
+
+					ImGui::EndCombo();
+				}
 
 				ImGui::EndMenu();
 			}
@@ -202,6 +266,7 @@ namespace tezcat::Editor
 			auto size = ImGui::CalcTextSize("Info");
 			ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - size.x);
 
+			static bool bInfo;
 			ImGui::MenuItem("Info", 0, &bInfo);
 			if (bInfo)
 			{
@@ -477,22 +542,20 @@ namespace tezcat::Editor
 		//	ImVec2 delta_drag = current_drag - old_drag;
 		//	old_drag = current_drag;
 		//
-		//	float3 pos(current_drag.x * Engine::getDeltaTime(), current_drag.y * Engine::getDeltaTime(), 0.0f);
+		//	float3 pos(current_drag.x * EngineContext::DeltaTime, current_drag.y * EngineContext::DeltaTime, 0.0f);
 		//	transform->translate(pos);
 		//
 		//	std::cout << delta_drag.x << "|" << delta_drag.y << "\n";
 		//}
 
-		
-		if (ImGui::IsMouseDragging(ImGuiMouseButton_Right))
+		float speed = mCameraMoveSpeed * EngineContext::DeltaTime;
+		static double old_time = ImGui::GetTime();
+		double current_time = ImGui::GetTime();
+		float delta = current_time - old_time;
+		old_time = current_time;
+
+		if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
 		{
-			static double old_time = ImGui::GetTime();
-			double current_time = ImGui::GetTime();
-			float delta = current_time - old_time;
-			old_time = current_time;
-
-			float speed = mCameraMoveSpeed * Engine::getDeltaTime();
-
 			if (ImGui::IsKeyPressed(ImGuiKey_W))
 			{
 				flag = true;
@@ -526,6 +589,14 @@ namespace tezcat::Editor
 				position -= transform->getUp() * speed;
 			}
 
+			if (flag)
+			{
+				transform->translate(position);
+			}
+		}
+		
+		if (ImGui::IsMouseDragging(ImGuiMouseButton_Right))
+		{
 			auto mouse_pos = ImGui::GetMousePos();
 			if (mFixMouse)
 			{
@@ -535,7 +606,7 @@ namespace tezcat::Editor
 			}
 			else
 			{
-				float rollspeed = 20 * Engine::getDeltaTime();
+				float rollspeed = 20 * EngineContext::DeltaTime;
 
 				float offset_x = mouse_pos.x - mLastX;
 				float offset_y = mLastY - mouse_pos.y;
@@ -550,11 +621,5 @@ namespace tezcat::Editor
 		{
 			mFixMouse = true;
 		}
-
-		if (flag)
-		{
-			transform->translate(position);
-		}
-		
 	}
 }

@@ -80,7 +80,7 @@ namespace tezcat::Tiny
 					}
 					else
 					{
-						TINY_LOG_ERROR("GLShader: Shader Param [bool]`s string must [true] or [false]");
+						TINY_LOG_ERROR("ShaderParser: Shader Param [bool]`s string must [true] or [false]");
 						//throw std::logic_error("GLShader: Shader Param [bool]`s string must [true] or [false]");
 					}
 				}
@@ -207,11 +207,11 @@ namespace tezcat::Tiny
 		//std::regex regex_comment(R"(/\*[\s\S]*\*/|//.*)");
 		//std::sregex_iterator end;
 
-		std::function<void(std::string&, std::unordered_set<uint64_t>&, std::vector<std::string>&, const std::filesystem::path&)> parse =
+		std::function<void(std::string&, std::unordered_set<uint64_t>&, std::vector<std::string>&, const file_path&)> parse =
 			[this, &parse, &regex_include](std::string& include_content
 				, std::unordered_set<uint64_t>& check_includes
 				, std::vector<std::string>& all_includes
-				, const std::filesystem::path& rootPath)
+				, const file_path& rootPath)
 			{
 				//删除所有注释
 				this->removeComment(include_content);
@@ -228,9 +228,9 @@ namespace tezcat::Tiny
 				if (!include_heads.empty())
 				{
 					//遍历所有include 加载数据
-					for (auto& file_path : include_heads)
+					for (auto& head_file_path : include_heads)
 					{
-						std::filesystem::path sys_path(rootPath.string() + "/" + file_path);
+						file_path sys_path(rootPath.string() + "/" + head_file_path);
 						auto content = FileTool::loadText(sys_path.string());
 						if (!content.empty())
 						{
@@ -263,9 +263,9 @@ namespace tezcat::Tiny
 			content = std::regex_replace(content, regex_include, "");
 
 			//遍历所有include 加载数据
-			for (auto& file_path : include_heads)
+			for (auto& head_file_path : include_heads)
 			{
-				std::filesystem::path sys_path(rootPath + "/" + file_path);
+				file_path sys_path(rootPath + "/" + head_file_path);
 				auto content = FileTool::loadText(sys_path.string());
 				if (!content.empty())
 				{
@@ -459,8 +459,8 @@ namespace tezcat::Tiny
 				member->valueName = arg_name;
 				member->valueCount = array_count;
 
-				auto it = ContextMap::UniformTypeUMap.find(arg_type);
-				if (it != ContextMap::UniformTypeUMap.end())
+				auto it = GraphicsConfig::UniformTypeUMap.find(arg_type);
+				if (it != GraphicsConfig::UniformTypeUMap.end())
 				{
 					auto [show_name, constraint, rangePtr] = progress_constraint((*argument_i)[1], it->second);
 
@@ -527,7 +527,7 @@ namespace tezcat::Tiny
 			else
 			{
 				std::shared_ptr<ShaderUniformMember> uniform_value = std::make_shared<ShaderUniformMember>();
-				auto uniform_info = uniform_value->createInfo<ShaderMemberInfo>(ContextMap::UniformTypeUMap[uniform_match_type]);
+				auto uniform_info = uniform_value->createInfo<ShaderMemberInfo>(GraphicsConfig::UniformTypeUMap[uniform_match_type]);
 				uniform_value->valueName = uniform_match_name;
 				uniform_value->valueCount = array_count;
 
@@ -560,14 +560,17 @@ namespace tezcat::Tiny
 		//	写入shader头
 		//
 		//content.insert(0, "#pragma optimize(off)\n");
-		content.insert(0, " core\n");
-		content.insert(0, std::to_string(mConfigUMap["Version"].cast<int>()));
-		content.insert(0, "#version ");
+
+		content = std::format("#version {} core\n", mConfigUMap["Version"].cast<int>()) + content;
+
+		//content.insert(0, " core\n");
+		//content.insert(0, std::to_string(mConfigUMap["Version"].cast<int>()));
+		//content.insert(0, "#version ");
 	}
 
 	void ShaderParser::parse(const std::string& path)
 	{
-		auto root = std::filesystem::path(path).parent_path().string();
+		auto root = file_path(path).parent_path().string();
 
 		auto content = FileTool::loadText(path);
 		this->removeComment(content);
@@ -579,7 +582,7 @@ namespace tezcat::Tiny
 	void ShaderParser::parse(std::string& content, const std::string& path)
 	{
 		this->removeComment(content);
-		auto root = std::filesystem::path(path).parent_path().string();
+		auto root = file_path(path).parent_path().string();
 
 		this->parseHeader(content);
 		this->parseShaders(content, root);
@@ -616,18 +619,18 @@ namespace tezcat::Tiny
 		it = mConfigUMap.find("Queue");
 		if (it != mConfigUMap.end())
 		{
-			shader->setRenderQueue(ContextMap::QueueMap[it->second.cast<std::string>()]);
+			shader->setRenderQueue(GraphicsConfig::QueueMap[it->second.cast<std::string>()]);
 		}
 		else
 		{
-			shader->setRenderQueue(Queue::Opaque);
+			shader->setRenderQueue(PipelineQueueType::Opaque);
 		}
 
 		//LightMode
 		it = mConfigUMap.find("LightMode");
 		if (it != mConfigUMap.end())
 		{
-			shader->setLightMode(ContextMap::LightModeMap[it->second.cast<std::string>()]);
+			shader->setLightMode(GraphicsConfig::LightModeMap[it->second.cast<std::string>()]);
 		}
 		else
 		{
@@ -638,7 +641,7 @@ namespace tezcat::Tiny
 		it = mConfigUMap.find("DepthTest");
 		if (it != mConfigUMap.end())
 		{
-			shader->setDepthTest(ContextMap::DepthTestMap[it->second.cast<std::string>()]);
+			shader->setDepthTest(GraphicsConfig::DepthTestMap[it->second.cast<std::string>()]);
 			//ZWrite
 			it = mConfigUMap.find("ZWrite");
 			if (it != mConfigUMap.end())
@@ -661,8 +664,8 @@ namespace tezcat::Tiny
 		if (it != mConfigUMap.end() && it->second.cast<bool>())
 		{
 			shader->setBlend(true);
-			shader->setBlendFunction(ContextMap::BlendMap[mConfigUMap["BlendSrc"].cast<std::string>()]
-				, ContextMap::BlendMap[mConfigUMap["BlendTar"].cast<std::string>()]);
+			shader->setBlendFunction(GraphicsConfig::BlendMap[mConfigUMap["BlendSrc"].cast<std::string>()]
+				, GraphicsConfig::BlendMap[mConfigUMap["BlendTar"].cast<std::string>()]);
 		}
 		else
 		{
@@ -673,7 +676,7 @@ namespace tezcat::Tiny
 		it = mConfigUMap.find("CullFace");
 		if (it != mConfigUMap.end())
 		{
-			shader->setCullFace(ContextMap::CullFaceMap[it->second.cast<std::string>()]);
+			shader->setCullFace(GraphicsConfig::CullFaceMap[it->second.cast<std::string>()]);
 		}
 	}
 }

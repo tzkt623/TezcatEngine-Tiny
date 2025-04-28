@@ -76,11 +76,11 @@ namespace tezcat::Tiny
 
 	protected:
 		LightComponent() = default;
-		virtual LightType getLightType() = 0;
 
 	public:
 		virtual ~LightComponent() = default;
 		virtual void submit(Shader* shader) = 0;
+		virtual LightType getLightType() = 0;
 	};
 
 	class TINY_API DirectionalLight : public LightComponent

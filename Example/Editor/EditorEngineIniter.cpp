@@ -24,10 +24,12 @@ namespace tezcat::Editor
 		//engine->setEnableMultiThread();
 
 		//mResourceFolderName = "Resource";
-		mGameName = u8"V0.3(没有黑夜君临玩我要死了)";
-		mWindowWidth = 1920;
-		mWindowHeight = 1080;
-		mEnableVsync = true;
+		//mGameName = u8"V0.3(没有黑夜君临玩我要死了)";
+		EngineContext::Name = u8"V0.3(没有黑夜君临玩我要死了)";
+		EngineContext::ScreenWidth = 1920;
+		EngineContext::ScreenHeight = 1080;
+		EngineContext::EnableVsync = true;
+
 		this->setGLVersion(4, 3);
 	}
 
