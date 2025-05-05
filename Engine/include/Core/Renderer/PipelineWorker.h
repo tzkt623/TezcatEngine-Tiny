@@ -1,6 +1,6 @@
 ﻿#pragma once
 /*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -88,6 +88,13 @@ namespace tezcat::Tiny
 		TinyWeakRef<BaseRenderObserver> mRenderObserver;
 	};
 
+	/*
+	* Pass只会存储在三个地方
+	* QueueRenderArray,QueueTable,ReplacedPassPreArray
+	* 存储在Qtable中时只有2
+	* 存储在ReplacedPassPreArray中时也只有2
+	* 所以最高只有2
+	*/
 	class TINY_API PipelinePass : public PipelineWorker
 	{
 	public:

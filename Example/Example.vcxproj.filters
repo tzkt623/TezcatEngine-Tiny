@@ -156,6 +156,9 @@
     <ClCompile Include="Editor\Scene\Tutorial_Normal.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Editor\Scene\Tutorial_Skybox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor\EditorInputer.h">
@@ -315,6 +318,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Scene\Tutorial_Normal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Scene\Tutorial_Skybox.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

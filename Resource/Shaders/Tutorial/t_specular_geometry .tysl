@@ -47,7 +47,7 @@
         in float3 myWorldPos;
         out float4 myFinalColor;
 
-        [Editor(Roughness, Range(0, 1))]
+        @[Editor(Name(Roughness), Range(0, 1))]
         uniform float myRoughness;
 
         void main()

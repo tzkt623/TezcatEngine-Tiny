@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 /*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -112,21 +112,15 @@ namespace tezcat::Tiny
 				, float4x4[6]
 				, "TINY_SkyBox_MatrixV");
 
-			TINY_UNIFORM_BUFFER_LAYOUT(ViewIndex
-				, SkyBox
-				, 2
-				, int32_t
-				, "TINY_SkyBox_ViewIndex");
-
 			TINY_UNIFORM_BUFFER_LAYOUT(Resolution
 				, SkyBox
-				, 3
+				, 2
 				, int32_t
 				, "TINY_SkyBox_Resolution");
 
 			TINY_UNIFORM_BUFFER_LAYOUT(Roughness
 				, SkyBox
-				, 4
+				, 3
 				, float
 				, "TINY_SkyBox_Roughness");
 		};

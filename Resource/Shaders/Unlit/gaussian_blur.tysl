@@ -42,11 +42,11 @@
         in float2 myUV;
         out float4 myFinalColor;
 
-        [Editor(Color2D)]
+        @[Editor(Name(Color2D))]
         uniform tex2D myTexColor2D;
-        [Editor(KernelSize)]
+        @[Editor(Name(KernelSize))]
         uniform int myKernelSize;
-        [Editor(Kernel)]
+        @[Editor(Name(Kernel))]
         uniform float myKernel[32];
 
         const float2 texSize = float2(2048, 1024);

@@ -1,6 +1,6 @@
 ﻿#pragma once
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ namespace tezcat::Tiny
 
 		ViewType getViewType() const { return mViewType; }
 
-		virtual void lookAt(Transform* transform) {}
+		virtual void lookAt(const float3& worldPosition) {}
 
 		PipelineQueue* getPipelineQueue() { return mQueue; }
 
@@ -206,13 +206,13 @@ namespace tezcat::Tiny
 		virtual ~ShadowObserver();
 
 	public:
-		virtual void preRender() override;
-		virtual void submit(Shader* shader) override;
-		virtual float4x4& getViewMatrix() { return mViewMatrix; }
+		void preRender() override;
+		void submit(Shader* shader) override;
+		float4x4& getViewMatrix() override { return mViewMatrix; }
 
-		virtual float4x4& getViewMatrix(int32_t index) const final { TINY_THROW("Fatal Error!"); }
-		virtual float4x4* getViewMatrixAry() const final { TINY_THROW("Fatal Error!"); }
-		virtual int32_t getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
+		float4x4& getViewMatrix(int32_t index) const override final { TINY_THROW("Fatal Error!"); }
+		float4x4* getViewMatrixAry() const override final { TINY_THROW("Fatal Error!"); }
+		int32_t getViewMatrixArySize() const override final { TINY_THROW("Fatal Error!"); }
 
 	private:
 		float4x4 mViewMatrix;
@@ -227,15 +227,15 @@ namespace tezcat::Tiny
 		virtual ~RenderObserver();
 
 	public:
-		virtual void preRender() override;
-		virtual void submit(Shader* shader) override;
-		virtual float4x4& getViewMatrix() { return mViewMatrix; }
+		void preRender() override;
+		void submit(Shader* shader) override;
+		float4x4& getViewMatrix() override { return mViewMatrix; }
 
-		virtual float4x4& getViewMatrix(int32_t index) const final { TINY_THROW("Fatal Error!"); }
-		virtual float4x4* getViewMatrixAry() const final { TINY_THROW("Fatal Error!"); }
-		virtual int32_t getViewMatrixArySize() const final { TINY_THROW("Fatal Error!"); }
+		float4x4& getViewMatrix(int32_t index) const override final { TINY_THROW("Fatal Error!"); }
+		float4x4* getViewMatrixAry() const override final { TINY_THROW("Fatal Error!"); }
+		int32_t getViewMatrixArySize() const override final { TINY_THROW("Fatal Error!"); }
 
-		void lookAt(Transform* transform) override;
+		void lookAt(const float3& worldPosition) override;
 
 	protected:
 		float4x4 mViewMatrix;
@@ -251,15 +251,15 @@ namespace tezcat::Tiny
 
 		void setViewMartixArray(float4x4* array, int32_t size);
 
-		virtual void submit(Shader* shader) override;
-		virtual void preRender() override;
+		void submit(Shader* shader) override;
+		void preRender() override;
 
 	public:
-		virtual float4x4& getViewMatrix() override final { TINY_THROW("Fatal Error!"); }
+		float4x4& getViewMatrix() override final { TINY_THROW("Fatal Error!"); }
 
-		virtual float4x4& getViewMatrix(int32_t index) const override { return mViewMatrixArray[index]; }
-		virtual float4x4* getViewMatrixAry() const override { return mViewMatrixArray; }
-		virtual int32_t getViewMatrixArySize() const override { return mArraySize; }
+		float4x4& getViewMatrix(int32_t index) const override { return mViewMatrixArray[index]; }
+		float4x4* getViewMatrixAry() const override { return mViewMatrixArray; }
+		int32_t getViewMatrixArySize() const override { return mArraySize; }
 
 	protected:
 		float4x4* mViewMatrixArray;
@@ -291,5 +291,5 @@ public:\
 	void setCullLayer(uint32_t index) { memberName->setCullLayer(index); }\
 	void addCullLayer(uint32_t index) { memberName->addCullLayer(index); }\
 	void removeCullLayer(uint32_t index) { memberName->removeCullLayer(index); }\
-	void lookAt(Transform* transform) { memberName->lookAt(transform); }
+	void lookAt(const float3& worldPosotion) { memberName->lookAt(worldPosotion); }
 }

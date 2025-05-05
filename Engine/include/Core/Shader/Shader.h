@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 #include "ShaderParam.h"
 #include "Uniform.h"
-#include "ShaderConfig.h"
+#include "ShaderReflection.h"
 
 #include "../Head/GLMHead.h"
 #include "../Base/TinyObject.h"
@@ -240,14 +240,15 @@ namespace tezcat::Tiny
 		//std::string mContent;
 
 	private:
-		void setupTinyUniform(ShaderUniformMember* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex = -1);
-		void setupUserUniformID(ShaderUniformMember* metaData, const std::string& name, const int& shaderID, const int& arrayIndex = -1);
+		void setupTinyUniform(ShaderMetaDataMember* metaData, const std::string& name, const uint32_t& index, const int& shaderID, const int& arrayIndex = -1);
+		void setupUserUniformID(ShaderMetaDataMember* metaData, const std::string& name, const int& shaderID, const int& arrayIndex = -1);
 
-		void registerTinyUniform(ShaderUniformMember* memberData);
-		void registerUserUniform(ShaderUniformMember* memberData);
+		void registerTinyUniform(ShaderMetaDataArgument* memberData);
+		void registerUserUniform(ShaderMetaDataArgument* memberData);
+		void registerGlobalUniform(ShaderMetaDataArgument* memberData);
 
-		void parseTinyUniform(ShaderUniformMember* memberData, const std::string& parentName);
-		void parseUserUniform(ShaderUniformMember* memberData, const std::string& parentName);
+		void parseTinyUniform(ShaderMetaDataArgument* memberData, const std::string& parentName);
+		void parseUserUniform(ShaderMetaDataArgument* memberData, const std::string& parentName);
 
 	protected:
 		std::string mName;
@@ -281,6 +282,7 @@ namespace tezcat::Tiny
 		DepthTestWrapper mDepthTest;
 
 	protected:
+		std::vector<UniformValueConfig*> mGlobalUniformArray;
 		std::vector<UniformValueConfig*> mTinyUniformList;
 		std::vector<UniformValueConfig*> mUserUniformValueConfigAry;
 		std::unordered_map<std::string_view, UniformValueConfig*> mUserUniformValueConfigMap;

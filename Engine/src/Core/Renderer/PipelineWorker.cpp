@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -129,6 +129,9 @@ namespace tezcat::Tiny
 		Graphics::getInstance()->bind(mShader);
 		Graphics::getInstance()->setPassState(mShader);
 		mRenderObserver->submit(mShader);
+		//GlobalSlotManager::submit(mShader);
+
+
 		switch (mShader->getLightMode())
 		{
 		case LightMode::Forward:
@@ -545,6 +548,7 @@ namespace tezcat::Tiny
 		{
 			pass = ObserverPipelinePass::create(mRenderObserver.get(), shader);
 			mPassTable[uid] = pass;
+			pass->saveObject();
 		}
 
 		pass->addToPipeline();
@@ -575,6 +579,12 @@ namespace tezcat::Tiny
 	void PipelineQueue::onExitPipeline()
 	{
 		Base::onExitPipeline();
+		for (auto pass : mRenderingPassArray)
+		{
+			pass->onExitPipeline();
+			pass->deleteObject();
+		}
+		mRenderingPassArray.clear();
 	}
 
 	void PipelineQueue::onEnterPipeline()
@@ -586,10 +596,16 @@ namespace tezcat::Tiny
 	void PipelineQueue::onClose()
 	{
 		Base::onClose();
-		for (auto pass : mRenderingPassArray)
+		this->onExitPipeline();
+
+		for (auto pass : mPassTable)
 		{
-			pass->removeFromPipeline();
-			pass->deleteObject();
+			if (pass)
+			{
+				TINY_ASSERT(pass->getRefCount() == 1);
+				pass->deleteObject();
+			}
 		}
+		mPassTable.clear();
 	}
 }

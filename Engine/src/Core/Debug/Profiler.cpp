@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ namespace tezcat::Tiny
 	std::vector<Profiler::PipelineInfo> Profiler::RenderInfoList;
 	int32_t Profiler::RenderInfoLayer = 0;
 	int32_t Profiler::CurrentRenderInfoLayer = 0;
-	int32_t Profiler::RenderInfoChecker = -1;
+	std::size_t Profiler::RenderInfoChecker = -1;
 	bool Profiler::EnableRenderInfo = false;
 
 	const unsigned char* Profiler::GPU;

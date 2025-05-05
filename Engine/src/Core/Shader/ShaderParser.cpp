@@ -5,21 +5,40 @@
 #include "ThirdParty/Hash/city.h"
 #include "Core/Manager/VertexBufferManager.h"
 
+#include "Core/Shader/ShaderParserRule.h"
+
 namespace tezcat::Tiny
 {
 	ShaderParser::ShaderParser()
-		: regex_remove_constraint(R"(\[\w+\(.*\)\]\s*)")
-		, regex_comment(R"(/\*[\s\S]*\*/|//.*)")
-		, end()
 	{
 
 	}
 
-	bool ShaderParser::splitConfig(const std::string& content, std::string& config, std::string& suffix, const char* regex)
+	void ShaderParser::parse(const std::string& path)
 	{
-		std::regex reg(regex);
+		auto root = file_path(path).parent_path().string();
+
+		auto content = FileTool::loadText(path);
+		this->removeComment(content);
+
+		this->parseHeader(content);
+		this->parseShaders(content, root);
+	}
+
+	void ShaderParser::parse(std::string& content, const std::string& path)
+	{
+		this->removeComment(content);
+		auto root = file_path(path).parent_path().string();
+
+		this->parseHeader(content);
+		this->parseShaders(content, root);
+	}
+
+	bool ShaderParser::splitConfig(const std::string& content, std::string& config, std::string& suffix, const std::regex& regex)
+	{
+		//std::regex reg(regex);
 		std::smatch result;
-		if (std::regex_search(content, result, reg))
+		if (std::regex_search(content, result, regex))
 		{
 			config = result[1];
 			suffix = result.suffix();
@@ -30,31 +49,24 @@ namespace tezcat::Tiny
 		return false;
 	}
 
-	bool ShaderParser::splitValue(std::string& content
-		, std::unordered_map<std::string, Any>& map)
+	bool ShaderParser::splitValue(std::string& content, std::unordered_map<std::string, Any>& map)
 	{
-		std::regex regex_empty(R"(\t|\r|\n)");
-		content = std::regex_replace(content, regex_empty, "");
+		content = std::regex_replace(content, ShaderParserRule::GetTabAndEnter, "");
 
-		std::regex regex_spliter(";");
-		std::sregex_token_iterator end;
-
-		std::regex regex_value_pair(R"((\w+)\s(\w+)\s=\s([\s\S]+))");
 		std::smatch value_pair_result;
-
 		std::string type, name, value, temp;
 
 		//0表示全匹配
 		//-1表示用匹配字符串(当前是;)当分隔符,分割原始字符串并保存,但是不保存匹配字符串(;)
 		//>0表示匹配并保存第x个字符串
-		for (auto i = std::sregex_token_iterator(content.begin(), content.end(), regex_spliter, -1); i != end; i++)
+		for (auto i = std::sregex_token_iterator(content.begin(), content.end(), ShaderParserRule::SpliterSemicolon, -1); i != ShaderParserRule::EndTokenIterator; i++)
 		{
-			temp.assign(std::move((*i).str()));
-			if (std::regex_search(temp, value_pair_result, regex_value_pair))
+			temp = std::move(i->str());
+			if (std::regex_search(temp, value_pair_result, ShaderParserRule::GetValueInfo))
 			{
-				type.assign(std::move(value_pair_result[1].str()));
-				name.assign(std::move(value_pair_result[2].str()));
-				value.assign(std::move(value_pair_result[3].str()));
+				type = std::move(value_pair_result[1].str());
+				name = std::move(value_pair_result[2].str());
+				value = std::move(value_pair_result[3].str());
 
 				if (type == "str")
 				{
@@ -81,7 +93,6 @@ namespace tezcat::Tiny
 					else
 					{
 						TINY_LOG_ERROR("ShaderParser: Shader Param [bool]`s string must [true] or [false]");
-						//throw std::logic_error("GLShader: Shader Param [bool]`s string must [true] or [false]");
 					}
 				}
 			}
@@ -92,37 +103,32 @@ namespace tezcat::Tiny
 
 	void ShaderParser::splitPasses(std::string& content, std::vector<std::string>& passArray)
 	{
-		std::regex pattern(R"(#TINY_PASS_BEGIN\s*\{\s*([\s\S]*?)\}\s*#TINY_PASS_END)");
 		std::sregex_iterator end;
-		for (auto i = std::sregex_iterator(content.begin(), content.end(), pattern); i != end; i++)
+		for (auto i = std::sregex_iterator(content.begin(), content.end(), ShaderParserRule::Tiny::GetPass); i != end; i++)
 		{
-			//UniformID::USet set;
-
-			std::string temp((*i)[1]);
-			passArray.push_back(std::move(temp));
+			//std::string temp(i->str(1));
+			passArray.emplace_back(std::move(i->str(1)));
 		}
 	}
 
 	std::string ShaderParser::getName(const std::string& textToSave)
 	{
-		std::regex rg_find_name(R"(#TINY_HEAD_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_HEAD_END)");
-		std::sregex_token_iterator it(textToSave.begin(), textToSave.end(), rg_find_name, 1);
-		std::string content(it->str());
-		std::unordered_map<std::string, Any> map;
-		ShaderParser::splitValue(content, map);
-		content = map["Name"].cast<std::string>();
-		
-		return content;
+		std::smatch result;
+		if (std::regex_search(textToSave, result, ShaderParserRule::Tiny::GetNameInHead))
+		{
+			return { std::move(result.str(1)) };
+		}
+
+		return {};
 	}
 
 	void ShaderParser::parseHeader(std::string& content)
 	{
-		std::regex regex(R"(#TINY_HEAD_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_HEAD_END)");
 		std::smatch result;
-		if (std::regex_search(content, result, regex))
+		if (std::regex_search(content, result, ShaderParserRule::Tiny::GetHead))
 		{
-			std::string temp = result[1];
-			content = result.suffix();
+			std::string temp(std::move(result.str(1)));
+			//content = result.suffix();
 			ShaderParser::splitValue(temp, mHeadUMap);
 		}
 	}
@@ -130,12 +136,12 @@ namespace tezcat::Tiny
 	void ShaderParser::parseShaders(std::string& content, std::string& rootPath)
 	{
 		std::string config, shader_content;
-		if (splitConfig(content, config, shader_content, R"(#TINY_CFG_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_CFG_END)"))
+		if (splitConfig(content, config, shader_content, ShaderParserRule::Tiny::GetConfig))
 		{
 			ShaderParser::splitValue(config, mConfigUMap);
 			if (!this->parseShader(shader_content
 				, rootPath
-				, R"(#TINY_VS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_VS_END)"
+				, ShaderParserRule::Tiny::GetVS
 				, mVertexShader))
 			{
 				TINY_LOG_ERROR("ShaderParser: Shader Format Error");
@@ -143,7 +149,7 @@ namespace tezcat::Tiny
 
 			if (!this->parseShader(shader_content
 				, rootPath
-				, R"(#TINY_FS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_FS_END)"
+				, ShaderParserRule::Tiny::GetFS
 				, mFragShader))
 			{
 				TINY_LOG_ERROR("ShaderParser: Shader Format Error");
@@ -151,7 +157,7 @@ namespace tezcat::Tiny
 
 			this->parseShader(shader_content
 				, rootPath
-				, R"(#TINY_GS_BEGIN\s*\{\s*([\s\S]*)\}\s*#TINY_GS_END)"
+				, ShaderParserRule::Tiny::GetGS
 				, mGeometryShader);
 		}
 		else
@@ -167,17 +173,17 @@ namespace tezcat::Tiny
 		//	删除注释
 		//	包括//型 和 /**/型
 		//
-		content = std::regex_replace(content, regex_comment, "");
+		content = std::regex_replace(content, ShaderParserRule::GetComment, "");
 	}
 
 	bool ShaderParser::parseShader(std::string& content
 		, std::string& rootPath
-		, const char* regex
+		, const std::regex& regex
 		, std::string& outContent)
 	{
-		std::regex regex_shader(regex);
+		//std::regex regex_shader(regex);
 		std::smatch result;
-		if (std::regex_search(content, result, regex_shader))
+		if (std::regex_search(content, result, regex))
 		{
 			std::string shader_content(result[1]);
 
@@ -203,69 +209,24 @@ namespace tezcat::Tiny
 		//	2.删除所有include
 		//	3.保存剩下的部分
 		//
-		std::regex regex_include(R"(#include\s*\"(\S+)\"\s*)");
-		//std::regex regex_comment(R"(/\*[\s\S]*\*/|//.*)");
-		//std::sregex_iterator end;
-
-		std::function<void(std::string&, std::unordered_set<uint64_t>&, std::vector<std::string>&, const file_path&)> parse =
-			[this, &parse, &regex_include](std::string& include_content
-				, std::unordered_set<uint64_t>& check_includes
-				, std::vector<std::string>& all_includes
-				, const file_path& rootPath)
-			{
-				//删除所有注释
-				this->removeComment(include_content);
-
-				//找出所有include
-				std::vector<std::string> include_heads;
-				for (auto struct_i = std::sregex_iterator(include_content.begin(), include_content.end(), regex_include); struct_i != end; struct_i++)
-				{
-					std::string include_name = (*struct_i)[1];
-					include_heads.emplace_back(std::move(include_name));
-				}
-
-				//如果有include
-				if (!include_heads.empty())
-				{
-					//遍历所有include 加载数据
-					for (auto& head_file_path : include_heads)
-					{
-						file_path sys_path(rootPath.string() + "/" + head_file_path);
-						auto content = FileTool::loadText(sys_path.string());
-						if (!content.empty())
-						{
-							auto hash_id = CityHash64(content.c_str(), content.size());
-							if (!check_includes.contains(hash_id))
-							{
-								check_includes.emplace(hash_id);
-								parse(content, check_includes, all_includes, sys_path.parent_path());
-							}
-						}
-					}
-				}
-
-				//删掉所有include
-				all_includes.emplace_back(std::move(std::regex_replace(include_content, regex_include, "")));
-			};
-
 		std::unordered_set<uint64_t> check_includes;
-		std::vector<std::string> all_includes;
-		std::vector<std::string> include_heads;
-		for (auto struct_i = std::sregex_iterator(content.begin(), content.end(), regex_include); struct_i != end; struct_i++)
+		std::vector<file_path> all_includes;
+		std::vector<file_path> include_heads;
+		for (auto struct_i = std::sregex_iterator(content.begin(), content.end(), ShaderParserRule::Tiny::GetIncludeFile); struct_i != ShaderParserRule::EndIterator; struct_i++)
 		{
-			std::string include_name = (*struct_i)[1];
+			file_path include_name(struct_i->str(1));
 			include_heads.emplace_back(std::move(include_name));
 		}
 
 		if (!include_heads.empty())
 		{
 			//删除所有include
-			content = std::regex_replace(content, regex_include, "");
+			content = std::regex_replace(content, ShaderParserRule::Tiny::GetIncludeFile, "");
 
 			//遍历所有include 加载数据
 			for (auto& head_file_path : include_heads)
 			{
-				file_path sys_path(rootPath + "/" + head_file_path);
+				file_path sys_path(rootPath / head_file_path);
 				auto content = FileTool::loadText(sys_path.string());
 				if (!content.empty())
 				{
@@ -273,7 +234,7 @@ namespace tezcat::Tiny
 					if (!check_includes.contains(hash_id))
 					{
 						check_includes.emplace(hash_id);
-						parse(content, check_includes, all_includes, sys_path.parent_path());
+						this->parseInclude(content, check_includes, all_includes, sys_path.parent_path());
 					}
 				}
 			}
@@ -284,7 +245,7 @@ namespace tezcat::Tiny
 			std::string data;
 			for (auto& s : all_includes)
 			{
-				data += s;
+				data += s.string();
 				data += "\n";
 			}
 
@@ -294,38 +255,52 @@ namespace tezcat::Tiny
 
 	void ShaderParser::splitUniformBuffer(std::string& content)
 	{
+		constexpr int32_t index_name = 2;
+		constexpr int32_t index_binding_index = 1;
+		constexpr int32_t index_values = 3;
 		//------------------------------------------------------------
 		//
 		// 分析Uniform Object
 		//
 		try
 		{
-			std::regex regex_uniform_object(R"(\[\s*Binding\s*=\s*(\d)\s*\]\s*layout\(std140\)\s+uniform\s+(\w+)\s*\{([\s\S]*?)\};)");
-			std::regex regex_remove_constraint(R"(\[\s*Binding\s*=\s*\d\s*\]\s)");
-			std::regex regex_split_value(R"(\w+\s+(\w+)[\[*\d\]]*;)");
-
 			std::string name;
-			for (auto uniform_object_i = std::sregex_iterator(content.begin(), content.end(), regex_uniform_object); uniform_object_i != end; uniform_object_i++)
+			for (auto uniform_object_i = std::sregex_iterator(content.begin(), content.end(), ShaderParserRule::UniformBuffer::GetOneBuffer); uniform_object_i != ShaderParserRule::EndIterator; uniform_object_i++)
 			{
-				name = (*uniform_object_i)[2];
-				auto [flag, buffer] = VertexBufferManager::createUniformBufferLayout(name);
-				if (flag)
-				{
-					buffer->mName = std::move(name);
-					buffer->mBindingIndex = std::stoi((*uniform_object_i)[1]);
+				auto layout_struct = std::make_unique<ShaderMetaDataLayoutStruct>();
+				layout_struct->initBindingAttribute();
 
-					std::string values = (*uniform_object_i)[3];
-					for (auto it = std::sregex_iterator(values.begin(), values.end(), regex_split_value); it != end; it++)
-					{
-						buffer->mSlot.emplace_back((*it)[1], -1, 0);
-						//buffer->pushLayout((*it)[1], -1, 0);
-						//buffer->members.emplace((*it)[1], -1);
-					}
+				layout_struct->name = uniform_object_i->str(index_name);
+				layout_struct->attributBinding->bindingIndex = std::stoi(uniform_object_i->str(index_binding_index));
+
+				std::string values(std::move(uniform_object_i->str(index_values)));
+				for (auto it = std::sregex_iterator(values.begin(), values.end(), ShaderParserRule::UniformBuffer::SplitValue); it != ShaderParserRule::EndIterator; it++)
+				{
+					//分析成员名称并记录
+					layout_struct->addMemeber(it->str(2), GraphicsConfig::UniformTypeUMap[it->str(1)]);
 				}
-				mUBOMap.emplace(buffer->mName, buffer->mBindingIndex);
+
+				//auto [flag, buffer] = VertexBufferManager::createUniformBufferLayout(name);
+				//if (flag)
+				//{
+				//	buffer->mName = std::move(name);
+				//	buffer->mBindingIndex = std::stoi(uniform_object_i->str(index_binding_index));
+				//
+				//	//得到类中的所有成员
+				//	std::string values(std::move(uniform_object_i->str(index_values)));
+				//	for (auto it = std::sregex_iterator(values.begin(), values.end(), ShaderParserRule::UniformBuffer::SplitValue); it != ShaderParserRule::EndIterator; it++)
+				//	{
+				//		//分析成员名称并记录
+				//		buffer->mSlot.emplace_back(it->str(1), -1, 0);
+				//		auto member = std::make_shared<ShaderMetaDataMember>();
+				//		member->name = it->str(1);
+				//		layout_struct->memberMap.emplace(member->name, member);
+				//	}
+				//}
+				mUBOMap.emplace(layout_struct->name, std::move(layout_struct));
 			}
 
-			content = std::regex_replace(content, regex_remove_constraint, "");
+			content = std::regex_replace(content, ShaderParserRule::UniformBuffer::GetProperty, "");
 		}
 		catch (const std::regex_error& e)
 		{
@@ -339,154 +314,90 @@ namespace tezcat::Tiny
 
 	void ShaderParser::splitStruct(std::string& content)
 	{
-		//------------------------------------------------------------
-		//
-		// 分析struct中的arguments
-		//
-		//struct Name的解析规则
-		//没有+后面的?就会进入贪婪模式匹配到所有struct甚至一堆无用的数据
-		std::regex regex_struct(R"(struct\s+(\w+)\s*\{([\w\W]+?)\s*\};)");
-		//解析带约束的argument
-		std::regex regex_constraint_argument(R"((?:(\[\w+\(.*\)\])\s*)*(\w+)\s+(\w+)\[?(\d*)\]?[\s\S]*?;)");
-		//解析约束
-		std::regex regex_constraint(R"(\[(\w+\(.*?\))\]\s*)");
-		//解析约束的名称和值
-		std::regex regex_constraint_name_value(R"((\w+)\((.*)\))");
-		//解析约束的值
-		std::regex regex_constraint_value(R"((\w+)\s*,?\s*(.*))");
-		//移除约束条件
-		//std::regex regex_remove_constraint(R"(\[\w+\(.*\)\]\s*)");
-		//移除空白
-		std::regex regex_space(R"(\s)");
-
-		auto progress_constraint = [&regex_constraint_name_value, &regex_constraint_value, &regex_constraint, &regex_space]
-		(const std::ssub_match& match_constraints, UniformType& utype)
-			{
-				std::smatch match_constraint;
-				std::regex_match(match_constraints.first, match_constraints.second, match_constraint, regex_constraint);
-
-				//解析约束的名称和内容
-				std::smatch match_constraint_name_value;
-				std::regex_match(match_constraint[1].first, match_constraint[1].second, match_constraint_name_value, regex_constraint_name_value);
-				//std::string constraint_name = match_constraint_name_value[1];
-				//std::string constraint_value = match_constraint_name_value[2];
-
-				//解析约束值的类型
-				std::smatch match_constraint_value;
-				std::regex_match(match_constraint_name_value[2].first, match_constraint_name_value[2].second, match_constraint_value, regex_constraint_value);
-				std::string show_name = match_constraint_value[1];
-				std::string range = match_constraint_value[2];
-
-				//删除空白
-				show_name = std::regex_replace(show_name, regex_space, "");
-				range = std::regex_replace(range, regex_space, "");
-
-				ShaderMemberConstraint constraint = ShaderMemberConstraint::Null;
-				size_t pos;
-				std::shared_ptr<BaseRange> rangePtr;
-				if ((pos = range.find_first_of("Range")) != range.npos)
-				{
-					constraint = ShaderMemberConstraint::Range;
-
-					range = range.substr(pos + 5, range.size() - pos);
-					range.erase(range.begin());
-					range.erase(range.end() - 1);
-
-					pos = range.find_first_of(',');
-					std::string min = range.substr(0, pos);
-					std::string max = range.substr(pos + 1, range.size() - pos - 1);
-
-					switch (utype)
-					{
-					case UniformType::Float:
-					case UniformType::Float2:
-					case UniformType::Float3:
-					case UniformType::Float4:
-						rangePtr.reset(new RangeFloat{ std::stof(min), std::stof(max) });
-						break;
-					case UniformType::Int:
-					case UniformType::Int2:
-					case UniformType::Int3:
-					case UniformType::Int4:
-						rangePtr.reset(new RangeInt{ std::stoi(min), std::stoi(max) });
-						break;
-					case UniformType::UInt:
-					case UniformType::UInt2:
-					case UniformType::UInt3:
-					case UniformType::UInt4:
-						rangePtr.reset(new RangeUInt{ std::stoul(min), std::stoul(max) });
-						break;
-					default:
-						break;
-					}
-				}
-				else if ((pos = range.find_first_of("Color")) != range.npos)
-				{
-					constraint = ShaderMemberConstraint::Color;
-				}
-				else
-				{
-					rangePtr.reset(new RangeFloat{ 0.0f, 0.0f });
-				}
-
-				return std::tuple{ show_name, constraint, rangePtr };
-			};
-
-		//分析struct
-		for (auto struct_i = std::sregex_iterator(content.begin(), content.end(), regex_struct); struct_i != end; struct_i++)
+		//分析并记录所有的struct
+		//以供在后续解析中查找
+		for (auto struct_i = std::sregex_iterator(content.begin(), content.end(), ShaderParserRule::Struct::GetOneStruct); struct_i != ShaderParserRule::EndIterator; struct_i++)
 		{
-			std::shared_ptr<ShaderUniformMember> meta_data(new ShaderUniformMember());
-			auto struct_info = meta_data->createInfo<ShaderStructInfo>(UniformType::Struct);
-			struct_info->structName = (*struct_i)[1];
-			meta_data->valueName = (*struct_i)[1];
-			mStructUMap[meta_data->valueName] = meta_data;
+			auto meta_data_struct = std::make_unique<ShaderMetaDataStruct>();
+			meta_data_struct->structType = (*struct_i)[1];
 
 			//分析argument pair
 			auto& struct_match = (*struct_i)[2];
+			std::string arg_type, arg_name, arg_count;
 
-			for (auto argument_i = std::sregex_iterator(struct_match.first, struct_match.second, regex_constraint_argument); argument_i != end; argument_i++)
+			for (auto argument_i = std::sregex_iterator(struct_match.first, struct_match.second, ShaderParserRule::Struct::GetMemberValue); argument_i != ShaderParserRule::EndIterator; argument_i++)
 			{
-				std::string arg_type = (*argument_i)[2];
-				std::string arg_name = (*argument_i)[3];
-				std::string arg_count = (*argument_i)[4];
-				int array_count = 0;
-				if (!arg_count.empty())
-				{
-					array_count = std::stoi(arg_count);
-				}
-
-				std::shared_ptr<ShaderUniformMember> member(new ShaderUniformMember());
-				member->valueName = arg_name;
-				member->valueCount = array_count;
+				arg_type = argument_i->str(2);
 
 				auto it = GraphicsConfig::UniformTypeUMap.find(arg_type);
 				if (it != GraphicsConfig::UniformTypeUMap.end())
 				{
-					auto [show_name, constraint, rangePtr] = progress_constraint((*argument_i)[1], it->second);
+					arg_name = argument_i->str(3);
+					arg_count = argument_i->str(4);
+					int array_count = 0;
+					if (!arg_count.empty())
+					{
+						array_count = std::stoi(arg_count);
+					}
 
-					auto member_info = member->createInfo<ShaderMemberInfo>(it->second);
-					member_info->editorName = show_name;
-					member_info->constraint = constraint;
-					member_info->range = rangePtr;
+					auto member = meta_data_struct->addMemeber(arg_name, it->second);
+					member->arrayCount = array_count;
+					if (((*argument_i)[1]).matched)
+					{
+						std::string attributes_str = std::regex_replace(argument_i->str(1), ShaderParserRule::GetBlank, "");
+						this->parseAttribute(attributes_str, member);
+					}
 				}
 				else
 				{
-					auto member_info = member->createInfo<ShaderStructInfo>(UniformType::Struct);
-					member_info->structName = arg_type;
+					auto _struct = meta_data_struct->addStruct(arg_name);
+					_struct->structType = arg_type;
 				}
 
-				//[name,type]
-				struct_info->members.emplace_back(member);
 			}
+
+			mStructUMap[meta_data_struct->structType] = std::move(meta_data_struct);
 		}
 
-		//------------------------------------------------------------
-		//
-		// 分析Uniform
-		//
-		std::regex regex_uniform(R"((?:(\[\w+\(.*\)\])\s*)*uniform\s+(\w+)\s+(\w+)\[?(\d*)\]?[\s\S]*?;)");
+		this->parseUniformValue(content);
 
-		for (auto uniform_i = std::sregex_iterator(content.begin(), content.end(), regex_uniform); uniform_i != end; uniform_i++)
+		//删除约束
+		content = std::regex_replace(content, ShaderParserRule::GetAllAttribute, "");
+	}
+
+	void ShaderParser::parseAttribute(const std::string& attributeMatch, ShaderMetaDataMember* member)
+	{
+		for (auto i = std::regex_iterator(attributeMatch.begin(), attributeMatch.end(), ShaderParserRule::GetOneAttribute); i != ShaderParserRule::EndIterator; i++)
+		{
+			std::string attribute_type = i->str(1);
+			auto& attribute_value = (*i)[2];
+
+			if (attribute_type == "Editor")
+			{
+				this->parseEditorAttribute(attribute_value, member);
+			}
+			else if (attribute_type == "Register")
+			{
+				auto attribute = std::make_unique<ShaderAttributeRegister>();
+
+				std::smatch match_attribute_value;
+				std::regex_match(attribute_value.first, attribute_value.second, match_attribute_value, ShaderParserRule::Uniform::GetAttributeValue);
+				std::string type = match_attribute_value[1];
+				if (type == "GlobalSlot")
+				{
+					attribute->globalIndex = std::stoi(match_attribute_value[2]);
+				}
+
+				member->attributeRegister = std::move(attribute);
+
+				//mGlobalUniform.push_back(member);
+			}
+		}
+	}
+
+	void ShaderParser::parseUniformValue(std::string& content)
+	{
+		for (auto uniform_i = std::sregex_iterator(content.begin(), content.end(), ShaderParserRule::Uniform::GetOneUniform); uniform_i != ShaderParserRule::EndIterator; uniform_i++)
 		{
 			auto& uniform_match_type = (*uniform_i)[2];
 			auto& uniform_match_name = (*uniform_i)[3];
@@ -506,88 +417,170 @@ namespace tezcat::Tiny
 			//如果是结构类型,转到处理结构类型的方式
 			if (it != mStructUMap.end())
 			{
-				std::shared_ptr<ShaderUniformMember> uniform_value = std::make_shared<ShaderUniformMember>();
-				auto uniform_info = uniform_value->createInfo<ShaderStructInfo>(it->second->valueType);
-				uniform_value->valueName = uniform_match_name;
-				uniform_value->valueCount = array_count;
+				//结构数据
+				auto& ptr = it->second;
+				//创建当前
+				auto uniform_value = std::make_unique<ShaderMetaDataStruct>();
+				uniform_value->structType = ptr->structType;
+				uniform_value->name = uniform_match_name;
+				uniform_value->arrayCount = array_count;
 
-				uniform_info->structName = it->second->getInfo<ShaderStructInfo>()->structName;
-				auto& members = it->second->getInfo<ShaderStructInfo>()->members;
-				uniform_info->members.assign(members.begin(), members.end());
 
-				if (uniform_value->valueName.starts_with("TINY_"))
+				//auto& members = ptr->getMembers();
+				uniform_value->copyMembers(ptr.get());
+
+				if (uniform_value->name.starts_with("TINY_"))
 				{
-					mTinyUMap.emplace(uniform_value->valueName, uniform_value);
+					mTinyUMap.emplace(uniform_value->name, std::move(uniform_value));
 				}
 				else
 				{
-					mUserUMap.emplace(uniform_value->valueName, uniform_value);
+					mUserUMap.emplace(uniform_value->name, std::move(uniform_value));
 				}
 			}
 			else
 			{
-				std::shared_ptr<ShaderUniformMember> uniform_value = std::make_shared<ShaderUniformMember>();
-				auto uniform_info = uniform_value->createInfo<ShaderMemberInfo>(GraphicsConfig::UniformTypeUMap[uniform_match_type]);
-				uniform_value->valueName = uniform_match_name;
-				uniform_value->valueCount = array_count;
+				auto uniform_value = std::make_unique<ShaderMetaDataMember>();
+				uniform_value->name = uniform_match_name;
+				uniform_value->arrayCount = array_count;
+				uniform_value->valueType = GraphicsConfig::UniformTypeUMap[uniform_type];
 
-				auto [show_name, constraint, rangePtr] = progress_constraint((*uniform_i)[1], uniform_value->valueType);
+				if (((*uniform_i)[1]).matched)
+				{
+					std::string attributes_str = std::regex_replace(uniform_i->str(1), ShaderParserRule::GetBlank, "");
+					this->parseAttribute(attributes_str, uniform_value.get());
+				}
+				//this->parseAttribute((*uniform_i)[1], uniform_value.get());
 
-				uniform_info->editorName = show_name;
-				uniform_info->constraint = constraint;
-				uniform_info->range = rangePtr;
-
-				if (uniform_value->valueName.starts_with("TINY_"))
+				if (uniform_value->name.starts_with("TINY_"))
 				{
 					//组合struct中的uniform
-					mTinyUMap.emplace(uniform_value->valueName, uniform_value);
+					mTinyUMap.emplace(uniform_value->name, std::move(uniform_value));
 				}
 				else
 				{
-					mUserUMap.emplace(uniform_value->valueName, uniform_value);
+					mUserUMap.emplace(uniform_value->name, std::move(uniform_value));
+				}
+			}
+		}
+	}
+
+	void ShaderParser::parseInclude(std::string& include_content
+		, std::unordered_set<uint64_t>& check_includes
+		, std::vector<file_path>& all_includes
+		, const file_path& rootPath)
+	{
+		//删除所有注释
+		this->removeComment(include_content);
+
+		//找出所有include
+		std::vector<std::string> include_heads;
+		for (auto struct_i = std::sregex_iterator(include_content.begin(), include_content.end(), ShaderParserRule::Tiny::GetIncludeFile); struct_i != ShaderParserRule::EndIterator; struct_i++)
+		{
+			std::string include_name = (*struct_i)[1];
+			include_heads.emplace_back(std::move(include_name));
+		}
+
+		//如果有include
+		if (!include_heads.empty())
+		{
+			//遍历所有include 加载数据
+			for (auto& head_file_path : include_heads)
+			{
+				file_path sys_path(rootPath / head_file_path);
+				auto content = FileTool::loadText(sys_path);
+				if (!content.empty())
+				{
+					auto hash_id = CityHash64(content.c_str(), content.size());
+					if (!check_includes.contains(hash_id))
+					{
+						check_includes.emplace(hash_id);
+						this->parseInclude(content, check_includes, all_includes, sys_path.parent_path());
+					}
 				}
 			}
 		}
 
-		//删除约束
-		content = std::regex_replace(content, regex_remove_constraint, "");
+		//删掉所有include
+		all_includes.emplace_back(std::move(std::regex_replace(include_content, ShaderParserRule::Tiny::GetIncludeFile, "")));
 	}
 
-	void ShaderParser::writeShaderHead(std::string& content)
+	void ShaderParser::parseEditorAttribute(const std::ssub_match& attributeMatch, ShaderMetaDataMember* member)
 	{
-		//------------------------------------------------------
-		//
-		//	写入shader头
-		//
-		//content.insert(0, "#pragma optimize(off)\n");
+		auto attribute = std::make_unique<ShaderAttributeEditor>();
 
-		content = std::format("#version {} core\n", mConfigUMap["Version"].cast<int>()) + content;
+		//解析约束值的类型
+		std::string type, context;
+		for (auto i = std::regex_iterator(attributeMatch.first, attributeMatch.second, ShaderParserRule::Attribute::GetOneAttributeData); i != ShaderParserRule::EndIterator; i++)
+		{
+			type = i->str(1);
+			if (type == "Name")
+			{
+				attribute->editorName = i->str(2);
+				continue;
+			}
 
-		//content.insert(0, " core\n");
-		//content.insert(0, std::to_string(mConfigUMap["Version"].cast<int>()));
-		//content.insert(0, "#version ");
+			if (type == "Range")
+			{
+				context = i->str(2);
+				attribute->rangeType = RangeType::Number;
+				std::smatch match_range;
+				std::regex_search(context, match_range, ShaderParserRule::Attribute::GetRangeValue);
+				std::string min = match_range.str(1);
+				std::string max = match_range.str(2);
+
+				switch (member->valueType)
+				{
+				case UniformType::Float:
+				case UniformType::Float2:
+				case UniformType::Float3:
+				case UniformType::Float4:
+				{
+					//float fmin = 0, fmax = 0;
+					//std::from_chars(min.data(), min.data() + min.size(), fmin);
+					//std::from_chars(max.data(), max.data() + max.size(), fmax);
+					attribute->range.reset(new RangeFloat{ std::stof(min), std::stof(max) });
+					break;
+				}
+				case UniformType::Int:
+				case UniformType::Int2:
+				case UniformType::Int3:
+				case UniformType::Int4:
+				{
+					//int32_t fmin = 0, fmax = 0;
+					//std::from_chars(min.data(), min.data() + min.size(), fmin);
+					//std::from_chars(max.data(), max.data() + max.size(), fmax);
+					attribute->range.reset(new RangeInt{ std::stoi(min), std::stoi(max) });
+					break;
+				}
+				case UniformType::UInt:
+				case UniformType::UInt2:
+				case UniformType::UInt3:
+				case UniformType::UInt4:
+				{
+					//uint32_t fmin = 0, fmax = 0;
+					//std::from_chars(min.data(), min.data() + min.size(), fmin);
+					//std::from_chars(max.data(), max.data() + max.size(), fmax);
+					attribute->range.reset(new RangeUInt{ std::stoul(min), std::stoul(max) });
+					break;
+				}
+				default:
+					//attribute->range.reset(new RangeFloat{ 0, 0 });
+					break;
+				}
+
+				continue;
+			}
+
+			if(type == "Color")
+			{
+				attribute->rangeType = RangeType::Color;
+				continue;
+			}
+		}
+
+		member->attributeEditor = std::move(attribute);
 	}
-
-	void ShaderParser::parse(const std::string& path)
-	{
-		auto root = file_path(path).parent_path().string();
-
-		auto content = FileTool::loadText(path);
-		this->removeComment(content);
-
-		this->parseHeader(content);
-		this->parseShaders(content, root);
-	}
-
-	void ShaderParser::parse(std::string& content, const std::string& path)
-	{
-		this->removeComment(content);
-		auto root = file_path(path).parent_path().string();
-
-		this->parseHeader(content);
-		this->parseShaders(content, root);
-	}
-
 	void ShaderParser::updateShaderConfig(Shader* shader)
 	{
 		for (auto& pair : mTinyUMap)
@@ -599,6 +592,29 @@ namespace tezcat::Tiny
 		for (auto& pair : mUserUMap)
 		{
 			shader->registerUserUniform(pair.second.get());
+		}
+
+		for (auto& pair : mUBOMap)
+		{
+			auto [flag, buffer] = VertexBufferManager::createUniformBufferLayout(pair.first.data());
+			if (flag == FlagCreate::Succeeded)
+			{
+				auto& attribute = pair.second;
+				buffer->mName = attribute->name;
+				buffer->mBindingIndex = attribute->attributBinding->bindingIndex;
+				for (auto& member : attribute->getMembers())
+				{
+					buffer->mSlot.emplace_back(member->name, -1, 0);
+				}
+			}
+		}
+
+		for (auto global : mGlobalUniform)
+		{
+			//auto info = global->getInfo<ShaderMemberInfo>();
+			//auto index = info->attributeRegister->globalIndex;
+			//GlobalSlotManager::registerSlot();
+			//shader->registerGlobalUniform(index, )
 		}
 
 		shader->setName(mHeadUMap["Name"].cast<std::string>());
@@ -679,5 +695,17 @@ namespace tezcat::Tiny
 			shader->setCullFace(GraphicsConfig::CullFaceMap[it->second.cast<std::string>()]);
 		}
 	}
+
+	void ShaderParser::writeShaderHead(std::string& content)
+	{
+		//------------------------------------------------------
+		//
+		//	写入shader头
+		//
+		//content.insert(0, "#pragma optimize(off)\n");
+
+		content = std::format("#version {} core\n{}", mConfigUMap["Version"].cast<int>(), content);
+	}
+
 }
 

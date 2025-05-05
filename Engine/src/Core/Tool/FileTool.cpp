@@ -101,7 +101,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	std::string FileTool::loadText(const std::string& path)
+	std::string FileTool::loadText(const file_path& path)
 	{
 		std::string data;
 		std::fstream io(path, std::ios::in | std::ios::binary);
@@ -115,7 +115,7 @@ namespace tezcat::Tiny
 		return data;
 	}
 
-	void FileTool::saveFile(const std::string& path, std::string& data)
+	void FileTool::saveFile(const file_path& path, std::string& data)
 	{
 		std::fstream io(path, std::ios::out | std::ios::binary);
 		if (io.is_open())

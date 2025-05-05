@@ -1,6 +1,6 @@
 ﻿#pragma once
 /*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -44,6 +44,8 @@ namespace tezcat::Editor
 
 		static ValueConfig* getValueConfig(const UniformID& ID);
 		static void clearOnPopScene();
+		static void changeScene(Scene* scene);
+		static void closeScene();
 
 		static void matrix4(glm::mat4& mat4);
 		static void transform(glm::vec3& position, glm::vec3& rotation, glm::vec3& scale);
@@ -115,6 +117,8 @@ namespace tezcat::Editor
 		static ReplacedPipelinePass* mShowMeshFramePass;
 		static ReplacedPipelinePass* mShowSelectedObjectPass;
 		static ReplacedPipelinePass* mShadowPass;
+		static Scene* mNewScene;
+		static bool mCloseScene;
 	};
 
 #define TINY_EDITOR_WINDOW_INSTANCE_H(class_name)\

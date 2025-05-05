@@ -10,6 +10,7 @@
     {
         int Version = 330;
         int OrderID = 0;
+        str Queue = Post;
         bool Blend = true;
         str BlendSrc = 1;
         str BlendTar = 0;

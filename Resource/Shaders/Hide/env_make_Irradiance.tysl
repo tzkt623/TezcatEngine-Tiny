@@ -68,7 +68,7 @@
                     // tangent space to world
                     float3 samplefloat = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N; 
 
-                    irradiance += texture(TINY_TexSkybox, samplefloat).rgb * cos(theta) * sin(theta);
+                    irradiance += texture(TINY_SkyBox_TexCube, samplefloat).rgb * cos(theta) * sin(theta);
                     nrSamples++;
                 }
             }

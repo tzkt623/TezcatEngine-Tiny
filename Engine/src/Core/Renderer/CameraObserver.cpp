@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ namespace tezcat::Tiny
 	{
 		if (mUniformBuffer)
 		{
-			Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
+			Graphics::getInstance()->updateUniformBuffer(mUniformBuffer);
 			Graphics::getInstance()->bind(mUniformBuffer);
 		}
 	}

@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 #include "Core/Tool/FileTool.h"
 
-#include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/RenderCommand.h"
 
 #include "Core/Debug/Debug.h"
@@ -49,7 +48,7 @@ namespace tezcat::Tiny
 	{
 		for (auto& pair : mShaderUMap)
 		{
-			Graphics::getInstance()->addCommand(new RenderCMD_RebuildShader(pair.second));
+			RenderCommandHelper::addCommand(new RenderCMD_RebuildShader(pair.second));
 		}
 	}
 
@@ -59,7 +58,7 @@ namespace tezcat::Tiny
 		if (it != mShaderUMap.end())
 		{
 			it->second->mContent = std::make_unique<std::string>(std::move(data));
-			Graphics::getInstance()->addCommand<RenderCMD_RebuildShader>(it->second);
+			RenderCommandHelper::addCommand<RenderCMD_RebuildShader>(it->second);
 		}
 	}
 

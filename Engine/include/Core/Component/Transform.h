@@ -111,7 +111,7 @@ namespace tezcat::Tiny
 		void setWorldPosition(const float3& world);
 		void setWorldRotation(const float3& worldRotation);
 
-		float3 getWorldRotation();
+		float3 getWorldRotation() const;
 		float3 getWorldPosition() const { return mModelMatrix[3]; }
 		float3 getWorldScale() const;
 
@@ -130,26 +130,26 @@ namespace tezcat::Tiny
 
 	public:
 		//转换一个点到世界坐标,受位移,缩放,旋转影响
-		void transformPoint(const float3& local, float3& world);
+		void transformPoint(const float3& local, float3& world) const;
 		//转换一个向量到世界坐标,受缩放和旋转影响
-		void transformVector(const float3& local, float3& world);
+		void transformVector(const float3& local, float3& world) const;
 		//转换一个旋转到世界坐标,不受缩放和位移影响
-		void transformRotation(const float3& local, float3& world);
+		void transformRotation(const float3& local, float3& world) const;
 		//转换一个朝向到世界坐标,不受缩放影响
-		void transformDirection(const float3& local, float3& world);
+		void transformDirection(const float3& local, float3& world) const;
 		//转换一个缩放到世界坐标,不受旋转和位移影响
-		void transformScale(const float3& local, float3& world);
+		void transformScale(const float3& local, float3& world) const;
 
 		//转化一个点到局部坐标,受位移,缩放,旋转影响
-		void inverseTransformPoint(const float3& world, float3& local);
+		void inverseTransformPoint(const float3& world, float3& local) const;
 		//转化一个向量到局部坐标,受缩放和旋转影响
-		void inverseTransformVector(const float3& world, float3& local);
+		void inverseTransformVector(const float3& world, float3& local) const;
 		//转化一个旋转到局部坐标,不受缩放和位移影响
-		void inverseTransformRotation(const float3& world, float3& local);
+		void inverseTransformRotation(const float3& world, float3& local) const;
 		//转换一个方向到局部坐标,不受缩放影响
-		void inverseTransformDirection(const float3& world, float3& local);
+		void inverseTransformDirection(const float3& world, float3& local) const;
 		//转换一个缩放到局部坐标,不受旋转和位移影响
-		void inverseTransformScale(const float3& world, float3& local);
+		void inverseTransformScale(const float3& world, float3& local) const;
 
 	private:
 		void calculatePureLocalToWorldRotationMatrix(float3x3& outMatrix);

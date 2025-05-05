@@ -14,7 +14,6 @@ namespace tezcat::Tiny
 	{
 	public:
 		InputSystem();
-
 		void push(Inputer* inputer);
 		void pop();
 		Inputer* currentInputer() { return mInputerStack.top(); }

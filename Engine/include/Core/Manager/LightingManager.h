@@ -1,6 +1,6 @@
 ﻿#pragma once
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -88,6 +88,8 @@ namespace tezcat::Tiny
 			return (sLightData != nullptr) && (sLightData->directionalLight != nullptr);
 		}
 
+		static void loadSkyboxHDR(const file_path& path);
+
 	public:
 		//-----------------------------------------
 		//
@@ -97,7 +99,7 @@ namespace tezcat::Tiny
 		static void submitEnvLighting(Shader* shader);
 		static void setSkyBoxHDRTexture(Image* image);
 		static Texture2D* getSkyBoxHDRTexture() { return sTexHDR; }
-		static auto getCubeMapTextureArray() { return sCubeTextures; }
+		static const std::array<Texture2D*, 6>& getCubeMapTextureArray() { return sCubeTextures; }
 
 	public:
 		static void enableSkyBox() { sEnableSkyBox = true; }
@@ -130,7 +132,8 @@ namespace tezcat::Tiny
 		static Texture2D* sBRDFLUTMap;
 
 		static Texture2D* sTexHDR;
-		static Texture2D* sCubeTextures[6];
+		//static Texture2D* sCubeTextures[6];
+		static std::array<Texture2D*, 6> sCubeTextures;
 
 		Shader* mSkyboxShader;
 		static Vertex* sSkyboxVertex;

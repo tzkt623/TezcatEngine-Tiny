@@ -8,6 +8,7 @@
 #include "Tutorial_FrameBuffer.h"
 #include "Tutorial_Lighting.h"
 #include "Tutorial_Normal.h"
+#include "Tutorial_Skybox.h"
 
 class SceneHelper
 {
@@ -21,5 +22,6 @@ public:
 		Tutorial_Normal::create("Tutorial Normal")->prepare();
 		Tutorial_FrameBuffer::create("Tutorial FrameBuffer")->prepare();
 		Tutorial_Lighting::create("Tutorial Lighting")->prepare();
+		Tutorial_Skybox::create("Tutorial Skybox")->prepare();
 	}
 };

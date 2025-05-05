@@ -12,10 +12,9 @@
         int OrderID = 0;
         str LightMode = Forward;
         str Queue = Opaque;
-        str DepthTest = Less;
+        str DepthTest = LessEqual;
         bool ZWrite = true;
         str CullFace = Back;
-        bool Blend = false;
     }
     #TINY_CFG_END
 

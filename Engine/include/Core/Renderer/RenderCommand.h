@@ -1,6 +1,6 @@
 ﻿#pragma once
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -53,6 +53,33 @@ namespace tezcat::Tiny
 		Normal,
 		Build,
 		Draw
+	};
+
+
+
+	class RenderCommadBuild;
+
+	template <typename CMD>
+	concept RequireRenderBuildCommand = std::is_convertible_v<CMD*, RenderCommadBuild*>;
+
+	class RenderCommandHelper
+	{
+		friend class BaseGraphics;
+	public:
+		static void addCommand(RenderCommadBuild* cmd)
+		{
+			BuildCMDList->push_back(cmd);
+		}
+
+		template<RequireRenderBuildCommand CMD, typename... Args>
+		static void addCommand(Args&&... args)
+		{
+			BuildCMDList->push_back(new CMD(TINY_FWD(args)...));
+		}
+
+	private:
+		static void setBuildCMDList(std::vector<RenderCommadBuild*>* cmdList);
+		static std::vector<RenderCommadBuild*>* BuildCMDList;
 	};
 
 	class RenderCommand

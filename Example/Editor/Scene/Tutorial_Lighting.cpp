@@ -44,7 +44,7 @@ void Tutorial_Lighting::onEnter()
 	{
 		GameObject* go = GameObject::create("Lambert");
 		auto transform_cube = go->addComponent<Transform>();
-		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setScale(10.0f, 10.0f, 10.0f);
 		transform_cube->setPosition(0.0f, 0.0f, 0.0f);
 
 		auto mr = go->addComponent<MeshRenderer>();
@@ -58,8 +58,8 @@ void Tutorial_Lighting::onEnter()
 	{
 		GameObject* go = GameObject::create("LambertHalf");
 		auto transform_cube = go->addComponent<Transform>();
-		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
-		transform_cube->setPosition(2.0f, 0.0f, 0.0f);
+		transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(20.0f, 0.0f, 0.0f);
 
 		auto mr = go->addComponent<MeshRenderer>();
 		mr->setMesh("Sphere");
@@ -72,8 +72,8 @@ void Tutorial_Lighting::onEnter()
 	{
 		GameObject* go = GameObject::create("Phong");
 		auto transform_cube = go->addComponent<Transform>();
-		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
-		transform_cube->setPosition(4.0f, 0.0f, 0.0f);
+		transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(40.0f, 0.0f, 0.0f);
 
 		auto mr = go->addComponent<MeshRenderer>();
 		mr->setMesh("Sphere");
@@ -87,8 +87,8 @@ void Tutorial_Lighting::onEnter()
 	{
 		GameObject* go = GameObject::create("BlinnPhong");
 		auto transform_cube = go->addComponent<Transform>();
-		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
-		transform_cube->setPosition(6.0f, 0.0f, 0.0f);
+		transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(60.0f, 0.0f, 0.0f);
 
 		auto mr = go->addComponent<MeshRenderer>();
 		mr->setMesh("Sphere");
@@ -102,8 +102,8 @@ void Tutorial_Lighting::onEnter()
 	{
 		GameObject* go = GameObject::create("Fresnel");
 		auto transform_cube = go->addComponent<Transform>();
-		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
-		transform_cube->setPosition(0.0f, 2.0f, 0.0f);
+		transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(0.0f, 20.0f, 0.0f);
 
 		auto mr = go->addComponent<MeshRenderer>();
 		mr->setMesh("Sphere");
@@ -116,8 +116,8 @@ void Tutorial_Lighting::onEnter()
 	{
 		GameObject* go = GameObject::create("SpecularNormalDistribution");
 		auto transform_cube = go->addComponent<Transform>();
-		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
-		transform_cube->setPosition(2.0f, 2.0f, 0.0f);
+		transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(20.0f, 20.0f, 0.0f);
 
 		auto mr = go->addComponent<MeshRenderer>();
 		mr->setMesh("Sphere");
@@ -130,8 +130,8 @@ void Tutorial_Lighting::onEnter()
 	{
 		GameObject* go = GameObject::create("SpecularGeometry");
 		auto transform_cube = go->addComponent<Transform>();
-		//transform_cube->setScale(10.0f, 10.0f, 10.0f);
-		transform_cube->setPosition(4.0f, 2.0f, 0.0f);
+		transform_cube->setScale(10.0f, 10.0f, 10.0f);
+		transform_cube->setPosition(40.0f, 20.0f, 0.0f);
 
 		auto mr = go->addComponent<MeshRenderer>();
 		mr->setMesh("Sphere");

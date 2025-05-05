@@ -12,7 +12,7 @@ namespace tezcat::Editor
 		mShaderValueFunctionArray[(int32_t)UniformType::Bool] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
 			{
 				auto f1 = (UniformI1*)uniform;
-				ImGui::Text(config->editorName.c_str());
+				ImGui::Text(config->editorName.data());
 				ImGui::PushID(id);
 				ImGui::SetNextItemWidth(-FLT_MIN);
 				bool v = f1->value;
@@ -28,7 +28,7 @@ namespace tezcat::Editor
 		mShaderValueFunctionArray[(int32_t)UniformType::Int] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
 			{
 				auto f1 = (UniformI1*)uniform;
-				ImGui::Text(config->editorName.c_str());
+				ImGui::Text(config->editorName.data());
 				ImGui::PushID(id);
 				ImGui::SetNextItemWidth(-FLT_MIN);
 				ImGui::DragInt("", &f1->value, 0.02f);
@@ -40,8 +40,8 @@ namespace tezcat::Editor
 		mShaderValueFunctionArray[(int32_t)UniformType::Float] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
 			{
 				auto f1 = (UniformF1*)uniform;
-				auto range = (RangeFloat*)config->range.get();
-				ImGui::Text(config->editorName.c_str());
+				auto range = (RangeFloat*)config->attributeEditor->range.get();
+				ImGui::Text(config->editorName.data());
 				ImGui::PushID(id);
 				ImGui::SetNextItemWidth(-FLT_MIN);
 				ImGui::DragFloat("", &f1->value, 0.02f, range->min, range->max);
@@ -53,16 +53,16 @@ namespace tezcat::Editor
 			{
 				auto f3 = (UniformF3*)uniform;
 
-				ImGui::Text(config->editorName.c_str());
+				ImGui::Text(config->editorName.data());
 				ImGui::PushID(id);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (config->constraint == ShaderMemberConstraint::Color)
+				if (config->attributeEditor->rangeType == RangeType::Color)
 				{
 					ImGui::ColorEdit3("", glm::value_ptr(f3->value));
 				}
 				else
 				{
-					auto range = (RangeFloat*)config->range.get();
+					auto range = (RangeFloat*)config->attributeEditor->range.get();
 					ImGui::DragFloat3("", glm::value_ptr(f3->value), 0.02f, range->min, range->max);
 				}
 
@@ -74,16 +74,16 @@ namespace tezcat::Editor
 			{
 				auto f4 = (UniformF4*)uniform;
 
-				ImGui::Text(config->editorName.c_str());
+				ImGui::Text(config->editorName.data());
 				ImGui::PushID(id);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (config->constraint == ShaderMemberConstraint::Color)
+				if (config->attributeEditor->rangeType == RangeType::Color)
 				{
 					ImGui::ColorEdit4("", glm::value_ptr(f4->value));
 				}
 				else
 				{
-					auto range = (RangeFloat*)config->range.get();
+					auto range = (RangeFloat*)config->attributeEditor->range.get();
 					ImGui::DragFloat4("", glm::value_ptr(f4->value), 0.02f, range->min, range->max);
 				}
 
@@ -94,7 +94,7 @@ namespace tezcat::Editor
 		mShaderValueFunctionArray[(int32_t)UniformType::Tex2D] = [](Uniform* uniform, UniformValueConfig* config, const int32_t& id)
 			{
 				auto tex = (UniformTex2D*)uniform;
-				ImGui::Text(config->editorName.c_str());
+				ImGui::Text(config->editorName.data());
 				if (tex->value)
 				{
 					ImGui::Image((ImTextureID)tex->value->getTextureID()
@@ -441,7 +441,7 @@ namespace tezcat::Editor
 						case ViewType::Perspective:
 						{
 							bool flag = false;
-							int fov = camera->getFOV();
+							int32_t fov = static_cast<int32_t>(camera->getFOV());
 							ImGui::TableNextRow();
 							ImGui::TableNextColumn();
 							ImGui::Text("Fov");

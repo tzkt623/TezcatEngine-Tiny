@@ -1,6 +1,6 @@
 ﻿#pragma once
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ namespace tezcat::Tiny::GL
 			, int32_t resolution) override;
 
 	public:
-		virtual void setUniformBuffer(UniformBuffer* uniformBuffer) override;
+		virtual void updateUniformBuffer(UniformBuffer* uniformBuffer) override;
 		virtual void setFrameBufferColorTexture2D(Texture2D* tex, int32_t index) override;
 		virtual void setFrameBufferColorTextureCube(TextureCube* tex, int32_t index, int32_t cubeFace) override;
 

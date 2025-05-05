@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -40,11 +40,11 @@ namespace tezcat::Editor
 	bool EditorContext::IsFocusOnGameView = false;
 	bool EditorContext::EditorSceneFoucsed = false;
 
-	float EditorContext::NormalLength = 0.1f;
+	float EditorContext::NormalLength = 1.0f;
 	bool EditorContext::IsShowNormal = false;
 	ReplacedPipelinePass* EditorContext::mShowNormalPass = nullptr;
 
-	float EditorContext::TangentLength = 0.1f;
+	float EditorContext::TangentLength = 1.0f;
 	bool EditorContext::IsShowTangents = false;
 	ReplacedPipelinePass* EditorContext::mShowTangentsPass = nullptr;
 
@@ -53,9 +53,11 @@ namespace tezcat::Editor
 	ReplacedPipelinePass* EditorContext::mShowMeshFramePass = nullptr;
 
 	ReplacedPipelinePass* EditorContext::mShowSelectedObjectPass = nullptr;
-	float EditorContext::SelectRectThickness = 0.1f;
+	float EditorContext::SelectRectThickness = 1.0f;
 
 	ReplacedPipelinePass* EditorContext::mShadowPass = nullptr;
+	Scene* EditorContext::mNewScene = nullptr;
+	bool EditorContext::mCloseScene = false;
 
 	void EditorContext::init()
 	{
@@ -241,6 +243,7 @@ namespace tezcat::Editor
 
 	void EditorContext::endFrame()
 	{
+		//删除所有需要删除的单位
 		if (!DeleteArray.empty())
 		{
 			for (auto go : DeleteArray)
@@ -251,6 +254,7 @@ namespace tezcat::Editor
 			DeleteArray.clear();
 		}
 
+		//查询场景可渲染对象
 		if (EditorContext::EditorSceneFoucsed && EditorContext::EditorCamera)
 		{
 			EditorContext::EditorCamera->getTransform()->update();
@@ -267,6 +271,19 @@ namespace tezcat::Editor
 		}
 
 		EditorContext::EditorSceneFoucsed = false;
+
+		if (mNewScene)
+		{
+			auto temp = std::exchange(mNewScene, nullptr);
+			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
+			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PushScene, temp });
+		}
+
+		if (mCloseScene)
+		{
+			mCloseScene = false;
+			EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
+		}
 	}
 
 	void EditorContext::beginFrame()
@@ -487,7 +504,7 @@ namespace tezcat::Editor
 			[](const EventData& data)
 			{
 				EditorTex2DColor->clearInGPU();
-				mShowSelectedObjectPass->removeFromPipeline();
+				//mShowSelectedObjectPass->removeFromPipeline();
 			});
 	}
 
@@ -611,4 +628,13 @@ namespace tezcat::Editor
 		mShowTangentsPass->saveObject();
 	}
 
+	void EditorContext::changeScene(Scene* scene)
+	{
+		mNewScene = scene;
+	}
+
+	void EditorContext::closeScene()
+	{
+		mCloseScene = true;
+	}
 }

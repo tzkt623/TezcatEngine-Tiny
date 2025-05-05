@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -36,10 +36,12 @@ namespace tezcat::Tiny
 
 	UniformID ShaderParam::TexDepth;
 	UniformID ShaderParam::TexShadow;
-	UniformID ShaderParam::TexSkybox;
-	UniformID ShaderParam::TexIrradiance;
-	UniformID ShaderParam::TexPrefilter;
-	UniformID ShaderParam::TexBRDFLUT;
+	UniformID ShaderParam::IBL::TexIrradiance;
+	UniformID ShaderParam::IBL::TexPrefilter;
+	UniformID ShaderParam::IBL::TexBRDFLUT;
+
+	UniformID ShaderParam::SkyBox::ViewIndex;
+	UniformID ShaderParam::SkyBox::TexCube;
 
 	UniformID ShaderParam::LightDirection::Direction;
 	UniformID ShaderParam::LightDirection::Ambient;
@@ -83,10 +85,12 @@ namespace tezcat::Tiny
 		//3
 		ShaderParam::TexDepth = "TINY_TexDepth";
 		ShaderParam::TexShadow = "TINY_TexShadow";
-		ShaderParam::TexSkybox = "TINY_TexSkybox";
-		ShaderParam::TexIrradiance = "TINY_TexIrradiance";
-		ShaderParam::TexPrefilter = "TINY_TexPrefilter";
-		ShaderParam::TexBRDFLUT = "TINY_TexBRDFLUT";
+		ShaderParam::IBL::TexIrradiance = "TINY_TexIrradiance";
+		ShaderParam::IBL::TexPrefilter = "TINY_TexPrefilter";
+		ShaderParam::IBL::TexBRDFLUT = "TINY_TexBRDFLUT";
+
+		ShaderParam::SkyBox::ViewIndex = "TINY_SkyBox_ViewIndex";
+		ShaderParam::SkyBox::TexCube = "TINY_SkyBox_TexCube";
 
 		//4
 		ShaderParam::LightDirection::Direction = "TINY_LitDir.direction";
@@ -103,5 +107,6 @@ namespace tezcat::Tiny
 
 		customIniter();
 	}
+
 
 }

@@ -11,8 +11,8 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Prepare;
-        str DepthTest = Off;
-        bool ZWrite = false;
+        str DepthTest = Less;
+        bool ZWrite = true;
         str CullFace = Front;
     }
     #TINY_CFG_END
@@ -35,7 +35,7 @@
     #TINY_FS_BEGIN
     {
         #include "../Include/tiny_fs.tyin"
-        #include "../Include/tiny_fs_pbr.tyin"
+        //#include "../Include/tiny_fs_pbr.tyin"
         
         in float3 myWorldPosition;
         out float4 myFinalColor;

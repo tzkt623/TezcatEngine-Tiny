@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ namespace tezcat::Editor
 				}
 
 				ImGui::Text("FOV");
-				int fov = EditorContext::EditorCamera->getFOV();
+				int32_t fov = static_cast<int32_t>(EditorContext::EditorCamera->getFOV());
 				if (ImGui::SliderInt("##fov", &fov, 1.0f, 180.0f))
 				{
 					EditorContext::EditorCamera->setFOV(fov);
@@ -391,8 +391,8 @@ namespace tezcat::Editor
 							{
 								int32_t pos[2]
 								{
-									mMousePos.x,
-									mMousePos.y
+									static_cast<int32_t>(mMousePos.x),
+									static_cast<int32_t>(mMousePos.y)
 								};
 								EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ReadObjectID, pos });
 							}
@@ -551,7 +551,7 @@ namespace tezcat::Editor
 		float speed = mCameraMoveSpeed * EngineContext::DeltaTime;
 		static double old_time = ImGui::GetTime();
 		double current_time = ImGui::GetTime();
-		float delta = current_time - old_time;
+		float delta = static_cast<float>(current_time - old_time);
 		old_time = current_time;
 
 		if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
@@ -594,7 +594,7 @@ namespace tezcat::Editor
 				transform->translate(position);
 			}
 		}
-		
+
 		if (ImGui::IsMouseDragging(ImGuiMouseButton_Right))
 		{
 			auto mouse_pos = ImGui::GetMousePos();

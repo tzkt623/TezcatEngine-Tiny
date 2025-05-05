@@ -1,5 +1,6 @@
 ﻿#include "EditorOverviewWindow.h"
 #include "../../EditorEvent.h"
+#include "../../EditorCamera.h"
 
 namespace tezcat::Editor
 {
@@ -105,6 +106,7 @@ namespace tezcat::Editor
 					EditorContext::SelectedGameObject = game_object;
 					EditorEvent::get()->dispatch({ EditorEventID::Window_ObjectSelected, game_object });
 					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_FocusObject, game_object });
+					EditorContext::EditorCamera->lookAt(EditorContext::SelectedGameObject->getTransform()->getWorldPosition());
 				}
 				else if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 				{

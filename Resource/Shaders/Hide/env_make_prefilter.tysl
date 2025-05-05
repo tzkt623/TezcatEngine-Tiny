@@ -76,7 +76,7 @@
                     float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.001f);
                     float mipLevel = TINY_SkyBox_Roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
                     
-                    prefilteredColor += textureLod(TINY_TexSkybox, L, mipLevel).rgb * NdotL;
+                    prefilteredColor += textureLod(TINY_SkyBox_TexCube, L, mipLevel).rgb * NdotL;
                     totalWeight += NdotL;
                 }
             }

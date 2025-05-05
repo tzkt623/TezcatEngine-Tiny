@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ namespace tezcat::Tiny
 		return nullptr;
 	}
 
-	std::tuple<bool, std::shared_ptr<UniformBufferLayout>> VertexBufferManager::createUniformBufferLayout(const std::string& name)
+	std::tuple<FlagCreate, std::shared_ptr<UniformBufferLayout>> VertexBufferManager::createUniformBufferLayout(const std::string& name)
 	{
 		auto result = mUniformBufferMap.try_emplace(name, nullptr);
 		if (result.second)
@@ -132,7 +132,7 @@ namespace tezcat::Tiny
 			result.first->second = std::make_shared<UniformBufferLayout>();
 		}
 
-		return { result.second, result.first->second };
+		return { result.second ? FlagCreate::Succeeded : FlagCreate::Existed, result.first->second };
 	}
 
 	std::shared_ptr<UniformBufferLayout> VertexBufferManager::getUniformBufferLayout(const std::string& name)

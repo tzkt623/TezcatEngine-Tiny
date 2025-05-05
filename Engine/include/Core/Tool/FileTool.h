@@ -1,6 +1,6 @@
 ﻿#pragma once
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -94,8 +94,8 @@ namespace tezcat::Tiny
 
 		static void loadFiles(const file_path& path, FileInfoMap& outFiles);
 
-		static std::string loadText(const std::string& path);
-		static void saveFile(const std::string& path, std::string& data);
+		static std::string loadText(const file_path& path);
+		static void saveFile(const file_path& path, std::string& data);
 
 		static void findAllFiles(const file_path& path, FileInfoMap& outFiles);
 

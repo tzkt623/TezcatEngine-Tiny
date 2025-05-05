@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ namespace tezcat::Tiny
 	TextureCube* LightingManager::sPrefilterMap = nullptr;
 	TextureCube* LightingManager::sIrradianceMap = nullptr;
 	TextureCube* LightingManager::sCurrentCubeMap = nullptr;
-	Texture2D* LightingManager::sCubeTextures[6] = { nullptr };
+	std::array<Texture2D*, 6> LightingManager::sCubeTextures{ nullptr };
 	Vertex* LightingManager::sSkyboxVertex = nullptr;
 	Vertex* LightingManager::sHDRVertex = nullptr;
 	LightData* LightingManager::sLightData = nullptr;
@@ -256,9 +256,9 @@ namespace tezcat::Tiny
 
 	void LightingManager::submitEnvLighting(Shader* shader)
 	{
-		Graphics::getInstance()->setGlobalTextureCube(shader, ShaderParam::TexIrradiance, sIrradianceMap);
-		Graphics::getInstance()->setGlobalTextureCube(shader, ShaderParam::TexPrefilter, sPrefilterMap);
-		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::TexBRDFLUT, sBRDFLUTMap);
+		Graphics::getInstance()->setGlobalTextureCube(shader, ShaderParam::IBL::TexIrradiance, sIrradianceMap);
+		Graphics::getInstance()->setGlobalTextureCube(shader, ShaderParam::IBL::TexPrefilter, sPrefilterMap);
+		Graphics::getInstance()->setGlobalTexture2D(shader, ShaderParam::IBL::TexBRDFLUT, sBRDFLUTMap);
 	}
 
 	void LightingManager::createHDR2Cube()
@@ -440,6 +440,7 @@ namespace tezcat::Tiny
 		sBRDFLUTPass->setUserSortingID(3);
 		sBRDFLUTPass->saveObject();
 	}
+
 	void LightingManager::showIrradianceMap()
 	{
 		sCurrentCubeMap = sIrradianceMap;
@@ -497,7 +498,6 @@ namespace tezcat::Tiny
 			{
 				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::MatrixP>();
 				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::MatrixV6>();
-				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::ViewIndex>();
 				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::Roughness>();
 				layout->pushLayoutWithConfig<UniformBufferBinding::SkyBox::Resolution>();
 			});
@@ -556,6 +556,13 @@ namespace tezcat::Tiny
 		}
 	}
 
+	void LightingManager::loadSkyboxHDR(const file_path& path)
+	{
+		auto img = ResourceManager::loadOnly<Image>(path);
+		setSkyBoxHDRTexture(img);
+		sEnableSkyBox = true;
+		sRefreshSkyBox = true;
+	}
 
 	TINY_OBJECT_CPP(LightData, TinyObject);
 	LightData::LightData()

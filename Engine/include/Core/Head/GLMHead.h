@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 /*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -185,6 +185,19 @@ namespace tezcat::Tiny
 			Rotation = glm::degrees(glm::eulerAngles(Orientation));
 
 			return true;
+		}
+
+		static void buildQuaternion(quaternion& rotationQ, float3 eulerAngle)
+		{
+			eulerAngle = glm::radians(eulerAngle);
+
+			float3 c = glm::cos(eulerAngle * float(0.5f));
+			float3 s = glm::sin(eulerAngle * float(0.5f));
+
+			rotationQ.w = c.x * c.y * c.z + s.x * s.y * s.z;
+			rotationQ.x = s.x * c.y * c.z - c.x * s.y * s.z;
+			rotationQ.y = c.x * s.y * c.z + s.x * c.y * s.z;
+			rotationQ.z = c.x * c.y * s.z - s.x * s.y * c.z;
 		}
 	};
 }

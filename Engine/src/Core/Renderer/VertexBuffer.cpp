@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 */
 
 #include "Core/Renderer/VertexBuffer.h"
-#include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/RenderCommand.h"
 #include "Core/Data/MeshData.h"
 #include "Core/Manager/VertexBufferManager.h"
@@ -104,7 +103,7 @@ namespace tezcat::Tiny
 
 	void VertexBuffer::onClose()
 	{
-		Graphics::getInstance()->addCommand<RenderCMD_DeleteVertexBuffer>(this);
+		RenderCommandHelper::addCommand<RenderCMD_DeleteVertexBuffer>(this);
 	}
 
 	//---------------------------------------------
@@ -125,7 +124,7 @@ namespace tezcat::Tiny
 
 	void IndexBuffer::onClose()
 	{
-		Graphics::getInstance()->addCommand<RenderCMD_DeleteIndexBuffer>(this);
+		RenderCommandHelper::addCommand<RenderCMD_DeleteIndexBuffer>(this);
 	}
 
 	TINY_OBJECT_CPP(UniformBuffer, IBuffer);
@@ -170,7 +169,7 @@ namespace tezcat::Tiny
 
 		if (mLayout->isValied())
 		{
-			Graphics::getInstance()->addCommand<RenderCMD_CreateUniformBuffer>(this, mLayout->mBindingIndex);
+			RenderCommandHelper::addCommand<RenderCMD_CreateUniformBuffer>(this, mLayout->mBindingIndex);
 		}
 	}
 
@@ -183,13 +182,13 @@ namespace tezcat::Tiny
 			{
 				mOnLayoutDataUpdated(this);
 			}
-			Graphics::getInstance()->addCommand<RenderCMD_CreateUniformBuffer>(this, mLayout->mBindingIndex);
+			RenderCommandHelper::addCommand<RenderCMD_CreateUniformBuffer>(this, mLayout->mBindingIndex);
 		}
 	}
 
 	void UniformBuffer::onClose()
 	{
-		Graphics::getInstance()->addCommand<RenderCMD_DeleteUniformBuffer>(this);
+		RenderCommandHelper::addCommand<RenderCMD_DeleteUniformBuffer>(this);
 		mLayout->removeHolder(this);
 	}
 }

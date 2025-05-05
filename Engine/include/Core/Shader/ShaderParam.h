@@ -2,7 +2,7 @@
 
 
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -58,10 +58,13 @@ namespace tezcat::Tiny
 
 		static UniformID TexDepth;
 		static UniformID TexShadow;
-		static UniformID TexSkybox;
-		static UniformID TexIrradiance;
-		static UniformID TexPrefilter;
-		static UniformID TexBRDFLUT;
+
+		struct IBL
+		{
+			static UniformID TexIrradiance;
+			static UniformID TexPrefilter;
+			static UniformID TexBRDFLUT;
+		};
 
 		struct LightDirection
 		{
@@ -74,12 +77,16 @@ namespace tezcat::Tiny
 		struct LightPoint
 		{
 			static UniformID Position;
-
 			static UniformID Ambient;
 			static UniformID Diffuse;
 			static UniformID Specular;
-
 			static UniformID Config;
+		};
+
+		struct SkyBox
+		{
+			static UniformID ViewIndex;
+			static UniformID TexCube;
 		};
 	};
 }

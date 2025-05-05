@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 */
 
 #include "Core/Renderer/Texture.h"
-#include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/RenderCommand.h"
 
 #include "Core/Manager/TextureManager.h"
@@ -127,7 +126,7 @@ namespace tezcat::Tiny
 
 	Texture2D::~Texture2D()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_DeleteTexture2D(this));
+		RenderCommandHelper::addCommand(new RenderCMD_DeleteTexture2D(this));
 	}
 
 	void Texture2D::setImage(const Image* image)
@@ -205,15 +204,16 @@ namespace tezcat::Tiny
 		if (mTextureID != 0)
 		{
 			//Graphics::getInstance()->cmdDeleteTexture2D(mTextureID);
-			Graphics::getInstance()->addCommand(new RenderCMD_DeleteTexture2D(this));
+			RenderCommandHelper::addCommand(new RenderCMD_DeleteTexture2D(this));
 		}
 
-		Graphics::getInstance()->addCommand(new RenderCMD_CreateTexture2D(this));
+		RenderCommandHelper::addCommand(new RenderCMD_CreateTexture2D(this));
 	}
 
 	void Texture2D::update()
 	{
-		Graphics::getInstance()->cmdUpdateTexture2D(this);
+		//Graphics::getInstance()->cmdUpdateTexture2D(this);
+		//RenderCommandHelper::addCommand<RenderCMD_UpdateTexture2D>();
 	}
 
 	void Texture2D::apply(uint32_t id)
@@ -225,7 +225,7 @@ namespace tezcat::Tiny
 
 	void Texture2D::clearInGPU()
 	{
-		Graphics::getInstance()->addCommand<RenderCMD_ClearTexture2D>(this);
+		RenderCommandHelper::addCommand<RenderCMD_ClearTexture2D>(this);
 	}
 
 	//--------------------------------------------------------
@@ -299,7 +299,7 @@ namespace tezcat::Tiny
 
 	TextureCube::~TextureCube()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_DeleteTextureCube(this));
+		RenderCommandHelper::addCommand(new RenderCMD_DeleteTextureCube(this));
 	}
 
 	void TextureCube::setImage(const std::array<Image*, 6>& images)
@@ -353,7 +353,7 @@ namespace tezcat::Tiny
 
 	void TextureCube::generate()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_CreateTextureCube(this));
+		RenderCommandHelper::addCommand(new RenderCMD_CreateTextureCube(this));
 	}
 
 	void TextureCube::apply(uint32_t id)
@@ -398,7 +398,7 @@ namespace tezcat::Tiny
 
 	TextureRender2D::~TextureRender2D()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_DeleteTextureRender2D(this));
+		RenderCommandHelper::addCommand(new RenderCMD_DeleteTextureRender2D(this));
 	}
 
 	void TextureRender2D::setConfig(const uint32_t& width, const uint32_t& height, const TextureInternalFormat& internalFormat)
@@ -410,6 +410,6 @@ namespace tezcat::Tiny
 
 	void TextureRender2D::generate()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_CreateTextureRender2D(this));
+		RenderCommandHelper::addCommand(new RenderCMD_CreateTextureRender2D(this));
 	}
 }

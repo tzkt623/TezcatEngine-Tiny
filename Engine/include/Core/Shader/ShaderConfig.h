@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,13 +21,11 @@
 
 namespace tezcat::Tiny
 {
-	struct ShaderUniformMember;
-
-	enum class TINY_API ShaderMemberConstraint : int8_t
+	enum class TINY_API RangeType : int8_t
 	{
 		Null = -1,
 		Color,
-		Range,
+		Number,
 		Count
 	};
 
@@ -38,14 +36,14 @@ namespace tezcat::Tiny
 			Float,
 			Int,
 			UInt,
-			Double
+			Double,
 		};
 
 		virtual Type getType() = 0;
 	};
 
 	template<typename T>
-	struct TINY_API RangeT : BaseRange
+	struct TINY_API RangeT : public BaseRange
 	{
 		T min;
 		T max;
@@ -76,79 +74,8 @@ namespace tezcat::Tiny
 		Type getType() final { return BaseRange::Type::UInt; }
 	};
 
-	struct TINY_API BaseShaderInfo
+	struct TINY_API GlobalSlotConfig
 	{
 
-	};
-
-	struct TINY_API ShaderMemberInfo : public BaseShaderInfo
-	{
-		//编辑器中的名称
-		std::string editorName;
-		//约束
-		ShaderMemberConstraint constraint;
-		//范围
-		std::shared_ptr<BaseRange> range;
-	};
-
-	struct TINY_API ShaderStructInfo : public BaseShaderInfo
-	{
-		//类类型名
-		std::string structName;
-		//类成员变量
-		std::vector<std::shared_ptr<ShaderUniformMember>> members;
-	};
-
-	struct TINY_API ShaderUniformMember
-	{
-		//值名称
-		std::string valueName;
-		//值类型
-		UniformType valueType;
-		//值数量
-		int valueCount;
-
-		std::shared_ptr<BaseShaderInfo> info;
-
-		ShaderUniformMember()
-			: valueCount(0)
-			, valueType(UniformType::Error)
-		{
-
-		}
-
-		~ShaderUniformMember()
-		{
-
-		}
-
-		template<typename Info>
-		auto createInfo(const UniformType& uType)
-		{
-			info.reset(new Info());
-			this->valueType = uType;
-			return (Info*)info.get();
-		}
-
-		template<typename Info>
-		auto getInfo()
-		{
-			return (Info*)info.get();
-		}
-	};
-
-
-	struct TINY_API UniformValueConfig
-	{
-		//index in class Shader
-		int32_t index;
-		std::string name;
-		UniformType type;
-		//id in Graphic shader
-		int32_t valueID;
-		ShaderMemberConstraint constraint;
-		std::string editorName;
-
-		std::shared_ptr<BaseRange> range;
 	};
 }

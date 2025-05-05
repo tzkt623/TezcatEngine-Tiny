@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ namespace tezcat::Tiny
 	*
 	*/
 
-	using TinyString = IDString<TinyRefObject>;
+	using TinyIDString = IDString<TinyRefObject>;
 
 	class TINY_API TinyRefObject
 	{
@@ -79,7 +79,7 @@ namespace tezcat::Tiny
 
 		virtual std::string getMemoryInfo() { return this->getClassName(); }
 
-		TinyString getEngineName() { return mEngineName; }
+		TinyIDString getEngineName() { return mEngineName; }
 		void setEngineName(const std::string& name) { mEngineName = name; }
 
 
@@ -131,7 +131,7 @@ namespace tezcat::Tiny
 		}
 
 	protected:
-		TinyString mEngineName;
+		TinyIDString mEngineName;
 	};
 
 	//-----------------------------------------------------
@@ -515,14 +515,20 @@ namespace tezcat::Tiny
 // 	};
 
 	template<class Current, class Parent>
-	struct BaseChecker
+	concept BPRule = std::is_convertible_v<Current*, Parent*>;
+
+	template<class Current, class Parent>
+	requires BPRule<Current, Parent>
+	struct GetParentClassType
 	{
-		using Base = typename std::enable_if_t<std::is_convertible_v<Current*, Parent*>, Parent>;
+		using type = Parent;
 	};
+
 #define TINY_TEMPLATE_NAME(x) x
 
 #define TINY_ABSTRACT_OBJECT_H(currentClass, parentClass)\
-private:\
+public:\
+		/*using Base = GetParentClassType<currentClass, parentClass>::type;*/\
 		using Base = parentClass;\
 public:\
 		constexpr static const std::string& staticGetClassName() { return __TINY__RTTI__453.__className; }\
@@ -561,7 +567,7 @@ visit:\
 		#currentClass,\
 		typeid(currentClass),\
 		TinyRefObject::giveID()\
-	};
+	}
 
 #define	TINY_OBJECT_CPP_TEMPLATE(currentClass, parentClass, ...) TINY_OBJECT_CPP(currentClass, parentClass<__VA_ARGS__>)
 

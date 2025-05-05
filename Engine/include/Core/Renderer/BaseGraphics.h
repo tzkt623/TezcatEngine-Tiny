@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ namespace tezcat::Tiny
 			, int32_t resolution) {}
 
 	public:
-		virtual void setUniformBuffer(UniformBuffer* uniformBuffer) {}
+		virtual void updateUniformBuffer(UniformBuffer* uniformBuffer) {}
 		virtual void setFrameBufferColorTexture2D(Texture2D* tex, int32_t index) {}
 		virtual void setFrameBufferColorTextureCube(TextureCube* tex, int32_t index, int32_t cubeFace) {}
 
@@ -284,18 +284,9 @@ namespace tezcat::Tiny
 		virtual void draw(const DrawMode& mode, Vertex* vertex) = 0;
 		virtual void drawLine(const float3& begin, const float3& end, const float3& color = float3(0.0f, 1.0f, 0.0f));
 
-	public:
-		void addCommand(RenderCommadBuild* cmd);
-
-		template<class CMD, typename... Args>
-		void addCommand(Args&&... args)
-		{
-			mBuildCommandList.push_back(new CMD(TINY_FWD(args)...));
-		}
-
 	private:
 		std::vector<RenderCommadBuild*> mBuildCommandList;
-		std::queue<RenderCommadBuild*> mBuildCommandQueue;
+		//std::queue<RenderCommadBuild*> mBuildCommandQueue;
 		std::stack<FrameBuffer*> mFrameBufferStack;
 
 	protected:

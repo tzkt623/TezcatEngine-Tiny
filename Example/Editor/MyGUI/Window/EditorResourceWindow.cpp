@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ namespace tezcat::Editor
 		auto tex = ResourceManager::loadOnly<Texture2D>(filePath);
 		tex->saveObject();
 		mIconAry.push_back(tex);
-		return mIconAry.size() - 1;
+		return static_cast<uint32_t>(mIconAry.size() - 1);
 	}
 
 	bool EditorResourceWindow::begin()
@@ -92,18 +92,18 @@ namespace tezcat::Editor
 
 	void EditorResourceWindow::drawFolder()
 	{
-		static int space = 32;
-		static int path_button_width = 64;
+		static int32_t space = 32;
+		static int32_t path_button_width = 64;
 
 		float item_space = mFileItemSize + space;
 		float window_length = ImGui::GetWindowSize().x;
-		int item_count = window_length / item_space;
+		int32_t item_count = static_cast<int32_t>(window_length / item_space);
 		if (item_count < 1)
 		{
 			item_count = 1;
 		}
 
-		int path_button_length = 0;
+		int32_t path_button_length = 0;
 		std::filesystem::path temp = mCurrentPath;
 		while (temp.has_parent_path())
 		{
@@ -112,16 +112,16 @@ namespace tezcat::Editor
 			temp = temp.parent_path();
 		}
 
-		int path_length = window_length - 120;
+		int32_t path_length = window_length - 120;
 		if (path_length < 0)
 		{
 			path_length = 0;
 		}
 
-		int path_count = path_length / path_button_width;
+		int32_t path_count = path_length / path_button_width;
 		if (path_count >= mPathAry.size())
 		{
-			for (int i = mPathAry.size() - 1; i >= 0; i--)
+			for (int32_t i = mPathAry.size() - 1; i >= 0; i--)
 			{
 				if (ImGui::Button(mPathAry[i].filename().string().c_str(), ImVec2(path_button_width, 0)))
 				{
@@ -132,7 +132,7 @@ namespace tezcat::Editor
 		}
 		else
 		{
-			for (int i = mPathAry.size() - 1; i >= path_count; i--)
+			for (int32_t i = mPathAry.size() - 1; i >= path_count; i--)
 			{
 				if (ImGui::Button(mPathAry[i].filename().string().c_str(), ImVec2(path_button_width, 0)))
 				{

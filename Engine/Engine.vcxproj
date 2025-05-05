@@ -169,6 +169,9 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Shader\ShaderReflection.cpp" />
+    <ClCompile Include="src\Core\Base\TinyString.cpp" />
+    <ClCompile Include="src\Core\Manager\GlobalSlotManager.cpp" />
     <ClCompile Include="src\Core\EngineContext.cpp" />
     <ClCompile Include="src\Core\Manager\ObserverManager.cpp" />
     <ClCompile Include="src\Core\Manager\PipelineManager.cpp" />
@@ -222,6 +225,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClCompile Include="src\Core\Scene.cpp" />
     <ClCompile Include="src\Core\Manager\SceneManager.cpp" />
     <ClCompile Include="src\Core\Shader\Shader.cpp" />
+    <ClCompile Include="src\Core\Shader\ShaderParserRule.cpp" />
     <ClCompile Include="src\Core\Shader\Uniform.cpp" />
     <ClCompile Include="src\Core\Tool\Collision\BoundingBox.cpp" />
     <ClCompile Include="src\Core\Tool\Collision\OBB.cpp" />
@@ -272,6 +276,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Component\Camera.h" />
     <ClInclude Include="include\Core\Component\FlyController.h" />
     <ClInclude Include="include\Core\Head\ConfigHead.h" />
+    <ClInclude Include="include\Core\Manager\GlobalSlotManager.h" />
     <ClInclude Include="include\Core\Renderer\PipelineWorker.h" />
     <ClInclude Include="include\Core\Renderer\RenderConfig.h" />
     <ClInclude Include="include\Core\LightLayer.h" />
@@ -298,6 +303,8 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Renderer\VertexConfig.h" />
     <ClInclude Include="include\Core\Shader\ShaderConfig.h" />
     <ClInclude Include="include\Core\Shader\ShaderParser.h" />
+    <ClInclude Include="include\Core\Shader\ShaderParserRule.h" />
+    <ClInclude Include="include\Core\Shader\ShaderReflection.h" />
     <ClInclude Include="include\Core\Shader\Uniform.h" />
     <ClInclude Include="include\Core\Tool\Collision\BoundingBox.h" />
     <ClInclude Include="include\Core\Tool\Collision\OBB.h" />
@@ -312,6 +319,7 @@ copy "$(TargetDir)$(ProjectName).lib" "$(SolutionDir)build\libs-$(Configuration)
     <ClInclude Include="include\Core\Tool\Octree\OctreeAgentList.h" />
     <ClInclude Include="include\Core\Tool\Octree\OctreeConfig.h" />
     <ClInclude Include="include\Core\Tool\Octree\OctreeNode.h" />
+    <ClInclude Include="include\Core\Base\TinyString.h" />
     <ClInclude Include="include\Platform\OpenGL\GLFunction.h" />
     <ClInclude Include="include\Platform\OpenGL\GLHead.h" />
     <ClInclude Include="include\Core\Head\GLMHead.h" />

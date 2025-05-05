@@ -46,7 +46,7 @@
         in float3 myWorldPos;
         out float4 myFinalColor;
 
-        [Editor(Color, Color)]
+        @[Editor(Name(Color), Color())]
         uniform float4 myColor;
 
         void main()

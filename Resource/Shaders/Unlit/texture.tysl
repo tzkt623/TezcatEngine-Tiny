@@ -11,9 +11,8 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
-        str DepthTest = Less;
+        str DepthTest = LessEqual;
         bool ZWrite = true;
-        str DepthTest = Less;
         str CullFace = Off;
     }
     #TINY_CFG_END
@@ -41,7 +40,7 @@
 
         in float2 myUV;
         out float4 myFinalColor;
-        [Editor(ColorTexture)]
+        @[Editor(Name(ColorTexture))]
         uniform tex2D myTexColor2D;
 
         void main()

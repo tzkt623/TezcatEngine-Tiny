@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2025 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ namespace tezcat::Editor
 				}
 				else if (ImGui::MenuItem("关闭当前场景(Close Current Scene)"))
 				{
-					EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
+					EditorContext::closeScene();
 				}
 
 				ImGui::Separator();
@@ -273,8 +273,7 @@ namespace tezcat::Editor
 				{
 					if (ImGui::MenuItem(scene->getName().data()))
 					{
-						EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PopScene });
-						EngineEvent::getInstance()->dispatch({ EngineEventID::EE_PushScene, scene });
+						EditorContext::changeScene(scene);
 					}
 				}
 

@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -52,8 +52,10 @@ namespace tezcat::Tiny
 			, [this](const EventData& data)
 			{
 				int* pos = (int*)data.userData;
-				this->addCommand<RenderCMD_ReadObjectID>(pos[0], pos[1], FrameBufferManager::find("FB_ObjectID"));
+				RenderCommandHelper::addCommand<RenderCMD_ReadObjectID>(pos[0], pos[1], FrameBufferManager::find("FB_ObjectID"));
 			});
+
+		RenderCommandHelper::setBuildCMDList(&mBuildCommandList);
 	}
 
 	BaseGraphics::~BaseGraphics()
@@ -94,22 +96,6 @@ namespace tezcat::Tiny
 	void BaseGraphics::drawLine(const float3& begin, const float3& end, const float3& color)
 	{
 
-	}
-
-	void BaseGraphics::addCommand(RenderCommadBuild* cmd)
-	{
-		mBuildCommandList.push_back(cmd);
-		//cmd->execute(nullptr);
-
-
-// 		if (Engine::sMultiThread)
-// 		{
-// 			mBuildCommandList.push_back(cmd);
-// 		}
-// 		else
-// 		{
-// 			cmd->execute(nullptr);
-// 		}
 	}
 
 	void BaseGraphics::setPolygonMode(PolygonMode mode)

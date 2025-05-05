@@ -143,6 +143,10 @@
     <ClCompile Include="src\Core\Renderer\PipelineWorker.cpp" />
     <ClCompile Include="src\Core\EngineContext.cpp" />
     <ClCompile Include="ThirdParty\ImageLoad\miniz.c" />
+    <ClCompile Include="src\Core\Manager\GlobalSlotManager.cpp" />
+    <ClCompile Include="src\Core\Shader\ShaderParserRule.cpp" />
+    <ClCompile Include="src\Core\Base\TinyString.cpp" />
+    <ClCompile Include="src\Core\Shader\ShaderReflection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1345,6 +1349,10 @@
     <ClInclude Include="include\Core\EngineContext.h" />
     <ClInclude Include="ThirdParty\ImageLoad\tinyexr.h" />
     <ClInclude Include="ThirdParty\ImageLoad\miniz.h" />
+    <ClInclude Include="include\Core\Manager\GlobalSlotManager.h" />
+    <ClInclude Include="include\Core\Shader\ShaderParserRule.h" />
+    <ClInclude Include="include\Core\Base\TinyString.h" />
+    <ClInclude Include="include\Core\Shader\ShaderReflection.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThirdParty\glm\detail\func_common.inl">

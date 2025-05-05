@@ -109,8 +109,8 @@ namespace tezcat::Editor
 			};
 
 
-		auto cube_array = LightingManager::getCubeMapTextureArray();
-		if (cube_array)
+		auto& cube_array = LightingManager::getCubeMapTextureArray();
+		if (cube_array[0] != nullptr)
 		{
 			ImVec2 size(128, 128);
 			//X

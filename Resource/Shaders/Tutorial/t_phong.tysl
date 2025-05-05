@@ -46,10 +46,10 @@
         in float3 myWorldPos;
         out float4 myFinalColor;
 
-        [Editor(Color, Color)]
+        @[Editor(Name(Color), Color())]
         uniform float4 myColor;
 
-        [Editor(Shininess)]
+        @[Editor(Name(Shininess))]
         uniform int myShininess = 32;
 
         void main()
@@ -73,6 +73,7 @@
     #TINY_FS_END
 }
 #TINY_PASS_END
+
 
 
 

@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ namespace tezcat::Tiny
 		, mFrameBuffer(nullptr)
 		, mNearFace(0.1f)
 		, mFarFace(100.0f)
-		, mFOV(60.0f)
+		, mFOV(70.0f)
 		, mProjectionMatrix(1.0f)
 		, mViewType(ViewType::Screen)
 		, mSortingID(0)
@@ -244,8 +244,8 @@ namespace tezcat::Tiny
 	{
 		if (mUniformBuffer)
 		{
-			Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
 			Graphics::getInstance()->bind(mUniformBuffer);
+			Graphics::getInstance()->updateUniformBuffer(mUniformBuffer);
 		}
 	}
 
@@ -272,7 +272,7 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void RenderObserver::lookAt(Transform* transform)
+	void RenderObserver::lookAt(const float3& worldPosition)
 	{
 		//auto dir = transform->getWorldPosition() - this->getTransform()->getWorldPosition();
 		//dir = glm::normalize(dir);
@@ -282,6 +282,11 @@ namespace tezcat::Tiny
 		//mViewMatrix = glm::lookAt(mTransform->getWorldPosition()
 		//	, transform->getWorldPosition()
 		//	, mTransform->getUp());
+
+		//得到当前要看的位置
+		//mTransform->setWorldPosition(worldPosition - mTransform->getForward() * 10.0f);
+
+		//mViewMatrix = glm::lookAt(worldPosition, worldPosition + this->getf)
 	}
 
 #pragma endregion
@@ -315,7 +320,7 @@ namespace tezcat::Tiny
 		//Graphics::getInstance()->setFloat2(shader, ShaderParam::CameraNearFar, float2(mNearFace, mFarFace));
 		if (mUniformBuffer)
 		{
-			Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
+			Graphics::getInstance()->updateUniformBuffer(mUniformBuffer);
 			Graphics::getInstance()->bind(mUniformBuffer);
 		}
 	}
@@ -341,7 +346,7 @@ namespace tezcat::Tiny
 			{
 				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::MatrixP>();			//P
 				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::MatrixV>();			//V
-				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::MatrixVP>();		//VP
+				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::MatrixVP>();			//VP
 				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::WorldPosition>();	//Position
 				layout->pushLayoutWithConfig<UniformBufferBinding::Camera::NearFar>();			//NearFar
 			});
@@ -371,7 +376,7 @@ namespace tezcat::Tiny
 
 	void ShadowObserver::submit(Shader* shader)
 	{
-		Graphics::getInstance()->setUniformBuffer(mUniformBuffer);
+		Graphics::getInstance()->updateUniformBuffer(mUniformBuffer);
 		Graphics::getInstance()->bind(mUniformBuffer);
 	}
 }

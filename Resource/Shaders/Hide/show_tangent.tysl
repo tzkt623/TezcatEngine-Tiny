@@ -35,7 +35,7 @@
         {
             vs_out.tangent = normalize(TINY_MatrixM * float4(tiny_layout_Tangent, 0.0f)).xyz;
             vs_out.bitangent = normalize(TINY_MatrixM * float4(tiny_layout_BiTangent, 0.0f)).xyz;
-            gl_Position = TINY_MatrixM * float4(tiny_layout_Position, 1.0);
+            gl_Position = TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
         }
     }
     #TINY_VS_END
@@ -45,7 +45,7 @@
         #include "../Include/tiny_vs.tyin"
 
         layout (triangles) in;
-        layout (line_strip, max_vertices = 12) out; // 每个三角形生成3条法线
+        layout (line_strip, max_vertices = 12) out;
 
         in VS_OUT
         {
@@ -55,18 +55,14 @@
 
         out float4 myColor;
 
-        [Editor(NormalLength)]
-        uniform float myTangentLength; // 法线显示长度
+        //@[Editor(TangentLength)]
+        uniform float myTangentLength;
 
         void drawNormalLine(int index)
         {
-            // 原始顶点位置（世界空间）
             float4 begin = TINY_MatrixVP * gl_in[index].gl_Position;
-            
-            // 计算线段终点
             float4 end = TINY_MatrixVP * (gl_in[index].gl_Position + float4(gs_in[index].tangent * myTangentLength, 0.0f));
             
-            // 应用变换矩阵
             gl_Position = begin;
             EmitVertex();
             gl_Position = end;
@@ -74,10 +70,8 @@
             myColor = float4(0.0f, 0.0f, 1.0f, 1.0f);
             EndPrimitive();
             
-            // 计算线段终点
             end = TINY_MatrixVP * (gl_in[index].gl_Position + float4(gs_in[index].bitangent * myTangentLength, 0.0f));
             
-            // 应用变换矩阵
             gl_Position = begin;
             EmitVertex();
             gl_Position = end;

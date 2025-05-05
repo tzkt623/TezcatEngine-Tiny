@@ -11,7 +11,7 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Opaque;
-        str DepthTest = Less;
+        str DepthTest = LessEqual;
         bool ZWrite = true;
         str CullFace = Back;
         str LightMode = Forward;
@@ -72,18 +72,18 @@
         
         out float4 myFinalColor;
 
-        [Editor(Diffuse)]
+        @[Editor(Name(Diffuse))]
         uniform float3 myDiffuse;
-        [Editor(Specular)]
+        @[Editor(Name(Specular))]
         uniform float3 mySpecular;
-        [Editor(Shininess)]
+        @[Editor(Name(Shininess))]
         uniform float myShininess;
 
         float4 reflection(float3 I)
         {
             //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
             float3 R = reflect(I, normalize(myNormal));
-            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
+            return float4(texture(TINY_SkyBox_TexCube, R).rgb, 1.0);
         }
 
         float4 refraction(float3 I)
@@ -91,7 +91,7 @@
             float ratio = 1.00 / 1.52;
             //float3 I = normalize(myWorldPosition - TINY_CameraWorldPosition);
             float3 R = refract(I, normalize(myNormal), ratio);
-            return float4(texture(TINY_TexSkybox, R).rgb, 1.0);
+            return float4(texture(TINY_SkyBox_TexCube, R).rgb, 1.0);
         }
 
         float3 calcDirectionLight(LightDirection lit, float3 viewDir, float3 normal)

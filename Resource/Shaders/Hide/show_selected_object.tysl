@@ -9,13 +9,13 @@
     #TINY_CFG_BEGIN
     {
         int Version = 330;
-        int OrderID = -1;
+        int OrderID = 1;
         str Queue = Background;
         //bool Blend = true;
         //str BlendSrc = SrcA;
         //str BlendTar = 1-SrcA;
-        str DepthTest = Always;
-        bool ZWrite = false;
+        str DepthTest = LessEqual;
+        bool ZWrite = true;
         str CullFace = Back;
     }
     #TINY_CFG_END
@@ -32,17 +32,21 @@
             float3 normal;
         } vs_out;
 
+        uniform float myThickness;
+
         void main()
         {
-            gl_Position = TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
-            vs_out.normal = normalize(TINY_MatrixN * tiny_layout_Normal);
-
+            float3 normal = normalize(TINY_MatrixN * tiny_layout_Normal);
+            float4 pos = TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
+            pos.xyz += normal * myThickness;
+            gl_Position = TINY_MatrixVP * pos;
             //gl_Position = TINY_MatrixVP * TINY_MatrixM * float4(tiny_layout_Position, 1.0f);
             //vs_out.normal = normalize(TINY_MatrixVP * float4(TINY_MatrixN * tiny_layout_Normal, 1.0f)).xyz;
         }
     }
     #TINY_VS_END
 
+/*
     #TINY_GS_BEGIN
     {
         #include "../Include/tiny_vs.tyin"
@@ -79,7 +83,7 @@
         }
     }
     #TINY_GS_END
-
+*/
     #TINY_FS_BEGIN
     {
         #include "../Include/tiny_config.tyin"

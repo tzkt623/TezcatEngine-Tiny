@@ -48,20 +48,15 @@
             float3 normal;
         } gs_in[];
 
-        [Editor(NormalLength)]
+        //@[Editor(NormalLength)]
         uniform float myNormalLength; // 法线显示长度
-
-        const float MAGNITUDE = 0.1;
 
         void drawNormalLine(int index)
         {
-            // 原始顶点位置（世界空间）
             float4 begin = TINY_MatrixVP * gl_in[index].gl_Position;
             
-            // 计算线段终点
             float4 end = TINY_MatrixVP * (gl_in[index].gl_Position + float4(gs_in[index].normal * myNormalLength, 0.0f));
             
-            // 应用变换矩阵
             gl_Position = begin;
             EmitVertex();
             gl_Position = end;

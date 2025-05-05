@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -40,6 +40,12 @@
 
 namespace tezcat::Tiny
 {
+	std::vector<RenderCommadBuild*>* RenderCommandHelper::BuildCMDList;
+	void RenderCommandHelper::setBuildCMDList(std::vector<RenderCommadBuild*>* cmdList)
+	{
+		BuildCMDList = cmdList;
+	}
+
 	RenderCommand::RenderCommand()
 	{
 
@@ -302,7 +308,7 @@ namespace tezcat::Tiny
 	{
 		TINY_PIPELINE_INFO_PUSH("SkyBox");
 
-		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, mSkybox);
+		Graphics::getInstance()->setTextureCube(shader, ShaderParam::SkyBox::TexCube, mSkybox);
 		Graphics::getInstance()->setFloat1(shader, "myLod", mLod);
 		Graphics::getInstance()->setBool(shader, "myIsHDR", mIsHdr);
 		Graphics::getInstance()->setFloat1(shader, "myExposure", mExposure);
@@ -654,5 +660,8 @@ namespace tezcat::Tiny
 
 		TINY_PIPELINE_INFO_POP();
 	}
+
+
+
 
 }

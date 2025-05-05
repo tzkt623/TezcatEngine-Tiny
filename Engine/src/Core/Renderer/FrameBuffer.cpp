@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 #include "Core/Renderer/FrameBuffer.h"
 #include "Core/Renderer/Texture.h"
-#include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/Pipeline.h"
 #include "Core/Renderer/RenderCommand.h"
 
@@ -26,7 +25,7 @@
 
 namespace tezcat::Tiny
 {
-	TINY_OBJECT_CPP(FrameBuffer, TinyObject)
+	TINY_OBJECT_CPP(FrameBuffer, TinyObject);
 
 	FrameBuffer::FrameBuffer()
 		: mBufferID(0)
@@ -55,7 +54,7 @@ namespace tezcat::Tiny
 
 	void FrameBuffer::generate()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_CreateFrameBuffer(this));
+		RenderCommandHelper::addCommand(new RenderCMD_CreateFrameBuffer(this));
 	}
 
 	void FrameBuffer::addAttachment(Texture* tex)
@@ -71,7 +70,7 @@ namespace tezcat::Tiny
 
 	void FrameBuffer::onClose()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_DeleteFrameBuffer(this));
+		RenderCommandHelper::addCommand(new RenderCMD_DeleteFrameBuffer(this));
 
 		for (auto tex : mComponents)
 		{

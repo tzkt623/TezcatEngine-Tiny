@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -70,7 +70,6 @@ namespace tezcat::Tiny::GL
 			, std::string(EngineContext::Name.begin(), EngineContext::Name.end()).c_str(), nullptr, nullptr);
 		if (mWindow == nullptr)
 		{
-			//std::cout << "Failed to create GLFW window" << std::endl;
 			TINY_LOG_ERROR("Failed to create GLFW window");
 			glfwTerminate();
 			return;
@@ -78,16 +77,17 @@ namespace tezcat::Tiny::GL
 
 		glfwMakeContextCurrent(mWindow);
 		glfwSwapInterval(EngineContext::EnableVsync ? 1 : 0);
+
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
 			TINY_LOG_ERROR("Failed to initialize GLAD");
-			TINY_THROW_LOGIC("Failed to initialize GLAD");
+			glfwTerminate();
+			return;
 		}
 
 		GLint max;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
-		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		TINY_LOG_ENGINE(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
+		TINY_LOG_ENGINE(std::format("GL_MAX_UNIFORM_LOCATIONS: {}", max));
 
 		auto get_default_color_buffer = [&](GLint id)
 			{
@@ -140,7 +140,7 @@ namespace tezcat::Tiny::GL
 
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &max);
 		//std::cout << "GL_MAX_UNIFORM_LOCATIONS: " << max << std::endl;
-		TINY_LOG_ENGINE(StringTool::stringFormat("GL_MAX_UNIFORM_LOCATIONS: %d", max));
+		TINY_LOG_ENGINE(std::format("GL_MAX_UNIFORM_LOCATIONS: {}", max));
 
 		glGetIntegerv(GL_DRAW_BUFFER, &max);
 		get_default_color_buffer(max);
@@ -656,8 +656,9 @@ namespace tezcat::Tiny::GL
 		auto uniform_config = shader->getUserUniformValueConfig("myTexHDR2D");
 		this->setTexture2D(shader, uniform_config->valueID, texHDR);
 
-		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
-		Texture2D** array = LightingManager::getCubeMapTextureArray();
+
+		//UniformBuffer* uniform_buffer = observer->getUniformBuffer();
+		auto& array = LightingManager::getCubeMapTextureArray();
 
 		//auto id1 = glGetUniformBlockIndex(shader->getProgramID(), "SkyboxUBO");
 		//GLint index1;
@@ -672,8 +673,10 @@ namespace tezcat::Tiny::GL
 
 		for (uint32_t i = 0; i < 6; i++)
 		{
-			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
-			this->setUniformBuffer(uniform_buffer);
+			//uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
+			//this->setUniformBuffer(uniform_buffer);
+
+			this->setInt1(shader, ShaderParam::SkyBox::ViewIndex, i);
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 				 , GL_COLOR_ATTACHMENT0
@@ -728,16 +731,17 @@ namespace tezcat::Tiny::GL
 		this->setViewport(ViewportInfo(0, 0, viewSize[0], viewSize[1]));
 
 		shader->resetLocalState();
-		this->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
-		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
+		this->setTextureCube(shader, ShaderParam::SkyBox::TexCube, skybox);
+		//UniformBuffer* uniform_buffer = observer->getUniformBuffer();
 		//TINY_GL_CHECK(glBindBufferBase(GL_UNIFORM_BUFFER
 		//	, uniform_buffer->getLayout()->mBindingIndex
 		//	, uniform_buffer->getBufferID()));
 
 		for (uint32_t i = 0; i < 6; i++)
 		{
-			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
-			this->setUniformBuffer(uniform_buffer);
+			//uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
+			//this->setUniformBuffer(uniform_buffer);
+			this->setInt1(shader, ShaderParam::SkyBox::ViewIndex, i);
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER
 								 , GL_COLOR_ATTACHMENT0
@@ -762,8 +766,9 @@ namespace tezcat::Tiny::GL
 		, int32_t resolution)
 	{
 		shader->resetLocalState();
-		this->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
+		this->setTextureCube(shader, ShaderParam::SkyBox::TexCube, skybox);
 		UniformBuffer* uniform_buffer = observer->getUniformBuffer();
+		uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::Resolution>(&resolution);
 
 		//TINY_GL_CHECK(glBindBufferBase(GL_UNIFORM_BUFFER
 		//	, uniform_buffer->getLayout()->mBindingIndex
@@ -778,12 +783,13 @@ namespace tezcat::Tiny::GL
 			float roughness = (float)mip / (float)(mipMaxLevel - 1);
 
 			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::Roughness>(&roughness);
-			uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::Resolution>(&resolution);
+			this->updateUniformBuffer(uniform_buffer);
 
 			for (uint32_t i = 0; i < 6; ++i)
 			{
-				uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
-				this->setUniformBuffer(uniform_buffer);
+				//uniform_buffer->updateWithConfig<UniformBufferBinding::SkyBox::ViewIndex>(&i);
+				//this->setUniformBuffer(uniform_buffer);
+				this->setInt1(shader, ShaderParam::SkyBox::ViewIndex, i);
 
 				glFramebufferTexture2D(GL_FRAMEBUFFER
 									 , GL_COLOR_ATTACHMENT0
@@ -1227,7 +1233,7 @@ namespace tezcat::Tiny::GL
 		TINY_GL_CHECK(glUniformMatrix4fv(valueID, count, GL_FALSE, glm::value_ptr(data[0])));
 	}
 
-	void GLGraphics::setUniformBuffer(UniformBuffer* uniformBuffer)
+	void GLGraphics::updateUniformBuffer(UniformBuffer* uniformBuffer)
 	{
 		TINY_GL_CHECK(glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer->getBufferID()));
 		TINY_GL_CHECK(glBufferSubData(GL_UNIFORM_BUFFER, 0, uniformBuffer->getDataSize(), uniformBuffer->getData()));
@@ -1283,5 +1289,4 @@ namespace tezcat::Tiny::GL
 	{
 		TINY_GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK, mSavePolygonMode));
 	}
-
 }

@@ -11,7 +11,7 @@
         int Version = 330;
         int OrderID = 0;
         str Queue = Transparent;
-        str DepthTest = Less;
+        str DepthTest = LessEqual;
         bool ZWrite = false;
         str CullFace = Off;
         bool Blend = true;
@@ -44,7 +44,7 @@
         in float2 myUV;
         out float4 myFinalColor;
 
-        [Editor(ColorTexture)]
+        @[Editor(Name(ColorTexture))]
         uniform tex2D myTexColor2D;
 
         void main()

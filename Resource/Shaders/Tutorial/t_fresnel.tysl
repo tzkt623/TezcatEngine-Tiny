@@ -47,10 +47,10 @@
         in float3 myWorldPos;
         out float4 myFinalColor;
 
-        [Editor(Fresnel, Color)]
+        @[Editor(Name(Fresnel), Color())]
         uniform float3 myFresnel;
 
-        [Editor(Switcher)]
+        @[Editor(Name(Switcher))]
         uniform int mySwitcher;
 
         void main()

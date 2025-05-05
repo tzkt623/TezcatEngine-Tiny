@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 #include "Core/Renderer/Vertex.h"
 #include "Core/Renderer/VertexBuffer.h"
-#include "Core/Renderer/BaseGraphics.h"
 #include "Core/Renderer/RenderCommand.h"
 
 #include "Core/Data/MeshData.h"
@@ -96,12 +95,12 @@ namespace tezcat::Tiny
 
 	void Vertex::generate()
 	{
-		Graphics::getInstance()->addCommand(new RenderCMD_CreateVertex(this));
+		RenderCommandHelper::addCommand(new RenderCMD_CreateVertex(this));
 	}
 
 	void Vertex::onClose()
 	{
-		Graphics::getInstance()->addCommand<RenderCMD_DeleteVertex>(this);
+		RenderCommandHelper::addCommand<RenderCMD_DeleteVertex>(this);
 
 		for (auto buffer : mVertexBuffers)
 		{

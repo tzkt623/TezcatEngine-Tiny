@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -373,35 +373,38 @@ namespace tezcat::Tiny::GL
 			return;
 		}
 
-		std::function<void(ShaderUniformMember*, const std::string&)> progress_tiny =
-			[&progress_tiny, &pid, &shader](ShaderUniformMember* memberData, const std::string& parentName)
+		std::function<void(ShaderMetaDataArgument*, const std::string&)> progress_tiny =
+			[&progress_tiny, &pid, &shader](ShaderMetaDataArgument* argument, const std::string& parentName)
 			{
-				auto& name = memberData->valueName;
-				auto array_size = memberData->valueCount;
+				auto& name = argument->name;
+				auto& array_size = argument->arrayCount;
 				auto is_root = parentName.empty();
 
 				//如果是类,需要拼接名称
-				if (memberData->valueType == UniformType::Struct)
+				if (argument->valueType == UniformType::Struct)
 				{
-					auto& members = memberData->getInfo<ShaderStructInfo>()->members;
+					//auto& members = argument->getInfo<ShaderStructInfo>()->members;
+
+					auto _struct = (ShaderMetaDataStruct*)argument;
+					auto& members = _struct->getMembers();
 
 					if (array_size > 0)
 					{
-						for (int32_t i = 0; i < array_size; i++)
+						for (uint32_t i = 0; i < array_size; i++)
 						{
-							for (auto& m : members)
+							for (auto& member : members)
 							{
 								std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
-								progress_tiny(m.get(), true_name);
+								progress_tiny(member.get(), true_name);
 							}
 						}
 					}
 					else
 					{
-						for (auto& m : members)
+						for (auto& member : members)
 						{
 							std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
-							progress_tiny(m.get(), true_name);
+							progress_tiny(member.get(), true_name);
 						}
 					}
 				}
@@ -409,69 +412,52 @@ namespace tezcat::Tiny::GL
 				{
 					if (array_size > 0)
 					{
-						for (int32_t i = 0; i < array_size; i++)
+						for (uint32_t i = 0; i < array_size; i++)
 						{
 							std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
 							shader->setTinyUniform(true_name, glGetUniformLocation(pid, true_name.c_str()));
-
-							//auto uid = UniformID::staticGetUID(true_name);
-							//if (uid < shader->getTinyUniformCount())
-							//{
-							//}
-							//else
-							//{
-							//	TINY_LOG_ERROR(std::format("Tiny Shader`s buildin value name[{}] write error!!!", true_name));
-							//}
 						}
 					}
 					else
 					{
 						std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
 						shader->setTinyUniform(true_name, glGetUniformLocation(pid, true_name.c_str()));
-
-
-						//auto uid = UniformID::staticGetUID(true_name);
-						//if (uid < shader->getTinyUniformCount())
-						//{
-						//	shader->setTinyUniform(memberData, true_name, uid, glGetUniformLocation(pid, true_name.c_str()));
-						//}
-						//else
-						//{
-						//	TINY_LOG_ERROR(std::format("Tiny Shader`s buildin value name[{}] write error!!!", true_name));
-						//}
 					}
 				}
 			};
 
-		std::function<void(ShaderUniformMember*, const std::string&)> progress_user =
-			[&progress_user, &pid, &shader](ShaderUniformMember* memberData, const std::string& parentName)
+		std::function<void(ShaderMetaDataArgument*, const std::string&)> progress_user =
+			[&progress_user, &pid, &shader](ShaderMetaDataArgument* argument, const std::string& parentName)
 			{
-				auto& name = memberData->valueName;
-				auto array_size = memberData->valueCount;
+				auto& name = argument->name;
+				auto& array_size = argument->arrayCount;
 				auto is_root = parentName.empty();
 
 				//如果是类,需要拼接名称
-				if (memberData->valueType == UniformType::Struct)
+				if (argument->valueType == UniformType::Struct)
 				{
-					auto& members = memberData->getInfo<ShaderStructInfo>()->members;
+					//auto& members = argument->getInfo<ShaderStructInfo>()->members;
+
+					auto _struct = (ShaderMetaDataStruct*)argument;
+					auto& members = _struct->getMembers();
 
 					if (array_size > 0)
 					{
-						for (int32_t i = 0; i < array_size; i++)
+						for (uint32_t i = 0; i < array_size; i++)
 						{
-							for (auto& m : members)
+							for (auto& member : members)
 							{
 								std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
-								progress_user(m.get(), true_name);
+								progress_user(member.get(), true_name);
 							}
 						}
 					}
 					else
 					{
-						for (auto& m : members)
+						for (auto& member : members)
 						{
 							std::string true_name = is_root ? name : std::format("{}.{}", parentName, name);
-							progress_user(m.get(), true_name);
+							progress_user(member.get(), true_name);
 						}
 					}
 				}
@@ -479,7 +465,7 @@ namespace tezcat::Tiny::GL
 				{
 					if (array_size > 0)
 					{
-						for (int32_t i = 0; i < array_size; i++)
+						for (uint32_t i = 0; i < array_size; i++)
 						{
 							std::string true_name = is_root ? std::format("{}[{}]", name, i) : std::format("{}.{}[{}]", parentName, name, i);
 							shader->setUserUniform(true_name, glGetUniformLocation(pid, true_name.c_str()));
@@ -506,9 +492,8 @@ namespace tezcat::Tiny::GL
 		//把shader连接到UBO槽上
 		for (auto& pair : parser->mUBOMap)
 		{
-			auto info = VertexBufferManager::getUniformBufferLayout(pair.first);
-
-			TINY_GL_CHECK_RETURN(glGetUniformBlockIndex(pid, pair.first.c_str()), ubID);
+			auto [flag, info] = VertexBufferManager::createUniformBufferLayout(pair.first.data());
+			TINY_GL_CHECK_RETURN(glGetUniformBlockIndex(pid, pair.first.data()), ubID);
 			TINY_GL_CHECK(glUniformBlockBinding(pid, ubID, info->mBindingIndex));
 
 			if (!info->isGPUChecked())
@@ -517,7 +502,7 @@ namespace tezcat::Tiny::GL
 				TINY_GL_CHECK(glGetActiveUniformBlockiv(pid, ubID, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size));
 				TINY_LOG_ENGINE(std::format("{}{}", pair.first, block_size));
 				info->mSize = block_size;
-				
+
 				for (auto& slot : info->mSlot)
 				{
 					uint32_t index;
@@ -745,7 +730,7 @@ namespace tezcat::Tiny::GL
 		, TextureCube* irradiance) const
 	{
 		shader->resetLocalState();
-		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
+		Graphics::getInstance()->setTextureCube(shader, ShaderParam::SkyBox::TexCube, skybox);
 
 		for (uint32_t i = 0; i < 6; i++)
 		{
@@ -774,7 +759,7 @@ namespace tezcat::Tiny::GL
 		, int32_t resolution) const
 	{
 		shader->resetLocalState();
-		Graphics::getInstance()->setTextureCube(shader, ShaderParam::TexSkybox, skybox);
+		Graphics::getInstance()->setTextureCube(shader, ShaderParam::SkyBox::TexCube, skybox);
 
 		for (uint32_t mip = 0; mip < mipMaxLevel; ++mip)
 		{

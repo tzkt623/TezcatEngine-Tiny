@@ -2,7 +2,7 @@
 
 
 /*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,23 +18,16 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "../Head/CppHead.h"
-#include "ShaderConfig.h"
+#include "../Head/TinyCpp.h"
+//#include "ShaderConfig.h"
 #include "ShaderParam.h"
+#include "ShaderReflection.h"
 
 namespace tezcat::Tiny
 {
 	class Shader;
 	class ShaderParser
 	{
-	private:
-		//移除约束条件
-		std::regex regex_remove_constraint;
-		//移除注释
-		std::regex regex_comment;
-		//结束位置
-		std::sregex_iterator end;
-
 	public:
 		ShaderParser();
 
@@ -47,16 +40,21 @@ namespace tezcat::Tiny
 		void parseShaders(std::string& content, std::string& rootPath);
 
 	private:
-		bool parseShader(std::string& content, std::string& rootPath, const char* regex, std::string& outContent);
+		bool parseShader(std::string& content, std::string& rootPath, const std::regex& regex, std::string& outContent);
 		void removeComment(std::string& content);
 		void splitInclude(std::string& content, const std::string& rootPath);
 		void splitUniformBuffer(std::string& content);
 		void splitStruct(std::string& content);
 		void writeShaderHead(std::string& content);
 
+		void parseAttribute(const std::string& attributeMatch, ShaderMetaDataMember* member);
+		void parseUniformValue(std::string& content);
+		void parseInclude(std::string& include_content, std::unordered_set<uint64_t>& check_includes, std::vector<file_path>& all_includes, const file_path& rootPath);
+		void parseEditorAttribute(const std::ssub_match& attributeMatch, ShaderMetaDataMember* member);
+
 	public:
 		static bool splitValue(std::string& content, std::unordered_map<std::string, Any>& map);
-		static bool splitConfig(const std::string& content, std::string& config, std::string& suffix, const char* regex);
+		static bool splitConfig(const std::string& content, std::string& config, std::string& suffix, const std::regex& regex);
 		static void splitPasses(std::string& content, std::vector<std::string>& passArray);
 		static std::string getName(const std::string& textToSave);
 
@@ -67,14 +65,17 @@ namespace tezcat::Tiny
 		UniformID::USet mUniformSet;
 		std::unordered_set<std::string> mUserSet;
 
-		std::unordered_map<std::string_view, std::shared_ptr<ShaderUniformMember>> mTinyUMap;
-		std::unordered_map<std::string_view, std::shared_ptr<ShaderUniformMember>> mUserUMap;
-		std::unordered_map<std::string_view, std::shared_ptr<ShaderUniformMember>> mStructUMap;
+		std::unordered_map<std::string_view, std::unique_ptr<ShaderMetaDataArgument>> mTinyUMap;
+		std::unordered_map<std::string_view, std::unique_ptr<ShaderMetaDataArgument>> mUserUMap;
+		std::unordered_map<std::string_view, std::unique_ptr<ShaderMetaDataStruct>> mStructUMap;
+		std::unordered_map<std::string_view, std::unique_ptr<ShaderMetaDataLayoutStruct>> mUBOMap;
+
+		std::vector<ShaderMetaDataArgument*> mGlobalUniform;
 
 		std::string mVertexShader;
 		std::string mFragShader;
 		std::string mGeometryShader;
 
-		std::unordered_map<std::string, int32_t> mUBOMap;
+		//std::unordered_map<std::string, int32_t> mUBOMap;
 	};
 }

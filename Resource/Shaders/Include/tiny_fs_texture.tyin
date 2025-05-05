@@ -1,6 +1,7 @@
 uniform tex2D TINY_TexDepth;
 uniform tex2D TINY_TexShadow;
-uniform texCube TINY_TexSkybox;
+@[Register(GlobalSlot(0))]
+uniform texCube TINY_SkyBox_TexCube;
 uniform texCube TINY_TexIrradiance;
 uniform texCube TINY_TexPrefilter;
 uniform tex2D TINY_TexBRDFLUT;

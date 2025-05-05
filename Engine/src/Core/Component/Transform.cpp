@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (C) 2024 Tezcat(特兹卡特) tzkt623@qq.com
+	Copyright (C) 2022 - 2025 Tezcat(特兹卡特) tzkt623@qq.com
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -44,6 +44,11 @@ namespace tezcat::Tiny
 		, mLocalPosition(0.0f)
 		, mLocalRotation(0.0f)
 		, mLocalScale(1.0f)
+		, mLocalRotationQ()
+		, mWorldPosition(0.0f)
+		, mWorldRotation(0.0f)
+		, mWorldScale(0.0f)
+		, mWorldRotationQ()
 		, mModelMatrix(1.0f)
 		, mParent(parent)
 		, mIndex(0)
@@ -86,11 +91,6 @@ namespace tezcat::Tiny
 		//如果已经在运行了
 		if (is_running)
 		{
-			//得到在世界空间中的数据
-// 			float3 world_position = this->getWorldPosition();
-// 			float3 world_rotation = this->getWorldRotation();
-// 			float3 world_scale = this->getWorldScale();
-
 			//如果父节点不为空
 			if (mParent != nullptr)
 			{
@@ -117,31 +117,6 @@ namespace tezcat::Tiny
 			}
 
 			this->decomposeTransform();
-#if 0
-			//如果变到根节点上,直接使用世界坐标系
-			if (mParent == nullptr)
-			{
-				mLocalPosition = world_position;
-				mLocalRotation = world_rotation;
-				mLocalScale = world_scale;
-
-				mIndex = 0;
-				SceneManager::getCurrentScene()->addTransform(this);
-			}
-			//如果没有变到根节点上,使用当前父节点的矩阵得到本地坐标
-			else
-			{
-				mIndex = mParent->mIndex + 1;
-				mParent->addChild(this);
-
-				mParent->inverseTransform(world_position, world_rotation, world_scale, mLocalPosition, mLocalRotation, mLocalScale);
-
-				// 				mParent->inverseTransformPoint(world_position, mLocalPosition);
-				// 				mParent->inverseTransformVector(world_rotation, mLocalRotation);
-				// 				mParent->inverseTransformVector(world_scale, mLocalScale);
-
-			}
-#endif
 		}
 		//如果是新节点准备加入
 		else
@@ -276,7 +251,9 @@ namespace tezcat::Tiny
 
 	void Transform::updateMatrix(Transform* self)
 	{
-		mLocalRotationQ = quaternion(glm::radians(float3(mLocalRotation)));
+		//mLocalRotationQ = quaternion(glm::radians(float3(mLocalRotation)));
+
+		GLMHelper::buildQuaternion(mLocalRotationQ, mLocalRotation);
 
 		if (mParent != nullptr)
 		{
@@ -345,27 +322,27 @@ namespace tezcat::Tiny
 		}
 	}
 
-	void Transform::transformPoint(const float3& local, float3& world)
+	void Transform::transformPoint(const float3& local, float3& world) const
 	{
 		world = mWorldScale * local;
 		world = mWorldRotationQ * world;
 		world += mWorldPosition;
 	}
 
-	void Transform::transformVector(const float3& local, float3& world)
+	void Transform::transformVector(const float3& local, float3& world) const
 	{
 		//world = mModelMatrix * float4(local, 0.0f);
 		world = mWorldRotationQ * local;
 		world = world * mWorldScale;
 	}
 
-	void Transform::transformRotation(const float3& local, float3& world)
+	void Transform::transformRotation(const float3& local, float3& world) const
 	{
 		world = glm::eulerAngles(quaternion(glm::radians(local)) * mWorldRotationQ);
 		world = glm::degrees(world);
 	}
 
-	void Transform::transformDirection(const float3& local, float3& world)
+	void Transform::transformDirection(const float3& local, float3& world) const
 	{
 		//float3x3 temp_mat;
 		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
@@ -373,12 +350,12 @@ namespace tezcat::Tiny
 		world = mWorldRotationQ * local;
 	}
 
-	void Transform::transformScale(const float3& local, float3& world)
+	void Transform::transformScale(const float3& local, float3& world) const
 	{
 		world = mWorldScale * local;
 	}
 
-	void Transform::inverseTransformPoint(const float3& world, float3& local)
+	void Transform::inverseTransformPoint(const float3& world, float3& local) const
 	{
 		//local = glm::inverse(mModelMatrix) * float4(world, 1.0f);
 
@@ -387,7 +364,7 @@ namespace tezcat::Tiny
 		local = local / mWorldScale;
 	}
 
-	void Transform::inverseTransformVector(const float3& world, float3& local)
+	void Transform::inverseTransformVector(const float3& world, float3& local) const
 	{
 		//local = glm::inverse(mModelMatrix) * float4(world, 0.0f);
 
@@ -395,13 +372,13 @@ namespace tezcat::Tiny
 		local = local / mWorldScale;
 	}
 
-	void Transform::inverseTransformRotation(const float3& world, float3& local)
+	void Transform::inverseTransformRotation(const float3& world, float3& local) const
 	{
 		local = glm::eulerAngles(quaternion(glm::radians(world)) * glm::inverse(mWorldRotationQ));
 		local = glm::degrees(local);
 	}
 
-	void Transform::inverseTransformDirection(const float3& world, float3& local)
+	void Transform::inverseTransformDirection(const float3& world, float3& local) const
 	{
 		//float3x3 temp_mat;
 		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);
@@ -410,12 +387,12 @@ namespace tezcat::Tiny
 		local = glm::inverse(mWorldRotationQ) * world;
 	}
 
-	void Transform::inverseTransformScale(const float3& world, float3& local)
+	void Transform::inverseTransformScale(const float3& world, float3& local) const
 	{
 		local = world / mWorldScale;
 	}
 
-	float3 Transform::getWorldRotation()
+	float3 Transform::getWorldRotation() const
 	{
 		//float3x3 temp_mat;
 		//this->calculatePureLocalToWorldRotationMatrix(temp_mat);

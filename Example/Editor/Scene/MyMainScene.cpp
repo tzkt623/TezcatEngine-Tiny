@@ -1,6 +1,6 @@
 ﻿#include "MyMainScene.h"
 #include "../EditorInputer.h"
-#include "../MyController.h"
+//#include "../MyController.h"
 
 using namespace tezcat::Editor;
 
@@ -16,8 +16,7 @@ MyMainScene::MyMainScene(const std::string& name)
 void MyMainScene::onEnter()
 {
 	Base::onEnter();
-	LightingManager::enableSkyBox();
-
+	LightingManager::loadSkyboxHDR("Resource/Image/SkyboxHDR/newport_loft.hdr");
 	InputSys::getInstance()->push(EditorInputer::getInstance());
 
 	if (true)
@@ -46,10 +45,6 @@ void MyMainScene::onEnter()
 	this->createPBR();
 	this->createModel();
 	this->createCubes0();
-
-	auto img = ResourceManager::loadOnly<Image>("Resource/Image/SkyboxHDR/newport_loft.hdr");
-	EngineEvent::getInstance()->dispatch({ EngineEventID::EE_ChangeEnvImage, img });
-
 
 	quaternion rotation1(glm::radians(float3(30.0f, 0.0f, 0.0f)));
 	quaternion rotation2(glm::radians(float3(60.0f, 0.0f, 0.0f)));
