@@ -47,23 +47,9 @@
 - [ ] PBR Shader some issues now
 - [ ] ShaderEditor has some issues now
 - [ ] Disabled multithreading mode for now
+- [ ] Memory Viewer has a read null object issue
 
 -------------------------------------------
-
-```glsl
-struct MatPBR_Test
-{
-    //Type(EditorName, Range)
-    [Editor(Albedo, Color)]
-    float3 albedo;
-    [Editor(Metallic, Range(0, 1))]
-    float metallic;
-    [Editor(Roughness, Range(0, 1))]
-    float roughness;
-    [Editor(AO,Range(0, 1))]
-    float ao;
-};
-```
 
 ## To Do
 
@@ -737,6 +723,36 @@ bool ZWrite = false;
 |    TINY_LAYOUT_UV    | layout (location = 2) in float2 |    tiny_layout_UV    |
 |  TINY_LAYOUT_COLOR   | layout (location = 3) in float4 |  tiny_layout_Color   |
 
+### ***Atrribute***
+
+Format```@[AttributeType(Arg1(), Arg2(),.....)]```
+
+```glsl
+//EditorView
+struct TinyPBR_Test
+{
+    @[Editor(Name(Albedo), Color())]
+    float3 albedo;
+    @[Editor(Name(Metallic), Range(0, 1))]
+    float metallic;
+    @[Editor(Name(Roughness), Range(0, 1))]
+    float roughness;
+    @[Editor(Name(AO), Range(0, 1))]
+    float ao;
+};
+
+//UBO Index
+@[Binding(0)]
+layout(std140) uniform CameraUBO
+{
+    float4x4 TINY_MatrixP;
+    float4x4 TINY_MatrixV;
+    float4x4 TINY_MatrixVP;
+    float3 TINY_CameraWorldPosition;
+    float2 TINY_CameraNearFar;
+};
+```
+
 ### **DefaultValue**
 
 The[`int Version`] should be setted.The other params You can set as your wish.
@@ -752,7 +768,6 @@ The[`int Version`] should be setted.The other params You can set as your wish.
 {
     #TINY_CFG_BEGIN
     {
-        str Name = Standard/Std1;
         int Version = 330;
         int OrderID = 50;
         str Queue = Opaque;

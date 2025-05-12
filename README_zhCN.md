@@ -47,23 +47,9 @@
 - [ ] PBR效果被我改坏了
 - [ ] Shader编辑器有点问题
 - [ ] 暂时取消多线程模式
+- [ ] 内存查看器有空对象读取bug
 
 -------------------------------------------
-
-```glsl
-struct MatPBR_Test
-{
-    //Type(EditorName, Range)
-    [Editor(Albedo, Color)]
-    float3 albedo;
-    [Editor(Metallic, Range(0, 1))]
-    float metallic;
-    [Editor(Roughness, Range(0, 1))]
-    float roughness;
-    [Editor(AO,Range(0, 1))]
-    float ao;
-};
-```
 
 ## To Do
 
@@ -738,6 +724,36 @@ bool ZWrite = false;
 |  TINY_LAYOUT_NORMAL  | layout (location = 1) in float3 |  tiny_layout_Normal  |
 |    TINY_LAYOUT_UV    | layout (location = 2) in float2 |    tiny_layout_UV    |
 |  TINY_LAYOUT_COLOR   | layout (location = 3) in float4 |  tiny_layout_Color   |
+
+### ***参数属性***
+
+格式```@[AttributeType(Arg1(), Arg2(),.....)]```
+
+```glsl
+//EditorView
+struct TinyPBR_Test
+{
+    @[Editor(Name(Albedo), Color())]
+    float3 albedo;
+    @[Editor(Name(Metallic), Range(0, 1))]
+    float metallic;
+    @[Editor(Name(Roughness), Range(0, 1))]
+    float roughness;
+    @[Editor(Name(AO), Range(0, 1))]
+    float ao;
+};
+
+//UBO Index
+@[Binding(0)]
+layout(std140) uniform CameraUBO
+{
+    float4x4 TINY_MatrixP;
+    float4x4 TINY_MatrixV;
+    float4x4 TINY_MatrixVP;
+    float3 TINY_CameraWorldPosition;
+    float2 TINY_CameraNearFar;
+};
+```
 
 ### **默认值**
 
